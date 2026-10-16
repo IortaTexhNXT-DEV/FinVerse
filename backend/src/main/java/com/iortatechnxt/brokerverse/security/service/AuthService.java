@@ -14,8 +14,10 @@ import java.util.Optional;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Password sign-in with lockout, and the sign-out.
@@ -42,6 +44,9 @@ public class AuthService {
 
   private static final String ENTITY = "AppUser";
 
+  /** A user name no account can have (user names hold no space). */
+  private static final String NO_USER = "no such user";
+
   private final DirectoryAuthenticators authenticators;
   private final AppUserRepository users;
   private final JwtTokenService tokens;
@@ -52,6 +57,8 @@ public class AuthService {
   private final SignInCompletion completion;
   private final LocalPasswordSignIn localSignIn;
   private final SecurityStoreAlarm alarm;
+  private final TransactionTemplate readTx;
+  private final TransactionTemplate writeTx;
 
   /**
    * Creates the service.
@@ -66,6 +73,7 @@ public class AuthService {
    * @param completion second factor and session
    * @param localSignIn whether local passwords may be used in this deployment
    * @param alarm reports an unreachable denylist at sign-out
+   * @param transactions transaction manager (the checks before and the outcome after the password)
    */
   @SuppressWarnings("java:S107") // collaborators of the sign-in
   public AuthService(
@@ -78,7 +86,8 @@ public class AuthService {
       UserSessionLog sessions,
       SignInCompletion completion,
       LocalPasswordSignIn localSignIn,
-      SecurityStoreAlarm alarm) {
+      SecurityStoreAlarm alarm,
+      PlatformTransactionManager transactions) {
     this.authenticators = authenticators;
     this.users = users;
     this.tokens = tokens;
@@ -89,46 +98,79 @@ public class AuthService {
     this.completion = completion;
     this.localSignIn = localSignIn;
     this.alarm = alarm;
+    this.readTx = new TransactionTemplate(transactions);
+    this.readTx.setReadOnly(true);
+    this.readTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    this.writeTx = new TransactionTemplate(transactions);
+    this.writeTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
   }
 
   /**
    * Checks a password and continues the sign-in (second factor or session).
    *
-   * @param username user name (LOCAL, break-glass) or Windows ID (DIRECTORY)
+   * @param username user name (LOCAL) or Windows ID (DIRECTORY)
    * @param password password
    * @return the answer: the session, or the second factor asked for
    */
-  @Transactional(
-      propagation = Propagation.REQUIRES_NEW,
-      noRollbackFor = AuthenticationException.class)
   public SignInResult login(String username, String password) {
     return login(username, password, null);
   }
 
   /**
-   * Checks a password and continues the sign-in (second factor or session).
+   * Checks a password and continues the sign-in (second factor or session). The password is checked
+   * outside any transaction: the hash takes a few hundred milliseconds of processor and must not
+   * hold a database connection, or a burst of sign-ins empties the pool for every other request.
+   * The user is checked before in a short read, and the outcome (the session, or the failure
+   * counted towards the lockout) is written after in a transaction of its own that a refusal does
+   * not roll back.
    *
-   * @param username user name (LOCAL, break-glass) or Windows ID (DIRECTORY)
+   * @param username user name (LOCAL) or Windows ID (DIRECTORY)
    * @param password password
    * @param deviceToken token of a device remembered for the second factor, may be null
    * @return the answer: the session, or the second factor asked for
    */
-  @Transactional(
-      propagation = Propagation.REQUIRES_NEW,
-      noRollbackFor = AuthenticationException.class)
   public SignInResult login(String username, String password, String deviceToken) {
-    AuthMode mode = completion.mode();
-    AppUser user = passwordUser(mode, username);
-    AuthMode checkedBy = mode == AuthMode.DIRECTORY ? AuthMode.DIRECTORY : AuthMode.LOCAL;
+    Checked checked = check(username);
+    AuthMode checkedBy = checked.mode() == AuthMode.DIRECTORY ? AuthMode.DIRECTORY : AuthMode.LOCAL;
     DirectoryResult result =
         authenticators.authenticate(
             checkedBy,
-            checkedBy == AuthMode.LOCAL ? user.getUsername() : username,
+            checkedBy == AuthMode.LOCAL ? checked.username() : username,
             password == null ? new char[0] : password.toCharArray());
-    if (!result.succeeded()) {
-      refuse(user, username, mode, result);
+    Object outcome = writeTx.execute(s -> outcome(checked.mode(), username, result, deviceToken));
+    if (outcome instanceof AuthenticationException refused) {
+      throw refused;
     }
-    return completion.afterFirstFactor(user, SignInMethod.PASSWORD, deviceToken);
+    return (SignInResult) outcome;
+  }
+
+  /** The user before the password, in a short read; an unknown user costs a password check too. */
+  private Checked check(String username) {
+    try {
+      return readTx.execute(
+          s -> {
+            AuthMode mode = completion.mode();
+            return new Checked(mode, passwordUser(mode, username).getUsername());
+          });
+    } catch (AuthenticationException ex) {
+      // An unknown, locked or deactivated user takes as long as a wrong password: no timing clue.
+      authenticators.authenticate(AuthMode.LOCAL, NO_USER, new char[] {' '});
+      throw ex;
+    }
+  }
+
+  /** The session, or the refusal counted towards the lockout (returned so that it is committed). */
+  private Object outcome(
+      AuthMode mode, String username, DirectoryResult result, String deviceToken) {
+    try {
+      AppUser user = passwordUser(mode, username);
+      if (!result.succeeded()) {
+        refuse(user, username, mode, result);
+      }
+      return completion.afterFirstFactor(user, SignInMethod.PASSWORD, deviceToken);
+    } catch (AuthenticationException ex) {
+      return ex;
+    }
   }
 
   /**
@@ -236,4 +278,7 @@ public class AuthService {
   private static String suffix(AuthMode mode) {
     return mode == AuthMode.DIRECTORY ? " (directory sign-in)" : "";
   }
+
+  /** The sign-in mode and the user found before the password is checked. */
+  private record Checked(AuthMode mode, String username) {}
 }

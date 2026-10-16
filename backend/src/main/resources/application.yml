@@ -39,6 +39,9 @@ spring:
           time_zone: UTC
           batch_size: 50
         order_inserts: true
+        # Lazy and eager collections of a list are loaded for up to 100 owners in one query (the
+        # roles of the users, the permissions of the roles), not one query per owner.
+        default_batch_fetch_size: 100
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -261,6 +264,8 @@ brokerverse:
   # Largest JSON request body (JsonBodyLimitFilter, 413 above); file uploads have their own limits.
   http:
     max-json-body-size: ${BROKERVERSE_MAX_JSON_BODY_SIZE:2MB}
+    # Largest page of a list (PageSizeLimitFilter: a larger "size" parameter is answered with 400).
+    max-page-size: ${BROKERVERSE_MAX_PAGE_SIZE:500}
   # ---- Document storage (build step ST0), docs/architecture/DOCUMENT_STORAGE_DECISION.md ----
   storage:
     # s3 (every shared environment; the local store is refused in production) or local (file system).

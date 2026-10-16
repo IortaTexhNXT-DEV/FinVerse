@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -156,16 +157,22 @@ public class ScimProvisioningController {
   }
 
   /**
-   * The accounts with their group profiles (certification extract).
+   * The accounts with their group profiles (certification extract), a page at a time.
    *
+   * @param startIndex first account, from 1
+   * @param count accounts of the page, at most 200
    * @return SCIM ListResponse
    */
   @GetMapping("/Users")
-  public ResponseEntity<JsonNode> users() {
+  public ResponseEntity<JsonNode> users(
+      @RequestParam(defaultValue = "1") int startIndex,
+      @RequestParam(defaultValue = "" + ScimAnswers.MAX_COUNT) int count) {
     List<IdentityExtract.Account> accounts = extract.accounts();
-    ObjectNode list = answers.listResponse(accounts.size());
+    ScimAnswers.Page page = new ScimAnswers.Page(startIndex, count);
+    List<IdentityExtract.Account> shown = page.of(accounts);
+    ObjectNode list = answers.listResponse(accounts.size(), page, shown.size());
     ArrayNode resources = list.putArray(RESOURCES);
-    accounts.forEach(a -> resources.add(ScimUsers.write(json, a.account(), a.groupProfiles())));
+    shown.forEach(a -> resources.add(ScimUsers.write(json, a.account(), a.groupProfiles())));
     return ResponseEntity.ok().contentType(ScimAnswers.SCIM).body(list);
   }
 

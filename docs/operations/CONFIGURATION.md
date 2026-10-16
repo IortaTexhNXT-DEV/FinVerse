@@ -412,7 +412,8 @@ must also be UTF-8 (`FILE_TEXT_ENCODING`, with a hint to save as "CSV UTF-8") an
 **Request size.** `BROKERVERSE_MAX_JSON_BODY_SIZE` (`brokerverse.http.max-json-body-size`, default `2MB`) limits a
 JSON request body: a larger declared length is answered with 413 before security and the controllers run, and a
 body without a length stops being read at the limit (413, `REQUEST_TOO_LARGE`). File uploads keep the multipart
-limits above.
+limits above. `BROKERVERSE_MAX_PAGE_SIZE` (`brokerverse.http.max-page-size`, default `500`) is the largest page of a
+list: a `size` parameter above it (or not a whole number) on `/api/**` is answered with 400 (`PAGE_SIZE_TOO_LARGE`).
 
 **Log forging.** Line breaks in log messages (CR, LF, NEL, Unicode line separators) are replaced by `_` by the
 message converter of `logback-spring.xml` (`%m`, `%msg`, `%message`), so the protection holds for any

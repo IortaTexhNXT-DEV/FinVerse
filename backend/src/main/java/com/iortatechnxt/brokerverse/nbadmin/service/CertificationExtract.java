@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +48,8 @@ public class CertificationExtract {
 
   /** Frontend route of the extract. */
   public static final String SCREEN = "/access/reports";
+
+  private static final int ROW_WINDOW = 500;
 
   private static final String ENTITY = "CertificationExtract";
 
@@ -242,7 +244,8 @@ public class CertificationExtract {
   }
 
   private static byte[] xlsx(List<List<String>> rows) {
-    try (XSSFWorkbook wb = new XSSFWorkbook();
+    // Streamed: the extract has a row per user, profile and permission (tens of thousands).
+    try (SXSSFWorkbook wb = new SXSSFWorkbook(ROW_WINDOW);
         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       Sheet sheet = wb.createSheet("Certification");
       write(sheet.createRow(0), HEADER);

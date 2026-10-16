@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.identity.domain.IdentityEventType;
 import com.iortatechnxt.brokerverse.identity.service.GroupProfileChecks;
 import com.iortatechnxt.brokerverse.identity.service.IdentityExtract;
 import com.iortatechnxt.brokerverse.identity.service.ScimUsers;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 class ScimAnswers {
+
+  /** Largest page of a list, and the page when none is asked. */
+  static final int MAX_COUNT = 200;
 
   /** Media type of the interface. */
   static final MediaType SCIM = MediaType.valueOf("application/scim+json");
@@ -49,14 +53,41 @@ class ScimAnswers {
         .body(ScimUsers.error(json, status.value(), scimType, detail));
   }
 
-  /** The start of a SCIM ListResponse. */
-  ObjectNode listResponse(int total) {
+  /**
+   * The start of a SCIM ListResponse.
+   *
+   * @param total items of the whole list
+   * @param page the page asked
+   * @param items items in this answer
+   * @return the response without its resources
+   */
+  ObjectNode listResponse(int total, Page page, int items) {
     ObjectNode list = json.createObjectNode();
     list.putArray("schemas").add(ScimUsers.LIST);
     list.put("totalResults", total);
-    list.put("itemsPerPage", total);
-    list.put("startIndex", 1);
+    list.put("itemsPerPage", items);
+    list.put("startIndex", page.startIndex());
     return list;
+  }
+
+  /**
+   * A page of a list (RFC 7644 section 3.4.2.4): {@code startIndex} from 1, {@code count} at most
+   * {@value #MAX_COUNT} (also the default), so a list never answers in one unbounded response.
+   *
+   * @param startIndex first item, from 1 (below 1 counts as 1)
+   * @param count items asked (negative counts as 0, above the maximum as the maximum)
+   */
+  record Page(int startIndex, int count) {
+
+    Page {
+      startIndex = Math.max(1, startIndex);
+      count = Math.clamp(count, 0, MAX_COUNT);
+    }
+
+    <T> List<T> of(List<T> all) {
+      int from = Math.min(all.size(), startIndex - 1);
+      return all.subList(from, Math.min(all.size(), from + count));
+    }
   }
 
   /** The User of an applied event, or the SCIM error of a refused or failed one. */

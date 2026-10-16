@@ -58,7 +58,7 @@ public class IdentityUserChanges {
 
   private final AppUserRepository users;
   private final RoleRepository roles;
-  private final PasswordEncoder encoder;
+  private final String unusablePassword;
   private final AccessChangeLogRepository log;
   private final UserSessionLog sessions;
   private final SystemParameterService parameters;
@@ -70,7 +70,9 @@ public class IdentityUserChanges {
    *
    * @param users users
    * @param roles roles (option b of the provisioning)
-   * @param encoder password encoder (an unusable password for single sign-on users)
+   * @param encoder password encoder: the unusable password of the single sign-on users is the hash
+   *     of a random secret thrown away at once, computed once (a hash per joiner made a full
+   *     re-sync of UIDM-ISC CPU-bound)
    * @param log access change log
    * @param sessions session log (a deactivated user's sessions end at once)
    * @param parameters business parameters
@@ -89,7 +91,7 @@ public class IdentityUserChanges {
       Clock clock) {
     this.users = users;
     this.roles = roles;
-    this.encoder = encoder;
+    this.unusablePassword = encoder.encode(SecureTokens.newToken());
     this.log = log;
     this.sessions = sessions;
     this.parameters = parameters;
@@ -107,7 +109,7 @@ public class IdentityUserChanges {
    */
   public AppUser create(DirectoryAccount a, Source source) {
     checkNewUser(a);
-    AppUser user = new AppUser(a.userId(), a.fullName(), encoder.encode(SecureTokens.newToken()));
+    AppUser user = new AppUser(a.userId(), a.fullName(), unusablePassword);
     user.setEmail(a.email());
     user.setWindowsId(a.windowsId());
     user.setEnabled(true);

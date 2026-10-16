@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -82,16 +83,23 @@ public class ScimGroupsController {
   }
 
   /**
-   * The group profiles with their permissions and members (certification extract).
+   * The group profiles with their permissions and members (certification extract), a page at a
+   * time.
    *
+   * @param startIndex first group profile, from 1
+   * @param count group profiles of the page, at most 200
    * @return SCIM ListResponse of Groups
    */
   @GetMapping
-  public ResponseEntity<JsonNode> groups() {
+  public ResponseEntity<JsonNode> groups(
+      @RequestParam(defaultValue = "1") int startIndex,
+      @RequestParam(defaultValue = "" + ScimAnswers.MAX_COUNT) int count) {
     List<IdentityExtract.Group> groups = extract.groups();
-    ObjectNode list = answers.listResponse(groups.size());
+    ScimAnswers.Page page = new ScimAnswers.Page(startIndex, count);
+    List<IdentityExtract.Group> shown = page.of(groups);
+    ObjectNode list = answers.listResponse(groups.size(), page, shown.size());
     ArrayNode resources = list.putArray(RESOURCES);
-    groups.forEach(g -> resources.add(resource(g)));
+    shown.forEach(g -> resources.add(resource(g)));
     return ResponseEntity.ok().contentType(ScimAnswers.SCIM).body(list);
   }
 

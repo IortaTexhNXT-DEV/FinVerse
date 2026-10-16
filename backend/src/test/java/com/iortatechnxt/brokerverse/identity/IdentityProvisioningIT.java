@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -338,6 +339,12 @@ class IdentityProvisioningIT {
     mvc.perform(uidm(get(USERS)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.totalResults").isNumber());
+    mvc.perform(uidm(get(USERS + "?startIndex=2&count=1")))
+        .andExpect(jsonPath("$.startIndex").value(2))
+        .andExpect(jsonPath("$.itemsPerPage").value(1))
+        .andExpect(jsonPath("$.Resources.length()").value(1));
+    mvc.perform(uidm(get(USERS + "?count=100000")))
+        .andExpect(jsonPath("$.Resources.length()").value(lessThanOrEqualTo(200)));
     mvc.perform(uidm(get("/integration/v1/scim/v2/Groups")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.Resources[?(@.id == 'AUDITOR')].permissions").isNotEmpty());

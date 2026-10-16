@@ -1,4 +1,5 @@
-"""The review workbooks of BRD-11 User Access Maintenance that go with the FRS in BDOI's template v1.4.
+"""Superseded by build_brd11_v15_workbooks.py (workbooks v1.2 for the document set v1.5); running this script
+builds those. Former description: the review workbooks of BRD-11 User Access Maintenance that go with the FRS in BDOI's template v1.4.
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd11_workbooks.py
 
@@ -1177,4 +1178,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    import build_brd11_v15_workbooks  # noqa: E402
+
+    sys.exit(build_brd11_v15_workbooks.main())
     sys.exit(main())

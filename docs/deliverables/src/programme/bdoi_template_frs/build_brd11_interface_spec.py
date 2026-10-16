@@ -3,7 +3,7 @@ sign-in with Microsoft Entra ID, in BDOI's template.
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd11_interface_spec.py [--no-pdf]
 
-Starts from the User Access Maintenance FRS v1.4 in BDOI's template (BDO ITG template D051): keeps its cover, page set-up,
+Starts from BDOI's FRS template (BDO ITG template D051, templates/bdoi_d051_frs_template.docx): keeps its cover, page set-up,
 headers and footers, styles, revision-log table and table of contents, and replaces the body. The content is in
 brd11_icd_content.py; the context figure in figures/brd11_icd_context.dot.
 
@@ -45,7 +45,7 @@ from brd11_xlsx import ReviewWorkbook  # noqa: E402
 from bdoi_xlsx import Column  # noqa: E402
 
 OUT = REPO / "docs" / "deliverables" / "out" / "Programme" / "BDOI_Template_FRS" / "BRD-11_User_Access_Maintenance"
-TEMPLATE = OUT / "BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.4.docx"
+TEMPLATE = HERE / "templates" / "bdoi_d051_frs_template.docx"
 FIGURE = HERE / "figures" / "brd11_icd_context.dot"
 FONT = "Arial"
 HEAD_FILL = "D9E2F3"

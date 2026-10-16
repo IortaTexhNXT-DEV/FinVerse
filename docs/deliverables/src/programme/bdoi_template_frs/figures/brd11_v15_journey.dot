@@ -1,0 +1,57 @@
+digraph journey {
+  graph [rankdir=TB, fontname="Arial", fontsize=11, nodesep=0.25, ranksep=0.28, newrank=true];
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=10, width=2.6, margin="0.08,0.05", color="#5F6B7A"];
+  edge [color="#5F6B7A", arrowsize=0.7];
+  subgraph "cluster_UIDM-ISC" { label="UIDM-ISC"; style="rounded,filled"; fillcolor="#E8EEF7"; color="#9AA5B1"; fontname="Arial Bold";
+    s1 [label="1. The line manager raises an access\nrequest for the new joiner in\nUIDM-ISC.", fillcolor="white"];
+    s2 [label="2. The UIDM-ISC approvers approve the\nrequest.", fillcolor="white"];
+    s4 [label="4. UIDM-ISC sends the joiner to BIBS\nover SCIM 2.0 with the UIDM\nrequest number.", fillcolor="white"];
+    s6 [label="6. UIDM-ISC adds the user to the\napproved group profile (SCIM group\nmembership).", fillcolor="white"];
+    s11 [label="11. Mover: UIDM-ISC sends the new\ndetails and group profiles; BIBS\napplies them.", fillcolor="white"];
+    s12 [label="12. Leaver: UIDM-ISC deactivates the\nuser; BIBS deactivates the user\nand ends the sessions.", fillcolor="white"];
+  }
+  subgraph "cluster_Entra ID" { label="Entra ID"; style="rounded,filled"; fillcolor="#EAF4EA"; color="#9AA5B1"; fontname="Arial Bold";
+    s3 [label="3. UIDM-ISC creates the identity in\nEntra ID: Windows ID, e-mail,\nsecond-factor registration.", fillcolor="white"];
+    s9 [label="9. Entra ID checks the password, the\nsecond factor and the device, and\nreturns the identity.", fillcolor="white"];
+  }
+  subgraph "cluster_User" { label="User"; style="rounded,filled"; fillcolor="#FFF6E0"; color="#9AA5B1"; fontname="Arial Bold";
+    s8 [label="8. The user opens BIBS and is sent to\nMicrosoft Entra ID.", fillcolor="white"];
+  }
+  subgraph "cluster_BIBS" { label="BIBS"; style="rounded,filled"; fillcolor="#F3E9F7"; color="#9AA5B1"; fontname="Arial Bold";
+    s5 [label="5. BIBS checks the event and creates\nthe user, active and without a\ngroup profile.", fillcolor="white"];
+    s7 [label="7. BIBS checks that the group profile\nexists and is active, applies it\nand records the history.", fillcolor="white"];
+    s10 [label="10. BIBS links the identity to the\nactive user and opens a session\nwith the menus of the profiles.", fillcolor="white"];
+    s13 [label="13. An event BIBS cannot apply is\nrefused and alerted; UIDM-ISC\ncorrects it, the administrator\nretries or dismisses it.", fillcolor="white"];
+    s14 [label="14. Every day BIBS reconciles its\nusers with UIDM-ISC; mismatches\nare resolved after UIDM-ISC\ncorrects them.", fillcolor="white"];
+    s15 [label="15. The Auditor and Information\nSecurity take reports, the\ncertification extract and the\naudit log; certification decisions\nare actioned in UIDM-ISC.", fillcolor="white"];
+  }
+  s1 -> s2;
+  s2 -> s3;
+  s3 -> s4;
+  s4 -> s5;
+  s5 -> s6;
+  s6 -> s7;
+  s7 -> s8;
+  s8 -> s9;
+  s9 -> s10;
+  s10 -> s11;
+  s11 -> s12;
+  s12 -> s13;
+  s13 -> s14;
+  s14 -> s15;
+  {rank=same; s1}
+  {rank=same; s2}
+  {rank=same; s3}
+  {rank=same; s4}
+  {rank=same; s5}
+  {rank=same; s6}
+  {rank=same; s7}
+  {rank=same; s8}
+  {rank=same; s9}
+  {rank=same; s10}
+  {rank=same; s11}
+  {rank=same; s12}
+  {rank=same; s13}
+  {rank=same; s14}
+  {rank=same; s15}
+}

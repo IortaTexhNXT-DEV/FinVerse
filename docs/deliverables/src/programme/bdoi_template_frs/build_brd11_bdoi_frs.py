@@ -1,4 +1,9 @@
-"""User Access Maintenance FRS in BDOI's template, version 1.3 (Business Unit review edition).
+"""Helpers of the BDOI-template FRS builders, first written for the User Access Maintenance FRS v1.2 to v1.4.
+
+The BRD-11 User Access Maintenance document set is built by build_brd11_v15.py since version 1.5; running this
+script builds that set. The helpers below stay in use by the BRD-02 and BRD-06 builders. Former description:
+
+User Access Maintenance FRS in BDOI's template, version 1.3 (Business Unit review edition).
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd11_bdoi_frs.py [--no-pdf]
 
@@ -1752,4 +1757,7 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    import build_brd11_v15  # noqa: E402  (the BRD-11 set is built from version 1.5 on)
+
+    sys.exit(build_brd11_v15.main())
     sys.exit(main())

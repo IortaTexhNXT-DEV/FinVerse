@@ -264,6 +264,7 @@ class Api:
     def __init__(self, base: str, token: str | None = None):
         self.base = base.rstrip("/")
         self.token = token
+        self.relogin = None  # signs the administrator in again when the session has expired
 
     def call(self, method: str, path: str, body=None, token: str | None = None):
         data = json.dumps(body).encode() if body is not None else None
@@ -276,7 +277,12 @@ class Api:
             req.add_header("Authorization", "Bearer " + bearer)
         for attempt in range(4):
             try:
-                return self._send(req)
+                status, answer = self._send(req)
+                if status == 401 and token is None and self.relogin is not None and attempt == 0:
+                    self.token = self.relogin()
+                    req.add_header("Authorization", "Bearer " + self.token)
+                    continue
+                return status, answer
             except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
                 if isinstance(e, urllib.error.HTTPError) or attempt == 3:
                     raise
@@ -443,6 +449,7 @@ def main() -> None:
         password = os.environ.get(args.admin_password_env or "", "") or getpass.getpass(f"Password of {args.admin}: ")
         try:
             api.token = api.sign_in(args.admin, password, args.mfa_code)["accessToken"]
+            api.relogin = lambda: api.sign_in(args.admin, password, args.mfa_code)["accessToken"]
         except NeedsSecondFactor:
             sys.exit("the administrator is asked for a second factor: pass --mfa-code or --token-env")
     load(people, api, user_password, args.request_no, args.reset_existing)

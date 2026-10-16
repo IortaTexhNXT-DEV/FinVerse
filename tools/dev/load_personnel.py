@@ -274,7 +274,7 @@ class Api:
         if bearer:
             req.add_header("Authorization", "Bearer " + bearer)
         try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
+            with urllib.request.urlopen(req, timeout=300) as resp:
                 raw = resp.read()
                 return resp.status, json.loads(raw) if raw else None
         except urllib.error.HTTPError as e:

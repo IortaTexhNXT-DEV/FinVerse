@@ -67,7 +67,7 @@ The test plans of each BRD (Excel workbook and Word summary) hold the test condi
 | R1 | FRS of BRD-00 to BRD-12; Data Migration Handbook (BRD-13) | Versions in the traceability matrix |
 | R2 | Test plans of BRD-1 to BRD-13 (workbook and summary) | Versions in chapter 5 |
 | R3 | BIBS System Requirements Specification | v{{version}} |
-| R4 | BIBS Non-Functional Requirements and NFR register | v{{version}} |
+| R4 | BIBS Non-Functional and Security Requirements (Programme/Common) | v2.0 |
 | R5 | BIBS Requirements Traceability Matrix | v{{version}} |
 | R6 | BIBS project plan (timeline, milestones, test windows, dependencies) | v1.0 |
 | R7 | Programme alignment pack; IER workbook v20 | v1.0; v20 |
@@ -149,7 +149,7 @@ Each BRD has a test plan with scenarios, test conditions (TC-xx-nnn.c), test cas
 | Code coverage overall | At least 80% of lines and 65% of branches | CI coverage gate | Every change |
 | Test execution | 100% of the cases of the drop run; 100% of Must-have cases passed | Test management tool | SIT exit |
 | Automated regression | The positive main flow of every Must-have FR in the automated regression set | Regression suite report | SIT exit of each drop |
-| NFRs | Evidence for every NFR at its stage | NFR register | ORR / PRR |
+| NFRs | Evidence for every NFR at its stage | Non-Functional and Security Requirements v2.0 | ORR / PRR |
 
 Today the traceability matrix v{{version}} covers {{covered}} of the {{in_scope_ids}} in-scope BRD requirement IDs ({{coverage_pct}}%); {{fr_only}} rows are traced to umbrella FRs whose cases sit in the function test plans, and {{clr_ids}} wait for a BDOI decision.
 

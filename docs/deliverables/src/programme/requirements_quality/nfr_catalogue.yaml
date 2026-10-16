@@ -492,7 +492,7 @@ nfrs:
     cat: SEC
     title: Second factor
     req: Privileged users prove a second factor.
-    target: "TOTP second factor for every privileged role and every break-glass administrator; EIAM conditional access for single sign-on users"
+    target: "Second factor for every bank user at Microsoft Entra ID (EIAM conditional access); TOTP second factor for privileged test accounts outside production; no break-glass account (BDOI IT, 15 Oct 2026)"
     measure: Security-access cases of the BRD-11 test plan; configuration review of the MFA policy
     method: Test
     test: Security
@@ -507,7 +507,7 @@ nfrs:
     cat: SEC
     title: User provisioning and leavers
     req: Joiners, movers and leavers reach BIBS from UIDM-ISC; dormant accounts are disabled.
-    target: "SCIM 2.0 provisioning from UIDM-ISC (planned); a leaver disabled in BIBS within 1 hour of the UIDM-ISC change; accounts dormant for 90 days disabled by the daily job"
+    target: "SCIM 2.0 provisioning from UIDM-ISC for every joiner, mover and leaver; a leaver disabled in BIBS with every session ended on receipt of the UIDM-ISC event; accounts dormant for 90 days disabled by the daily run after a 7-day notice; daily reconciliation with UIDM-ISC"
     measure: SIT provisioning cases; access review report after the first month of production
     method: Test
     test: System integration; security

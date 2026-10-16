@@ -84,7 +84,7 @@ BIBS is the enterprise-wide insurance broking system of BDOI. Phase 1 covers the
 | R1 | BDOI Core Replacement BRD (umbrella) and the function BRDs BRD-1 to BRD-12, Data Migration BRD | Versions held on 8 October 2026 |
 | R2 | FRS of BRD-00 to BRD-12 and the Data Migration Handbook (BRD-13) | Versions listed in chapter 4 |
 | R3 | Test plans of BRD-1 to BRD-13 | Versions listed in chapter 4 |
-| R4 | BIBS Non-Functional Requirements and NFR register | v{{version}}, 8 October 2026 |
+| R4 | BIBS Non-Functional and Security Requirements (Programme/Common) | v2.0, 16 October 2026 |
 | R5 | BIBS Requirements Traceability Matrix | v{{version}}, 8 October 2026 |
 | R6 | BIBS Test Strategy | v{{version}}, 8 October 2026 |
 | R7 | Programme alignment pack: drops, integrations, infrastructure, and the integration inventory | v1.0, 26 September 2026 |

@@ -2,8 +2,6 @@
 
 Outputs (docs/deliverables/out/Programme/Requirements/ and .../Quality/):
   * BIBS_SRS_BRD-00_System_Requirements_Specification_v<v>.docx          from SRS_BIBS.md
-  * BIBS_NFR_BRD-00_Non_Functional_Requirements_v<v>.docx                from NFR_CATALOGUE.md
-  * BIBS_NFR_BRD-00_Non_Functional_Requirements_Register_v<v>.xlsx       from nfr_catalogue.yaml
   * BIBS_RTM_BRD-00_Requirements_Traceability_Matrix_v<v>.xlsx           from the FRS and the test plans
   * BIBS_TestStrategy_BRD-00_Test_Strategy_v<v>.docx                     from TEST_STRATEGY.md
 
@@ -17,7 +15,8 @@ Inputs
     requirement, FR, screen, test conditions); the appendices "User-story view" and "Storyboard index" (row counts);
   * the test plans brdNN_cases.yaml, loaded with the test-plan builder (src/testplans/build_test_plan.py, read only):
     test conditions, test cases with their type, polarity, screen path and screen ID;
-  * nfr_catalogue.yaml (this folder): the NFR rows and the reconciliation with the FRS, the register and the IER;
+  * nfr_catalogue.yaml (this folder): the NFR rows and the reconciliation with the FRS, the register and the IER
+    (the NFR document itself is written by bdoi_template_frs/build_programme_common.py into Programme/Common);
   * src/alignment/alignment_data.yaml (read only): the integration inventory for the SRS interface chapter.
 
 The Word sources use two kinds of placeholders, expanded before the build: a line <!-- rq:<name> --> becomes a
@@ -54,10 +53,8 @@ DATE = "8 October 2026"
 OUT_REQ = brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Requirements"
 OUT_QA = brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Quality"
 RTM_NAME = f"BIBS_RTM_BRD-00_Requirements_Traceability_Matrix_v{VERSION}.xlsx"
-NFR_XLSX = f"BIBS_NFR_BRD-00_Non_Functional_Requirements_Register_v{VERSION}.xlsx"
 DOCS = {  # source -> output folder and file
     "SRS_BIBS.md": (OUT_REQ, f"BIBS_SRS_BRD-00_System_Requirements_Specification_v{VERSION}.docx"),
-    "NFR_CATALOGUE.md": (OUT_REQ, f"BIBS_NFR_BRD-00_Non_Functional_Requirements_v{VERSION}.docx"),
     "TEST_STRATEGY.md": (OUT_QA, f"BIBS_TestStrategy_BRD-00_Test_Strategy_v{VERSION}.docx"),
 }
 BRDS = [f"BRD-{n:02d}" for n in range(14)]
@@ -586,61 +583,6 @@ def nfr_rows(nfr: dict[str, Any]) -> list[dict[str, Any]]:
     return [{**n, "catname": cats[n["cat"]]} for n in nfr["nfrs"]]
 
 
-def build_nfr_register(nfr: dict[str, Any]) -> Path:
-    wb = BdoiWorkbook("Non-Functional Requirements Register", doc_type="NFR register", brd="BRD-00",
-                      version=VERSION, date=DATE, subtitle="Measurable NFRs of BIBS with verification and owners")
-    wb.legend = [(k, v) for k, v in nfr["statuses"].items()]
-    wb.cover_notes = [
-        "Companion of the Word document 'Non-Functional Requirements' of the same version. The targets here are the "
-        "ones quoted in the System Requirements Specification and the Test Strategy.",
-        "Precedence of sources: BDOI decision, IER workbook v20, BIBS-wide value of the discrepancy register v1.2, "
-        "BRD values, iorta TechNXT proposal."]
-    rows = nfr_rows(nfr)
-    ws = wb.sheet("NFR register", [
-        Column("id", "NFR ID", 12, "NFR-<category>-<nn>"),
-        Column("catname", "Category", 18, "Category of the NFR"),
-        Column("title", "Title", 24, "Short name"),
-        Column("req", "Requirement", 40, "What BIBS must do"),
-        Column("target", "Measurable target", 40, "The value accepted as met"),
-        Column("measure", "How it is measured", 36, "Metric, conditions and evidence"),
-        Column("method", "Verification method", 12, "Test, Analysis, Inspection or Walk-through",
-               values=["Test", "Analysis", "Inspection", "Walk-through"]),
-        Column("test", "Test type", 20, "Test type of the Test Strategy"),
-        Column("stage", "Verified in", 26, "Test stage and dates"),
-        Column("owner", "Owner (iorta TechNXT)", 22, "Role accountable for meeting the target"),
-        Column("acceptor", "Accepted by (BDOI)", 22, "Role that accepts the evidence"),
-        Column("source", "Source", 36, "BRD pages, IER, register items and design documents"),
-        Column("frs", "FRS reconciliation", 36, "How the FRS non-functional chapters relate to the target"),
-        Column("status", "Status", 11, "ALIGNED, DECISION or PROPOSED", values=list(nfr["statuses"])),
-        Column("prio", "Priority", 9, "Must or Should", values=["Must", "Should"]),
-    ], rows, description="One row per NFR; filter by category, status or test type")
-    _fill_values(ws, "N", 5, 4 + len(rows), NFR_FILL)
-    recon = [dict(zip(["theme", "brd", "frs", "ier", "cat", "action", "refs"], r)) for r in nfr["reconciliation"]]
-    wb.sheet("Reconciliation", [
-        Column("theme", "Theme", 16, "NFR theme"),
-        Column("brd", "BRD values", 40, "Values of the BRDs with pages (register v1.2, NFR comparison sheet)"),
-        Column("frs", "FRS statements", 32, "What the non-functional chapters of the FRS state"),
-        Column("ier", "IER workbook v20", 28, "What the infrastructure estimate states"),
-        Column("cat", "Catalogue target", 30, "NFR of this register"),
-        Column("action", "Difference and action", 34, "What changes where"),
-        Column("refs", "Register / questions", 18, "Register items and open questions"),
-    ], recon, description="The catalogue against the FRS non-functional chapters, the register and the IER")
-    cats = nfr["categories"]
-    by = [{"cat": f"{k} {v}", "n": sum(1 for r in rows if r["cat"] == k),
-           "must": sum(1 for r in rows if r["cat"] == k and r["prio"] == "Must"),
-           **{s.lower(): sum(1 for r in rows if r["cat"] == k and r["status"] == s) for s in nfr["statuses"]}}
-          for k, v in cats.items()]
-    wb.sheet("Summary", [
-        Column("cat", "Category", 34, "Category code and name"),
-        Column("n", "NFRs", 8, "Number of NFRs", kind="number"),
-        Column("must", "Must", 8, "Must-have NFRs", kind="number"),
-        Column("aligned", "Aligned", 9, "Status ALIGNED", kind="number"),
-        Column("decision", "BDOI decision", 10, "Status DECISION", kind="number"),
-        Column("proposed", "Proposed", 9, "Status PROPOSED", kind="number"),
-    ], by, description="NFRs per category and status")
-    return wb.save(OUT_REQ / NFR_XLSX)
-
-
 # --------------------------------------------------------------------------------------------- Word placeholders
 
 def md_table(headers, rows, widths, caption, size=8.5, bold_first=True, status=None) -> list[str]:
@@ -791,7 +733,7 @@ def placeholders(d: Data) -> dict[str, list[str]]:
         "nft_targets": nfr_head(["NFR-PRF-01", "NFR-PRF-02", "NFR-PRF-03", "NFR-PRF-04", "NFR-PRF-05",
                                  "NFR-PRF-07", "NFR-CAP-01", "NFR-CAP-02", "NFR-CAP-05", "NFR-SCL-01",
                                  "NFR-SCL-04", "NFR-AVL-04", "NFR-AVL-05", "NFR-REC-01", "NFR-REC-02"],
-                                "Targets of the non-functional tests (from the NFR register)"),
+                                "Targets of the non-functional tests (from the Non-Functional and Security Requirements)"),
     }
     for cat in cats:
         blocks[f"nfr_{cat.lower()}"] = nfr_table(cat)
@@ -893,7 +835,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check", action="store_true", help="checks only")
     ap.add_argument("--previews", action="store_true", help="page previews of the outputs")
     ap.add_argument("--no-pdf", action="store_true", help="skip the PDF pass (no page numbers in the TOC)")
-    ap.add_argument("--only", choices=["rtm", "nfr", "srs", "ts", "docs", "xlsx"], help="build one part only")
+    ap.add_argument("--only", choices=["rtm", "srs", "ts", "docs", "xlsx"], help="build one part only")
     args = ap.parse_args(argv)
     d = load_all()
     print(report(d))
@@ -910,9 +852,7 @@ def main(argv: list[str] | None = None) -> int:
     built: list[Path] = []
     if args.only in (None, "rtm", "xlsx"):
         built.append(build_rtm(d.docs, d.plans, d.matrix, d.frreg, d.summ))
-    if args.only in (None, "nfr", "xlsx"):
-        built.append(build_nfr_register(d.nfr))
-    want = {"srs": ["SRS_BIBS.md"], "nfr": ["NFR_CATALOGUE.md"], "ts": ["TEST_STRATEGY.md"]}
+    want = {"srs": ["SRS_BIBS.md"], "ts": ["TEST_STRATEGY.md"]}
     names = list(DOCS) if args.only in (None, "docs") else want.get(args.only or "", [])
     for name in names:
         path, pdf = build_doc(d, name, pdf=not args.no_pdf, keep_pdf=args.previews)

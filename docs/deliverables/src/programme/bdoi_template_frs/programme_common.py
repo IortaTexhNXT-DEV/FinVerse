@@ -1,0 +1,237 @@
+"""Content of the programme documents every BRD pack refers to (Programme/Common): Non-Functional and Security
+Requirements, Glossary, Decision and Observation Log, Document Register. Read by build_programme_common.py.
+
+The non-functional requirements themselves are in requirements_quality/nfr_catalogue.yaml (one source for this
+document, the SRS and the Test Strategy); this module adds the measured results, the security checklist summary and
+the business wording of the other three documents.
+"""
+
+from __future__ import annotations
+
+DATE = "16 Oct 2026"
+DATE_US = "10/16/2026"
+NFR_VERSION = "2.0"
+VERSION = "1.0"
+HEADER_RIGHT = "BDO Insure Brokering System (BIBS) - Programme"
+FILES = {
+    "NFR": f"BIBS_NFR_BRD-00_Non_Functional_and_Security_Requirements_v{NFR_VERSION}.docx",
+    "GLO": f"BIBS_Glossary_BRD-00_Programme_Glossary_v{VERSION}.xlsx",
+    "LOG": f"BIBS_Log_BRD-00_Decision_and_Observation_Log_v{VERSION}.xlsx",
+    "REG": f"BIBS_Register_BRD-00_Document_Register_v{VERSION}.xlsx",
+}
+# Programme files these documents replace (removed from out/).
+SUPERSEDED = [
+    "Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_v1.0.docx",
+    "Requirements/BIBS_NFR_BRD-00_Non_Functional_Requirements_Register_v1.0.xlsx",
+]
+
+NFR_INTRO = (
+    "This document states the non-functional and security requirements of BIBS once, for every BRD. Each "
+    "requirement has an ID (NFR-<area>-nn), a measurable target, how it is verified, when, and its status. An FRS "
+    "or another document of a BRD pack refers to these IDs and does not repeat them.")
+NFR_STATUS_NOTE = ("Status: ALIGNED, the sources agree or BDOI has answered; DECISION, the BRDs conflict and BDOI "
+                   "decides, the proposal applies until then; PROPOSED, no BDOI value exists, BDOI confirms.")
+NFR_CHANGES = [
+    ("NFR-SEC-02", "Second factor at Microsoft Entra ID for every bank user; no break-glass account (BDOI IT, 15 Oct "
+     "2026; D-008)."),
+    ("NFR-SEC-03", "Provisioning from UIDM-ISC over SCIM 2.0 in force; a leaver loses every session on receipt of "
+     "the event; daily reconciliation added."),
+]
+SIZING = [
+    ("Named users", "530 (User Access sizing); 1,344 in NFR-CAP-01, to be confirmed by BDOI (O-001)"),
+    ("Concurrent users", "150 in year 1 (NFR-CAP-01)"),
+    ("UIDM-ISC full re-synchronisation", "600 users and 2,000 group-profile membership changes"),
+    ("Data of the measured run", "1,200 users, 157 group profiles, 120,000 sessions, 63,000 access change records"),
+    ("Host of the measured run", "4 virtual processors, database on the same host, 1 GB application memory, 20 "
+     "database connections; production runs at least 3 application instances (NFR-AVL-04)"),
+]
+# Measured results of User Access (load test of 16 Oct 2026): run, load, requests, errors, p95, p99, NFR, target met
+MEASURED = [
+    ("Sign-in and menu", "150 users", "42,054", "0 %", "Reads 14 ms; sign-in 373 ms", "Reads 24 ms; sign-in 389 ms",
+     "NFR-PRF-01, NFR-PRF-09", "Yes"),
+    ("Users and user detail", "30 users", "6,289", "0 %", "322 ms", "478 ms", "NFR-PRF-01, NFR-PRF-02", "Yes"),
+    ("Group profiles", "30 users", "5,651", "0 %", "112 ms", "330 ms", "NFR-PRF-01, NFR-PRF-02", "Yes"),
+    ("Certification extract", "5 users, 20 extracts", "20", "0 %", "2.2 s (1,200 users)", "2.2 s", "NFR-PRF-04",
+     "Yes"),
+    ("UIDM-ISC re-synchronisation", "600 users + 2,000 changes", "3,200", "0 %", "84 ms", "98 ms", "NFR-SEC-03",
+     "Yes"),
+    ("UIDM-ISC new joiners", "600 joiners", "600", "0 %", "94 ms", "104 ms", "NFR-SEC-03", "Yes"),
+    ("Mixed load", "150 users + 10 changes a second", "35,368", "0 %", "Reads 76 ms; sign-in 680 ms", "Reads 163 ms",
+     "NFR-PRF-01, NFR-PRF-09", "Yes"),
+]
+MEASURED_NOTE = ("Measured on 16 Oct 2026 on a single host with the volumes above. The same scenarios run again on "
+                 "the production-sized Pre-Prod during the non-functional tests (1 Nov to 15 Dec 2027) are the "
+                 "acceptance evidence.")
+ASR = {"source": "BDO Application Security Requirement workbook (ITS-SQT-1.2.8-L3, ASR V4.10, Fraud-ASR V4.9)",
+       "summary": [("ASR", 79, 12, 1, 41, 133), ("Fraud-ASR", 0, 0, 0, 27, 27)],
+       "open": [
+           ("1.8.6", "Quantum-resistant algorithms for network communications", "Not met",
+            "Depends on the load balancer and runtime support; plan with BDOI IT."),
+           ("1.2.5", "Minimum password length 12 for administrator accounts", "Partly",
+            "Met by Entra ID in production; test accounts use 10 characters."),
+           ("1.2.14", "Password parameters adjustable to the threat level", "Partly",
+            "All parameters except the minimum length are UAM settings."),
+           ("1.5.2, 1.5.3, 1.5.5", "Audit of start-up, failures, record reads and storage access", "Partly",
+            "Application log and cloud storage logging to confirm with BDOI IT."),
+           ("1.7.6", "Least privilege on the database", "Partly", "Separate account for schema changes to add."),
+           ("1.7.10, 1.9.7", "Recovery after ransomware", "Partly", "Immutable or cross-account backup copies to "
+            "confirm with BDOI IT."),
+           ("1.9.3, 1.9.5", "Supported libraries; third-party libraries encapsulated", "Partly",
+            "Dependency scanning key to set in the delivery pipeline."),
+           ("2.3.1", "No authorisation bypass through record references", "Partly",
+            "Every read and change is checked by permission and data access; record numbers stay visible."),
+           ("3.4.2", "Answers limited to what the caller needs", "Partly", "Two user lists return every user; "
+            "paging above a few thousand users."),
+       ]}
+OWASP = [
+    ("Access control and identity", "Met"), ("Authentication and session", "Met; single sign-on settings per "
+     "environment"), ("Input, output and errors", "Met"), ("Transport, headers and configuration", "Met; values per "
+     "environment"),
+]
+SECURITY_OPEN = [
+    ("A dormant user deactivated in BIBS returns active if UIDM-ISC sends the account as active.",
+     "UIDM-ISC disables the account on the notice Dormant users deactivated."),
+    ("Two user lists return every user (425 KB for 1,200 users).", "Server paging above a few thousand users."),
+    ("Two sign-ins of the same test account at the same instant can be refused once.", "Accept (test accounts "
+     "only) or retry once."),
+    ("Integration rate limit (300 calls a minute) against a full re-synchronisation (about 2,600 calls).",
+     "Agree the value with BDOI IT before the load test."),
+]
+
+GLOSSARY = [
+    # term, meaning, category
+    ("Acceptance criteria", "Conditions a user story meets to be accepted, written Given / When / Then.", "Method"),
+    ("Access matrix", "Table of the group profiles against the permissions, and against the actions of each screen.",
+     "User Access"),
+    ("Audit trail", "Insert-only record of who did what, when and from where.", "Control"),
+    ("BDOI", "BDO Insurance and Reinsurance Brokers, the client.", "Organisation"),
+    ("BIBS", "BDO Insure Brokering System, the system described by the packs.", "System"),
+    ("BPS", "Business Process and Storyboards: to-be process flows and storyboards of a BRD.", "Document"),
+    ("BRD", "Business Requirements Document of BDOI; BRD-00 is the umbrella document.", "Document"),
+    ("Certification extract", "File of every account, group profile and permission, used for access reviews.",
+     "User Access"),
+    ("Change request (CR)", "A point not in the BRD and not offered by the OOTB platform; done only if approved.",
+     "Method"),
+    ("Checker", "User who approves, returns or rejects a change made by another user.", "Control"),
+    ("Colour code", "Black in the BRD; green OOTB; orange change request; blue best practice; grey label for "
+     "Integration or Data Migration scope.", "Method"),
+    ("Data access", "Companies and branches a user may act for; every list and record is limited to them.",
+     "User Access"),
+    ("DDI", "Data Dictionary: tables, columns, lists of values, parameters, status models, indexes.", "Document"),
+    ("DEV, SIT, UAT, Pre-Prod", "Development, system integration test, user acceptance test and pre-production "
+     "environments.", "Environment"),
+    ("Dormant user", "User without a sign-in for the dormancy period; deactivated after a notice.", "User Access"),
+    ("Drop", "Delivery group of BRDs agreed with BDOI (Drop 0, 1, 2).", "Method"),
+    ("DSP", "Developer Specification: screens, service operations, field checks, rules, states, jobs, audit, "
+     "permissions.", "Document"),
+    ("Epic", "Group of user stories about one capability.", "Method"),
+    ("FitGap", "Workbook of each requirement against the BRD, the OOTB platform and best practice.", "Document"),
+    ("FRS", "Functional Requirements Specification in BDOI's template D051.", "Document"),
+    ("FRUM", "Functional requirement of User Access Maintenance (FRUM.nnn.nn).", "User Access"),
+    ("Group profile", "Named set of permissions held by users; maintained in BIBS under maker-checker, membership "
+     "from UIDM-ISC.", "User Access"),
+    ("ICD", "Interface Specification of a BRD.", "Document"),
+    ("Identity event", "Change received from UIDM-ISC: joiner, mover, leaver, rehire, status or group profiles.",
+     "User Access"),
+    ("iNXT BrokerVerse", "OOTB platform of iorta TechNXT on which BIBS is configured.", "System"),
+    ("Joiner, mover, leaver", "New user, change of a user's job or unit, user who leaves.", "User Access"),
+    ("List of values (LOV)", "Maintained code list shown in a drop-down.", "Data"),
+    ("Maker", "User who proposes a change; never decides it.", "Control"),
+    ("Maker-checker", "Control by which a change applies only after another user approves it.", "Control"),
+    ("Microsoft Entra ID", "BDO identity provider (EIAM) that signs every bank user in with OpenID Connect.",
+     "System"),
+    ("NFR", "Non-functional requirement (NFR-<area>-nn), stated in the programme NFR document.", "Document"),
+    ("OOTB", "Out of the box: offered by the iNXT BrokerVerse platform at no cost.", "Method"),
+    ("OpenID Connect", "Standard sign-in protocol used with Microsoft Entra ID.", "Integration"),
+    ("p95, p99", "Response time that 95 or 99 percent of requests do not exceed.", "Quality"),
+    ("Parameter", "Setting that changes behaviour without a release; changed under maker-checker.", "Data"),
+    ("Permission", "Right to open a screen or take an action; held through group profiles.", "User Access"),
+    ("Persona", "Typical user of a pack (for example User Access Administrator, Auditor).", "Method"),
+    ("PHT", "Philippine time (UTC+8).", "Quality"),
+    ("Reconciliation", "Daily comparison of the users and group profiles of BIBS with UIDM-ISC.", "User Access"),
+    ("RNO", "Reports, Notifications and Outputs of a BRD.", "Document"),
+    ("RPO, RTO", "Recovery point and recovery time objectives.", "Quality"),
+    ("RTM", "Requirements traceability matrix and test cases: BRD, requirement, user story, screen, test case.",
+     "Document"),
+    ("SCIM 2.0", "Standard for provisioning users and group membership, used by UIDM-ISC.", "Integration"),
+    ("Second approval", "Approval by a second checker of a privileged or out-of-hours change.", "Control"),
+    ("Separation of duties (SoD)", "Rule that two group profiles or permissions are not held by one user.",
+     "Control"),
+    ("Story points", "Relative size of a user story (first estimate).", "Method"),
+    ("Test account", "Local account for testing in DEV, SIT and UAT only; never in production.", "User Access"),
+    ("UIDM-ISC", "BDOI identity governance platform; source of users and group-profile membership.", "System"),
+    ("User story", "Need of a persona: As a ..., I want ..., so that ....", "Method"),
+    ("USR", "User Stories workbook of a BRD.", "Document"),
+    ("UXD", "UX Design Specification: every screen of a BRD with a screenshot per page.", "Document"),
+    ("WCAG 2.2 AA", "Web accessibility guidelines level AA (NFR-ACC-01).", "Quality"),
+]
+
+LOG = [
+    # id, date, type, BRD, subject, text, by (role), impact or action, status, reference
+    ("D-001", "26 Sep 2026", "Decision", "All", "Delivery by drops", "BRDs are grouped and delivered by BDOI drop "
+     "(Drop 0, 1, 2).", "BDOI (answer A5)", "Folder structure of the packs.", "Closed", "Programme README"),
+    ("D-002", "27 Sep 2026", "Decision", "All", "Client documents describe the proposed system",
+     "Until the Business Unit signs off each FRS, a client document presents the proposed system only.",
+     "BDOI", "Wording rules of every document.", "Closed", "-"),
+    ("D-003", "28 Sep 2026", "Decision", "All", "Business and technical content apart", "Business sets hold business "
+     "content; technical content is in the technical documents of the set, reviewed by BDOI IT.", "BDOI",
+     "DSP, DDI and ICD are the technical documents of a pack.", "Closed", "-"),
+    ("D-004", "28 Sep 2026", "Decision", "All", "Workbook templates", "Fill-in workbooks carry a title block, column "
+     "guide, mandatory marks, an example row and drop-downs.", "BDOI", "All workbooks.", "Closed", "-"),
+    ("D-005", "08 Oct 2026", "Decision", "All", "Documents stored in S3 only", "Documents are kept in the cloud "
+     "document store only.", "BDOI (answer A4)", "NFR-RET-04.", "Closed", "NFR"),
+    ("D-006", "09 Oct 2026", "Decision", "All", "Backlog tool", "The working backlog is kept in the backlog tool "
+     "chosen by BDOI; user stories are delivered import-ready.", "BIBS Product Owner", "USR workbook columns.",
+     "Closed", "Programme Backlog"),
+    ("D-007", "11 Oct 2026", "Decision", "All", "Walkthrough environment", "Business Unit walkthroughs run on the "
+     "BIBS DEV environment with fictitious data.", "Product Owner", "Walkthrough Users workbooks.", "Closed", "-"),
+    ("D-008", "15 Oct 2026", "Decision", "BRD-11", "No break-glass account", "When Entra ID is unavailable nobody "
+     "signs in until it is restored.", "BDOI IT", "CR-UA-003 withdrawn; NFR-SEC-02.", "Closed", "FRS BRD-11 v1.6"),
+    ("D-009", "15 Oct 2026", "Decision", "BRD-11", "Users from UIDM-ISC", "UIDM-ISC maintains users and their group "
+     "profiles over SCIM 2.0; BIBS keeps the group-profile definitions.", "BDOI IT", "FRUM.009 and FRUM.011 "
+     "withdrawn; CR-UA-011, CR-UA-014 withdrawn.", "Closed", "FRS BRD-11 v1.6; ICD v1.1"),
+    ("D-010", "16 Oct 2026", "Decision", "BRD-11", "Data access by company and branch", "CR-UA-007 rescoped to "
+     "company and branch scope per user.", "Product Owner", "CR Register v1.3.", "Open: BDOI approval (Q-UA-05)",
+     "CR Register"),
+    ("D-011", "16 Oct 2026", "Decision", "All", "Standard document set per BRD", "Each BRD pack holds FRS, BPS, UXD, "
+     "RNO, ICD (where interfaces exist), DSP, DDI, USR and the review workbooks, plus a How to read this pack note; "
+     "NFR, glossary and decisions are kept once at programme level.", "Product Owner", "BRD-11 first; BRD-03, "
+     "BRD-06 and BRD-02 follow.", "Open: BRD-03, BRD-06, BRD-02 to complete", "Document Register"),
+    ("O-001", "16 Oct 2026", "Observation", "All", "Number of named users", "NFR-CAP-01 states 1,344 named users; "
+     "the User Access sizing uses 530.", "iorta TechNXT", "BDOI to confirm the figure; capacity targets follow.",
+     "Open", "NFR"),
+    ("O-002", "16 Oct 2026", "Observation", "BRD-11", "Dormant users and UIDM-ISC", "A dormant user deactivated in "
+     "BIBS returns active if UIDM-ISC sends the account as active.", "iorta TechNXT", "UIDM-ISC disables the "
+     "account on the notice.", "Open", "NFR section 5"),
+    ("O-003", "16 Oct 2026", "Observation", "BRD-11", "Integration rate limit", "A full re-synchronisation (about "
+     "2,600 calls) takes about 9 minutes at 300 calls a minute.", "iorta TechNXT", "Agree the limit with BDOI IT "
+     "before the load test.", "Open", "NFR section 5"),
+    ("O-004", "16 Oct 2026", "Observation", "All", "Quantum-resistant network encryption", "ASR 1.8.6 is not met.",
+     "iorta TechNXT", "Plan with BDOI IT.", "Open", "NFR section 5"),
+    ("O-005", "16 Oct 2026", "Observation", "All", "Backups after ransomware", "Immutable or cross-account backup "
+     "copies are not yet confirmed (ASR 1.7.10).", "iorta TechNXT", "Confirm with BDOI IT.", "Open",
+     "NFR-REC-03"),
+    ("O-006", "16 Oct 2026", "Observation", "All", "References to the NFR register", "The System Requirements "
+     "Specification and the Test Strategy v1.0 name the NFR document v1.0 and its register.", "iorta TechNXT",
+     "They refer to this NFR v2.0 at their next issue.", "Open", "SRS, Test Strategy"),
+    ("O-007", "16 Oct 2026", "Observation", "BRD-03, BRD-06, BRD-02", "Packs to complete", "These BRDs have the FRS "
+     "and the review workbooks; BPS, UXD, RNO, DSP, DDI, USR and the How to read note are to be issued.",
+     "iorta TechNXT", "Issue with the reusable builders of BRD-11.", "Open", "Document Register"),
+]
+
+# Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.
+REGISTER_BRDS = [
+    ("BRD-11", "BRD-11_User_Access_Maintenance", "User Access Maintenance", "BDOI Product Owner, User Access"),
+    ("BRD-03", "BRD-03_Product_Maintenance", "Product Maintenance", "BDOI Product Owner, Product Maintenance"),
+    ("BRD-06", "BRD-06_Renewal", "Renewal", "BDOI Product Owner, Renewal"),
+    ("BRD-02", "BRD-02_Operations_Cashiering", "Operations Cashiering", "BDOI Product Owner, Operations"),
+]
+STANDARD_SET = [
+    ("README", "How to read this pack"), ("FRS", "Functional Requirements Specification"),
+    ("BPS", "Business Process and Storyboards"), ("UXD", "UX Design Specification"),
+    ("RNO", "Reports, Notifications and Outputs"), ("ICD", "Interface Specification (where interfaces exist)"),
+    ("DSP", "Developer Specification"), ("DDI", "Data Dictionary"), ("USR", "User Stories"),
+    ("RTM", "Test Cases and Traceability"), ("FitGap", "BRD vs OOTB vs Best Practice"),
+    ("CR", "Change Request Register and Effort Estimate"), ("Inputs", "Business Unit Requirements Collection"),
+    ("UAT", "Business Unit Walkthrough Users"),
+]

@@ -196,7 +196,16 @@ LOG = [
     ("D-011", "16 Oct 2026", "Decision", "All", "Standard document set per BRD", "Each BRD pack holds FRS, BPS, UXD, "
      "RNO, ICD (where interfaces exist), DSP, DDI, USR and the review workbooks, plus a How to read this pack note; "
      "NFR, glossary and decisions are kept once at programme level.", "Product Owner", "BRD-11 first; BRD-03, "
-     "BRD-06 and BRD-02 follow.", "Open: BRD-06, BRD-02 to complete (BRD-03 complete)", "Document Register"),
+     "BRD-06 and BRD-02 follow.", "Open: BRD-02 to complete (BRD-03 and BRD-06 complete)", "Document Register"),
+    ("D-012", "16 Oct 2026", "Decision", "BRD-06", "Renewal FRS numbering", "BDOI's FRRN numbers are kept; "
+     "duplicate and short numbers of BDOI's FRS are corrected (FRRN.004.05, 013.03, 013.04, 038.04, 026.01, 027.0x, "
+     "029.0x) and the CBG Motor rules of BDOI's Annexes D and E are stated apart as FRRN.009.02.", "Product Owner",
+     "FRS Renewal v1.3, section Changes from Version 1.2.", "Open: BDOI confirmation", "FRS BRD-06 v1.3"),
+    ("D-013", "16 Oct 2026", "Decision", "BRD-06", "Renewal change requests", "Four change requests stay open: "
+     "CR-RN-005 budget, CR-RN-008 CBG Motor rules, CR-RN-015 placement turnaround (delivered, for approval or "
+     "removal) and CR-RN-024 accessibility; the other candidates of register v1.0 are BRD items, OOTB or "
+     "Integration scope.", "Product Owner", "CR Register BRD-06 v1.1.", "Open: BDOI approval (Q-RN-11)",
+     "CR Register"),
     ("O-001", "16 Oct 2026", "Observation", "All", "Number of named users", "NFR-CAP-01 states 1,344 named users; "
      "the User Access sizing uses 530.", "iorta TechNXT", "BDOI to confirm the figure; capacity targets follow.",
      "Open", "NFR"),
@@ -214,9 +223,9 @@ LOG = [
     ("O-006", "16 Oct 2026", "Observation", "All", "References to the NFR register", "The System Requirements "
      "Specification and the Test Strategy v1.0 name the NFR document v1.0 and its register.", "iorta TechNXT",
      "They refer to this NFR v2.0 at their next issue.", "Open", "SRS, Test Strategy"),
-    ("O-007", "16 Oct 2026", "Observation", "BRD-06, BRD-02", "Packs to complete", "These BRDs have the FRS "
-     "and the review workbooks; BPS, UXD, RNO, DSP, DDI, USR and the How to read note are to be issued. BRD-03 "
-     "was completed on 16 Oct 2026.",
+    ("O-007", "16 Oct 2026", "Observation", "BRD-02", "Packs to complete", "BRD-02 has the FRS and the review "
+     "workbooks; BPS, UXD, RNO, DSP, DDI, USR and the How to read note are to be issued. BRD-03 and BRD-06 were "
+     "completed on 16 Oct 2026.",
      "iorta TechNXT", "Issue with the reusable builders of BRD-11.", "Open", "Document Register"),
 ]
 

@@ -22,6 +22,13 @@ def _fk_of(cons: list[dict], col: str) -> dict | None:
                 None)
 
 
+def _text(K, text: str) -> str:
+    """A description in business words: a content module may reword the texts of the schema (DDI_TEXT)."""
+    for old, new in getattr(K, "DDI_TEXT", {}).items():
+        text = text.replace(old, new)
+    return text
+
+
 def _label(code: str, K) -> str:
     return K.ENUM_LABELS.get(code) or code.replace("_", " ").capitalize()
 
@@ -78,7 +85,7 @@ def write(K, out: Path) -> tuple[Path, dict]:
                 "len": m.group(2) if m and m.group(2) else "-", "null": "Yes" if col["nullable"] else "No",
                 "def": sd.fmt_default(col) or "-", "chk": "; ".join(texts) or "-",
                 "fk": f"{fk['ref_table'].upper()}" if fk else "-",
-                "desc": sd.column_description({"name": t}, col, fk, allowed)})
+                "desc": _text(K, sd.column_description({"name": t}, col, fk, allowed))})
         for ix in sf.indexes(t):
             cols_txt = re.search(r"\((.*)\)", ix["definition"]).group(1)
             where = re.search(r"\bWHERE (.*)$", ix["definition"])
@@ -124,7 +131,7 @@ def write(K, out: Path) -> tuple[Path, dict]:
         p_rows.append({"k": r["param_key"], "lb": labels.get(r["param_key"], "-"), "ty": r["value_type"],
                        "d": r["param_value"] or "(empty)", "r": rng,
                        "mc": special_text if r["param_key"] in special else other_text,
-                       "ds": sd.upper_identifiers(r["description"])})
+                       "ds": _text(K, sd.upper_identifiers(r["description"]))})
     missing = [k for k in special if k not in {p["k"] for p in p_rows}]
     if missing:
         raise SystemExit(f"data dictionary: settings of the screen without a parameter row: {missing}")

@@ -58,6 +58,7 @@ def _clean(text: str) -> str:
     text = re.sub(r"\s*\([^()]*\b(?:GET|POST|PUT|PATCH|DELETE) /[^()]*\)", "", text)
     text = re.sub(r"\b[A-Z][a-z]+(?:[A-Z][a-z]+){2,}\b", "", text)
     text = text.replace("BrokerVerse", "BIBS")
+    text = re.sub(r"\bBuilds\b", "Creates", text)
     return " ".join(text.split()).rstrip(" ;,")
 
 

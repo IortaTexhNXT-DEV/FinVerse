@@ -1,0 +1,5401 @@
+# Mapping of the Renewal BRD (8-Oct-2026) to the FRRN items: the 42 BRRN requirements, the 47 sections and the 1,033
+# requirement lines of the main BRD. Taken from the Business Requirements Mapping of the FRS v1.2 (numbers of the items
+# corrected as in the FRS v1.3). Read by brd06_v13_content.py and build_brd06_v13_workbooks.py.
+brrn:
+- id: BRRN.001
+  text: System must allow the user to generate and send a No Advice Letter (NAL) to clients whose expiring policies do not
+    require either a Renewal Advice (RA) or a Not for Renewal Letter (NFR) or Non-Renewal Letter (NRL), typically when no
+    action or advice is needed regarding the expiring policy.
+  frrn:
+  - FRRN.022
+  - FRRN.023
+- id: BRRN.002
+  text: The system must allow users to select and change the date range (month, day, year) for generating the list of expiring
+    accounts.
+  frrn:
+  - FRRN.004
+- id: BRRN.003
+  text: System provides filter criteria for generating the list, including all specified options, and allows filter management
+    (apply, cancel, clear)
+  frrn:
+  - FRRN.004
+- id: BRRN.004
+  text: System displays the generated list in a scrollable view with all required columns.
+  frrn:
+  - FRRN.004
+- id: BRRN.005
+  text: System captures expired/expiring and unbooked accounts.
+  frrn:
+  - FRRN.004
+  - FRRN.004.04
+  - FRRN.045.01
+- id: BRRN.006
+  text: System allows column filtering and search.
+  frrn:
+  - FRRN.002
+- id: BRRN.007
+  text: System allows download, save, and print in .xlsx format.
+  frrn:
+  - FRRN.004.06
+- id: BRRN.008
+  text: System provides print preview and settings.
+  frrn:
+  - FRRN.004.06
+- id: BRRN.009
+  text: System tags non-renewable risk codes, excludes them, maintains codes, and sends NFR letters.
+  frrn:
+  - FRRN.007
+  - FRRN.038
+  - FRRN.023
+- id: BRRN.010
+  text: '- Generate Renewal Advice (RA) - Ability to select accounts for RA generation (single, multiple, all, all except)
+    - Generate RA for selected accounts - Prevent RA generation for locked accounts - Identify if RA is for first or second
+    notice - View, preview, and close RA details - Download and save RA (single or batch) - Extract details for RA sending
+    - Send RA in batch, with encryption and password protection'
+  frrn:
+  - FRRN.022
+  - FRRN.024.01
+- id: BRRN.011
+  text: System allows users to view all accounts assigned to them in a single, scrollable view. Any updates or endorsements
+    made to an account are automatically reflected on the mother policy.
+  frrn:
+  - FRRN.014
+  - FRRN.004.06
+  - FRRN.010
+  - FRRN.002.08
+- id: BRRN.012
+  text: System allows users to select any account from the displayed list for further action or review.
+  frrn:
+  - FRRN.014
+  - FRRN.002.08
+- id: BRRN.013
+  text: System displays all renewal fields for the selected account, sourced from the generated expiring account list.
+  frrn:
+  - FRRN.014
+- id: BRRN.014
+  text: System provides filtering options for each column in the account list, allowing users to narrow down results.
+  frrn:
+  - FRRN.002
+  - FRRN.002.08
+- id: BRRN.015
+  text: System provides sorting options for the account list, allowing users to order accounts by any column.
+  frrn:
+  - FRRN.002
+  - FRRN.002.08
+- id: BRRN.016
+  text: System provides a search function that allows users to find specific information within the account list, similar
+    to a Ctrl+F feature.
+  frrn:
+  - FRRN.002
+  - FRRN.002.08
+- id: BRRN.017
+  text: System allows users to search for a particular account using name or unique reference number.
+  frrn:
+  - FRRN.002
+  - FRRN.002.08
+- id: BRRN.018
+  text: Upload file(s) Select the source path Select the file(s) for upload System allows users to select a source path
+    and upload one or more dispositioned files to update account details in the system.
+  frrn:
+  - FRRN.015
+  - FRRN.015.07
+- id: BRRN.019
+  text: The system must allow users to generate comprehensive reports on accounts and transactions relevant to their role.
+    - Users should be able to define the report scope using flexible filters (such as invoice number, date range, unit,
+    region, product, account type, status, and other relevant fields). - Reports must be viewable in a single, scrollable
+    interface and include all necessary columns for business review (e.g., invoice number, account details, transaction
+    status, renewal information, remarks). Users must have the ability to download, save, and print reports in standard
+    formats (e.g., .xlsx, .pdf), with print preview and customizable print settings. Each report should also provide a summary
+    section showing aggregate figures and key performance indicators.
+  frrn:
+  - FRRN.044
+  - FRRN.044.02
+- id: BRRN.020
+  text: As a renewal processor, I want data sanitation to occur within the system after extraction or upload, so that renewal
+    eligibility is determined consistently and not dependent on manual pre-cleaning.
+  frrn:
+  - FRRN.007
+  - FRRN.040
+  - FRRN.040.01
+  - FRRN.046.01
+- id: BRRN.021
+  text: As an authorized user, I want expiring accounts to be extracted (e.g. within the system and displayed on the screen/dashboard),
+    with renewal processing starting only upon explicit user initiation, so that accounts do not renew prematurely and proper
+    governance is maintained.
+  frrn:
+  - FRRN.004
+  - FRRN.003
+  - FRRN.004.07
+- id: BRRN.022
+  text: As a renewal user, I want to have a unique reference number to be mandatory and used as the primary matching key,
+    so that renewal records reliably link to the correct existing policies.
+  frrn:
+  - FRRN.004
+- id: BRRN.023
+  text: I want the system to automatically classify renewal records into rule-based buckets (i.e. Clean, Review, Exception),
+    so that renewal work is prioritized, straight through cases are processed efficiently, and exceptions are controlled
+    and isolated.
+  frrn:
+  - FRRN.007
+  - FRRN.008
+  - FRRN.020.03
+- id: BRRN.024
+  text: As an authorized user, I want the LAMD role limited to early validation only, so that booking, placement, and customer
+    communications remain role-appropriate and controlled.
+  frrn:
+  - FRRN.012
+  - FRRN.001.02
+- id: BRRN.025
+  text: I want expiry-driven reminder letters generated for expiring policies that are not yet submitted at the defined
+    follow-up checkpoint (e.g., +90 days), so that follow-ups are standardized and time-bound.
+  frrn:
+  - FRRN.023
+  - FRRN.023.03
+- id: BRRN.026
+  text: As a Contact Center user, I want system access to renewal lists and the ability to update renewal statuses, so that
+    follow-ups are done via system.
+  frrn:
+  - FRRN.047.01
+- id: BRRN.027
+  text: As a Renewal User, I want to view the full historical account record (i.e. policies, renewals, endorsements, payment
+    history, and claims) during renewal review so that I can make an informed and auditable renewal decision.
+  frrn:
+  - FRRN.014
+- id: BRRN.028
+  text: I want the system to identify and view accounts that are due or upcoming for KYC review, so that compliance monitoring
+    and follow up can be performed without blocking or interrupting the renewal process.
+  frrn:
+  - FRRN.039
+- id: BRRN.029
+  text: The system shall ingest LAMD-provided reports and match paid-off loan records against RMEL policies to determine
+    renewal eligibility and proper routing.
+  frrn:
+  - FRRN.012
+  - FRRN.041.01
+- id: BRRN.030
+  text: The system shall automatically extract renewal candidates based on policy expiry date using configurable lead days
+    (e.g., -140 days).
+  frrn:
+  - FRRN.004
+  - FRRN.004.04
+  - FRRN.040.03
+- id: BRRN.031
+  text: I want the system to apply rule-based disposition automatically and isolate exceptions, so that straight-through
+    renewals proceed without manual effort and manual handling is focused only on high-impact or non-standard cases.
+  frrn:
+  - FRRN.007
+  - FRRN.008
+  - FRRN.008.01
+  - FRRN.040.02
+  - FRRN.020.03
+- id: BRRN.032
+  text: Endorsements occurring before or during renewal must be reflected on the mother (expiring) policy prior to renewal
+    approval.
+  frrn:
+  - FRRN.004.06
+- id: BRRN.033
+  text: The system shall allow renewal-identified accounts to follow the New Business flow when financial or structural
+    changes require repricing or restructuring.
+  frrn:
+  - FRRN.017
+  - FRRN.018
+  - FRRN.019
+  - FRRN.020
+  - FRRN.018.02
+- id: BRRN.034
+  text: The system shall provide a configurable decision matrix defining which renewal scenarios are automated versus manual.
+  frrn:
+  - FRRN.040
+  - FRRN.040.02
+- id: BRRN.035
+  text: As a renewal user, I want the system to capture insurer responses (e.g., Approve/ Renew As-ls, Reject, Revise) and
+    automatically apply them to the renewal workflow, so that renewal status progression is accurate, controlled, and does
+    not rely on manual re-encoding or interpretation.
+  frrn:
+  - FRRN.013
+  - FRRN.013.05
+- id: BRRN.036
+  text: I want the system to generate customizable, centralized renewal listings (e.g., by unit, segment, UH, IBG, Leasing),
+    expiry window, and current status, so that renewal exposure is clearly visible, proactively monitored, and escalated
+    appropriately without relying on manual tracking.
+  frrn:
+  - FRRN.002.05
+  - FRRN.044.03
+- id: BRRN.037
+  text: I want the system to identify NRNS (No Renew/ No Submit) accounts and trigger reminder or non-acceptance letters
+    to manage lapse risk.
+  frrn:
+  - FRRN.023
+  - FRRN.023.03
+  - FRRN.037.02
+- id: BRRN.038
+  text: The system shall enforce routing of renewal changes based on financial impact, ensuring proper approval and proposal
+    handling.
+  frrn:
+  - FRRN.017
+  - FRRN.009.01
+  - FRRN.018.02
+- id: BRRN.039
+  text: The system shall support LAMD-driven matching and categorization for CBG Motor and Fire renewals, including straight-through
+    processing and letter generation.
+  frrn:
+  - FRRN.012
+- id: BRRN.040
+  text: I want the system to automatically proceed to placement and booking once the client has accepted the Renewal Advice
+    (RA) and applicable payment rules are satisfied, so that the renewal process is completed without delay, duplicate handling,
+    or manual re initiation, and the policy can be issued on time.
+  frrn:
+  - FRRN.029
+  - FRRN.025.01
+  - FRRN.026.01
+  - FRRN.028.02
+- id: BRRN.041
+  text: The system shall evaluate renewal transactions for incentive eligibility after successful placement, booking, and
+    full payment confirmation, and assign an incentive eligibility indicator based on predefined, rule-based criteria, including
+    applicable endorsements, so that incentive processing and reporting are accurate, consistent, and auditable.
+  frrn:
+  - FRRN.034
+- id: BRRN.042
+  text: As a renewal user, I want to be able to send request for Hold Cover to insurer/s and to record the Hold Cover confirmation
+    details received from the insurer.
+  frrn:
+  - FRRN.036
+  - FRRN.037.02
+sections:
+- id: BRD 1.001
+  text: Log in (Marketing Team Leader)
+- id: BRD 1.002
+  text: Open in several tabs (Marketing Team Leader)
+- id: BRD 1.003
+  text: Generate the list of expiring accounts (Marketing Team Leader)
+- id: BRD 1.004
+  text: View account (Marketing Team Leader)
+- id: BRD 1.005
+  text: Assign accounts (Marketing Team Leader)
+- id: BRD 1.006
+  text: Transfer account to other units (Marketing Team Leader)
+- id: BRD 1.007
+  text: Receive account transfer (Marketing Team Leader)
+- id: BRD 1.008
+  text: Review and post (Marketing Team Leader)
+- id: BRD 1.009
+  text: Generate report (Marketing Team Leader)
+- id: BRD 1.010
+  text: Generate Renewal Advice (Marketing Team Leader)
+- id: BRD 1.011
+  text: Override accounts (Marketing Team Leader)
+- id: BRD 2.001
+  text: Log in (Marketing AO / Admin (Account Broker))
+- id: BRD 2.002
+  text: Open in several tabs (Marketing AO / Admin (Account Broker))
+- id: BRD 2.003
+  text: View accounts for disposition (Marketing AO / Admin (Account Broker))
+- id: BRD 2.004
+  text: Provide disposition (Marketing AO / Admin (Account Broker))
+- id: BRD 2.005
+  text: Transfer account to other units (Marketing AO / Admin (Account Broker))
+- id: BRD 2.006
+  text: View the list of dispositioned accounts (Marketing AO / Admin (Account Broker))
+- id: BRD 2.007
+  text: Update the returned accounts (Marketing AO / Admin (Account Broker))
+- id: BRD 2.008
+  text: Generate report (Marketing AO / Admin (Account Broker))
+- id: BRD 2.009
+  text: Generate Renewal Advice (Marketing AO / Admin (Account Broker))
+- id: BRD 3.001
+  text: Log in (Processing Team Leader)
+- id: BRD 3.002
+  text: Open in several tabs (Processing Team Leader)
+- id: BRD 3.003
+  text: Generate list of accounts for processing (Processing Team Leader)
+- id: BRD 3.004
+  text: Upload dispositioned file (Processing Team Leader)
+- id: BRD 3.005
+  text: Assign accounts (Processing Team Leader)
+- id: BRD 3.006
+  text: View accounts for processing (Processing Team Leader)
+- id: BRD 3.007
+  text: Update data on an account (Processing Team Leader)
+- id: BRD 3.008
+  text: Review computations; return (Processing Team Leader)
+- id: BRD 3.009
+  text: Extract accounts per insurer (Processing Team Leader)
+- id: BRD 3.010
+  text: Generate report (Processing Team Leader)
+- id: BRD 3.011
+  text: Generate Renewal Advice (Processing Team Leader)
+- id: BRD 4.001
+  text: Log in (Processing Officer / Broker)
+- id: BRD 4.002
+  text: Open in several tabs (Processing Officer / Broker)
+- id: BRD 4.003
+  text: View accounts for processing (Processing Officer / Broker)
+- id: BRD 4.004
+  text: Upload dispositioned file (Processing Officer / Broker)
+- id: BRD 4.005
+  text: Update data on an account (Processing Officer / Broker)
+- id: BRD 4.006
+  text: Review computations; return (Processing Officer / Broker)
+- id: BRD 4.007
+  text: Extract accounts per insurer (Processing Officer / Broker)
+- id: BRD 4.008
+  text: Generate report (Processing Officer / Broker)
+- id: BRD 4.09
+  text: Generate Renewal Advice (Processing Officer / Broker)
+- id: BRD 5.001
+  text: Log in (Business Administrator)
+- id: BRD 5.002
+  text: Open in several tabs (Business Administrator)
+- id: BRD 5.003
+  text: Maintain lists of values (Business Administrator)
+- id: BRD 5.004
+  text: Maintain users (Business Administrator)
+- id: BRD 5.005
+  text: Update the RA template (Business Administrator)
+- id: BRD 6.001
+  text: Access the application (System Administrator)
+- id: BRD 6.002
+  text: Manage users, profiles and functions (System Administrator)
+lines:
+- id: BRD 1.001.1
+  text: a. Access the module/application using any BDO issued device
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 1.001.1.1
+  text: 1. Log in with a Marketing Team Leader user profile
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 1.001.2.1
+  text: 2. Receive the inactivity warning (15 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 1.001.3.1
+  text: 3. Receive warning prior to system triggered log out (30 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 1.002.1
+  text: a. Open the module/application in multiple tabs
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 1.003.1
+  text: a. Select the date range of the List of Expiring Accounts
+  frrn:
+  - FRRN.004.01
+  - FRRN.004.02
+- id: BRD 1.003.1.1
+  text: 1. Select the month, day and year
+  frrn:
+  - FRRN.004.01
+  - FRRN.004.02
+- id: BRD 1.003.2
+  text: b. Change the selected date range
+  frrn:
+  - FRRN.004.01
+  - FRRN.004.02
+- id: BRD 1.003.3
+  text: c. Filter Criteria
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1
+  text: 1. Select single, multiple, select all except and all Unit Head from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.2
+  text: 2. Select single, multiple, select all except and all business Origin from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.3
+  text: 3. Select single, multiple, select all except and all account type from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.4
+  text: 4. Select single, multiple, select all except and all Region from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.5
+  text: 5. Select single, multiple, select all except and all Area from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.6
+  text: 6. Select single, multiple, select all except and all Invoicing Branch from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.7
+  text: 7. Select single, multiple, select all except and all Risk Code from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.8
+  text: 8. Select single, multiple, select all except and all Market Segment from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.9
+  text: 9. Select single, multiple, select all except and all Department Name from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.10
+  text: 10. Select single, multiple, select all except and all account Officer from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.11
+  text: 11. Cancel the selected filter
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.12
+  text: 12. Clear the selected filter
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.3.1.13
+  text: 13. Apply filter criteria
+  frrn:
+  - FRRN.004.03
+- id: BRD 1.003.4.1
+  text: d. View the generated List of Expiring Accounts (display all accounts in 1 view using a scroll bar)
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1
+  text: '1. View the generated List of Expiring accounts with below columns:'
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.1
+  text: 1.1 Expiring EBIX Invoice No.
+  frrn:
+  - FRRN.002.05
+- id: BRD 1.003.4.1.1.2
+  text: 1.2 Renewal Reference No.
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.3
+  text: 1.3 BDOIsys Reference No.
+  frrn:
+  - FRRN.002.05
+- id: BRD 1.003.4.1.1.4
+  text: 1.4 Cover No.
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.5
+  text: 1.5 Version No.
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.6
+  text: 1.6 Invoicing Branch
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.7
+  text: 1.7 Department Code
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.8
+  text: 1.8 Department Name
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.9
+  text: 1.9 Unit Head
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.10
+  text: 1.10 Client Name
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.11
+  text: 1.11 Assured’s Name
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.12
+  text: 1.12 Business Origin
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.13
+  text: 1.13 Account Officer
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.14
+  text: 1.14 Expiring Policy No.
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.15
+  text: 1.15 Insurance Company
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.16
+  text: 1.16 Risk Code
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.17
+  text: 1.17 Risk Name
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.18
+  text: 1.18 Risk Description
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.19
+  text: 1.19 Renewal Stage/Status
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.20
+  text: 1.20 Renewal Disposition
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.21
+  text: 1.21 Disposition Remarks
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.22
+  text: 1.21 Number of Claims
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.23
+  text: 1.21 Status of Each claim
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.1.24
+  text: 1.21 Amount of Outstanding Premium
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.2
+  text: 2. Capture expired/expiring (within the identified date range) and unbooked account
+  frrn:
+  - FRRN.004.04
+- id: BRD 1.003.4.1.3
+  text: 3. Filter each column
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.4.1.4
+  text: 4. Search specific information from the list (i.e. similar to control F function)
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 1.003.5
+  text: e. Download the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 1.003.6
+  text: f. Save the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 1.003.7
+  text: g. Print the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 1.003.7.1
+  text: 1. Print preview option
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 1.003.7.2
+  text: 2. Print setting options
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 1.003.7.3
+  text: 3. Automatically tag non- renewable risk codes as "Not for renewal" and should not be part of the list for assignment.
+    There should be a maintenance for these risk codes.
+  frrn:
+  - FRRN.038.01
+  - FRRN.038.03
+- id: BRD 1.003.7.3.1
+  text: 3.1. System should automatically send Not for Renewal Letter (NFR)
+  frrn:
+  - FRRN.038.01
+  - FRRN.038.03
+- id: BRD 1.004.1
+  text: a. View the complete renewal fields of the expiring account
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 1.004.1.1
+  text: 1. Select an account
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 1.004.1.2
+  text: 2. View the complete renewal fields of the selected account from the generated expiring account list.
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 1.004.1.3
+  text: 3. Download the account details as needed in a .pdf or .xlsx format
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 1.004.1.4
+  text: 4. Save the account details as needed
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 1.004.1.5
+  text: 5. Print the account details as needed
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 1.004.1.5.1
+  text: 5.1. Print preview option
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 1.004.1.5.2
+  text: 5.2. Print setting options
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 1.005.1
+  text: a. Assign account to Marketing Account Officers (AO)
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.1.1
+  text: 1. Select account/s
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.1.1.1
+  text: 1.1 Select single, multiple, select all except and all account/s
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.1.1.2
+  text: 1.2 Unselect account/s
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.1.2
+  text: 2. Select the name of the Marketing AO
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.1.2.1
+  text: 2.1 Search the name or ID of the Marketing AO
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.1.2.2
+  text: 2.2 Select the name of the Marketing AO from the drop- down List
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.1.2.3
+  text: 3. Tag the account to the assigned Marketing AO
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.1.2.4
+  text: 4. Push the account to the next workflow
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.005.2
+  text: b. Re-assign account to another Marketing Account Officers (AO)
+  frrn:
+  - FRRN.010.01
+  - FRRN.010.02
+- id: BRD 1.006.1
+  text: a. Select an account
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.006.2
+  text: b. View details of the selected account
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.006.3
+  text: c. Select from the drop-down the Marketing unit where the account will be transferred to
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.006.4
+  text: d. Submit transfer request
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.006.5
+  text: e. Push the account to the next workflow
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.007.1
+  text: a. Receive notification on the transferred account/s from other unit
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.007.2
+  text: b. View flag on the transferred account/s
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.007.3
+  text: c. Accept transferred account/s
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.007.3.1
+  text: 1. Add accepted accounts to the list of accounts for assignment to Marketing AO
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.007.4
+  text: d. Decline transferred account/s
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.007.4.1
+  text: 1. Add remarks
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.007.4.2
+  text: 2. save remarks
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.007.5
+  text: e. Push the account to the next workflow
+  frrn:
+  - FRRN.011.06
+- id: BRD 1.008.1
+  text: a. Review Accounts
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.1.1
+  text: 1. View the list of all dispositioned accounts (display all accounts in 1 view using a scroll bar). Any updates/endorsement
+    should reflect on the mother policy
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.1.2
+  text: 2. Select an account
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.1.3
+  text: 3. View the complete renewal fields of the selected account
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.1.4
+  text: 4. Automatically tag the status as "review in progress" when Accounts are not yet posted
+  frrn:
+  - FRRN.004.06
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.2
+  text: b. Return account/s
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.2.1
+  text: 1. Select single, multiple, all except and all account/s
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.2.2
+  text: 2. Tag the status as returned
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.2.3
+  text: 3. Add remarks
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.2.4
+  text: 4. Save remarks
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.2.5
+  text: 5. Return to the assigned Marketing AO
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.2.6
+  text: 6. Automatically flag the returned account
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.2.7
+  text: 7. Push the account/s to the next workflow
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.3
+  text: c. Post account/s
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.3.1
+  text: 1. Select single, multiple, all except and all account/s
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.3.2
+  text: 2. Review the account details
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.3.3
+  text: 3. Post the account/s
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.008.3.4
+  text: 4. Push the account/s to the next workflow
+  frrn:
+  - FRRN.020.01
+  - FRRN.020.02
+- id: BRD 1.009.1
+  text: a. Select expiry date range for each report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.1.1
+  text: 1. Select month, day and year
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.1.2
+  text: 2. Change the selected date range
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2
+  text: b. Select single, multiple, all and all except criteria for each report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.1
+  text: 1. Select single, multiple, all except and all Unit Head from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.2
+  text: 2. Search specific Unit Head from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.3
+  text: 3. Select single, multiple, all except and all Risk Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.4
+  text: 4. Search specific Risk Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.5
+  text: 5. Select single, multiple, all except and all Insurance Company from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.6
+  text: 6. Search specific Insurance Company from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.7
+  text: 7. Select single, multiple, all except and all Insurance Group from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.8
+  text: 8. Search specific Insurance Group from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.9
+  text: 9. Select single, multiple, all except and all Business Origin from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.10
+  text: 10. Search specific Business Origin from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.11
+  text: 11. Select single, multiple, all except and all Market Category from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.12
+  text: 12. Search specific Market Category from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.13
+  text: 13. Select single, multiple, all except and all BDO Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.14
+  text: 14. Search specific BDO Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.15
+  text: 15. Select single, multiple, all except and all BDO Area from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.16
+  text: 16. Search specific BDO Area from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.17
+  text: 17. Select single, multiple, all except and all Region from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.18
+  text: 18. Search specific Region from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.19
+  text: 19. Select single, multiple, all except and all Bank Officer from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.20
+  text: 20. Search specific Bank Officer from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.21
+  text: 21. Select single, multiple, all except and all Bank Unit from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.22
+  text: 22. Search specific Bank Unit from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.23
+  text: 23. Select single, multiple, all except and all Product Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.24
+  text: 24. Search specific Product Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.25
+  text: 25. Select single, multiple, all except and all Account Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.26
+  text: 26. Search specific Account Type drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.27
+  text: 27. Select single, multiple, all except and all BDOI Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.28
+  text: 28. Search specific BDOI Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.29
+  text: 29. Select single, multiple, all except and all Location from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.30
+  text: 30. Search specific Location from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.31
+  text: 31. Select single, multiple, all except and all Account Broker from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.32
+  text: 32. Search specific Account Broker from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.33
+  text: 33. Select single, multiple, all except and all Business Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.34
+  text: 34. Search specific Business Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.35
+  text: 35. Select single, multiple, all except and all Customer Segment from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.36
+  text: 36. Search specific Customer Segment from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.37
+  text: 37. Select single, multiple, all except and all Specific Client from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.38
+  text: 38. Search specific Client from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.39
+  text: 39. Select single, multiple, all except and all Renewal Status from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.2.40
+  text: 40. Search specific Renewal Status from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3
+  text: c. Generate a report showing the overall status of the renewal accounts with the following information per invoice
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1
+  text: 1. Display the following information per invoice (display all accounts in 1 view using a scroll bar)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.1
+  text: 5.1. Unit Head
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.2
+  text: 5.2. Account Broker
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.3
+  text: 5.3. Business Origin
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.4
+  text: 5.4. Bank Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.5
+  text: 5.5. Renewal Reference
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.6
+  text: 5.6. Expiring Ebix Invoice No
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.7
+  text: 5.7. Assured
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.8
+  text: 5.8. Type of Risk
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.9
+  text: 5.9. Expiring Invoice Inception Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.10
+  text: 5.10. Expiring Invoice Expiry Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.11
+  text: 5.11. Renewal Reference Inception Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.12
+  text: 5.12. Renewal Reference Expiry Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.13
+  text: 5.13. Expiring Invoice Policy Number
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.14
+  text: 5.14. Account Type
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.15
+  text: 5.15. Basic Premium
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.16
+  text: 5.16. Gross Premium
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.17
+  text: 5.17. Premium Rate
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.18
+  text: 5.18. Commission Rate
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.19
+  text: 5.19. Total Sum Insured
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.20
+  text: 5.20. Risk Description
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.21
+  text: 5.21. Location of Risk
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.22
+  text: 5.22. Address
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.23
+  text: 5.23. Contact No(S).
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.24
+  text: 5.24. Email Address
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.25
+  text: 5.25. Region
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.26
+  text: 5.26. Area
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.27
+  text: 5.27. Branch
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.28
+  text: 5.28. Insurer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.29
+  text: 5.29. Location
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.30
+  text: 5.30. Mortgaged To BDO
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.31
+  text: 5.31. Mortgagee Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.32
+  text: 5.32. PN Number
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.33
+  text: 5.33. Hold Cover (HC)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.34
+  text: 5.34. HC End Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.35
+  text: 5.35. Renewal Status
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.36
+  text: 5.36. Reason for "Not For Renewal"
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.1.37
+  text: 5.37. Remarks Of Acct Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2
+  text: 2. Display a summary
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.1
+  text: 2.1. Total No. of Booked
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.2
+  text: 2.2. Total No. of Canceled
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.3
+  text: 2.3. Total No. of Renewal - For Placement
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.4
+  text: 2.4. Total No. of Renewal - For Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.5
+  text: 2.5. Total No. of Renewal - For ARF
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.6
+  text: 2.6. Total No. of RA Processed
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.7
+  text: 2.7. Total No. of Renewal - For RA Processing
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.8
+  text: 2.8. Total No. of Renew to TSU
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.9
+  text: 2.9. Total No. of Returned to Marketing
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.10
+  text: 2.10. Total No. of Awaiting Marketing TL Approval (For Renewal)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.11
+  text: 2.11. Total No. of Awaiting Marketing TL Approval (For Quotation)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.12
+  text: 2.12. Total No. of Awaiting Marketing TL Approval (Not For Renewal)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.13
+  text: 2.13. Total No. of Awaiting Marketing TL Approval (Lost Business)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.14
+  text: 2.14. Total No. of Disapproved Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.15
+  text: 2.15. Total No. of Not For Renewal Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.16
+  text: 2.16. Total No. of Mortgaged for Lost Business
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.17
+  text: 2.17. Total No. of Unrenewed Mortgaged For Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.18
+  text: 2.18. Total No. of Unrenewed Mortgaged Transferred to Other Unit
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.19
+  text: 2.19. Total No. of Mortgaged Loan Fully Paid
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.20
+  text: 2.20. Unrenewed Mortgaged Awaiting Confirmation
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.21
+  text: 2.21. Total No. of Mortgaged Booked under New Invoice No.
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.22
+  text: 2.22. Total No. of Unrenewed Mortgaged with No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.23
+  text: 2.23. Total No. of Unrenewed Mortgaged to Other Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.24
+  text: 2.24. Total No. of Non- Mortgaged Lost Business
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.25
+  text: 2.25. Total No. of Unrenewed Non- Mortgaged for Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.26
+  text: 2.26. Total No. of Unrenewed Non- Mortgaged Transferred to Other Unit
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.27
+  text: 2.27. Total No. of Non- Mortgaged Loan Fully Paid
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.28
+  text: 2.28. Total No. of Unrenewed Non- Mortgaged Awaiting Confirmation from Client
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.29
+  text: 2.29. Total No. of Non- Mortgaged Booked under Invoice No.
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.30
+  text: 2.30. Total No. of Unrenewed Non- Mortgaged with No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.31
+  text: 2.31. Total No. of Unrenewed Non- Mortgaged to Other Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.32
+  text: 2.32. Total No. of Non- Renewable Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.33
+  text: 2.33. Total No. of No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.3.2.34
+  text: 2.34. Total No. of Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.4
+  text: d. Download report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.4.1
+  text: 1. Download in a .xlsx format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.4.2
+  text: 2. Download in a .pdf format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.5
+  text: e. Save the report in the desired location
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.5.1
+  text: 1. Save in a .xlsx format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.5.2
+  text: 2. Save in a .pdf format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.6
+  text: f. Print report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 1.009.7
+  text: g. View the assigned accounts per Marketing AO in a dashboard
+  frrn:
+  - FRRN.002.02
+  - FRRN.003.01
+- id: BRD 1.010.1
+  text: a. Select single, multiple, all except and all accounts
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.2
+  text: b. Generate RA for the selected account/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.2.1
+  text: 1. Disable RA generation on locked accounts (account should be locked on the marketing side when the RA is generated)
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.2.2
+  text: 2. With visible identifier if the generated RA is for first notice or second notice
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.3
+  text: c. View the generated RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.3.1
+  text: 1. Select RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.3.2
+  text: 2. Preview the details of the RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.3.3
+  text: 3. Close the preview
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.4
+  text: d. Download the generated RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.4.1
+  text: 1. Select single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.4.2
+  text: 2. Download single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.5
+  text: e. Save the generated RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.5.1
+  text: 1. Select single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.5.2
+  text: 2. Select the desired location
+  frrn:
+  - FRRN.022.01
+- id: BRD 1.010.6
+  text: f. Extract the details required for RA sending
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 1.010.7
+  text: g. Send RA in batch
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 1.010.7.1
+  text: 1. Encrypt and add password prior to sending
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 1.011.1
+  text: a. Override Accounts with Outstanding balance
+  frrn:
+  - FRRN.014.04
+  - FRRN.020.03
+- id: BRD 1.011.1.1
+  text: 1. See flag on accounts with outstanding balance
+  frrn:
+  - FRRN.014.04
+  - FRRN.020.03
+- id: BRD 1.011.1.2
+  text: 2. Select single or multiple accounts with outstanding balance
+  frrn:
+  - FRRN.014.04
+  - FRRN.020.03
+- id: BRD 1.011.1.3
+  text: 3. Override single or multiple accounts with outstanding balance
+  frrn:
+  - FRRN.014.04
+  - FRRN.020.03
+- id: BRD 2.001.1
+  text: a. Access the module/application using any BDO issued device
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 2.001.1.1
+  text: 1. Log in with a Marketing Account Officer user profile
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 2.001.1.2
+  text: 2. Receive the inactivity warning (15 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 2.001.1.3
+  text: 3. Receive warning prior to system triggered log out (30 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 2.002.1
+  text: a. Open the application in multiple tabs
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 2.003.1
+  text: a. View all accounts assigned to me (display all accounts in 1 view using a scroll bar). Any updates/endorsement
+    should reflect on the mother policy
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.003.1.1
+  text: 1. Select an account
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.003.1.2
+  text: 2. View the complete renewal fields of the selected account from the generated expiring account list
+  frrn:
+  - FRRN.002.08
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 2.003.1.3
+  text: 3. Option to filter each column of the list
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.003.1.4
+  text: 4. Option to sort the list
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.003.1.5
+  text: 5. Search specific information from the list (i.e. similar to control F function)
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.003.1.6
+  text: 6. Search a particular account via name, QPS reference number, Ebix reference number
+  frrn:
+  - FRRN.002.06
+  - FRRN.002.08
+- id: BRD 2.003.2
+  text: b. Save the account details as needed
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 2.003.3
+  text: C. Print the account details as needed
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 2.003.3.1
+  text: 1. Print preview option
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 2.003.3.2
+  text: 2. Print setting options
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 2.004.1
+  text: a. Select a particular account from my list
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.2
+  text: b. View the complete renewal details of the account. Any updates/endorsement should reflect on the mother policy
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.3
+  text: 'c. Provide disposition by selecting any of the following from the drop- down:'
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.3.1
+  text: 1. For Renewal
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.3.2
+  text: 2. Not for Renewal
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.3.3
+  text: 3. For Quotation
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.3.4
+  text: 4. For Proposal
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.3.5
+  text: 5. Lost Business
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4
+  text: d. Select reason for non-renewal from the drop-down list
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.1
+  text: 1. Remedial Management Unit (RMU)
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.2
+  text: 2. With submitted policy
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.3
+  text: 3. Loan fully paid
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.4
+  text: 4. Direct to Insurer
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.5
+  text: 5. Total Loss Claim
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.6
+  text: 6. Unit Sold
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.7
+  text: 7. Canceled Policy
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.8
+  text: 8. Transfer to Another Marketing Unit
+  frrn:
+  - FRRN.011.06
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.9
+  text: 9. Non-renewable Accounts
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.4.10
+  text: 10. Booked to New Invoice
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.5
+  text: e. Update necessary details
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.5.1
+  text: 1. Easily view mandatory details
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.5.2
+  text: 2. Receive prompts to supply missing mandatory details. The system should not allow me to push the account to the
+    next workflow if there are missing mandatory fields
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.5.3
+  text: 3. Save updated details
+  frrn:
+  - FRRN.014.02
+  - FRRN.016.01
+- id: BRD 2.004.6
+  text: f. Add remarks (max number of characters = 200)
+  frrn:
+  - FRRN.014.02
+- id: BRD 2.004.7
+  text: g. Save remarks
+  frrn:
+  - FRRN.014.02
+- id: BRD 2.004.8
+  text: h. Push the account to the next workflow
+  frrn:
+  - FRRN.014.02
+- id: BRD 2.004.9
+  text: i. Disable disposition and editing on locked accounts (account should be locked on the marketing side once RA is
+    generated)
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.004.10
+  text: j. Edit disposition on accounts tagged as “Not for Renewal” (i.e. account was initially tagged as “Not for Renewal”
+    then client later on decided to renew, etc.)
+  frrn:
+  - FRRN.014.07
+- id: BRD 2.005.1
+  text: a. Select an account
+  frrn:
+  - FRRN.011.06
+- id: BRD 2.005.2
+  text: b. View details of the selected account
+  frrn:
+  - FRRN.011.06
+- id: BRD 2.005.3
+  text: c. Select from the drop-down the Marketing unit where the account will be transferred to
+  frrn:
+  - FRRN.011.06
+- id: BRD 2.005.3.1
+  text: 1. Add remarks
+  frrn:
+  - FRRN.011.06
+- id: BRD 2.005.3.2
+  text: 2. Save remarks
+  frrn:
+  - FRRN.011.06
+- id: BRD 2.005.4
+  text: d. Submit transfer request
+  frrn:
+  - FRRN.011.06
+- id: BRD 2.005.5
+  text: e. Push the account to the next workflow
+  frrn:
+  - FRRN.011.06
+- id: BRD 2.006.1
+  text: a. View the list of my dispositioned accounts with renewal status (display all accounts in 1 view using a scroll
+    bar).
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.006.1.1
+  text: 1. View complete list including the renewal status of each accounts
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.006.1.1.1
+  text: 1.1. Easily identify accounts with endorsements and claims (i.e. flag, etc.)
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.006.1.1.2
+  text: 1.2. Take effect the latest endorsement details to the mother policy
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.006.1.2
+  text: 2. Search a particular account via name, QPS reference number, Ebix reference number
+  frrn:
+  - FRRN.002.06
+  - FRRN.002.08
+- id: BRD 2.006.1.3
+  text: 3. Select Specific account
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.006.1.4
+  text: 4. View the complete renewal details of the selected account including the renewal status
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.006.1.5
+  text: 5. Add remarks on specific account (max number of characters = 200)
+  frrn:
+  - FRRN.014.02
+- id: BRD 2.006.1.5.1
+  text: 5.1. Capture Date and Time stamp
+  frrn:
+  - FRRN.014.02
+- id: BRD 2.006.1.5.2
+  text: 5.2. Capture user id of the processor who added remarks
+  frrn:
+  - FRRN.014.02
+- id: BRD 2.006.1.5.3
+  text: 5.3. Add remarks on accounts that are not yet closed (there should be an indicator whether an account is still open
+    or close i.e. padlock, etc.)
+  frrn:
+  - FRRN.014.02
+- id: BRD 2.006.1.6
+  text: 6. Save remarks
+  frrn:
+  - FRRN.014.02
+- id: BRD 2.007.1
+  text: a. Receive notification on returned account/s
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.2
+  text: b. Easily identify returned accounts from the list (i.e red flag, etc.)
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.3
+  text: c. Review remarks on returned account/s
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.4
+  text: d. Update returned accounts
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.4.1
+  text: 1. Search a particular account via name, QPS reference number, Ebix reference number
+  frrn:
+  - FRRN.002.06
+  - FRRN.002.08
+- id: BRD 2.007.4.2
+  text: 2. Select specific account
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.4.3
+  text: 3. Edit details on specific account
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.4.4
+  text: 4. Add remarks
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.4.5
+  text: 5. Save remarks
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.4.6
+  text: 6. Cancel editing
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.4.7
+  text: 7. Save the Updated details
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.007.5
+  text: e. Push the account to the next workflow
+  frrn:
+  - FRRN.002.08
+- id: BRD 2.008.1
+  text: a. Select expiry date range for each report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.1.1
+  text: 1. Select month, day and year
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.1.2
+  text: 2. Change the selected date range
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2
+  text: b. Select single, multiple, all and all except criteria for each report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.1
+  text: 1. Select single, multiple, all except and all Unit Head from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.2
+  text: 2. Search specific Unit Head from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.3
+  text: 3. Select single, multiple, all except and all Risk Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.4
+  text: 4. Search specific Risk Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.5
+  text: 5. Select single, multiple, all except and all Insurance Company from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.6
+  text: 6. Search specific Insurance Company from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.7
+  text: 7. Select single, multiple, all except and all Insurance Group from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.8
+  text: 8. Search specific Insurance Group from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.9
+  text: 9. Select single, multiple, all except and all Business Origin from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.10
+  text: 10. Search specific Business Origin from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.11
+  text: 11. Select single, multiple, all except and all Market Category from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.12
+  text: 12. Search specific Market Category from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.13
+  text: 13. Select single, multiple, all except and all BDO Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.14
+  text: 14. Search specific BDO Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.15
+  text: 15. Select single, multiple, all except and all BDO Area from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.16
+  text: 16. Search specific BDO Area from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.17
+  text: 17. Select single, multiple, all except and all Region from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.18
+  text: 18. Search specific Region from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.19
+  text: 19. Select single, multiple, all except and all Bank Officer from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.20
+  text: 20. Search specific Bank Officer from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.21
+  text: 21. Select single, multiple, all except and all Bank Unit from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.22
+  text: 22. Search specific Bank Unit from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.23
+  text: 23. Select single, multiple, all except and all Product Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.24
+  text: 24. Search specific Product Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.25
+  text: 25. Select single, multiple, all except and all Account Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.26
+  text: 26. Search specific Account Type drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.27
+  text: 27. Select single, multiple, all except and all BDOI Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.28
+  text: 28. Search specific BDOI Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.29
+  text: 29. Select single, multiple, all except and all Location from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.30
+  text: 30. Search specific Location from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.31
+  text: 31. Select single, multiple, all except and all Account Broker from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.32
+  text: 32. Search specific Account Broker from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.33
+  text: 33. Select single, multiple, all except and all Business Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.34
+  text: 34. Search specific Business Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.35
+  text: 35. Select single, multiple, all except and all Customer Segment from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.36
+  text: 36. Search specific Customer Segment from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.37
+  text: 37. Select single, multiple, all except and all Specific Client from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.38
+  text: 38. Search specific Client from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.39
+  text: 39. Select single, multiple, all except and all Renewal Status from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.2.40
+  text: 40. Search specific Renewal Status from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3
+  text: c. Generate a report showing the overall status of the renewal accounts with the following information per invoice
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1
+  text: 1. Display the following information per invoice (display all accounts in 1 view using a scroll bar)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.1
+  text: 1.1. Unit Head
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.2
+  text: 1.2. Account Broker
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.3
+  text: 1.3. Business Origin
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.4
+  text: 1.4. Bank Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.5
+  text: 1.5. Renewal Reference
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.6
+  text: 1.6. Expiring Ebix Invoice No
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.7
+  text: 1.7. Assured
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.8
+  text: 1.8. Type of Risk
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.9
+  text: 1.9. Expiring Invoice Inception Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.10
+  text: 1.10. Expiring Invoice Expiry Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.11
+  text: 1.11. Renewal Reference Inception Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.12
+  text: 1.12. Renewal Reference Expiry Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.13
+  text: 1.13. Expiring Invoice Policy Number
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.14
+  text: 1.14. Account Type
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.15
+  text: 1.15. Basic Premium
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.16
+  text: 1.16. Gross Premium
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.17
+  text: 1.17. Premium Rate
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.18
+  text: 1.18. Commission Rate
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.19
+  text: 1.19. Total Sum Insured
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.20
+  text: 1.20. Risk Description
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.21
+  text: 1.21. Location Of Risk
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.22
+  text: 1.22. Address
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.23
+  text: 1.23. Contact No(S).
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.24
+  text: 1.24. Email Address
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.25
+  text: 1.25. Region
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.26
+  text: 1.26. Area
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.27
+  text: 1.27. Branch
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.28
+  text: 1.28. Insurer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.29
+  text: 1.29. Location
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.30
+  text: 1.30. Mortgaged To BDO
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.31
+  text: 1.31. Mortgagee Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.32
+  text: 1.32. PN Number
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.33
+  text: 1.33. Hold Cover (HC)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.34
+  text: 1.34. HC End Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.35
+  text: 1.35. Renewal Status
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.36
+  text: 1.36. Reason for "Not For Renewal"
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.1.37
+  text: 1.37. Remarks Of Acct Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2
+  text: 2. Display a summary
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.1
+  text: 2.1. Total No. of Booked
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.2
+  text: 2.2. Total No. of Can celled
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.3
+  text: 2.3. Total No. of Renewal - For Placement
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.4
+  text: 2.4. Total No. of Renewal - For Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.5
+  text: 2.5. Total No. of Renewal - For ARF
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.6
+  text: 2.6. Total No. of RA Processed
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.7
+  text: 2.7. Total No. of Renewal - For RA Processing
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.8
+  text: 2.8. Total No. of Renew to TSU
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.9
+  text: 2.9. Total No. of Returned to Marketing
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.10
+  text: 2.10. Total No. of Awaiting Marketing TL Approval (For Renewal)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.11
+  text: 2.11. Total No. of Awaiting Marketing TL Approval (For Quotation)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.12
+  text: 2.12. Total No. of Awaiting Marketing TL Approval (Not For Renewal)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.13
+  text: 2.13.Total No. of Awaiting Marketing TL Approval (Lost Business)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.14
+  text: 2.14. Total No. of Disapproved Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.15
+  text: 2.15. Total No. of Not For Renewal Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.16
+  text: 2.16. Total No. of Mortgaged Lost Business
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.17
+  text: 2.17. Total No. of Unrenewed Mortgaged For Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.18
+  text: 2.18. Total No. of Unrenewed Mortgaged Transferred to Other Unit
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.19
+  text: 2.19. Total No. of Mortgaged Loan Fully Paid
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.20
+  text: 2.20. Unrenewed Mortgaged Awaiting Confirmation
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.21
+  text: 2.21. Total No. of Mortgaged Booked under New Invoice No.
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.22
+  text: 2.22. Total No. of Unrenewed Mortgaged with No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.23
+  text: 2.23. Total No. of Unrenewed Mortgaged to Other Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.24
+  text: 2.24. Total No. of Non- Mortgaged Lost Business
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.25
+  text: 2.25. Total No. of Unrenewed Non- Mortgaged For Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.26
+  text: 2.26. Total No. of Unrenewed Non- Mortgaged Transferred To Other Unit
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.27
+  text: 2.27. Total No. of Non- Mortgaged Loan Fully Paid
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.28
+  text: 2.28. Total No. of Unrenewed Non- Mortgaged Awaiting Confirmation from Client
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.29
+  text: 2.29. Total No. of Non- Mortgaged Booked under Invoice No.
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.30
+  text: 2.30. Total No. of Unrenewed Non- Mortgaged with No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.31
+  text: 2.31. Total No. of Unrenewed Non- Mortgaged to Other Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.32
+  text: 2.32. Total No. of Non- renewable Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.33
+  text: 2.33. Total No. of No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.3.2.34
+  text: 2.34. Total No. of Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.4
+  text: d. Download report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.4.1
+  text: 1. Download in a .xlsx format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.4.2
+  text: 2. Download in a .pdf format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.5
+  text: e. Save report in the desired location
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.5.1
+  text: 1. Save in a .xlsx format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.5.2
+  text: 2. Save in a .pdf format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.008.6
+  text: f. Print report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 2.009.1
+  text: a. Select single, multiple, all except and all accounts
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.2
+  text: b. Generate RA for the selected account/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.2.1
+  text: 1. Disable RA generation on locked accounts (account should be locked on the marketing side when the RA is generated)
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.2.2
+  text: 2. With visible identifier if the generated RA is for first notice or second notice
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.3
+  text: c. View the generated RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.3.1
+  text: 1. Select RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.3.2
+  text: 2. Preview the details of the RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.3.3
+  text: 3. Close the preview
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.4
+  text: d. Download the generated RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.4.1
+  text: 1. Select single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.4.2
+  text: 2. Download single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.5
+  text: e. Save the generated RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.5.1
+  text: 1. Select single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.5.2
+  text: 2. Select the desired location
+  frrn:
+  - FRRN.022.01
+- id: BRD 2.009.6
+  text: f. Extract the details required for RA sending
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 2.009.7
+  text: g. Send RA in batch
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 2.009.7.1
+  text: 1. Encrypt and add password prior to sending
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 3.001.1
+  text: a. Access the module/application using any BDO issued device
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 3.001.1.1
+  text: 1. Log in with a Processing Team Leader user profile
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 3.001.1.2
+  text: 2. Receive the inactivity warning (15 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 3.001.1.3
+  text: 3. Receive warning prior to system triggered log out (30 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 3.002.1
+  text: a. Open the application in multiple tabs
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 3.003.1
+  text: a. Select the date range of the List of Expiring Accounts
+  frrn:
+  - FRRN.004.01
+  - FRRN.004.02
+- id: BRD 3.003.1.1
+  text: 1. Select the month, day and year
+  frrn:
+  - FRRN.004.01
+  - FRRN.004.02
+- id: BRD 3.003.2
+  text: b. Change the selected date range
+  frrn:
+  - FRRN.004.01
+  - FRRN.004.02
+- id: BRD 3.003.3
+  text: c. Filter Criteria
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.1
+  text: 1. Select single, multiple, select all except and all Unit Head from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.2
+  text: 2. Select single, multiple, select all except and all business Origin from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.3
+  text: 3. Select single, multiple, select all except and all account type from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.4
+  text: 4. Select single, multiple, select all except and all Region from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.5
+  text: 5. Select single, multiple, select all except and all Area from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.6
+  text: 6. Select single, multiple, select all except and all Invoicing Branch from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.7
+  text: 7. Select single, multiple, select all except and all Risk Code from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.8
+  text: 8. Select single, multiple, select all except and all Market Segment from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.9
+  text: 9. Select single, multiple, select all except and all Department Name from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.10
+  text: 10. Select single, multiple, select all except and all account Officer from the drop-down
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.11
+  text: 11. Cancel the selected filter
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.12
+  text: 12. Clear the selected filter
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.3.13
+  text: 13. Apply filter criteria
+  frrn:
+  - FRRN.004.03
+- id: BRD 3.003.4
+  text: d. View the generated List of Expiring Accounts for Processing (display all accounts using scroll bars). Any updates/endorsement
+    should reflect on the mother policy
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1
+  text: '1. View the generated List of Expiring accounts with below column per invoice:'
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.1
+  text: 1.1 Expiring EBIX Invoice No.
+  frrn:
+  - FRRN.002.05
+- id: BRD 3.003.4.1.2
+  text: 1.2 Renewal Reference No.
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.3
+  text: 1.3 BDOIsys Reference No.
+  frrn:
+  - FRRN.002.05
+- id: BRD 3.003.4.1.4
+  text: 1.4 Cover No.
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.5
+  text: 1.5 Version No.
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.6
+  text: 1.6 Invoicing Branch
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.7
+  text: 1.7 Department Code
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.8
+  text: 1.2 Department Name
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.9
+  text: 1.3 Unit Head
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.10
+  text: 1.4 Client Name
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.11
+  text: 1.5 Assured’s Name
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.12
+  text: 1.6 Business Origin
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.13
+  text: 1.7 Account Officer
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.14
+  text: 1.8 Expiring Policy No.
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.15
+  text: 1.9 Insurance Company
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.16
+  text: 1.10 Risk Code
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.17
+  text: 1.11 Risk Name
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.18
+  text: 1.12 Risk Description
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.19
+  text: 1.13 Renewal Stage/Status
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.20
+  text: 1.14 Renewal Disposition
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.1.21
+  text: 1.15 Disposition Remarks
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.2
+  text: 2. Should capture expired/expiring (within the identified date range) and unrenewed account
+  frrn:
+  - FRRN.004.04
+- id: BRD 3.003.4.3
+  text: 3. Filter each column
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.4
+  text: 4. Search specific information from the list (i.e. similar to control F function)
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.003.4.5
+  text: 5. Search a particular account via name, QPS reference number, Ebix reference number
+  frrn:
+  - FRRN.002.06
+- id: BRD 3.003.5
+  text: e. Download the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 3.003.6
+  text: f. Save the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 3.003.7
+  text: g. Print the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 3.003.7.1
+  text: 1. Print preview option
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 3.003.7.2
+  text: 2. Print setting options
+  frrn:
+  - FRRN.002.07
+  - FRRN.004.06
+- id: BRD 3.004.1
+  text: a. Upload file/s
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 3.004.1.1
+  text: 1. Select the source path
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 3.004.1.2
+  text: 2. Select the file/s for upload
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 3.004.2
+  text: b. Upload single or multiple files
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 3.004.3
+  text: c. Push the uploaded account to the list of accounts for Processing
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 3.004.3.1
+  text: 1. Capture the account/s on the uploaded file as part of the generated list of accounts for processing
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 3.004.4
+  text: d. Automatically tag accounts as “Not for renewal” with reason “Non- renewable Accounts” if it is not part of the
+    uploaded dispositioned file and should not be part of the list for processing.
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 3.004.5
+  text: e. Edit disposition on accounts tagged as “Not for Renewal” (i.e. account was initially tagged as “Not for Renewal”
+    then client later on decided to renew, etc.)
+  frrn:
+  - FRRN.014.07
+- id: BRD 3.005.1
+  text: a. Assign account to Processing Office (PO)
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.1
+  text: 1. Select account/s
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.1.1
+  text: 1.1 Select single, multiple, select all except and all account/s
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.1.2
+  text: 1.2 Unselect account/s
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.2
+  text: 2. Select the name of the Processing Officer (PO)
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.2.1
+  text: 2.1 Search the name of the Processing Officer (PO)
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.2.2
+  text: 2.2 Select the ID of the Processing Officer (PO) from the drop-down List
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.3
+  text: 3. Tag the account to the assigned Processing Officer (PO)
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.4
+  text: 4. Tag the account to myself
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.5
+  text: 5. Push the account to the next workflow
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.005.1.6
+  text: b. Re-assign account to another Processing Officer (PO)
+  frrn:
+  - FRRN.010.01
+- id: BRD 3.006.1
+  text: a. View all accounts assigned to me (display all accounts in 1 view using a scroll bar)
+  frrn:
+  - FRRN.003.05
+- id: BRD 3.006.1.1
+  text: 1. Select an account
+  frrn:
+  - FRRN.003.05
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 3.006.1.2
+  text: 2. View the complete renewal fields of the selected account from the generated expiring account list. Any updates/endorsement
+    should reflect on the mother policy
+  frrn:
+  - FRRN.003.05
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 3.006.1.3
+  text: 3. Option to filter each column of the list
+  frrn:
+  - FRRN.003.05
+- id: BRD 3.006.1.4
+  text: 4. Option to sort the list
+  frrn:
+  - FRRN.003.05
+- id: BRD 3.006.1.5
+  text: 5. Search specific information from the list (i.e. similar to control F function)
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 3.006.1.6
+  text: 6. Search a particular account via name, QPS reference number, Ebix reference number
+  frrn:
+  - FRRN.003.05
+- id: BRD 3.006.2
+  text: b. Save the account details as needed
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 3.006.3
+  text: C. Print the account details as needed
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 3.006.3.1
+  text: 1. Print preview option
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 3.006.3.2
+  text: 2. Print setting options
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 3.007.1
+  text: a. Select an account
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 3.007.2
+  text: b. View specific details of the selected account. Any updates/endorsement should reflect on the mother policy
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 3.007.3
+  text: c. Update necessary details
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 3.007.3.1
+  text: 1. Easily view mandatory details
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 3.007.3.2
+  text: 2. Receive prompts to supply missing mandatory details. The system should not allow me to push the account to the
+    next workflow if there are missing mandatory fields
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 3.007.3.3
+  text: 3. Save updated details
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 3.007.3.4
+  text: 4. Disable editing on locked accounts (account should be locked when placement is completed)
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 3.008.1
+  text: a. Review computations per account
+  frrn:
+  - FRRN.009.01
+- id: BRD 3.008.1.1
+  text: 1.View all calculated fields
+  frrn:
+  - FRRN.009.01
+- id: BRD 3.008.2
+  text: b. Return account/s
+  frrn:
+  - FRRN.031.01
+- id: BRD 3.008.2.1
+  text: 1. Select single, multiple, all except and all account/s
+  frrn:
+  - FRRN.031.01
+- id: BRD 3.008.2.2
+  text: 2. Tag the status as returned
+  frrn:
+  - FRRN.031.01
+- id: BRD 3.008.2.3
+  text: 3. Add remarks
+  frrn:
+  - FRRN.031.01
+- id: BRD 3.008.2.4
+  text: 4. Save remarks
+  frrn:
+  - FRRN.031.01
+- id: BRD 3.008.2.5
+  text: 5. Return to the assigned Marketing TL
+  frrn:
+  - FRRN.031.01
+- id: BRD 3.008.2.6
+  text: 6. Flag the returned account
+  frrn:
+  - FRRN.031.01
+- id: BRD 3.008.2.7
+  text: 7. Push the account/s to the next workflow
+  frrn:
+  - FRRN.031.01
+- id: BRD 3.009.1
+  text: a. View the list of "For renewal" accounts per Insurer (display all accounts in 1 view using a scroll bar)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.1
+  text: 1. Select date range
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.2
+  text: 2. Select the name of the Insurer from the drop-down
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.3
+  text: 3. Search the name of specific Insurer
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4
+  text: '4. View the following columns:'
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.1
+  text: 4.1. Insurance Company
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.2
+  text: 4.2. Invoice No
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.3
+  text: 4.3. Assured Name
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.4
+  text: 4.4. Risk Code
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.5
+  text: 4.5. Inception Date
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.6
+  text: 4.6. Expiry Date
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.7
+  text: 4.7. Sum Insured
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.8
+  text: 4.8. Premium Amount
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.9
+  text: 4.9. Commission Rate
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.10
+  text: 4.10. AR Client (Unpaid Balance)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.11
+  text: 4.11. Is Mortgaged (Yes or No)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.12
+  text: 4.12. Premium Rate (breakdown per cover)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.13
+  text: 4.13. Policy No
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.14
+  text: 4.14. Risk Description
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.15
+  text: 4.15. Encoder Name (User Who Booked The Account)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.16
+  text: 4.16. Unit Head
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.17
+  text: 4.17. Business Origin
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.18
+  text: 4.18. Account Type
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.19
+  text: 4.19. Region
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.20
+  text: 4.20. Area
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.21
+  text: 4.21. Branch
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.22
+  text: 4.22. Account Officer Name
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.23
+  text: 4.23. Remarks
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.24
+  text: 4.24. Bodily Injury and Property Damage for Motor Accounts (BIPD)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.25
+  text: 4.25. Seating capacity for Motor
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.26
+  text: 4.26. Auto Personal Accident for Motor
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.27
+  text: 4.27. Sum Insured (breakdown per cover)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.1.4.28
+  text: 4.28. Packaged/Non- Packaged description
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.2
+  text: b. Download the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 3.009.3
+  text: c. Save the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 3.009.4
+  text: d. Print the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 3.009.4.1
+  text: 1. Print preview option
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 3.009.4.2
+  text: 2. Print setting options
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 3.009.5
+  text: e. Send the file to Insurer/s
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.5.1
+  text: 1. Encrypt and add password on the file
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 3.009.6
+  text: f. Received dispositioned file from Insurer
+  frrn:
+  - FRRN.013.01
+  - FRRN.013.02
+  - FRRN.013.05
+- id: BRD 3.009.6.1
+  text: 1. Download and view the file
+  frrn:
+  - FRRN.013.01
+  - FRRN.013.02
+  - FRRN.013.05
+- id: BRD 3.009.6.2
+  text: 2. Update account
+  frrn:
+  - FRRN.013.01
+  - FRRN.013.02
+  - FRRN.013.05
+- id: BRD 3.010.1
+  text: a. Select expiry date range for each report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.1.1
+  text: 1. Select month, day and year
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.1.2
+  text: 2. Change the selected date range
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2
+  text: b. Select single, multiple, all and all except criteria for each report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.1
+  text: 1. Select single, multiple, all except and all Unit Head from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.2
+  text: 2. Search specific Unit Head from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.3
+  text: 3. Select single, multiple, all except and all Risk Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.4
+  text: 4. Search specific Risk Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.5
+  text: 5. Select single, multiple, all except and all Insurance Company from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.6
+  text: 6. Search specific Insurance Company from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.7
+  text: 7. Select single, multiple, all except and all Insurance Group from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.8
+  text: 8. Search specific Insurance Group from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.9
+  text: 9. Select single, multiple, all except and all Business Origin from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.10
+  text: 10. Search specific Business Origin from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.11
+  text: 11. Select single, multiple, all except and all Market Category from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.12
+  text: 12. Search specific Market Category from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.13
+  text: 13. Select single, multiple, all except and all BDO Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.14
+  text: 14. Search specific BDO Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.15
+  text: 15. Select single, multiple, all except and all BDO Area from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.16
+  text: 16. Search specific BDO Area from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.17
+  text: 17. Select single, multiple, all except and all Region from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.18
+  text: 18. Search specific Region from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.19
+  text: 19. Select single, multiple, all except and all Bank Officer from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.20
+  text: 20. Search specific Bank Officer from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.21
+  text: 21. Select single, multiple, all except and all Bank Unit from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.22
+  text: 22. Search specific Bank Unit from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.23
+  text: 23. Select single, multiple, all except and all Product Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.24
+  text: 24. Search specific Product Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.25
+  text: 25. Select single, multiple, all except and all Account Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.26
+  text: 26. Search specific Account Type drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.27
+  text: 27. Select single, multiple, all except and all BDOI Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.28
+  text: 28. Search specific BDOI Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.29
+  text: 29. Select single, multiple, all except and all Location from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.30
+  text: 30. Search specific Location from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.31
+  text: 31. Select single, multiple, all except and all Account Broker from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.32
+  text: 32. Search specific Account Broker from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.33
+  text: 33. Select single, multiple, all except and all Business Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.34
+  text: 34. Search specific Business Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.35
+  text: 35. Select single, multiple, all except and all Customer Segment from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.36
+  text: 36. Search specific Customer Segment from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.37
+  text: 37. Select single, multiple, all except and all Specific Client from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.38
+  text: 38. Search specific Client from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.39
+  text: 39. Select single, multiple, all except and all Renewal Status from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.2.40
+  text: 40. Search specific Renewal Status from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3
+  text: c. Generate a report showing the overall status of the renewal accounts with the following information per invoice
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1
+  text: 1. Display the following information per invoice (display all accounts in 1 view using a scroll bar)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.1
+  text: 1.1. Unit Head
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.2
+  text: 1.2. Account Broker
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.3
+  text: 1.3. Business Origin
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.4
+  text: 1.4. Bank Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.5
+  text: 1.1. Renewal Reference
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.6
+  text: 1.6. Expiring Ebix Invoice No
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.7
+  text: 1.7. Assured
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.8
+  text: 1.8. Type of Risk
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.9
+  text: 1.9. Expiring Invoice Inception Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.10
+  text: 1.10. Expiring Invoice Expiry Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.11
+  text: 1.11. Renewal Reference Inception Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.12
+  text: 1.12. Renewal Reference Expiry Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.13
+  text: 1.13. Expiring Invoice Policy Number
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.14
+  text: 1.14. Account Type
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.15
+  text: 1.11. Basic Premium
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.16
+  text: 1.16. Gross Premium
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.17
+  text: 1.17. Premium Rate
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.18
+  text: 1.18. Commission Rate
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.19
+  text: 1.19. Total Sum Insured
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.20
+  text: 1.20. Risk Description
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.21
+  text: 1.21. Location Of Risk
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.22
+  text: 1.22. Address
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.23
+  text: 1.23. Contact No(S).
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.24
+  text: 1.24. Email Address
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.25
+  text: 1.21. Region
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.26
+  text: 1.26. Area
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.27
+  text: 1.27. Branch
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.28
+  text: 1.28. Insurer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.29
+  text: 1.29. Location
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.30
+  text: 1.30. Mortgaged To BDO
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.31
+  text: 1.31. Mortgagee Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.32
+  text: 1.32. PN Number
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.33
+  text: 1.33. Hold Cover (HC)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.34
+  text: 1.34. HC End Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.35
+  text: 1.31. Renewal Status
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.36
+  text: 1.36. Reason for "Not for Renewal"
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.37
+  text: 1.37. Remarks Of Acct Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.38
+  text: 1.38. Name of Renewal Processor
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.39
+  text: 1.39. Name of Assigned Marketing Account Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.1.40
+  text: 1.40. Sum Insured per Cover
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2
+  text: 2. Display a summary
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.1
+  text: 2.1. Total No. of Booked
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.2
+  text: 2.2. Total No. of Cancelled
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.3
+  text: 2.3. Total No. of Renewal - For Placement
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.4
+  text: 2.4. Total No. of Renewal - For Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.5
+  text: 2.5. Total No. of Renewal - For ARF
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.6
+  text: 2.6. Total No. of RA Processed
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.7
+  text: 2.7. Total No. of Renewal - For RA Processing
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.8
+  text: 2.8. Total No. of Renew to TSU
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.9
+  text: 2.9. Total No. of Returned to Marketing
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.10
+  text: 2.10. Total No. of Awaiting Marketing TL Approval (For Renewal)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.11
+  text: 2.11. Total No. of Awaiting Marketing TL Approval (For Quotation)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.12
+  text: 2.12. Total No. of Awaiting Marketing TL Approval (Not For Renewal)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.13
+  text: 2.13. Total No. of Awaiting Marketing TL Approval (Lost Business)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.14
+  text: 2.14. Total No. of Disapproved Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.15
+  text: 2.15. Total No. of Not for Renewal Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.16
+  text: 2.16. Total No. of Mortgaged Lost Business
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.17
+  text: 2.17. Total No. of Unrenewed Mortgaged for Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.18
+  text: 2.18. Total No. of Unrenewed Mortgaged Transferred to Other Unit
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.19
+  text: 2.19. Total No. of Mortgaged Loan Fully Paid
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.20
+  text: 2.20. Total number of Unrenewed Mortgaged Awaiting Confirmation
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.21
+  text: 2.21. Total No. of Mortgaged Booked under New Invoice No.
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.22
+  text: 2.22. Total No. of Unrenewed Mortgaged No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.23
+  text: 2.23. Total No. of Unrenewed Mortgaged to Other Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.24
+  text: 2.24. Total No. of Non- Mortgaged Lost Business
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.25
+  text: 2.25. Total No. of Unrenewed Non- Mortgaged For Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.26
+  text: 2.26. Total No. of Unrenewed Non- Mortgaged Transferred to Other Unit
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.27
+  text: 2.27. Total No. of Non- Mortgaged Loan Fully Paid
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.28
+  text: 2.28. Total No. of Unrenewed Non- Mortgaged Awaiting Confirmation from Client
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.29
+  text: 2.29. Total No. of Non- Mortgaged Booked under Invoice No.
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.30
+  text: 2.30. Total No. of Unrenewed Non- Mortgaged with No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.31
+  text: 2.31. Total No. of Unrenewed Non- Mortgaged to Other Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.32
+  text: 2.32. Total No. of Non- renewable Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.33
+  text: 2.33. Total No. of No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.3.2.34
+  text: 2.34. Total No. of Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.4
+  text: d. Download report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.4.1
+  text: 1. Download in a .xlsx format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.4.2
+  text: 2. Download in a .pdf format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.5
+  text: e. Save report in the desired location
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.5.1
+  text: 1. Save in a .xlsx format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.5.2
+  text: 2. Save in a .pdf format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.6
+  text: f. Print report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 3.010.7
+  text: g. View the assigned accounts per Processing Officer in a dashboard
+  frrn:
+  - FRRN.002.02
+  - FRRN.003.01
+- id: BRD 3.011.1
+  text: a. Select single, multiple, all except and all accounts
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.2
+  text: b. Generate RA for the selected account/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.2.1
+  text: 1. Disable RA generation on locked accounts (account should be locked on the marketing side when the RA is generated)
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.2.2
+  text: 2. With visible identifier if the generated RA is for first notice or second notice
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.3
+  text: c. View the generated RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.3.1
+  text: 1. Select RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.3.2
+  text: 2. Preview the details of the RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.3.3
+  text: 3. Close the preview
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.4
+  text: d. Download the generated RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.4.1
+  text: 1. Select single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.4.2
+  text: 2. Download single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.5
+  text: e. Save the generated RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.5.1
+  text: 1. Select single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.5.2
+  text: 2. Select the desired location
+  frrn:
+  - FRRN.022.01
+- id: BRD 3.011.6
+  text: f. Extract the details required for RA sending
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 3.011.7
+  text: g. Send RA in batch
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 3.011.7.1
+  text: 1. Encrypt and add password prior to sendin
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 4.001.1
+  text: a. Access the module/application using any BDO issued device
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 4.001.1.1
+  text: 1. Log in with a Operations Team Leader user profile
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 4.001.1.2
+  text: 2. Receive the inactivity warning (15 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 4.001.1.3
+  text: 3. Receive warning prior to system triggered log out (30 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 4.002.1
+  text: a. Open the application in multiple tabs
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 4.003.1
+  text: a. View all accounts assigned to me (display all accounts in 1 view using a scroll bar). Any updates/endorsement
+    should reflect on the mother policy
+  frrn:
+  - FRRN.003.05
+- id: BRD 4.003.1.1
+  text: 1. Select an account
+  frrn:
+  - FRRN.003.05
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 4.003.1.2
+  text: 2. View the complete renewal fields of the selected account from the generated expiring account list
+  frrn:
+  - FRRN.003.05
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 4.003.1.3
+  text: 3. Option to filter each column of the list
+  frrn:
+  - FRRN.003.05
+- id: BRD 4.003.1.4
+  text: 4. Option to sort the list
+  frrn:
+  - FRRN.003.05
+- id: BRD 4.003.1.5
+  text: 5. Search specific information from the list (i.e. similar to control F function)
+  frrn:
+  - FRRN.002.05
+  - FRRN.002.06
+- id: BRD 4.003.1.6
+  text: 6. Search a particular account via name, QPS reference number, Ebix reference number
+  frrn:
+  - FRRN.002.06
+- id: BRD 4.003.2
+  text: b. Save the account details as needed
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 4.003.3
+  text: C. Print the account details as needed
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 4.003.3.1
+  text: 1. Print preview option
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 4.003.3.2
+  text: 2. Print setting options
+  frrn:
+  - FRRN.014.01
+  - FRRN.014.06
+- id: BRD 4.004.1
+  text: a. Upload file/s
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 4.004.1.1
+  text: 1. Select the source path
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 4.004.1.2
+  text: 2. Select the file/s for upload
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 4.004.2
+  text: b. Upload single or multiple files
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 4.004.3
+  text: c. Push the uploaded account to the list of accounts for Processing
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 4.004.3.1
+  text: 1. Capture the account/s on the uploaded file as part of the generated list of accounts for processing
+  frrn:
+  - FRRN.015.03
+  - FRRN.015.07
+- id: BRD 4.005.1
+  text: a. Select an account
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 4.005.2
+  text: b. View specific details of the selected account
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 4.005.3
+  text: c. Update necessary details
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 4.005.3.1
+  text: 1. Easily view mandatory details
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 4.005.3.2
+  text: 2. Receive prompts to supply missing mandatory details. The system should not allow me to push the account to the
+    next workflow if there are missing mandatory fields
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 4.005.3.3
+  text: 3. Save updated details
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 4.005.3.4
+  text: 4. Disable editing on locked accounts (account should be locked after placement)
+  frrn:
+  - FRRN.005.01
+  - FRRN.009.01
+- id: BRD 4.006.1
+  text: a. Review computations per account
+  frrn:
+  - FRRN.009.01
+- id: BRD 4.006.1.1
+  text: 1.View all calculated fields
+  frrn:
+  - FRRN.009.01
+- id: BRD 4.006.2
+  text: b. Return account/s
+  frrn:
+  - FRRN.031.01
+- id: BRD 4.006.2.1
+  text: 1. Select single, multiple, all except and all account/s
+  frrn:
+  - FRRN.031.01
+- id: BRD 4.006.2.2
+  text: 2. Tag the status as returned
+  frrn:
+  - FRRN.031.01
+- id: BRD 4.006.2.3
+  text: 3. Add remarks
+  frrn:
+  - FRRN.031.01
+- id: BRD 4.006.2.4
+  text: 4. Save remarks
+  frrn:
+  - FRRN.031.01
+- id: BRD 4.006.2.5
+  text: 5. Return to the assigned Marketing AO
+  frrn:
+  - FRRN.031.01
+- id: BRD 4.006.2.6
+  text: 6. Flag the returned account
+  frrn:
+  - FRRN.031.01
+- id: BRD 4.006.2.7
+  text: 7. Push the account/s to the next workflow
+  frrn:
+  - FRRN.031.01
+- id: BRD 4.007.1
+  text: a. View the list of "For renewal" accounts per Insurer (display all accounts in 1 view using a scroll bar)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.1
+  text: 1. Select date range
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.2
+  text: 2. Select the name of the Insurer from the drop-down
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.3
+  text: 3. Search the name of specific Insurer
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4
+  text: '4. View the following columns:'
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.1
+  text: 4.1. Insurance Company
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.2
+  text: 4.2. Invoice No
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.3
+  text: 4.3. Assured Name
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.4
+  text: 4.4. Risk Code
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.5
+  text: 4.5. Inception Date
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.6
+  text: 4.6. Expiry Date
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.7
+  text: 4.7. Sum Insured
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.8
+  text: 4.8. Premium Amount
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.9
+  text: 4.9. Commission Rate
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.10
+  text: 4.10. AR Client (Unpaid Balance)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.11
+  text: 4.11. Is Mortgaged (Yes Or No)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.12
+  text: 4.12. Premium Rate (breakdown per cover)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.13
+  text: 4.13. Policy No
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.14
+  text: 4.14. Risk Description
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.15
+  text: 4.15. Encoder Name (User Who Booked the Account)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.16
+  text: 4.16. Unit Head
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.17
+  text: 4.17. Business Origin
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.18
+  text: 4.18. Account Type
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.19
+  text: 4.19. Region
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.20
+  text: 4.20. Area
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.21
+  text: 4.21. Branch
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.22
+  text: 4.22. Account Officer Name
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.23
+  text: 4.23. Remarks
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.24
+  text: 4.24. Bodily Injury and Property Damage for Motor Accounts (BIPD)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.25
+  text: 4.25. Seating capacity for Motor
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.26
+  text: 4.26. Auto Personal Accident for Motor
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.27
+  text: 4.27. Sum Insured (breakdown per cover)
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.1.4.28
+  text: 4.28. Packaged/Non- Packaged description
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.2
+  text: b. Download the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 4.007.3
+  text: c. Save the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 4.007.4
+  text: d. Print the generated list in a .xlsx format when needed
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 4.007.4.1
+  text: 1. Print preview option
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 4.007.4.2
+  text: 2. Print setting options
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+  - FRRN.044.04
+- id: BRD 4.007.5
+  text: e. Send the file to Insurer/s
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.5.1
+  text: 1. Encrypt and add password on the file
+  frrn:
+  - FRRN.021
+  - FRRN.029.05
+- id: BRD 4.007.6
+  text: f. Received dispositioned file from Insurer
+  frrn:
+  - FRRN.013.01
+  - FRRN.013.02
+  - FRRN.013.05
+- id: BRD 4.007.6.1
+  text: 1. Download and view the file
+  frrn:
+  - FRRN.013.01
+  - FRRN.013.02
+  - FRRN.013.05
+- id: BRD 4.007.6.2
+  text: 2. Update account
+  frrn:
+  - FRRN.013.01
+  - FRRN.013.02
+  - FRRN.013.05
+- id: BRD 4.008.1
+  text: a. Select expiry date range for each report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.1.1
+  text: 1. Select month, day and year
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.1.2
+  text: 2. Change the selected date range
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2
+  text: b. Select single, multiple, all and all except criteria for each report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.1
+  text: 1. Select single, multiple, all except and all Unit Head from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.2
+  text: 2. Search specific Unit Head from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.3
+  text: 3. Select single, multiple, all except and all Risk Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.4
+  text: 4. Search specific Risk Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.5
+  text: 5. Select single, multiple, all except and all Insurance Company from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.6
+  text: 6. Search specific Insurance Company from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.7
+  text: 7. Select single, multiple, all except and all Insurance Group from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.8
+  text: 8. Search specific Insurance Group from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.9
+  text: 9. Select single, multiple, all except and all Business Origin from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.10
+  text: 10. Search specific Business Origin from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.11
+  text: 11. Select single, multiple, all except and all Market Category from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.12
+  text: 12. Search specific Market Category from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.13
+  text: 13. Select single, multiple, all except and all BDO Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.14
+  text: 14. Search specific BDO Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.15
+  text: 15. Select single, multiple, all except and all BDO Area from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.16
+  text: 16. Search specific BDO Area from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.17
+  text: 17. Select single, multiple, all except and all Region from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.18
+  text: 18. Search specific Region from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.19
+  text: 19. Select single, multiple, all except and all Bank Officer from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.20
+  text: 20. Search specific Bank Officer from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.21
+  text: 21. Select single, multiple, all except and all Bank Unit from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.22
+  text: 22. Search specific Bank Unit from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.23
+  text: 23. Select single, multiple, all except and all Product Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.24
+  text: 24. Search specific Product Code from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.25
+  text: 25. Select single, multiple, all except and all Account Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.26
+  text: 26. Search specific Account Type drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.27
+  text: 27. Select single, multiple, all except and all BDOI Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.28
+  text: 28. Search specific BDOI Branch from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.29
+  text: 29. Select single, multiple, all except and all Location from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.30
+  text: 30. Search specific Location from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.31
+  text: 31. Select single, multiple, all except and all Account Broker from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.32
+  text: 32. Search specific Account Broker from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.33
+  text: 33. Select single, multiple, all except and all Business Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.34
+  text: 34. Search specific Business Type from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.35
+  text: 35. Select single, multiple, all except and all Customer Segment from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.36
+  text: 36. Search specific Customer Segment from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.37
+  text: 37. Select single, multiple, all except and all Specific Client from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.38
+  text: 38. Search specific Client from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.39
+  text: 39. Select single, multiple, all except and all Renewal Status from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.2.40
+  text: 40. Search specific Renewal Status from the drop-down list
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3
+  text: c. Generate a report showing the overall status of the renewal accounts with the following information per invoice
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1
+  text: 1. Display the following information per invoice (display all accounts in 1 view using a scroll bar). Any updates/endorsement
+    should reflect on the mother policy
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.1
+  text: 1.1. Unit Head
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.2
+  text: 1.2. Account Broker
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.3
+  text: 1.3. Business Origin
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.4
+  text: 1.4. Bank Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.5
+  text: 1.1. Renewal Reference
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.6
+  text: 1.6. Expiring Ebix Invoice No
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.7
+  text: 1.7. Assured
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.8
+  text: 1.8. Type of Risk
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.9
+  text: 1.9. Expiring Invoice Inception Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.10
+  text: 1.10. Expiring Invoice Expiry Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.11
+  text: 1.11. Renewal Reference Inception Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.12
+  text: 1.12. Renewal Reference Expiry Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.13
+  text: 1.13. Expiring Invoice Policy Number
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.14
+  text: 1.14. Account Type
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.15
+  text: 1.11. Basic Premium
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.16
+  text: 1.16. Gross Premium
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.17
+  text: 1.17. Premium Rate
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.18
+  text: 1.18. Commission Rate
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.19
+  text: 1.19. Total Sum Insured
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.20
+  text: 1.20. Risk Description
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.21
+  text: 1.21. Location Of Risk
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.22
+  text: 1.22. Address
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.23
+  text: 1.23. Contact No(S).
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.24
+  text: 1.24. Email Address
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.25
+  text: 1.21. Region
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.26
+  text: 1.26. Area
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.27
+  text: 1.27. Branch
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.28
+  text: 1.28. Insurer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.29
+  text: 1.29. Location
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.30
+  text: 1.30. Mortgaged To BDO
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.31
+  text: 1.31. Mortgagee Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.32
+  text: 1.32. PN Number
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.33
+  text: 1.33. Hold Cover (HC)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.34
+  text: 1.34. HC End Date
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.35
+  text: 1.31. Renewal Status
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.36
+  text: 1.36. Reason for "Not For Renewal"
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.37
+  text: 1.37. Remarks of Acct Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.38
+  text: 1.38. Name of Renewal Processor
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.39
+  text: 1.39. Name of Assigned Marketing Account Officer
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.1.40
+  text: 1.40. Sum Insured per Cover
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2
+  text: 2. Display a summary
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.1
+  text: 2.1. Total No. of Booked
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.2
+  text: 2.2. Total No. of Cancelled
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.3
+  text: 2.3. Total No. of Renewal - For Placement
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.4
+  text: 2.4. Total No. of Renewal - For Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.5
+  text: 2.5. Total No. of Renewal - For ARF
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.6
+  text: 2.6. Total No. of RA Processed
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.7
+  text: 2.7. Total No. of Renewal - For RA Processing
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.8
+  text: 2.8. Total No. of Renew to TSU
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.9
+  text: 2.9. Total No. of Returned to Marketing
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.10
+  text: 2.10. Total No. of Awaiting Marketing TL Approval (For Renewal)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.11
+  text: 2.11. Total No. of Awaiting Marketing TL Approval (For Quotation)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.12
+  text: 2.12. Total No. of Awaiting Marketing TL Approval (Not For Renewal)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.13
+  text: 2.13. Total No. of Awaiting Marketing TL Approval (Lost Business)
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.14
+  text: 2.14. Total No. of Disapproved Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.15
+  text: 2.15. Total No. of Not For Renewal Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.16
+  text: 2.16. Total No. of Mortgaged Lost Business
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.17
+  text: 2.17. Total No. of Unrenewed Mortgaged for Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.18
+  text: 2.18. Total No. of Unrenewed Mortgaged Transferred to Other Unit
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.19
+  text: 2.19. Total No. of Mortgaged Loan Fully Paid
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.20
+  text: 2.20. Unrenewed Mortgaged Awaiting Confirmation
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.21
+  text: 2.21. Total No. of Mortgaged Booked under New Invoice No.
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.22
+  text: 2.22. Total No. of Unrenewed Mortgaged No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.23
+  text: 2.23. Total No. of Unrenewed Mortgaged to Other Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.24
+  text: 2.24. Total No. of Non- Mortgaged Lost Business
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.25
+  text: 2.25. Total No. of Unrenewed Non- Mortgaged for Proposal
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.26
+  text: 2.26. Total No. of Unrenewed Non- Mortgaged Transferred To Other Unit
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.27
+  text: 2.27. Total No. of Non- Mortgaged Loan Fully Paid
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.28
+  text: 2.28. Total No. of Unrenewed Non- Mortgaged Awaiting Confirmation from Client
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.29
+  text: 2.29. Total No. of Non- Mortgaged Booked under Invoice No.
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.30
+  text: 2.30. Total No. of Unrenewed Non- Mortgaged No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.31
+  text: 2.31. Total No. of Unrenewed Non- Mortgaged to Other Bank
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.32
+  text: 2.32. Total No. of Non- renewable Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.33
+  text: 2.33. Total No. of No Disposition
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.3.2.34
+  text: 2.34. Total No. of Accounts
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.4
+  text: d. Download report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.4.1
+  text: 1. Download in a .xlsx format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.4.2
+  text: 2. Download in a .pdf format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.5
+  text: e. Save report in the desired location
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.5.1
+  text: 1. Save in a .xlsx format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.5.2
+  text: 2. Save in a .pdf format
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.008.6
+  text: f. Print report
+  frrn:
+  - FRRN.044.01
+  - FRRN.044.02
+- id: BRD 4.09.1
+  text: a. Select single, multiple, all except and all accounts
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.2
+  text: b. Generate RA for the selected account/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.2.1
+  text: 1. Disable RA generation on locked accounts (account should be locked on the marketing side when the RA is generated)
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.2.2
+  text: 2. With visible identifier if the generated RA is for first notice or second notice
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.2.3
+  text: c. View the generated RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.3
+  text: 1. Select RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.3.1
+  text: 2. Preview the details of the RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.3.2
+  text: 3. Close the preview
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.4
+  text: d. Download the generated RA
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.4.1
+  text: 1. Select single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.4.2
+  text: 2. Download single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.5
+  text: e. Save the generated RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.5.1
+  text: 1. Select single or multiple RA/s
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.5.2
+  text: 2. Select the desired location
+  frrn:
+  - FRRN.022.01
+- id: BRD 4.09.6
+  text: f. Extract the details required for RA sending
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 4.09.7
+  text: g. Send RA in batch
+  frrn:
+  - FRRN.022.02
+  - FRRN.024.01
+- id: BRD 5.001.1
+  text: a. Access the module/application using any BDO issued device
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 5.001.1.1
+  text: 1. Log in with a Business Administrator user profile
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 5.001.1.2
+  text: 2. Receive the inactivity warning (15 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 5.001.1.3
+  text: 3. Receive warning prior to system triggered log out (30 minutes)
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 5.002.1
+  text: a. Open the application in multiple tabs
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 5.003.1
+  text: a. View defined LOVs
+  frrn:
+  - FRRN.049.01
+- id: BRD 5.003.2
+  text: b. Add new LOVs
+  frrn:
+  - FRRN.049.01
+- id: BRD 5.003.3
+  text: c. Edit defined LOVs
+  frrn:
+  - FRRN.049.01
+- id: BRD 5.003.4
+  text: d. Delete defined LOVs
+  frrn:
+  - FRRN.049.01
+- id: BRD 5.003.5
+  text: e. Select an effectivity date on the changes in LOVs
+  frrn:
+  - FRRN.049.01
+- id: BRD 5.004.1
+  text: a. Assign user profile/role to a specific user/s (based on agreed User Access Matrix)
+  frrn:
+  - FRRN.001.05
+- id: BRD 5.005.1
+  text: a. Update the Renewal Advice template when necessary
+  frrn:
+  - FRRN.049.02
+- id: BRD 6.001.1
+  text: a. Access the application using any BDO Work station
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 6.001.1.1
+  text: 1. Log in with a System Administrator User profile
+  frrn:
+  - FRRN.001.01
+  - FRRN.001.02
+  - FRRN.001.03
+  - FRRN.001.04
+- id: BRD 6.002.1
+  text: a. Define User profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.1.2
+  text: 1. Create profile for Marketing Team Leader
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.1.3
+  text: 2. Create profile for Marketing Account Officer/Admin
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.1.4
+  text: 3. Create profile for Processing Team Leader
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.1.5
+  text: 4. Create profile for Processing Officer
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.1.6
+  text: 5. Create profile for Business Administrator
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2
+  text: b. Assign specific functionality/capability to a user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.1
+  text: 1. Assign Acquire Document/s function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.2
+  text: 2. Assign open the application in multiple tabs function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.3
+  text: 3. Assign generate the list of expiring accounts function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.4
+  text: 4. Assign view account function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.5
+  text: 5. Assign accounts function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.6
+  text: 6. Assign transfer to account to other units’ function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.7
+  text: 7. Assign receive account transfer requests from other units’ function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.8
+  text: 8. Assign review and post disposition accounts function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.9
+  text: 9. Assign generate report function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.10
+  text: 10. Assign generate renewal advice (RA) function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.11
+  text: 11. Assign view accounts for disposition function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.12
+  text: 12. Assign provide disposition function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.13
+  text: 13. Assign view the list of dispositioned accounts function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.14
+  text: 14. Assign update the returned accounts function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.15
+  text: 15. Assign generate list of accounts for processing function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.16
+  text: 16. Assign upload dispositioned file function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.17
+  text: 17. Assign view accounts for processing function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.18
+  text: 18. Assign update data on an account function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.19
+  text: 19. Assign review computations function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.20
+  text: 20. Assign extract accounts for renewal per insurer function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.21
+  text: 21. Assign view generate renewal advice (RA) function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.22
+  text: 22. Assign return account/s function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.23
+  text: 23. Assign maintain LOVs function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+  - FRRN.049.01
+- id: BRD 6.002.2.24
+  text: 24. Assign maintain users function to a specific user profile/role
+  frrn:
+  - FRRN.001.05
+- id: BRD 6.002.2.25
+  text: 25. Update the Renewal Advice Template
+  frrn:
+  - FRRN.001.05
+  - FRRN.049.02

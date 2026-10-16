@@ -12,7 +12,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
@@ -30,9 +29,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * {@code UAM-REQUESTS} Access Requests (BRD 1.008; FR-UA-018): the access requests created in a
- * period by status, type, requester and approver, with their age in days (to the decision, or to
- * today while open). Grouped by status.
+ * {@code UAM-REQUESTS} Group Profile Changes (BRD 1.008; FR-UA-018): the maker-checker changes of
+ * the group profiles raised in a period (new group profile, change of definition or permissions,
+ * deactivation, reactivation) by status, with the maker, the checker and their age in days (to the
+ * decision, or to today while open). Grouped by status. Users and their membership are maintained
+ * in UIDM-ISC, so requests about users (kept as history from before) are not listed.
  */
 @Component
 public class AccessRequestsReport implements ReportDefinition, NamedExport {
@@ -42,6 +43,14 @@ public class AccessRequestsReport implements ReportDefinition, NamedExport {
 
   private static final String STATUS = "status";
   private static final String TYPE = "type";
+  private static final List<AccessRequestType> CHANGES =
+      Arrays.stream(AccessRequestType.values()).filter(AccessRequestType::isGroupProfile).toList();
+  private static final Map<String, String> CHANGE_NAMES =
+      Map.of(
+          "CREATE_ROLE", "New group profile",
+          "MODIFY_ROLE_PERMISSIONS", "Change of definition or permissions",
+          "DEACTIVATE_ROLE", "Deactivation",
+          "REACTIVATE_ROLE", "Reactivation");
   private static final Set<String> OPEN =
       Set.of("DRAFT", "PENDING", "PENDING_SECOND", "RETURNED", "SCHEDULED", "FOR_IMPLEMENTATION");
 
@@ -61,7 +70,7 @@ public class AccessRequestsReport implements ReportDefinition, NamedExport {
 
   @Override
   public String exportName() {
-    return "Access Requests Report";
+    return "Group Profile Changes Report";
   }
 
   @Override
@@ -72,11 +81,14 @@ public class AccessRequestsReport implements ReportDefinition, NamedExport {
             STATUS, "Status", options(AccessRequestStatus.values()), UamReportSupport.ALL));
     params.add(
         ParameterSpec.select(
-            TYPE, "Request Type", options(AccessRequestType.values()), UamReportSupport.ALL));
+            TYPE,
+            "Change",
+            options(CHANGES.toArray(AccessRequestType[]::new)),
+            UamReportSupport.ALL));
     return UamReportSupport.metadata(
         CODE,
-        "Access Requests",
-        "Access requests by status, type, requester and approver, with their age",
+        "Group Profile Changes",
+        "Changes of the group profiles by status, with the maker, the checker and their age",
         params);
   }
 
@@ -88,34 +100,39 @@ public class AccessRequestsReport implements ReportDefinition, NamedExport {
     args.put("end", Timestamp.from(UamReportSupport.endOf(period[1])));
     args.put(STATUS, p.text(STATUS));
     args.put(TYPE, p.text(TYPE));
+    args.put("changes", CHANGES.stream().map(Enum::name).toList());
     LocalDate today = BusinessClock.today(clock);
     List<Map<String, Object>> rows =
         jdbc
             .queryForList(
-                "select request_no, request_type, status, coalesce(role_code, username) as subject,"
-                    + " coalesce(submitted_by, created_by) as requester,"
-                    + " coalesce(decided_by, assigned_approver) as approver, created_at,"
-                    + " decided_at, effective_from from nba_access_request"
-                    + " where created_at >= :start and created_at < :end"
-                    + " and (:status = 'ALL' or status = :status)"
-                    + " and (:type = 'ALL' or request_type = :type)"
-                    + " order by status, created_at, request_no",
+                "select r.request_no, r.request_type, r.status, r.role_code,"
+                    + " coalesce(g.name, r.role_code) as profile_name,"
+                    + " r.permissions_added, r.permissions_removed,"
+                    + " coalesce(r.submitted_by, r.created_by) as maker, r.decided_by,"
+                    + " r.created_at, r.decided_at from nba_access_request r"
+                    + " left join sec_role g on g.code = r.role_code"
+                    + " where r.request_type in (:changes)"
+                    + " and r.created_at >= :start and r.created_at < :end"
+                    + " and (:status = 'ALL' or r.status = :status)"
+                    + " and (:type = 'ALL' or r.request_type = :type)"
+                    + " order by r.status, r.created_at, r.request_no",
                 args)
             .stream()
             .map(r -> row(r, today))
             .toList();
     return TabularReportBuilder.of(p)
         .columns(
-            ReportColumn.text("requestNo", "Request No."),
-            ReportColumn.text(TYPE, "Request Type"),
-            ReportColumn.text("subject", "User / Group Profile"),
-            ReportColumn.text("requester", "Requester"),
-            ReportColumn.text("approver", "Approver"),
-            ReportColumn.date("createdAt", "Date Created"),
+            ReportColumn.text("changeNo", "Change No."),
+            ReportColumn.text(TYPE, "Change"),
+            ReportColumn.text("profileCode", "Group Profile Code"),
+            ReportColumn.text("profileName", "Group Profile"),
+            ReportColumn.text("permissions", "Permissions Added / Removed"),
+            ReportColumn.text("maker", "Maker"),
+            ReportColumn.text("checker", "Checker"),
+            ReportColumn.date("createdAt", "Date Raised"),
             ReportColumn.date("decidedAt", "Date Decided"),
-            ReportColumn.date("effectiveFrom", "Effective Date"),
             new ReportColumn("age", "Age (days)", ColumnType.NUMBER, false),
-            ReportColumn.count("requests", "Requests"))
+            ReportColumn.count("changes", "Changes"))
         .groupBy(STATUS, "Status")
         .rows(rows)
         .presorted()
@@ -136,17 +153,36 @@ public class AccessRequestsReport implements ReportDefinition, NamedExport {
         OPEN.contains(status) || decided == null ? today : UamReportSupport.date(decided);
     Map<String, Object> m = new LinkedHashMap<>();
     m.put(STATUS, UamReportSupport.words(status));
-    m.put("requestNo", UamReportSupport.text(r, "request_no"));
-    m.put(TYPE, UamReportSupport.words(UamReportSupport.text(r, "request_type")));
-    m.put("subject", UamReportSupport.text(r, "subject"));
-    m.put("requester", UamReportSupport.text(r, "requester"));
-    m.put("approver", UamReportSupport.text(r, "approver"));
+    m.put("changeNo", UamReportSupport.text(r, "request_no"));
+    String type = UamReportSupport.text(r, "request_type");
+    m.put(TYPE, CHANGE_NAMES.getOrDefault(type, UamReportSupport.words(type)));
+    m.put("profileCode", UamReportSupport.text(r, "role_code"));
+    m.put("profileName", UamReportSupport.text(r, "profile_name"));
+    m.put("permissions", permissions(r));
+    m.put("maker", UamReportSupport.text(r, "maker"));
+    m.put("checker", UamReportSupport.text(r, "decided_by"));
     m.put("createdAt", createdOn);
     m.put("decidedAt", UamReportSupport.date(decided));
-    Object effective = r.get("effective_from");
-    m.put("effectiveFrom", effective instanceof Date d ? d.toLocalDate() : null);
     m.put("age", Math.max(0, ChronoUnit.DAYS.between(createdOn, until)));
-    m.put("requests", 1);
+    m.put("changes", 1);
     return m;
+  }
+
+  /** The count of permissions added and removed ("3 added, 1 removed"); empty when none. */
+  private static String permissions(Map<String, Object> r) {
+    int added = count(UamReportSupport.text(r, "permissions_added"));
+    int removed = count(UamReportSupport.text(r, "permissions_removed"));
+    List<String> parts = new ArrayList<>();
+    if (added > 0) {
+      parts.add(added + " added");
+    }
+    if (removed > 0) {
+      parts.add(removed + " removed");
+    }
+    return String.join(", ", parts);
+  }
+
+  private static int count(String codes) {
+    return codes == null || codes.isBlank() ? 0 : codes.split(",").length;
   }
 }

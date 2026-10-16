@@ -2,7 +2,10 @@ package com.iortatechnxt.brokerverse.nbadmin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +16,7 @@ import com.iortatechnxt.brokerverse.nbadmin.report.AccessRequestsReport;
 import com.iortatechnxt.brokerverse.nbadmin.report.GroupMembersReport;
 import com.iortatechnxt.brokerverse.nbadmin.report.GroupProfileReport;
 import com.iortatechnxt.brokerverse.nbadmin.report.UserAccessReport;
+import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportRow;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
@@ -24,6 +28,7 @@ import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -207,6 +212,73 @@ class UserAccessReportsIT {
             .isNotEmpty();
       }
     }
+  }
+
+  /** Labels of the columns no user access report may show any more. */
+  private static final List<String> OBSOLETE =
+      List.of("Approver", "Effective", "User Type", "Break", "Second Factor", "MFA");
+
+  private void hasColumns(ReportResult result, String... keys) {
+    assertThat(result.columns()).extracting(ReportColumn::key).contains(keys);
+    assertThat(result.columns())
+        .extracting(ReportColumn::label)
+        .noneMatch(label -> OBSOLETE.stream().anyMatch(label::contains));
+  }
+
+  @Test
+  void everyUserAccessReportRunsOnTheSeedDataWithItsColumns() throws Exception {
+    Map<String, String> yearToDate = Map.of("from", today().substring(0, 4) + "-01-01");
+    ReportResult users = run(UserAccessReport.CODE, Map.of());
+    hasColumns(users, "fullName", "userId", "profiles", "unit", "status", "createdBy");
+    assertThat(details(users))
+        .anySatisfy(r -> assertThat(String.valueOf(r.get("userId"))).startsWith("admin"));
+
+    ReportResult profiles = run(GroupProfileReport.CODE, Map.of());
+    hasColumns(profiles, "module", "task", "access", "createdAt", "modifiedBy");
+    assertThat(details(profiles)).hasSizeGreaterThan(10);
+
+    ReportResult members = run(GroupMembersReport.CODE, Map.of());
+    hasColumns(members, "fullName", "username", "addedBy", "addedAt");
+    assertThat(details(members)).anySatisfy(r -> assertThat(r.get("username")).isNotNull());
+
+    ReportResult audit = run(AccessAuditLogReport.CODE, yearToDate);
+    hasColumns(audit, "time", "userId", "doneBy", "action", "fromValue", "toValue", "activity");
+    assertThat(details(audit)).isNotEmpty();
+
+    // Group Profile Changes: the group-profile changes only, without the user request columns.
+    ReportResult changes = run(AccessRequestsReport.CODE, yearToDate);
+    assertThat(changes.title()).isEqualTo("Group Profile Changes");
+    hasColumns(
+        changes, "changeNo", "type", "profileCode", "profileName", "maker", "checker", "age");
+    assertThat(details(changes))
+        .isNotEmpty()
+        .allSatisfy(
+            r ->
+                assertThat(r.get("type"))
+                    .isIn(
+                        "New group profile",
+                        "Change of definition or permissions",
+                        "Deactivation",
+                        "Reactivation"));
+    assertThat(changes.columns())
+        .extracting(ReportColumn::key)
+        .doesNotContain("approver", "effectiveFrom", "subject", "requester");
+
+    api.doGet(BADMIN, "/api/v1/nbadmin/access-matrix/export")
+        .andExpect(status().isOk())
+        .andExpect(header().string("Content-Disposition", containsString(".xlsx")));
+    api.doGet(BADMIN, "/api/v1/nbadmin/sod-rules/violations").andExpect(status().isOk());
+    String extract =
+        api.doPost(BADMIN, "/api/v1/nbadmin/certification/extract", Map.of("format", "CSV"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString(StandardCharsets.UTF_8);
+    assertThat(extract.lines().findFirst().orElseThrow())
+        .contains("User ID", "Group Profile", "Permission");
+    assertThat(extract.lines().count()).isGreaterThan(10);
+    api.doGet(BADMIN, "/api/v1/nbadmin/certification/extracts")
+        .andExpect(jsonPath("$[0].format").value("CSV"));
   }
 
   @Test

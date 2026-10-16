@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 /**
  * {@code UAM-USER-ACCESS} User Access Report (BRD 3.003.1, sample A; FR-UA-060): each user with the
  * group profiles held at the end of the as-of date, business unit and level, status, who created
- * and last modified the user (the approver and request number of the request, from the access
- * change log) and the last action. Sorted by user ID.
+ * and last modified the user (UIDM-ISC with its request number, or the user of a change made here,
+ * from the access change log) and the last action. Sorted by user ID.
  */
 @Component
 public class UserAccessReport implements ReportDefinition, NamedExport {
@@ -119,8 +119,8 @@ public class UserAccessReport implements ReportDefinition, NamedExport {
         .withoutGrandTotal()
         .note(
             "Group profiles and status as at the end of the as-of date (Philippine time), from the"
-                + " access change log. Created / modified by: the approver and request number of"
-                + " the access request, or the user who made a direct change.")
+                + " access change log. Created / modified by: UIDM-ISC with its request number, or"
+                + " the user who made the change in this system.")
         .build();
   }
 

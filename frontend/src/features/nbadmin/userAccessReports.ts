@@ -13,7 +13,7 @@ export const USER_ACCESS_REPORTS: readonly UserAccessReportLink[] = [
   {
     code: 'UAM-USER-ACCESS',
     name: 'User Access Report',
-    text: 'Users with their group profiles, business unit, level and status, who created and last modified them (approver and request number) and the last action.',
+    text: 'Users with their group profiles, business unit, level and status, who created and last modified them (UIDM-ISC with its request number) and the last action.',
     requirementRefs: 'BRD 3.003.1',
     parameters: 'as of date, business unit, status, group profile',
   },
@@ -34,15 +34,15 @@ export const USER_ACCESS_REPORTS: readonly UserAccessReportLink[] = [
   {
     code: 'UAM-AUDIT-LOG',
     name: 'User Access Audit Log',
-    text: 'Every access activity with its from and to values, done by, approved by and request number; log-ins, failed log-ins and log-outs on request.',
+    text: 'Every access activity with its from and to values, done by, approved by and request or change number; log-ins, failed log-ins and log-outs on request.',
     requirementRefs: 'BRD 4.003.1',
     parameters: 'date from / to, user, activity, log-ins and log-outs',
   },
   {
     code: 'UAM-REQUESTS',
-    name: 'Access Requests',
-    text: 'Access requests by status, type, requester and approver, with their age in days.',
+    name: 'Group Profile Changes',
+    text: 'Changes of the group profiles (new, definition or permissions, deactivation, reactivation) by status, with the maker, the checker and their age in days.',
     requirementRefs: 'BRD 1.008',
-    parameters: 'date from / to, status, request type',
+    parameters: 'date from / to, status, change',
   },
 ];

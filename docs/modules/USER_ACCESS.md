@@ -51,14 +51,14 @@ Permissions and menus per persona are pinned in
 
 | Screen | Permission | Content |
 |---|---|---|
-| Users | USER_MANAGE or USER_VIEW | List, filters, CSV; detail with profile from UIDM-ISC, group profiles, permissions, data access, sessions, history |
+| Users | USER_MANAGE or USER_VIEW | List, filters, CSV; detail with profile from UIDM-ISC, group profiles, effective permissions (table with the granting group profiles and area, search, CSV; `GET /api/v1/admin/users/{id}/permissions`), data access, sessions, history |
 | Group Profiles | ROLE_MANAGE or the UAM viewers | Definition, permissions, members, pending change, history |
 | Identity Sync | USER_MANAGE | Status, events, refused events, reconciliation, simulator (non-production) |
 | Separation of Duties | UAM_SOD_MAINTAIN, UAM_SOD_AUTHORIZE, AUDIT_VIEW or USER_MANAGE | Rules and violations |
 | Access Matrix | UAM_REPORT_VIEW | Profiles x permissions |
-| Reports & Certification | UAM_REPORT_VIEW | Reports; certification extract (CSV/XLSX, logged with SHA-256) |
+| Reports & Certification | UAM_REPORT_VIEW | Reports (UAM-USER-ACCESS, UAM-GROUP-PROFILE, UAM-GROUP-MEMBERS, UAM-AUDIT-LOG, UAM-REQUESTS = Group Profile Changes, group-profile changes only); certification extract (CSV/XLSX, logged with SHA-256) |
 | Audit Log | AUDIT_VIEW | Audit trail preset to the user access records |
-| UAM Settings | USER_MANAGE | Session, dormancy, test-account and synchronisation parameters (maker-checker) |
+| UAM Settings | USER_MANAGE | Session, dormancy, test-account and synchronisation parameters by business name and formatted value (Yes/No, minutes, days); Change, then Approve / Reject by a second user (maker-checker) |
 
 ## 4. Group-profile change
 

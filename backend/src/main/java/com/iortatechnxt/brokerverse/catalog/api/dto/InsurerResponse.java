@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.catalog.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile.RemittanceTerms;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerTaxStatus;
 import com.iortatechnxt.brokerverse.catalog.domain.PlacementChannel;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
@@ -27,6 +28,7 @@ import java.util.List;
  * @param maker last maintainer
  * @param authorizedBy checker
  * @param origin BIBS or the legacy origin (source system, legacy reference, batch)
+ * @param remittance payment terms and remittance details
  */
 public record InsurerResponse(
     Long id,
@@ -43,7 +45,8 @@ public record InsurerResponse(
     RecordStatus recordStatus,
     String maker,
     String authorizedBy,
-    @JsonUnwrapped RecordOrigin origin) {
+    @JsonUnwrapped RecordOrigin origin,
+    RemittanceTerms remittance) {
 
   /**
    * Maps an entity.
@@ -67,6 +70,7 @@ public record InsurerResponse(
         e.getRecordStatus(),
         e.getMaker(),
         e.getAuthorizedBy(),
-        e.getRecordOrigin());
+        e.getRecordOrigin(),
+        e.getRemittanceTerms());
   }
 }

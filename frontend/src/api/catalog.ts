@@ -1,6 +1,7 @@
 import { api, toQuery } from './client';
 import type { ProductLifecycle, VersionStatus } from './productCatalog';
 import type { RecordStatus, RecordOriginFields } from './types';
+import type { InsurerDetail, RemittanceTerms } from './insurerPage';
 import type { ProductMatrixInput } from './pmWorkspace';
 import type {
   SalesAssignment,
@@ -47,6 +48,8 @@ export type CatalogKind =
   | 'TSU_RULE'
   | 'INSURER'
   | 'INSURER_BRANCH'
+  | 'INSURER_CONTACT'
+  | 'INSURER_BANK_ACCOUNT'
   | 'COMMISSION_RATE'
   | 'RATE'
   | 'SHORT_PERIOD_RATE'
@@ -217,6 +220,8 @@ export interface Insurer extends Authorizable, RecordOriginFields {
   placementEmails: string[];
   defaultCreditDays: number;
   taxStatus?: InsurerTaxStatus;
+  /** Payment terms and remittance details (G08). */
+  remittance?: RemittanceTerms;
 }
 
 /** VAT registration of an insurer: VAT on premium or premium tax. */
@@ -247,11 +252,7 @@ export interface Commission extends EffectiveDated {
   rate: number;
 }
 
-export interface InsurerDetail {
-  insurer: Insurer;
-  branches: InsurerBranch[];
-  commissions: Commission[];
-}
+export type { InsurerDetail };
 
 export interface RateInput {
   rateCode: RateCode;

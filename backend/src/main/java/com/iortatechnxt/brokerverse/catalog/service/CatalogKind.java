@@ -8,7 +8,9 @@ import com.iortatechnxt.brokerverse.catalog.domain.Coverage;
 import com.iortatechnxt.brokerverse.catalog.domain.DocumentRule;
 import com.iortatechnxt.brokerverse.catalog.domain.FieldRule;
 import com.iortatechnxt.brokerverse.catalog.domain.IncentiveCriteria;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerBankAccount;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerBranch;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerContact;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.MotorLimit;
 import com.iortatechnxt.brokerverse.catalog.domain.OtherCharge;
@@ -56,6 +58,11 @@ public enum CatalogKind {
   INSURER(InsurerProfile.class, "Insurer", Screens.INSURERS, Area.MASTER),
   /** Insurer branch. */
   INSURER_BRANCH(InsurerBranch.class, "Insurer branch", Screens.INSURERS, Area.MASTER),
+  /** Contact person of an insurer (G08). */
+  INSURER_CONTACT(InsurerContact.class, "Insurer contact", Screens.INSURERS, Area.MASTER),
+  /** Bank account of an insurer (G08). */
+  INSURER_BANK_ACCOUNT(
+      InsurerBankAccount.class, "Insurer bank account", Screens.INSURERS, Area.MASTER),
   /** Commission rate. */
   COMMISSION_RATE(CommissionRate.class, "Commission rate", Screens.INSURERS, Area.MASTER),
   /** Tax or rating factor. */

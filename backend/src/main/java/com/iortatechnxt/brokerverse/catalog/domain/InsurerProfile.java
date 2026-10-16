@@ -59,6 +59,23 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
   @Column(name = "tax_status", length = 15)
   private InsurerTaxStatus taxStatus;
 
+  @Column(name = "payment_terms", length = 300)
+  private String paymentTerms;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "remittance_cycle", length = 12)
+  private RemittanceCycle remittanceCycle;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "remittance_mode", length = 20)
+  private RemittanceMode remittanceMode;
+
+  @Column(name = "remittance_email", length = 120)
+  private String remittanceEmail;
+
+  @Column(name = "remittance_currency", length = 3)
+  private String remittanceCurrency;
+
   protected InsurerProfile() {}
 
   /**
@@ -105,6 +122,30 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
             : String.join(SEPARATOR, d.placementEmails());
     this.defaultCreditDays = d.defaultCreditDays();
     this.taxStatus = d.taxStatus();
+  }
+
+  /**
+   * Changes the payment terms and remittance details; the profile must be authorized again.
+   *
+   * @param terms payment terms and remittance details
+   */
+  public void updateRemittance(RemittanceTerms terms) {
+    this.paymentTerms = terms.paymentTerms();
+    this.remittanceCycle = terms.cycle();
+    this.remittanceMode = terms.mode();
+    this.remittanceEmail = terms.email();
+    this.remittanceCurrency = terms.currency();
+    markModified();
+  }
+
+  /**
+   * Payment terms and remittance details of the insurer.
+   *
+   * @return terms, with null attributes when not recorded
+   */
+  public RemittanceTerms getRemittanceTerms() {
+    return new RemittanceTerms(
+        paymentTerms, remittanceCycle, remittanceMode, remittanceEmail, remittanceCurrency);
   }
 
   /**
@@ -234,6 +275,44 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
           null);
     }
   }
+
+  /** How often premiums are remitted to the insurer. */
+  public enum RemittanceCycle {
+    /** Every business day. */
+    DAILY,
+    /** Every week. */
+    WEEKLY,
+    /** Twice a month. */
+    SEMI_MONTHLY,
+    /** Every month. */
+    MONTHLY
+  }
+
+  /** How premiums are remitted to the insurer. */
+  public enum RemittanceMode {
+    /** Check. */
+    CHECK,
+    /** Bank fund transfer. */
+    FUND_TRANSFER,
+    /** Online banking. */
+    ONLINE_BANKING
+  }
+
+  /**
+   * Payment terms and remittance details of an insurer.
+   *
+   * @param paymentTerms payment terms agreed with the insurer (free text)
+   * @param cycle remittance cycle
+   * @param mode remittance mode
+   * @param email mailbox receiving the remittance advices
+   * @param currency remittance currency
+   */
+  public record RemittanceTerms(
+      String paymentTerms,
+      RemittanceCycle cycle,
+      RemittanceMode mode,
+      String email,
+      String currency) {}
 
   /**
    * Marks a record loaded from a legacy system (DATA_MIGRATION_DESIGN section 10).

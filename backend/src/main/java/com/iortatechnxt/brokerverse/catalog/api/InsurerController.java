@@ -5,9 +5,15 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.BranchResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.CommissionRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.CommissionResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerDetailResponse;
+import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerPageDtos.BankAccountRequest;
+import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerPageDtos.BankAccountResponse;
+import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerPageDtos.ContactRequest;
+import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerPageDtos.ContactResponse;
+import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerPageDtos.RemittanceRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerResponse;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.service.InsurerPageService;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.RateTableService;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
@@ -32,16 +38,20 @@ public class InsurerController {
 
   private final InsurerService insurers;
   private final RateTableService rates;
+  private final InsurerPageService page;
 
   /**
    * Creates the controller.
    *
    * @param insurers insurers
    * @param rates commission rates
+   * @param page contacts, bank accounts, remittance details and linked products
    */
-  public InsurerController(InsurerService insurers, RateTableService rates) {
+  public InsurerController(
+      InsurerService insurers, RateTableService rates, InsurerPageService page) {
     this.insurers = insurers;
     this.rates = rates;
+    this.page = page;
   }
 
   /**
@@ -62,7 +72,7 @@ public class InsurerController {
   }
 
   /**
-   * An insurer with its branches and commission rates.
+   * An insurer with its branches, commission rates, contacts, bank accounts and linked products.
    *
    * @param id profile
    * @return detail
@@ -76,7 +86,82 @@ public class InsurerController {
         insurers.branches(id).stream().map(BranchResponse::from).toList(),
         rates.commissions(insurer.getCompanyId(), insurer.getPartyCode()).stream()
             .map(CommissionResponse::from)
-            .toList());
+            .toList(),
+        page.contacts(id).stream().map(ContactResponse::from).toList(),
+        page.bankAccounts(id).stream().map(BankAccountResponse::from).toList(),
+        page.linkedProducts(id));
+  }
+
+  /**
+   * Changes the payment terms and remittance details of an insurer (maker; pending authorization).
+   *
+   * @param id profile
+   * @param request terms
+   * @return insurer
+   */
+  @PutMapping("/{id}/remittance")
+  @PreAuthorize(CatalogAccess.MAINTAIN)
+  public InsurerResponse updateRemittance(
+      @PathVariable Long id, @Valid @RequestBody RemittanceRequest request) {
+    return InsurerResponse.from(page.updateRemittance(id, request.terms()));
+  }
+
+  /**
+   * Adds a contact person (maker; pending authorization).
+   *
+   * @param id profile
+   * @param request contact
+   * @return contact
+   */
+  @PostMapping("/{id}/contacts")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(CatalogAccess.MAINTAIN)
+  public ContactResponse addContact(
+      @PathVariable Long id, @Valid @RequestBody ContactRequest request) {
+    return ContactResponse.from(page.addContact(id, request.details()));
+  }
+
+  /**
+   * Changes a contact person (maker; pending authorization).
+   *
+   * @param contactId contact
+   * @param request contact
+   * @return contact
+   */
+  @PutMapping("/contacts/{contactId}")
+  @PreAuthorize(CatalogAccess.MAINTAIN)
+  public ContactResponse updateContact(
+      @PathVariable Long contactId, @Valid @RequestBody ContactRequest request) {
+    return ContactResponse.from(page.updateContact(contactId, request.details()));
+  }
+
+  /**
+   * Adds a bank account (maker; pending authorization).
+   *
+   * @param id profile
+   * @param request account
+   * @return account
+   */
+  @PostMapping("/{id}/bank-accounts")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(CatalogAccess.MAINTAIN)
+  public BankAccountResponse addBankAccount(
+      @PathVariable Long id, @Valid @RequestBody BankAccountRequest request) {
+    return BankAccountResponse.from(page.addBankAccount(id, request.details()));
+  }
+
+  /**
+   * Changes a bank account (maker; pending authorization).
+   *
+   * @param accountId account
+   * @param request account
+   * @return account
+   */
+  @PutMapping("/bank-accounts/{accountId}")
+  @PreAuthorize(CatalogAccess.MAINTAIN)
+  public BankAccountResponse updateBankAccount(
+      @PathVariable Long accountId, @Valid @RequestBody BankAccountRequest request) {
+    return BankAccountResponse.from(page.updateBankAccount(accountId, request.details()));
   }
 
   /**

@@ -1,0 +1,83 @@
+import { api } from './client';
+import type { Authorizable, Commission, Insurer, InsurerBranch } from './catalog';
+
+const insurers = '/catalog/insurers';
+
+export type RemittanceCycle = 'DAILY' | 'WEEKLY' | 'SEMI_MONTHLY' | 'MONTHLY';
+export type RemittanceMode = 'CHECK' | 'FUND_TRANSFER' | 'ONLINE_BANKING';
+
+/** Payment terms and remittance details of an insurer. */
+export interface RemittanceTerms {
+  paymentTerms?: string | null;
+  cycle?: RemittanceCycle | null;
+  mode?: RemittanceMode | null;
+  email?: string | null;
+  currency?: string | null;
+}
+
+export type ContactRole =
+  'PLACEMENT' | 'CLAIMS' | 'ACCOUNTING' | 'REMITTANCE' | 'RELATIONSHIP' | 'OTHER';
+
+export interface ContactInput {
+  role: ContactRole;
+  name: string;
+  position?: string | null;
+  email?: string | null;
+  phone?: string | null;
+}
+
+/** Contact person of an insurer (maker-checker). */
+export interface InsurerContact extends ContactInput, Authorizable {
+  insurerId: number;
+}
+
+export type AccountPurpose = 'REMITTANCE' | 'REFUND' | 'COMMISSION';
+
+export interface BankAccountInput {
+  purpose: AccountPurpose;
+  bankName: string;
+  bankBranch?: string | null;
+  accountNo: string;
+  accountName: string;
+  currency: string;
+  primaryAccount: boolean;
+}
+
+/** Bank account of an insurer (maker-checker). */
+export interface InsurerBankAccount extends BankAccountInput, Authorizable {
+  insurerId: number;
+}
+
+/** A product the insurer is linked to: on a package version or by a commission rate. */
+export interface LinkedProduct {
+  productCode: string;
+  productName: string;
+  role: string | null;
+  versionNo: number | null;
+  versionStatus: string | null;
+  commission: boolean;
+}
+
+/** An insurer with its branches, commissions, contacts, bank accounts and linked products. */
+export interface InsurerDetail {
+  insurer: Insurer;
+  branches: InsurerBranch[];
+  commissions: Commission[];
+  contacts: InsurerContact[];
+  bankAccounts: InsurerBankAccount[];
+  products: LinkedProduct[];
+}
+
+/** The full insurer page (G08): remittance details, contacts and bank accounts, maker-checker. */
+export const insurerPageApi = {
+  updateRemittance: (insurerId: number, input: RemittanceTerms) =>
+    api.put<Insurer>(`${insurers}/${insurerId}/remittance`, input),
+  createContact: (insurerId: number, input: ContactInput) =>
+    api.post<InsurerContact>(`${insurers}/${insurerId}/contacts`, input),
+  updateContact: (contactId: number, input: ContactInput) =>
+    api.put<InsurerContact>(`${insurers}/contacts/${contactId}`, input),
+  createBankAccount: (insurerId: number, input: BankAccountInput) =>
+    api.post<InsurerBankAccount>(`${insurers}/${insurerId}/bank-accounts`, input),
+  updateBankAccount: (accountId: number, input: BankAccountInput) =>
+    api.put<InsurerBankAccount>(`${insurers}/bank-accounts/${accountId}`, input),
+};

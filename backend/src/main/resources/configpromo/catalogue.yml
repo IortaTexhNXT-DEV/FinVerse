@@ -116,7 +116,7 @@ datasets:
   - {code: CAT_OTHER_CHARGE, name: Other charges of the products, group: PRODUCTS, module: catalog, table: cat_other_charge, key: [charge_code, line_code, product_code, effective_from]}
 
   # ---------- Insurers and business partners -------------------------------------------------------
-  - {code: CAT_INSURER, name: Insurers, group: PARTNERS, module: catalog, table: cat_insurer, key: [company_id, party_code], environment: [placement_emails]}
+  - {code: CAT_INSURER, name: Insurers, group: PARTNERS, module: catalog, table: cat_insurer, key: [company_id, party_code], environment: [placement_emails, remittance_email]}
   - {code: CAT_INSURER_BRANCH, name: Insurer branches, group: PARTNERS, module: catalog, table: cat_insurer_branch, key: [insurer_id, code], environment: [placement_email]}
   - {code: PTY_PARTY, name: Business partners, group: PARTNERS, module: party, table: pty_party, key: [company_id, code]}
   - {code: ACSL_SOA_LAYOUT, name: Insurer statement layouts, group: PARTNERS, module: acsl, table: acsl_soa_layout, key: [insurer_code]}
@@ -406,6 +406,7 @@ excluded:
   CLIENT_DATA:
     [crm_client, crm_client_instruction, crm_client_payout_account, crm_client_tag, crm_kyc_document,
      csf_contact_change, csf_contact_change_field, csf_sync_outbox, csf_verification,
+     cat_insurer_bank_account, cat_insurer_contact,
      csf_verification_check, dsb_payee, dsb_payee_account, dsb_payee_request, eb_member,
      eb_member_change, eb_member_change_line, eb_programme, eb_programme_contact, eb_programme_line,
      scr_client_risk_profile, tax_party_profile]

@@ -224,4 +224,30 @@ class RolePermissionRequestIT {
                 .value("APPROVE"));
     api.doGet("ao", "/api/v1/nbadmin/access-matrix/by-action").andExpect(status().isForbidden());
   }
+
+  @Test
+  void anEmptyPermissionCodeIsAValidationError() throws Exception {
+    String role = newRole();
+    for (String code : new String[] {"", "  "}) {
+      api.doPost(
+              "badmin",
+              "/api/v1/nbadmin/access-requests",
+              Json.of(
+                  "type",
+                  "MODIFY_ROLE_PERMISSIONS",
+                  "roleCode",
+                  role,
+                  "permissionsAdded",
+                  List.of(code),
+                  "justification",
+                  "Empty permission"))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+          .andExpect(
+              jsonPath(
+                  "$.errors.*",
+                  org.hamcrest.Matchers.hasItem(
+                      "Select a permission; a permission cannot be empty")));
+    }
+  }
 }

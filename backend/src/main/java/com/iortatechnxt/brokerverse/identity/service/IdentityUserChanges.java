@@ -49,7 +49,7 @@ public class IdentityUserChanges {
    * Setting: the group profiles of a UIDM-ISC create / update user event are given to the user
    * (option b). Kept alongside the MEMBERSHIP events of the groups interface: both come from
    * UIDM-ISC, the single source of group-profile membership, so they do not conflict (the Users
-   * screen no longer assigns roles). Off by default; with it on, the last event wins.
+   * screen no longer assigns roles). On by default; the last event wins.
    */
   public static final String ROLES_SETTING = "UAM_PROVISIONING_ROLES";
 
@@ -282,7 +282,7 @@ public class IdentityUserChanges {
 
   private Set<Role> providedRoles(DirectoryAccount a) {
     if (a.groupProfiles().isEmpty()
-        || !Boolean.parseBoolean(parameters.text(ROLES_SETTING, "false").trim())) {
+        || !Boolean.parseBoolean(parameters.text(ROLES_SETTING, Boolean.TRUE.toString()).trim())) {
       return Set.of();
     }
     Set<Role> found =

@@ -57,7 +57,7 @@ public class AccessSettings {
    * @return {@value #ANY_APPROVER}
    */
   public boolean anyApprover() {
-    return Boolean.parseBoolean(parameters.text(ANY_APPROVER, FALSE));
+    return Boolean.parseBoolean(parameters.text(ANY_APPROVER, Boolean.TRUE.toString()));
   }
 
   /**

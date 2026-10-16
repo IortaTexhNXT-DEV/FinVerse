@@ -143,9 +143,7 @@ public class IdentityReconciliationJob implements ManagedJob {
           new Notice(
               "Identity reconciliation: " + mismatches.size() + " mismatch(es)",
               mismatches.size()
-                  + " user(s) differ from the "
-                  + directory.name()
-                  + " directory on "
+                  + " user(s) differ from the UIDM-ISC directory on "
                   + BusinessClock.dateOf(clock.instant())
                   + ". Review them on the Identity Sync screen and ask UIDM-ISC to correct them.",
               IdentityAlerts.SCREEN,

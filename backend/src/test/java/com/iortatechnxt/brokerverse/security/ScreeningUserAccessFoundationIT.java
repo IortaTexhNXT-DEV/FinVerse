@@ -187,7 +187,8 @@ class ScreeningUserAccessFoundationIT {
     // U1-A (V1062) closed both switches once the implement-request flow was live.
     assertThat(parameters.text("UAM_DIRECT_ROLE_EDIT", "")).isEqualTo("false");
     assertThat(parameters.text("UAM_ROLE_APPLY_ON_APPROVAL", "")).isEqualTo("false");
-    assertThat(parameters.text("UAM_ANY_APPROVER", "")).isEqualTo("false");
+    // V2902: any user other than the maker with the checker right decides.
+    assertThat(parameters.text("UAM_ANY_APPROVER", "")).isEqualTo("true");
     assertThat(parameters.intValue("PASSWORD_HISTORY_COUNT", 0)).isEqualTo(10);
     assertThat("a123456789").matches(parameters.text("USER_ID_PATTERN", ""));
     assertThat(parameters.get("LOGIN_MAX_FAILED_ATTEMPTS").getDescription()).contains("all users");

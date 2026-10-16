@@ -196,7 +196,7 @@ LOG = [
     ("D-011", "16 Oct 2026", "Decision", "All", "Standard document set per BRD", "Each BRD pack holds FRS, BPS, UXD, "
      "RNO, ICD (where interfaces exist), DSP, DDI, USR and the review workbooks, plus a How to read this pack note; "
      "NFR, glossary and decisions are kept once at programme level.", "Product Owner", "BRD-11 first; BRD-03, "
-     "BRD-06 and BRD-02 follow.", "Open: BRD-02 to complete (BRD-03 and BRD-06 complete)", "Document Register"),
+     "BRD-06 and BRD-02 follow.", "Closed: BRD-11, BRD-03, BRD-06 and BRD-02 complete", "Document Register"),
     ("D-012", "16 Oct 2026", "Decision", "BRD-06", "Renewal FRS numbering", "BDOI's FRRN numbers are kept; "
      "duplicate and short numbers of BDOI's FRS are corrected (FRRN.004.05, 013.03, 013.04, 038.04, 026.01, 027.0x, "
      "029.0x) and the CBG Motor rules of BDOI's Annexes D and E are stated apart as FRRN.009.02.", "Product Owner",
@@ -206,6 +206,17 @@ LOG = [
      "removal) and CR-RN-024 accessibility; the other candidates of register v1.0 are BRD items, OOTB or "
      "Integration scope.", "Product Owner", "CR Register BRD-06 v1.1.", "Open: BDOI approval (Q-RN-11)",
      "CR Register"),
+    ("D-014", "16 Oct 2026", "Decision", "BRD-02", "Cashiering FRS numbering", "BDOI's FRS.CSH numbers are kept; "
+     "slips of BDOI's FRS v3.1 are corrected: FRS.OPS.001 and FRS.OPS.002.0x become FRS.CSH.01.01.01 and "
+     "FRS.CSH.01.02.0x; spaces in numbers removed; FRS.CSH.02.02.09.10 to .19 become FRS.CSH.02.02.10 to .19 (taxes "
+     "on ORs move to FRS.CSH.02.02.20); the duplicate FRS.CSH.03.01.05 (selection) becomes FRS.CSH.03.01.04.03 and the "
+     "duplicate FRS.CSH.04.01.03 becomes FRS.CSH.04.01.04; the report layout of FRS.CSH.09.02 becomes BR-CSH-21.",
+     "Product Owner", "FRS Operations Cashiering v3.4, section Changes from Version 3.3.", "Open: BDOI confirmation",
+     "FRS BRD-02 v3.4"),
+    ("D-015", "16 Oct 2026", "Decision", "BRD-02", "Cashiering change requests", "Two change requests stay open: "
+     "CR-CSH-101 time rules (not delivered) and CR-CSH-102 e-mail copy of the notices (delivered, for approval or "
+     "removal); D-CSH-01 and D-CSH-02 are BRD requirements.", "Product Owner", "CR Register BRD-02 v1.1.",
+     "Open: BDOI approval (Q-CSH-09)", "CR Register"),
     ("O-001", "16 Oct 2026", "Observation", "All", "Number of named users", "NFR-CAP-01 states 1,344 named users; "
      "the User Access sizing uses 530.", "iorta TechNXT", "BDOI to confirm the figure; capacity targets follow.",
      "Open", "NFR"),
@@ -223,10 +234,18 @@ LOG = [
     ("O-006", "16 Oct 2026", "Observation", "All", "References to the NFR register", "The System Requirements "
      "Specification and the Test Strategy v1.0 name the NFR document v1.0 and its register.", "iorta TechNXT",
      "They refer to this NFR v2.0 at their next issue.", "Open", "SRS, Test Strategy"),
-    ("O-007", "16 Oct 2026", "Observation", "BRD-02", "Packs to complete", "BRD-02 has the FRS and the review "
-     "workbooks; BPS, UXD, RNO, DSP, DDI, USR and the How to read note are to be issued. BRD-03 and BRD-06 were "
-     "completed on 16 Oct 2026.",
-     "iorta TechNXT", "Issue with the reusable builders of BRD-11.", "Open", "Document Register"),
+    ("O-007", "16 Oct 2026", "Observation", "BRD-02", "Packs to complete", "The BRD-02 pack is complete: FRS, BPS, "
+     "UXD and RNO v3.4, ICD, DSP, DDI, USR and How to read v1.0, workbooks v1.1.", "iorta TechNXT",
+     "None.", "Closed", "Document Register"),
+    ("O-008", "16 Oct 2026", "Observation", "BRD-02", "Cashiering decisions open", "Minimal balance 10.00 (BRD) "
+     "against -1.00 to 1.00 (BDOI's FRS); MBS has no group profile to maintain the AR and OR forms; the Check "
+     "Pick-up screen stays in the Cashier profile although CSHID.009 is removed; dashboard links to applications "
+     "outside BIBS wait for BDOI's list.", "iorta TechNXT", "BDOI answers Q-CSH-01, Q-CSH-06, Q-CSH-07, Q-CSH-08.",
+     "Open", "FRS BRD-02 v3.4"),
+    ("O-009", "16 Oct 2026", "Observation", "BRD-03", "Permissions in the Developer Specification", "A few "
+     "operations of the BRD-03 Developer Specification v1.0 show the permission JOURNAL_VIEW where the service checks "
+     "PRODUCT_VIEW or PKG_REPORT_VIEW (shared constant name read from another class).", "iorta TechNXT",
+     "Corrected at the next issue of the BRD-03 Developer Specification.", "Open", "DSP BRD-03 v1.0"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

@@ -1,0 +1,1490 @@
+# Requirements of the Operations Cashiering FRS v3.4 (BRD-02), one row per BDOI item, with its acceptance criteria.
+# Read by brd02_v34_content.py. BDOI's FRS.CSH numbers are kept; the numbering slips of BDOI's FRS v3.1 are corrected
+# (see the FRS, section Changes from Version 3.3, and the Decision and Observation Log). Sub-items of an item are
+# stated in its row. colour: k black (BRD, BRD-00 or programme NFR), g green (not in the BRD, OOTB), o orange (change
+# request). label: int (Integration scope) or dm (Data Migration scope). brd: the BRD IDs served by the entry.
+- id: FRS.CSH.01.01
+  component: Operations
+  capability: Access from BDO-issued devices
+  brd: [BRQID.001]
+  reqs:
+  - id: FRS.CSH.01.01.01
+    text: Cashiering is used through the web browser of a BDO-issued device. The BDO network and device policy limit access to BDO-issued devices. The screens, fields and actions are the same on desktop and tablet.
+    rule: NFR-SEC-01
+    colour: k
+    label: ''
+    ac:
+    - A cashier opens BIBS from the browser of a BDO-issued laptop and reaches the Login page.
+    - Receive Payment and Receipts keep their fields and actions on a BDO-issued tablet.
+- id: FRS.CSH.01.02
+  component: Login
+  capability: Role and profile log-in
+  brd: [BRQID.001, BRQID.002]
+  reqs:
+  - id: FRS.CSH.01.02.01
+    text: The user signs in with the user name and password of User Access Maintenance (BRD-11).
+    rule: NFR-SEC-02
+    colour: k
+    label: ''
+    ac:
+    - A Cashier signs in and lands on the Cashiering Dashboard.
+  - id: FRS.CSH.01.02.02
+    text: The menu shows only the Cashiering screens of the user's group profiles and hides the actions the user may not perform. Every list, search and report is limited to the user's company and branch.
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - A Cashier sees Receive Payment, Receipts, Unapplied Payments, Payment Uploads and Batch Print, and does not see Receipt Series.
+    - A user without the posting permission does not see Post, and a direct posting attempt is refused.
+  - id: FRS.CSH.01.02.03
+    text: A sign-in of a user that is not defined, expired or locked is refused with the same message as a wrong password, and recorded in the audit trail.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - A sign-in with an unknown user ID is refused with "Invalid user name or password" and the attempt is in the audit trail.
+  - id: FRS.CSH.01.02.04
+    text: Each Cashiering action is a permission granted to group profiles (section 6). A user with several profiles has the actions of all of them.
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - A user with the Cashier profile can create an AR record and cannot post it.
+  - id: FRS.CSH.01.02.05
+    text: The user who creates a record cannot post, approve or authorise it.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - A Cashiering Team Leader who created an AR record cannot post it; another Team Leader can.
+- id: FRS.CSH.01.03
+  component: Operations › Cashiering
+  capability: Cashiering Dashboard
+  brd: [BRQID.003]
+  reqs:
+  - id: FRS.CSH.01.03.01
+    text: Cashiering opens on the Cashiering Dashboard, set for the Cashiering group and the user's role.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - After sign-in a Cashier sees the Cashiering Dashboard with the groups of the Cashier role.
+  - id: FRS.CSH.01.03.02
+    text: 'The dashboard shows the count and amount per currency of: AR/OR, cancellation and reinstatement records for posting per receipt type; returned records; unapplied payments for disposition per type; payment files waiting for automatic processing. Counts are taken on opening and on Refresh.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The amount of AR for Posting – Premium equals the total of the premium AR creation records For Posting.
+    - The dashboard opens within 5 seconds.
+  - id: FRS.CSH.01.03.03
+    text: The Main Navigation links open Create AR/OR, the posting lists, cancellation and reinstatement, Batch Print, Unapplied Payments, Payment Uploads and Reports, as the user's permissions allow.
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - Main Navigation of a Cashier opens Create AR/OR; it shows no posting link.
+  - id: FRS.CSH.01.03.04
+    text: Each item opens its list already filtered (status, receipt type, record kind). Lists page, sort on any column and export to Excel.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Clicking Cancellation (AR/OR) for Posting – OR opens the posting list of OR cancellation records For Posting.
+    - Export of a list gives an Excel file with the columns of the screen.
+  - id: FRS.CSH.01.03.05
+    text: The dashboard search finds an account, invoice, ARN, AR or OR number and opens the receipt or the invoice.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Typing an AR number in the dashboard search opens the receipt.
+- id: FRS.CSH.02.01
+  component: Cashiering › Create AR/OR
+  capability: Create AR
+  brd: [CSHID.001, CSHID.006, CSHID.011, CSHID.020, CSHID.021]
+  reqs:
+  - id: FRS.CSH.02.01.01
+    text: An authorised Cashier of Head Office or a branch creates an AR creation record.
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - A user with the Cashier profile opens Create AR/OR; a Remittance Processor does not see it.
+  - id: FRS.CSH.02.01.02
+    text: 'The record holds: Receipt Type (AR), AR Type (Premium or Non-Premium: Refund from Insurer, Other Expenses, AR Insurance), Receipting Branch (default the user''s branch), Entry Type (Client, Insurer, Other) with its details, Payor Name, Payment Type (Cash, Check), Post to Bank Account, Currency, Paid Amount, check number, date and bank for a check, Remarks, and the accounts paid. Accounts are found by account, invoice, ARN, policy or PN number.'
+    rule: BR-CSH-05
+    colour: k
+    label: ''
+    ac:
+    - A cashier of the Cebu branch opens Create AR/OR; Receipting Branch shows Cebu.
+    - Searching part of an ARN in the account search lists the accounts whose number contains it.
+  - id: FRS.CSH.02.01.03
+    text: The Accounts table shows per account the premium receivable, commission receivable, invoice amount, paid amount, outstanding balance, PR 2307 amount (2% CWT accounts only) and the amount paid now, with a preview of the application by component.
+    rule: BR-CSH-06; BR-CSH-07
+    colour: k
+    label: ''
+    ac:
+    - For an account with DST 1,000.00, Premium Tax (VAT) 1,200.00 and Basic Premium 10,000.00, a payment of 1,500.00 shows 1,000.00 on DST and 500.00 on Premium Tax (VAT).
+    - An account without the BIR 2307 tag shows no PR 2307 amount.
+  - id: FRS.CSH.02.01.04
+    text: Several accounts of the payor are paid by one record; Add adds an account.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A record with three accounts posts one AR applied to the three accounts.
+  - id: FRS.CSH.02.01.05
+    text: The record shows the Total Paid Amount and the Excess Payment.
+    rule: BR-CSH-09
+    colour: k
+    label: ''
+    ac:
+    - A payment of 12,000.00 on an outstanding of 11,500.00 shows an excess of 500.00.
+  - id: FRS.CSH.02.01.06
+    text: Required fields carry "*". Remarks are required while the setting CASH_AR_REMARKS_REQUIRED is Y.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Receipt Type, AR Type, Entry Type, Payor Name, Payment Type, Post to Bank Account, Paid Amount, Currency and Remarks show "*".
+  - id: FRS.CSH.02.01.07
+    text: Save checks the record; Cancel leaves the form without saving.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Cancel on a new record saves nothing and gives no record number.
+  - id: FRS.CSH.02.01.08
+    text: 'Save refuses a record with a missing required field, a paid amount not above zero or above 1,000,000,000.00, a currency different from the account''s, account amounts that do not add up to the paid amount, or a check dated within the holding period. Each failure is shown at its field. A valid record is saved as Created.'
+    rule: BR-CSH-10; BR-CSH-11
+    colour: k
+    label: ''
+    ac:
+    - Saving without Post to Bank Account is refused with "Post to Bank Account is required".
+    - Saving a check dated within the 4 working days of the holding period is refused.
+    - Saving a USD record for a peso account is refused with the currency message.
+  - id: FRS.CSH.02.01.09
+    text: The record number is <Prefix>-<Receipt Type>-<Sequence>, prefix CR (creation), CN (cancellation) or RE (reinstatement). The sequence is unique per prefix and receipt type and never reused.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Two AR creation records saved one after the other get consecutive numbers CR-AR-<n> and CR-AR-<n+1>.
+  - id: FRS.CSH.02.01.10
+    text: Submit for Posting sets the record For Posting and notifies the users who may post it. The creator is not offered Post.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - After Submit for Posting the record is For Posting, on the posting list, and the Team Leader has the notice "<record> for posting".
+  - id: FRS.CSH.02.01.11
+    text: Cancel on an unsaved record asks for confirmation and saves nothing.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Cancel then Yes on a new record returns to the list without a record.
+  - id: FRS.CSH.02.01.12
+    text: A saved record is cancelled only while Created; it becomes Record Cancelled and keeps its number.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Cancelling a record For Posting is refused with "Only a record in status Created can be cancelled".
+  - id: FRS.CSH.02.01.13
+    text: The creator edits a record that is Created or Returned and has no AR number, then saves and submits it again. Every change is logged with the values before and after.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - A Returned record is edited and submitted again; the History shows the change.
+    - A record For Posting cannot be edited.
+  - id: FRS.CSH.02.01.14
+    text: Every action on the record is logged with the module, action, user, date and time, record number, AR number, source address and the values before and after.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - The History of a posted record shows its creation, submission and posting with the user and time.
+  - id: FRS.CSH.02.01.15
+    text: A Non-Premium AR (Refund from Insurer, Other Expenses, AR Insurance) is paid by an insurer, posted to AR Insurer of that insurer and never applied to a client account or remitted.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A Non-Premium AR without an insurer is refused with "A non-premium AR needs the paying insurer's code".
+  - id: FRS.CSH.02.01.16
+    text: The Day-End List gives each cashier the records of the day with their status and the totals per payment type and bank account.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - At the end of the day a cashier sees the records of the day with the totals of cash and of checks per bank account.
+- id: FRS.CSH.02.02
+  component: Cashiering › Create AR/OR
+  capability: Create OR
+  brd: [CSHID.002, CSHID.006, CSHID.007]
+  reqs:
+  - id: FRS.CSH.02.02.01
+    text: An authorised Head Office Cashier creates an OR creation record. A record of another branch is refused.
+    rule: BR-CSH-03
+    colour: k
+    label: ''
+    ac:
+    - An OR record of the Cebu branch is refused with "Official receipts are issued by Head Office only".
+  - id: FRS.CSH.02.02.02
+    text: 'The record holds: Receipt Type (OR), OR Type (Service Fee, Insurance Profit Share, Commissions, Incentives, Handling Fee, Others), Receipting Branch (Head Office), Entry Type (Insurer by default, Client, Other) with its details, Payor Name, Payment Type (Cash, Check, Direct Credit), Post to Bank Account, Currency, Paid Amount, VAT and withholding tax, Remarks and the items settled.'
+    rule: BR-CSH-03
+    colour: k
+    label: ''
+    ac:
+    - A new OR record defaults Entry Type to Insurer and Receipting Branch to Head Office.
+  - id: FRS.CSH.02.02.03
+    text: Commission Schedule files are uploaded on Payment Uploads, several files per upload.
+    rule: BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - Two Commission Schedule files are uploaded in one upload and listed with their results.
+  - id: FRS.CSH.02.02.04
+    text: An upload is checked for required fields, layout, size (at most 50 MB) and duplicates. A validation report lists the accepted and refused rows with the reason and is downloadable in Excel. The raw file is kept unchanged with its upload reference.
+    rule: BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - A file already uploaded is refused with "This file was already uploaded".
+    - The validation report of an upload gives the count of accepted and refused rows.
+  - id: FRS.CSH.02.02.06
+    text: A file that fails the file checks is not processed.
+    rule: BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - A file larger than 50 MB is refused and no row is processed.
+  - id: FRS.CSH.02.02.07
+    text: 'A Commission Schedule holds: insurer code, payee name, certificate reference, payment reference, invoice number, basic commission, VAT, withholding tax, payment date. The layout is kept on Cashiering Setup.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A Commission Schedule without the payment date column fails the template check.
+  - id: FRS.CSH.02.02.08
+    text: An OR without a file settles the items selected on the record. An incentive OR lists the insurer's Valid for Collection SOAs; a Fee Policy OR the client's open Fee Policy invoices.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - An incentive OR for an insurer lists that insurer's Valid for Collection SOAs.
+  - id: FRS.CSH.02.02.09
+    text: Each line of a Commission Schedule is matched on reference number and on paid amount equal to the outstanding commission. The matched and unmatched list shows reference, paid amount, outstanding and result, and is downloadable in Excel. Valid lines are processed (setting CASH_COMMISSION_SCHEDULE_MODE = LINE_LEVEL).
+    rule: BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - A schedule of three lines with one unknown reference shows two matched lines and one "unmatched".
+  - id: FRS.CSH.02.02.10
+    text: The OR record shows the Total Paid Amount and the Excess Payment.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - An OR record of 11,200.00 shows a Total Paid Amount of 11,200.00.
+  - id: FRS.CSH.02.02.11
+    text: Required fields carry "*" (Receipt Type, OR Type, Entry Type, details, Payor Name, Payment Type, Post to Bank Account, Paid Amount, check details, Currency, Remarks).
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The OR form marks OR Type and Post to Bank Account with "*".
+  - id: FRS.CSH.02.02.12
+    text: Save checks the OR record; Cancel leaves the form without saving.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Cancel on a new OR record saves nothing.
+  - id: FRS.CSH.02.02.13
+    text: Save applies the checks of FRS.CSH.02.01.08 to the OR record; a valid record is saved as Created and can be submitted for posting.
+    rule: BR-CSH-10; BR-CSH-11
+    colour: k
+    label: ''
+    ac:
+    - An OR record without OR Type is refused with "OR Type is required".
+  - id: FRS.CSH.02.02.14
+    text: The OR record is numbered CR-OR-<sequence>.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A saved OR record carries a number CR-OR-<n>.
+  - id: FRS.CSH.02.02.15
+    text: Submit for Posting sets the OR record For Posting and notifies the posters. Cancel on an unsaved record saves nothing.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - After Submit for Posting the OR record is on the posting list of the Head Office Team Leader.
+  - id: FRS.CSH.02.02.16
+    text: A saved OR record is cancelled only while Created.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Cancelling a Created OR record sets it Record Cancelled.
+  - id: FRS.CSH.02.02.17
+    text: The creator edits an OR record that is Created or Returned; every change is logged.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - A Returned OR record is edited; its History shows the values before and after.
+  - id: FRS.CSH.02.02.18
+    text: An edited OR record is submitted for posting again.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A Returned OR record submitted again is For Posting.
+  - id: FRS.CSH.02.02.19
+    text: Every action on the OR record is logged as for the AR record. A Commission Schedule with several insurers or payees gives one OR per insurer or payee.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - A schedule with two insurers gives two ORs, one per insurer.
+  - id: FRS.CSH.02.02.20
+    text: Each OR posts the income of its OR Type, the output VAT and the creditable withholding tax withheld by the payor. The VAT rate comes from the tax code of the OR Type.
+    rule: BR-CSH-15
+    colour: k
+    label: ''
+    ac:
+    - A Service Fee OR of 11,200.00 with VAT 1,200.00 posts income of 10,000.00 and output VAT of 1,200.00.
+- id: FRS.CSH.02.03
+  component: Maintenance › Cashiering
+  capability: AR/OR number series
+  brd: [CSHID.006, CSHID.015]
+  reqs:
+  - id: FRS.CSH.02.03.01
+    text: Authorised users maintain the AR and OR number series on Receipt Series.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - A Team Leader adds an AR series for a branch; it is Pending until another user authorises it.
+  - id: FRS.CSH.02.03.02
+    text: The number format of a new series is <Prefix>-<Year>-<Branch Indicator>-<Sequence> by default (setting CASH_RECEIPT_NO_FORMAT); it must hold the sequence.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A format without the sequence is refused with "The number format must hold the sequence {SEQ}".
+  - id: FRS.CSH.02.03.03
+    text: A series holds the receipt kind, receipting branch, year, prefix, first and last number, next number, BIR ATP number and the warning level of numbers left. OR series are for Head Office only. A new or changed series is used only after another user authorises it.
+    rule: BR-CSH-01; BR-CSH-03
+    colour: k
+    label: ''
+    ac:
+    - The user who maintained a series cannot authorise it.
+    - A last number below the first is refused.
+  - id: FRS.CSH.02.03.04
+    text: 'The receipting branches (Head Office, Cebu, Angeles, Davao, General Santos, CDO) are a maintained list with the branch indicator of the AR number.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A deactivated branch is no longer offered as Receipting Branch; its issued ARs keep their branch.
+  - id: FRS.CSH.02.03.05
+    text: Every change of a series is logged; the Team Leader is alerted when a series reaches its warning level.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - When a series reaches its warning level the alert "<kind> series <prefix> has <n> numbers left" is raised.
+  - id: FRS.CSH.02.03.06
+    text: The series in use at go-live, with their next number, are loaded before go-live so that numbering continues without a gap.
+    rule: '-'
+    colour: k
+    label: dm
+    ac:
+    - After the go-live load the first AR of each branch takes the next number of the load.
+- id: FRS.CSH.02.04
+  component: Cashiering › Batch Print
+  capability: Batch printing and re-printing
+  brd: [CSHID.019]
+  reqs:
+  - id: FRS.CSH.02.04.01
+    text: Authorised users print and re-print ARs and ORs on Batch Print.
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - A Cashier with the print permission opens Batch Print; a Remittance Processor does not see it.
+  - id: FRS.CSH.02.04.02
+    text: 'Receipts are found by receipting branch and issue date (AR), insurer and issue date (OR), or AR / OR number (re-print, partial number). ARs and ORs issued by the system (uploads, matured checks, automatic ORs) wait in the print queue For Printing.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - After a Bills Payment upload its ARs are in the print queue For Printing.
+  - id: FRS.CSH.02.04.03
+    text: Several filters can be combined.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Branch Cebu and an issue date range list only the Cebu ARs of the range.
+  - id: FRS.CSH.02.04.04
+    text: The list shows the AR or OR number, receipting branch, client, insurer and amount.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Each row of the print list shows the five columns.
+  - id: FRS.CSH.02.04.05
+    text: One print batch holds 1 to 500 receipts.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Selecting 501 receipts is refused with "Select between 1 and 500 receipts to print".
+  - id: FRS.CSH.02.04.06
+    text: Receipts print from the AR and OR forms in force on the print date.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - An AR printed after an approved form change shows the new footer.
+  - id: FRS.CSH.02.04.07
+    text: Each printed receipt gets an acknowledgement certificate number AC_<branch indicator>_<MMYYYY>_<5-digit sequence> (setting CASH_CERTIFICATE_NO_FORMAT), unique and never reused.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The first printed AR of Head Office in October 2026 carries a certificate number AC_<indicator>_102026_00001.
+  - id: FRS.CSH.02.04.08
+    text: The user downloads or prints the receipts of the batch.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A print batch offers both Download and Print.
+  - id: FRS.CSH.02.04.09
+    text: Download gives one PDF per receipt named <Receipt Type>_<Receipt Number>.pdf, or one ZIP for several receipts.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Downloading three receipts gives one ZIP with three PDFs named by the convention.
+  - id: FRS.CSH.02.04.10
+    text: Print merges the receipts of the batch into one print file for the user's printer.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Printing a batch of 20 ARs sends one file of 20 receipts.
+  - id: FRS.CSH.02.04.11
+    text: Print Preview shows each receipt of the queue before printing.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Print Preview shows the first receipt of the batch with its certificate number.
+  - id: FRS.CSH.02.04.12
+    text: The first print carries no mark; every later print carries the REPRINT watermark and raises the print count.
+    rule: BR-CSH-19
+    colour: k
+    label: ''
+    ac:
+    - The second print of an AR shows REPRINT; the first does not.
+  - id: FRS.CSH.02.04.13
+    text: A receipt that fails to print is shown with its error; the user retries it or skips it.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A failed receipt of a batch is listed with Retry and Skip.
+  - id: FRS.CSH.02.04.14
+    text: Retry prints the failed receipt again before the next one.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Retry on a failed receipt prints it and the batch shows no failure.
+  - id: FRS.CSH.02.04.15
+    text: Skip leaves the failed receipt and goes on with the next one.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A skipped receipt stays For Printing and is listed in the print log.
+  - id: FRS.CSH.02.04.16
+    text: The print log keeps the batch number, user, time, receipts printed, failures with their reason and the retry or skip.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - A batch of 50 ARs is ready within 10 seconds and the print log shows 50 receipts printed.
+  - id: FRS.CSH.02.04.17
+    text: The copy label (Client's Copy or BDOI Copy) follows the copy chosen; the BDOI Copy is kept as a PDF with the receipt.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The BDOI Copy of a printed OR is on the Documents tab of the receipt.
+- id: FRS.CSH.02.05
+  component: Cashiering › Posting
+  capability: AR/OR posting
+  brd: [CSHID.001, CSHID.002, CSHID.006, CSHID.014, CSHID.015, CSHID.016, CSHID.022, BRQID.007]
+  reqs:
+  - id: FRS.CSH.02.05.01
+    text: The poster lists the AR and OR creation records For Posting, filtered by creator, receipting branch (AR), insurer (OR), created date and record number.
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - The Posting list of a Team Leader shows the records For Posting by default.
+  - id: FRS.CSH.02.05.02
+    text: Several filters can be combined.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Creator and created date together narrow the posting list.
+  - id: FRS.CSH.02.05.03
+    text: The list shows creator, receipting branch, client, insurer, amount, date created, date printed, AR/OR status, record number and record status.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Each row of the posting list shows the record number and its status For Posting.
+  - id: FRS.CSH.02.05.04
+    text: The poster selects one, several or all records and posts them in one action.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Posting three selected records gives three receipts and one result per record.
+  - id: FRS.CSH.02.05.05
+    text: Post starts the issue of the AR or OR.
+    rule: BR-CSH-02
+    colour: k
+    label: ''
+    ac:
+    - Post is offered only to a user with the posting permission who did not create the record.
+  - id: FRS.CSH.02.05.06
+    text: Post asks for confirmation, then issues the number, applies the payment, records any excess in the Unapplied list and posts the journal. The record becomes AR/OR Issued and the creator is notified.
+    rule: BR-CSH-02; BR-CSH-06; BR-CSH-15
+    colour: k
+    label: ''
+    ac:
+    - After Post the record is AR/OR Issued, its receipt is Issued and the creator has the notice "<record> posted".
+  - id: FRS.CSH.02.05.07
+    text: Return sends the record back to its creator with a required reason; it becomes Returned and leaves the posting list.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Return without a reason is refused with "Enter the reason for the return".
+    - A record returned with the reason "Wrong account" shows Returned and the creator has the notice.
+  - id: FRS.CSH.02.05.08
+    text: At posting the AR number is taken from the receipting branch series and the OR number from the Head Office series, in sequence, under a lock, without duplicate or gap.
+    rule: BR-CSH-03; BR-CSH-04
+    colour: k
+    label: ''
+    ac:
+    - Two posters posting at the same time receive two consecutive numbers.
+  - id: FRS.CSH.02.05.09
+    text: A depleted series stops the posting with "Receipt Number series for this Branch is depleted. Contact your Administrator."; the record stays For Posting. Otherwise the number is assigned and set Issued.
+    rule: BR-CSH-04
+    colour: k
+    label: ''
+    ac:
+    - Posting on a depleted series is refused with the message and the record stays For Posting.
+  - id: FRS.CSH.02.05.10
+    text: The payment is applied to the outstanding balance of the selected accounts, less any PR 2307. An excess above the minimal balance threshold becomes an Excess payment record in the Unapplied list with its source and the marketing unit of the account.
+    rule: BR-CSH-07; BR-CSH-08; BR-CSH-09
+    colour: k
+    label: ''
+    ac:
+    - A payment of 12,000.00 on an outstanding of 11,500.00 creates an Excess payment record of 500.00 linked to the AR.
+  - id: FRS.CSH.02.05.11
+    text: Payments are applied check before cash, and per account in the order DST, Premium Tax (VAT), LGT, Fire Service Tax, Other Charges, Basic Premium.
+    rule: BR-CSH-06
+    colour: k
+    label: ''
+    ac:
+    - 5,000.00 on an account with DST 500.00, VAT 1,200.00 and LGT 100.00 applies 500.00, 1,200.00, 100.00 and 3,200.00 to Basic Premium.
+  - id: FRS.CSH.02.05.12
+    text: A premium balance or excess within the minimal balance threshold (10.00) is cleared in the same posting, unless it equals the 2% CWT, the DST or the whole premium. It never reaches the Unapplied list.
+    rule: BR-CSH-08
+    colour: k
+    label: ''
+    ac:
+    - A payment leaving 3.50 outstanding clears the 3.50 in the same posting and the account is fully paid.
+    - An excess of 8.00 goes to AP overages and no Excess record is created.
+  - id: FRS.CSH.02.05.13
+    text: For an account with the BIR 2307 tag the payment is applied up to the outstanding less the PR 2307 (2% of the premium). The excess is the paid amount less (outstanding less PR 2307).
+    rule: BR-CSH-07
+    colour: k
+    label: ''
+    ac:
+    - Outstanding 10,200.00, PR 2307 200.00, paid 10,100.00 applies 10,000.00 and creates an excess of 100.00.
+  - id: FRS.CSH.02.05.14
+    text: A processed Commission Schedule applies each line to its account and issues one OR per insurer or payee for the schedule, linked to each account and queued for printing.
+    rule: BR-CSH-03
+    colour: k
+    label: ''
+    ac:
+    - The OR of a processed schedule is on Commission ORs and in the print queue.
+  - id: FRS.CSH.02.05.15
+    text: Posting posts the journal of the receipt, the application and any minimal balance, with the AR or OR number as GL reference. A USD receipt is converted at the rate of the day.
+    rule: BR-CSH-11; BR-CSH-15
+    colour: k
+    label: ''
+    ac:
+    - The journal of a posted AR carries the AR number as reference and balances.
+  - id: FRS.CSH.02.05.16
+    text: A payment is applied to an account locked by Remittance or Adjustment; any other Cashiering action on that account is refused with the name of the team holding the lock.
+    rule: BR-CSH-13
+    colour: k
+    label: ''
+    ac:
+    - A payment for an account in a remittance batch is applied; a disposition to that account is refused.
+- id: FRS.CSH.02.06
+  component: Maintenance › Cashiering
+  capability: AR and OR forms
+  brd: [CSHID.019, CSHID.023]
+  reqs:
+  - id: FRS.CSH.02.06.01
+    text: MBS maintains the AR and OR forms on AR and OR Forms. A change applies from its effective date after another authorised user approves it; earlier versions are kept.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - The user who changed a form cannot approve it.
+    - An effective date before today is refused.
+  - id: FRS.CSH.02.06.02
+    text: 'OR form: header (logo, company name, description, address, VAT number), body (received from, address, TIN, form of payment, amount in words and figures, in payment of, VAT, withholding tax) and footer lines with the acknowledgement certificate number and the copy label.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A printed OR shows the insurer name, TIN and the amount in words.
+  - id: FRS.CSH.02.06.03
+    text: 'AR form: the same header, the AR body (payor, accounts paid, payment type, amount) and footer lines, with "THIS IS A SYSTEM GENERATED RECEIPT. NO SIGNATURE IS REQUIRED."'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A printed AR carries the system-generated receipt line.
+  - id: FRS.CSH.02.06.04
+    text: A Certification of Payment of an AR is issued on request as a PDF with its series number, AR number, policy number, payor, amount, date paid, requesting unit and date issued.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A Certification of Payment of a cancelled AR is refused with "Receipt <number> is cancelled".
+- id: FRS.CSH.03.01
+  component: Cashiering › Cancel AR/OR
+  capability: Cancellation of AR and OR
+  brd: [CSHID.001, CSHID.002, CSHID.003, CSHID.012]
+  reqs:
+  - id: FRS.CSH.03.01.01
+    text: An authorised Cashier creates and submits a cancellation record; the poster posts or returns it.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - A Cashier creates a cancellation record; only a user with the posting permission posts it.
+  - id: FRS.CSH.03.01.02
+    text: Issued receipts are found by AR or OR number.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Searching an AR number on Receipts finds the issued AR.
+  - id: FRS.CSH.03.01.03
+    text: The search accepts part of the number.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Searching the last six digits of an AR number lists that AR.
+  - id: FRS.CSH.03.01.04
+    text: 'Issued receipts are listed: for an OR the OR number, record number, issue date, payment type, insurer and amount; for an AR also the accounts, client, assured, invoice amount, payments and outstanding balance. The user selects ARs only or ORs only, one or several.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Selecting an AR and an OR together is refused with "Select AR numbers only or OR numbers only".
+  - id: FRS.CSH.03.01.05
+    text: The cancellation record needs a reason from the list (premium, commission and post-dated check reasons); Others needs a text. The reasons are a maintained list.
+    rule: BR-CSH-12
+    colour: k
+    label: ''
+    ac:
+    - Saving without a reason is refused with "Select a reason".
+    - Others without text is refused with "Specify the reason when 'Others' is selected".
+  - id: FRS.CSH.03.01.06
+    text: Save checks the reason; a check payment accepts only the check reasons. A valid record is saved as Created and can be submitted for posting, or cancelled while Created.
+    rule: BR-CSH-12; BR-CSH-13
+    colour: k
+    label: ''
+    ac:
+    - A cash reason on a check payment is refused with "The reason <reason> is not allowed for a check payment".
+    - A second cancellation record on the same receipt is refused while the first waits.
+  - id: FRS.CSH.03.01.07
+    text: The creator edits a cancellation record that is Created or Returned, saves it and submits it again; every change is logged.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - A Returned cancellation record is edited and submitted again.
+  - id: FRS.CSH.03.01.08
+    text: The poster lists the cancellation records For Posting (creator, client or insurer, record number, created date) and posts or returns them after confirmation. Posting sets the receipt Cancelled and reverses its payments; for a remitted AR the reversed amount becomes an AR Insurer Refund.
+    rule: BR-CSH-01; BR-CSH-14
+    colour: k
+    label: ''
+    ac:
+    - Posting the cancellation of an applied AR sets it Cancelled and the invoices show the outstanding again.
+    - Cancelling an AR already remitted creates an AR Insurer Refund for the remitted premium.
+  - id: FRS.CSH.03.01.09
+    text: The posted cancellation reverses the journal of the receipt, including any minimal balance, with the cancellation record number as GL reference.
+    rule: BR-CSH-15
+    colour: k
+    label: ''
+    ac:
+    - The reversal journal carries the CN record number and the reason.
+  - id: FRS.CSH.03.01.10
+    text: Every action is logged with user, time, record and AR or OR number.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - The History of a cancelled receipt shows the cancellation record and its poster.
+  - id: FRS.CSH.03.01.11
+    text: The posters are notified of a cancellation record for posting; the creator of its return or posting.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - After Submit for Posting the poster has the notice "<record> for posting".
+- id: FRS.CSH.04.01
+  component: Cashiering › Reinstate AR/OR
+  capability: Reinstatement of AR and OR
+  brd: [CSHID.001, CSHID.002, CSHID.004, CSHID.005, CSHID.013]
+  reqs:
+  - id: FRS.CSH.04.01.01
+    text: An authorised Cashier creates and submits a reinstatement record; the poster posts or returns it.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - A user without the reinstate permission does not see Reinstate.
+  - id: FRS.CSH.04.01.02
+    text: Receipts are found by AR or OR number.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Searching an OR number on Receipts finds the OR.
+  - id: FRS.CSH.04.01.03
+    text: The search shows the receipts whose number matches.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Searching part of an OR number lists the matching ORs.
+  - id: FRS.CSH.04.01.04
+    text: The receipts are listed with the columns of FRS.CSH.03.01.04. Reinstate applies to an issued receipt (reversal of its application) and to a cancelled receipt (restoration), as the setting CASH_REINSTATEMENT_SCOPE (BOTH) allows.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - With the setting BOTH, Reinstate is offered on an issued AR and on a cancelled AR.
+  - id: FRS.CSH.04.01.05
+    text: The user selects ARs only or ORs only, one or several.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A mixed selection is refused with "Select AR numbers only or OR numbers only".
+  - id: FRS.CSH.04.01.06
+    text: 'The record needs the type (Full; Partial for an AR only, with the accounts), the reason and, for a premium AR, the invoice, AR number, payor, amount reinstated, Account Officer, Unit Head and Team Leader; for a direct payment the invoice, OR number, payor and amount.'
+    rule: BR-CSH-12
+    colour: k
+    label: ''
+    ac:
+    - A partial reinstatement of an OR is refused with "Partial reinstatement is not available for an OR".
+    - A premium reinstatement without Unit Head is refused with "Enter the Unit Head".
+  - id: FRS.CSH.04.01.07
+    text: Save checks reason, type and accounts; remarks are at most 100 characters. A valid record is saved as Created, can be submitted for posting, or cancelled while Created.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A partial reinstatement without an account is refused with "Select at least one account for a partial reinstatement".
+  - id: FRS.CSH.04.01.08
+    text: The creator edits a reinstatement record that is Created or Returned and submits it again; every change is logged.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - A Returned reinstatement record is edited and submitted again.
+  - id: FRS.CSH.04.01.09
+    text: The poster lists the reinstatement records For Posting and posts or returns them after confirmation. Posting reverses the application of an issued receipt (the money becomes unapplied) or restores a cancelled receipt; the receipt keeps its number.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - Posting the full reinstatement of an applied AR returns the paid amount to the Unapplied list and the invoice shows its outstanding again.
+  - id: FRS.CSH.04.01.10
+    text: The posted reinstatement posts its journal, including any minimal balance, with the reinstatement record number as GL reference; a USD receipt uses the rate of its issue.
+    rule: BR-CSH-15
+    colour: k
+    label: ''
+    ac:
+    - The journal of a posted reinstatement carries the RE record number.
+  - id: FRS.CSH.04.01.11
+    text: Every action is logged with user, time, record and AR or OR number.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - The History of the receipt shows the reinstatement record and its poster.
+  - id: FRS.CSH.04.01.12
+    text: The posters are notified of a reinstatement record for posting; the creator of its return or posting.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The creator of a returned reinstatement record has the notice "<record> returned" with the reason.
+- id: FRS.CSH.05.01
+  component: Cashiering › Payment Uploads
+  capability: Automatic payment processing
+  brd: [CSHID.008, CSHID.020, BRQID.005, BRQID.006]
+  reqs:
+  - id: FRS.CSH.05.01.01
+    text: An authorised Cashier uploads payment files for automatic processing; the Team Leader follows the runs on Payment Files.
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - A Cashier with the upload permission opens Payment Uploads.
+  - id: FRS.CSH.05.01.02
+    text: Payment files arrive by upload or through MFT.
+    rule: '-'
+    colour: k
+    label: int
+    ac:
+    - A Bills Payment file put in the MFT folder is taken by the MFT intake and listed on Payment Files with source MFT.
+  - id: FRS.CSH.05.01.03
+    text: 'The user chooses the file type of each file (Bills Payment, CLPC, Trade, Direct Credit, PDC, Commission Schedule) and uploads several files of several types at once.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Uploading without a file type is refused with "Select the payment file type of every file".
+  - id: FRS.CSH.05.01.04
+    text: Bills Payment files of OBPCS and the matured post-dated checks of PMS arrive through MFT and pass the same checks as an upload; a refused MFT file alerts the Team Leader.
+    rule: BR-CSH-17
+    colour: k
+    label: int
+    ac:
+    - A refused MFT file raises the alert "Payment file <name> received via MFT was refused".
+  - id: FRS.CSH.05.01.05
+    text: Each file is checked for required fields, layout, size and duplicate before processing.
+    rule: BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - A Bills Payment file uploaded twice is refused the second time.
+  - id: FRS.CSH.05.01.06
+    text: 'Each file type has its layout on Cashiering Setup: Bills Payment pipe-delimited .txt named BDOIYYYYMMDD.txt; PDC pipe-delimited .txt; Trade text; CLPC Excel; Direct Credit text or Excel.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A Bills Payment file whose name does not follow the convention is refused.
+  - id: FRS.CSH.05.01.07
+    text: Valid rows are kept in staging with their file, row and upload reference.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The Matching view of a file lists every row with its upload reference.
+  - id: FRS.CSH.05.01.08
+    text: 'Bills Payment, CLPC, PDC and Trade rows are matched on the reference (QPS, ISYS, Ebix, PN, loan application or account number), first match wins, then on the paid amount against the outstanding.'
+    rule: BR-CSH-05
+    colour: k
+    label: ''
+    ac:
+    - A row quoting the PN number of a booked account is matched to that account.
+  - id: FRS.CSH.05.01.09
+    text: Direct Credit rows identify payments already received (BP file name and transaction number, paid amount) while the setting CASH_DIRECT_CREDIT_MODE is IDENTIFY.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A Direct Credit row whose BP file name is unknown is tagged Invalid BP file name.
+  - id: FRS.CSH.05.01.10
+    text: 'Each uploaded payment gets an AR (status For Printing) and a result: Applied, Excess, Unbooked/Unmatched or Pre-booked. The ARs are printed from Batch Print (FRS.CSH.02.04).'
+    rule: BR-CSH-05
+    colour: k
+    label: ''
+    ac:
+    - After a Bills Payment upload each row has its AR in the print queue.
+  - id: FRS.CSH.05.01.11
+    text: A matched payment is applied to the outstanding; a fully paid account gets an Excess record for the whole amount; an excess above the threshold becomes an Excess record with its source (module, file, row).
+    rule: BR-CSH-08; BR-CSH-09
+    colour: k
+    label: ''
+    ac:
+    - A row paying a fully paid account creates an Excess record of the whole amount.
+  - id: FRS.CSH.05.01.12
+    text: Uploaded payments follow the application order of FRS.CSH.02.05.11. The run report gives the count and amount per result and the failed rows with their reason, downloadable in Excel.
+    rule: BR-CSH-06; BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - The run report of a file of 4 rows shows the count per result and totals 4.
+  - id: FRS.CSH.05.01.13
+    text: Each row is processed on its own; a failed row never stops the others and is kept with its reason for reprocessing.
+    rule: BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - A file of 10 rows with one unknown reference processes 10 rows; the unknown one becomes Unbooked/Unmatched.
+- id: FRS.CSH.05.02
+  component: Cashiering › PDC Warehouse
+  capability: Post-dated check warehouse
+  brd: [CSHID.008, CSHID.020]
+  reqs:
+  - id: FRS.CSH.05.02.01
+    text: Every post-dated check is warehoused with a warehouse number, client, account reference, check number, bank and branch, maturity date, amount and segment. A check already warehoused is refused.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A check with the same bank and check number is refused with "Check <bank> <number> is already warehoused".
+  - id: FRS.CSH.05.02.02
+    text: On its maturity date the daily run (08:30) turns each check into a payment with its AR, matched and applied like any payment. No matching is done before maturity.
+    rule: BR-CSH-05
+    colour: k
+    label: ''
+    ac:
+    - A check maturing today is Applied after the run and its AR is in the print queue.
+  - id: FRS.CSH.05.02.03
+    text: Before maturity a check leaves the warehouse only as Returned, Replaced or Pulled Out, with a reason.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A check released as Replaced is not matured by the daily run.
+- id: FRS.CSH.05.03
+  component: Cashiering › Pre-booked Payments
+  capability: Pre-booked payments
+  brd: [CSHID.020]
+  reqs:
+  - id: FRS.CSH.05.03.01
+    text: Pre-booked payments are listed with reference, payor, amount, date received and days waiting. Re-match Now applies one at once; Release moves it to the Unapplied list as Unbooked/Unmatched. The job PREBOOKED_REMATCH applies them every 2 hours once the account is booked; a payment waiting beyond the ageing threshold alerts the Team Leader.
+    rule: BR-CSH-05
+    colour: k
+    label: ''
+    ac:
+    - A pre-booked payment whose account is booked is applied by Re-match Now.
+    - A payment waiting more than 5 days raises the alert "Payment for <ARN> waits for the booking since <date>".
+- id: FRS.CSH.05.04
+  component: Cashiering and New Business
+  capability: Payment confirmation to New Business
+  brd: [CSHID.020]
+  reqs:
+  - id: FRS.CSH.05.04.01
+    text: A payment applied, or recorded as pre-booked, on an account is the payment confirmation that New Business reads before placement.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A payment by ARN before booking shows the account as paid for placement in New Business.
+- id: FRS.CSH.06.01
+  component: Cashiering › Unapplied Payments
+  capability: Unapplied payments
+  brd: [CSHID.016, CSHID.021, CSHID.024]
+  reqs:
+  - id: FRS.CSH.06.01.01
+    text: Cashiering, Marketing and Commission Receivable users follow the unapplied payments and their dispositions. Marketing users see the records of their marketing unit (setting CASH_UNAPPLIED_MARKETING_SCOPE).
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - A Marketing user sees only the unapplied payments of his marketing unit.
+  - id: FRS.CSH.06.01.02
+    text: 'An unapplied payment comes from: an excess payment; a payment without a match; a cancelled reference; a pre-booked payment; an adjustment or endorsement (excess or AR Insurer Refund); a cancellation or reinstatement; a remittance return; unapplied commission; a migrated balance.'
+    rule: BR-CSH-09
+    colour: k
+    label: ''
+    ac:
+    - A posted negative endorsement on a paid invoice creates an unapplied payment with origin Adjustment.
+  - id: FRS.CSH.06.01.03
+    text: 'The list is filtered by type (Excess, Unapplied, AR Insurer Refund, Unbooked/Unmatched, Pre-booked, AP Unapplied Commission), stage, client, insurer, marketing unit and date, and searched by reference.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The filter Excess lists only the Excess records.
+  - id: FRS.CSH.06.01.04
+    text: The list shows source, type, unapplied payment number, date, account, PN or loan application number, client, insurer, amount, balance, age and disposition.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Each row of the Unapplied Payment List shows its number, balance and age.
+  - id: FRS.CSH.06.01.05
+    text: A record fully applied (balance 0.00) leaves the list.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A record applied in full by a disposition is no longer listed.
+  - id: FRS.CSH.06.01.06
+    text: The balance can be transferred (reclass to another client, transfer to another marketing unit).
+    rule: BR-CSH-16
+    colour: k
+    label: ''
+    ac:
+    - A reclass or transfer moves the whole balance; a partial amount is refused.
+  - id: FRS.CSH.06.01.07
+    text: Each record holds its number, source (module and record), origin, receipt, account, client, insurer, marketing unit, currency, amount, balance, stage and dispositions.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - An Excess record shows the AR and account it came from.
+  - id: FRS.CSH.06.01.08
+    text: Balances within the minimal balance threshold never become unapplied payments.
+    rule: BR-CSH-08
+    colour: k
+    label: ''
+    ac:
+    - A payment exceeding the outstanding by 5.00 creates no Excess record.
+- id: FRS.CSH.06.02
+  component: Cashiering › Unapplied Payments
+  capability: Dispositions and tabs
+  brd: [CSHID.024, CSHID.025]
+  reqs:
+  - id: FRS.CSH.06.02.01
+    text: 'Cashiering and Marketing Support users give a disposition: Apply to Other Invoice, DST Payment Application, Refund (paid by Disbursement), Reclass (Cashiering only), Transfer to Other Marketing Unit, Handling Fee, Others. Refund, Reclass, Transfer and Others wait for the Team Leader''s approval; the others are processed at once.'
+    rule: BR-CSH-01; BR-CSH-16
+    colour: k
+    label: ''
+    ac:
+    - A Refund submitted by a Cashier is For Approval; the Team Leader's approval sends the refund request to Disbursement.
+    - An amount above the balance is refused with "The amount must be above zero and at most the balance <balance>".
+  - id: FRS.CSH.06.02.02
+    text: 'The tabs are Unapplied (no disposition), Monitoring (disposition given), For Approval (waiting for approval), For Reversal (reversal requested) and Done (processed).'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A record with a submitted Refund moves from Unapplied to For Approval.
+  - id: FRS.CSH.06.02.03
+    text: A pre-booked payment is applied automatically once its account is booked.
+    rule: BR-CSH-05
+    colour: k
+    label: ''
+    ac:
+    - After booking, the pre-booked payment of the account is applied by the next run.
+- id: FRS.CSH.06.03
+  component: Cashiering › Incoming Requests
+  capability: Requests of other modules on payments
+  brd: [BRQID.004, CSHID.024]
+  reqs:
+  - id: FRS.CSH.06.03.01
+    text: Collectors (Collections) request to apply, refund or transfer an unapplied payment. The Cashier accepts a request (its disposition is created) or rejects it with a reason; the collector sees the outcome.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Accepting an apply request creates the disposition Apply to Other Invoice on the unapplied payment.
+    - Deciding a request twice is refused with "<request> is already <status>".
+  - id: FRS.CSH.06.03.02
+    text: Refund validation requests of Payment Requests and payment reversal requests of Accounting Controls are listed on Incoming Requests and decided by the Cashier or the Team Leader.
+    rule: BR-CSH-01
+    colour: k
+    label: ''
+    ac:
+    - Confirming a refund validation without choosing the unapplied item is refused.
+    - A payment reversal request is approved by a Team Leader and posts the reversal.
+- id: FRS.CSH.07.01
+  component: Cashiering › Settlement and Commission ORs
+  capability: Automatic OR
+  brd: [CSHID.007]
+  reqs:
+  - id: FRS.CSH.07.01.01
+    text: The OR of an insurer settlement is issued automatically once Disbursement approves its payment request (setting CASH_SETTLEMENT_OR_TRIGGER), numbered from the Head Office series, posted and queued For Printing.
+    rule: BR-CSH-03
+    colour: k
+    label: ''
+    ac:
+    - After Disbursement approves a settlement, its OR is on Settlement ORs and in the print queue.
+  - id: FRS.CSH.07.01.02
+    text: One OR is issued per insurer or payee per batch, for a commission check, a credited amount or payments received.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A settlement batch with two insurers gives two ORs.
+  - id: FRS.CSH.07.01.03
+    text: The automatic OR follows the OR form.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The automatic OR prints with the OR form in force.
+  - id: FRS.CSH.07.01.04
+    text: 'A settlement OR is mapped: OR date = date of the approval; Received From = the insurer (name, address, TIN); In payment of = Commissions; one line per account with its commission, VAT and withholding tax.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A settlement OR shows the insurer TIN and one line per account.
+  - id: FRS.CSH.07.01.05
+    text: The ORs of Commission Schedules and the automatic ORs are listed on Commission ORs and Settlement ORs with insurer, schedule or settlement, amount, status and print status. An OR that could not be issued is issued again from the list.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Issue Again on an OR that was issued is refused with "Only an OR that could not be issued is issued again".
+- id: FRS.CSH.08.01
+  component: Cashiering › Receipts
+  capability: Record inquiry and search
+  brd: [CSHID.010, BRQID.007]
+  reqs:
+  - id: FRS.CSH.08.01.01
+    text: 'Payment records are searched by AR or OR number, payor name and date of issue; account records by client number, account or invoice number, assured name, amount, policy number and insurer name.'
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - Searching a payor name lists the receipts of that payor.
+  - id: FRS.CSH.08.01.02
+    text: One or more criteria can be used together.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Payor name and a date range together narrow the receipts found.
+  - id: FRS.CSH.08.01.03
+    text: The result shows receipt number, paid amount, transaction type, payment date, accounts, invoice amount, excess and the remittance details of each account.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The receipt found shows its accounts with their remittance status.
+  - id: FRS.CSH.08.01.04
+    text: Every search is logged (user, time, criteria, results); the Search Log is read by the Auditor and the Cashiering Team Leader.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - The Auditor lists the searches of a user for a date range.
+- id: FRS.CSH.08.02
+  component: Operations › Invoice 360
+  capability: Payment history at invoice level
+  brd: [BRQID.007]
+  reqs:
+  - id: FRS.CSH.08.02.01
+    text: Each booked invoice keeps the history of its payments and remittances (payment date, amount per component, AR number, remittance batch and date), updated when a payment is applied.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - After a payment the invoice shows the AR, the date and the amount per component.
+- id: FRS.CSH.08.03
+  component: Cashiering › Receipt
+  capability: AR and OR audit trail
+  brd: [CSHID.011]
+  reqs:
+  - id: FRS.CSH.08.03.01
+    text: Every action on an AR or OR (create, edit, submit, post, return, print, re-print, cancel, reinstate, apply) is logged with the AR or OR number and the user; the History tab of the receipt shows it.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - The History tab of a re-printed AR shows both prints with user and time.
+- id: FRS.CSH.09.01
+  component: Reports › Cashiering
+  capability: Report generation
+  brd: [CSHID.017, CSHID.018, CSHID.023]
+  reqs:
+  - id: FRS.CSH.09.01.01
+    text: Authorised users run the Cashiering reports in the Report Centre. Viewing and downloading are separate permissions.
+    rule: BR-CSH-20
+    colour: k
+    label: ''
+    ac:
+    - A user without the report permission does not see the Cashiering reports.
+  - id: FRS.CSH.09.01.02
+    text: The reports of FRS.CSH.09.02 are run on demand (details in the Reports, Notifications and Outputs).
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The Cancelled Acknowledgment Receipts report runs for a period and downloads in Excel and PDF.
+  - id: FRS.CSH.09.01.03
+    text: Each run is recorded with the user, report and date and time.
+    rule: BR-CSH-18
+    colour: k
+    label: ''
+    ac:
+    - The run of a report is listed in the report history with the user and time.
+  - id: FRS.CSH.09.01.04
+    text: The user chooses the report and the covered period.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A report run without the period is refused.
+  - id: FRS.CSH.09.01.05
+    text: Reports can be scheduled with format and recipients, and the outputs are kept in the Report Archive.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - A Daily Cash Reconciliation report scheduled daily is in the Report Archive after its time.
+- id: FRS.CSH.09.02
+  component: Reports › Cashiering
+  capability: Report requirements
+  brd: [CSHID.023]
+  reqs:
+  - id: FRS.CSH.09.02.01
+    text: Applied Premium Report (file Manually Applied Payments_MMDDYYYY).
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the premium applied to invoices by AR in the period.
+  - id: FRS.CSH.09.02.02
+    text: Applied Commission Report.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the commission ORs with invoices, commission, WTAX and EVAT.
+  - id: FRS.CSH.09.02.03
+    text: Minimal Balance of Unapplied Payments (Excess Payments).
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the excess payments moved to AP overages.
+  - id: FRS.CSH.09.02.04
+    text: Cancelled Official Receipts.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the ORs cancelled in the period with the reason.
+  - id: FRS.CSH.09.02.05
+    text: Cancelled Acknowledgment Receipts (all ARs cancelled in the period).
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the ARs cancelled in the period with the reason.
+  - id: FRS.CSH.09.02.06
+    text: Unapplied Commission Receivable Extract for Mancom Reports.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the commission ORs with an OR balance at the end date.
+  - id: FRS.CSH.09.02.07
+    text: Unapplied Commission Receivable Payments YTD balance per Criteria.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report gives the year-to-date unapplied commission per criteria.
+  - id: FRS.CSH.09.02.08
+    text: Unapplied Premium Minimal Balance.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the minimal premium balances reversed in the period.
+  - id: FRS.CSH.09.02.09
+    text: Unapplied Commission Minimal Balance.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the minimal commission balances of the period.
+  - id: FRS.CSH.09.02.10
+    text: Daily Cash Reconciliation Reports.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the ORs of each day with the encoder, payor and deposit bank, and the grand total.
+  - id: FRS.CSH.09.02.11
+    text: Unapplied Premium Payment Transaction.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the unapplied premium payments with ageing and disposition.
+  - id: FRS.CSH.09.02.12
+    text: Direct Payment.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the direct payment accounts with their commission OR.
+  - id: FRS.CSH.09.02.13
+    text: Reinstatement Monitoring Report.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the reinstatements of the period with status, reason and approvers.
+  - id: FRS.CSH.09.02.14
+    text: Re-Application Report.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the payments re-applied after a reinstatement or a correction.
+  - id: FRS.CSH.09.02.15
+    text: Certification of Payment.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the Certifications of Payment issued in the period.
+  - id: FRS.CSH.09.02.16
+    text: Reinstatement.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the reinstatements posted per account and receipt.
+  - id: FRS.CSH.09.02.17
+    text: CWT Monitoring Report (Premium).
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the withholding tax per invoice with its BIR 2307 tag.
+  - id: FRS.CSH.09.02.18
+    text: Summary Per Disposition – Remittance.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report groups the unapplied payments by disposition type.
+  - id: FRS.CSH.09.02.19
+    text: Post-dated Checks Warehousing.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the warehoused checks by maturity date.
+  - id: FRS.CSH.09.02.20
+    text: Priority Posted Accounts.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the payments posted in the period with encoder and branch.
+  - id: FRS.CSH.09.02.21
+    text: Payment Reversals.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the cancellation and reinstatement records posted in the period.
+  - id: FRS.CSH.09.02.22
+    text: AR Outstanding with Ageing.
+    rule: BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the premium receivable outstanding per client and account, aged from booking.
+  - id: FRS.CSH.09.02.23
+    text: Payment Batch Run Report.
+    rule: BR-CSH-17; BR-CSH-21
+    colour: k
+    label: ''
+    ac:
+    - The report lists the payment uploads with applied, excess, pre-booked, unapplied and failed records.
+- id: FRS.CSH.10.01
+  component: Cashiering › Interfaces
+  capability: Interfaces with other systems and modules
+  brd: [BRQID.003, BRQID.004]
+  reqs:
+  - id: FRS.CSH.10.01.01
+    text: Cashiering exchanges payment files with OBPCS and PMS through MFT, receives Trade, CLPC and Direct Credit files by upload, and works with Collections, Disbursement, New Business, Remittance, Payment Requests, Accounting Controls and the accounting engine (Interface Specification).
+    rule: '-'
+    colour: k
+    label: int
+    ac:
+    - A payment applied by Cashiering is read as paid by the Remittance extraction of the next run.
+  - id: FRS.CSH.10.01.02
+    text: The Main Navigation of the dashboard opens the Cashiering facilities and the Report Centre; the other BIBS modules open from the menu. Links to applications outside BIBS are added when BDOI gives their list and addresses (Q-CSH-06).
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - Reports Generation in the Main Navigation opens the Report Centre.
+- id: FRS.CSH.10.02
+  component: Cashiering › Payment Files
+  capability: Flow-in of data
+  brd: [BRQID.005]
+  reqs:
+  - id: FRS.CSH.10.02.01
+    text: Each flow-in (payment files through MFT, collector requests, commission payment details, pick-up records) is recorded as a run with its counts and errors; a record is accepted only once.
+    rule: BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - A file received twice through MFT creates no duplicate payment.
+- id: FRS.CSH.10.03
+  component: Operations › Jobs
+  capability: Batch runs past failed records
+  brd: [BRQID.006]
+  reqs:
+  - id: FRS.CSH.10.03.01
+    text: Every batch run of Cashiering (payment files, re-matching, post-dated check maturity, minimal balance sweep, MFT intake, automatic ORs) processes each record on its own, logs failed records with their reason and gives a run report. A failed run notifies the job administrators.
+    rule: BR-CSH-17
+    colour: k
+    label: ''
+    ac:
+    - A run with one failed record completes the other records and lists the failure in its report.
+- id: FRS.CSH.10.04
+  component: Notifications
+  capability: Notices and alerts
+  brd: [BRQID.004, CSHID.019]
+  reqs:
+  - id: FRS.CSH.10.04.01
+    text: The notices of Cashiering (records for posting, returned or posted; approvals; requests of other modules; form changes) appear under the bell and open their record.
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - After Submit for Posting the poster has the notice under the bell and it opens the record.
+  - id: FRS.CSH.10.04.02
+    text: 'The Team Leader receives the alerts: series reaching its warning level; pre-booked payment waiting beyond the ageing threshold; payment file received through MFT and refused.'
+    rule: '-'
+    colour: k
+    label: ''
+    ac:
+    - The alerts are listed in the alert inbox of the Team Leader with their record.
+  - id: FRS.CSH.10.04.03
+    text: Each user chooses the in-app and e-mail channel of each Cashiering notice on Notification Settings; the default is in-app only.
+    rule: '-'
+    colour: o
+    label: ''
+    ac:
+    - A user who switches on e-mail for "Cashiering record for posting" also receives the notice by e-mail.

@@ -1,17 +1,17 @@
-"""Operations Cashiering - simplified process flow (FRS BRD-02 v3.3, section 1.4). Drawn from the FRS only:
-FRS.CSH.01 to FRS.CSH.10, Appendices C, J and M, and the Operations BRD (BRQID, CSHID)."""
+"""Operations Cashiering - simplified process flow (FRS BRD-02 v3.4; Process and Storyboards v3.4). Drawn from the FRS only:
+FRS.CSH.01 to FRS.CSH.10, and the Operations BRD (BRQID, CSHID)."""
 
 LEG = ('<div style="display:flex;gap:26px;font-size:12px;align-items:center;color:#374151">'
        '<span><b style="color:#0D47A1">&#8594;</b> Process flow</span>'
        '<span><b style="color:#0277BD">- - &#8594;</b> Files and exchanges with other systems</span>'
        '<span><b style="color:#5E35B1">- - &#8594;</b> Returned for correction</span>'
        '<span><b style="color:#7B1FA2">&#8594;</b> Accounting, reports and audit</span>'
-       '<span style="margin-left:auto">Source: FRS v3.3, FRS.CSH.01&#8211;10, Appendices C, J, M</span></div>')
+       '<span style="margin-left:auto">Source: FRS v3.4, FRS.CSH.01&#8211;10</span></div>')
 
 SPEC = dict(
     size=(1600, 1010), foot=26,
     title="BDO BIBS &#8211; Operations Cashiering &#8211; Simplified Process Flow",
-    tag="Based on FRS v3.3<br>Cashiering (BRD-02)",
+    tag="Based on FRS v3.4<br>Cashiering (BRD-02)",
     stages=["1. Payment Received", "2. Receipt Record", "3. Posting", "4. Application &amp; GL",
             "5. Exceptions", "6. Reports &amp; Audit"],
     lanes=[("Payors and<br>channels", "Clients, insurers, banks,<br>payment files (MFT)", 0.85),

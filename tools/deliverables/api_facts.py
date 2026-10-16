@@ -123,11 +123,25 @@ def _resolve(expr: str, consts: dict[str, str]) -> str:
             out.append(p.strip('"'))
         elif p in consts:
             out.append(consts[p])
+        elif CLASS_FIRST and "." in p and p.split(".")[-1] in _class_strings(p.split(".")[-2]):
+            out.append(_class_strings(p.split(".")[-2])[p.split(".")[-1]])
         elif "." in p and p.split(".")[-1] in _global_strings():
             out.append(_global_strings()[p.split(".")[-1]])
         else:
             out.append(p)
     return "".join(out)
+
+
+# A qualified constant (CashAccess.APPROVE) is read from its own class when set (BRD-02 onwards); otherwise the first
+# constant of that name anywhere in the sources, as the packs issued before it were written.
+CLASS_FIRST = False
+
+
+@lru_cache(maxsize=None)
+def _class_strings(cls: str) -> dict[str, str]:
+    """The string constants of one class (a qualified constant such as CashAccess.APPROVE is read from its class)."""
+    files = sorted(JAVA.rglob(f"{cls}.java"))
+    return _string_consts(files[0].read_text(encoding="utf-8")) if len(files) == 1 else {}
 
 
 @lru_cache(maxsize=1)

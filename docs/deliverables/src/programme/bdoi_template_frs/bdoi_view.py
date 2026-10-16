@@ -3,7 +3,7 @@
 The FRS and its workbooks revolve around the BRD, BDOI's own FRS and the iNXT BrokerVerse OOTB platform; the BIBS build
 is not described (BIBS stays only as BDOI's name for the system). The phrases of bdoi_view.yaml are rewritten as
 requirement wording in the added text of an FRS (BDOI's own paragraphs are never touched) and in every text cell of the
-workbooks of the packs. Used by build_bdoi_frs_pm.py, build_brd02_bdoi_frs.py and the
+workbooks of the packs. Used by build_bdoi_frs_pm.py and the
 workbook builders of those packs.
 """
 from __future__ import annotations

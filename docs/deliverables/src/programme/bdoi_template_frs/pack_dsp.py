@@ -58,6 +58,8 @@ def _clean(text: str) -> str:
     text = re.sub(r"\s*\([^()]*\b(?:GET|POST|PUT|PATCH|DELETE) /[^()]*\)", "", text)
     text = re.sub(r"\b[A-Z][a-z]+(?:[A-Z][a-z]+){2,}\b", "", text)
     text = text.replace("BrokerVerse", "BIBS")
+    for old, new in TEXT.get("replace", {}).items():  # wording a content module changes (DSP_TEXT["replace"])
+        text = text.replace(old, new)
     text = re.sub(r"\bBuilds\b", "Creates", text)
     return " ".join(text.split()).rstrip(" ;,")
 
@@ -222,6 +224,7 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
     global PREFIXES
     PREFIXES = K.PERMISSION_PREFIXES
     TEXT.update(getattr(K, "DSP_TEXT", {}))
+    af.CLASS_FIRST = getattr(K, "CLASS_FIRST_CONSTANTS", False)
     facts = Facts(K)
     problems = facts.check()
     if problems:
@@ -272,6 +275,8 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int, dict]:
         area_rows.append([area, what, str(n)])
     d.table(["Area", "Covers", "Operations"], area_rows, [2.4, 5.6, 1.2], caption="Service operations by area")
     jobs = [j for j in af.jobs(K.PACKAGES) if j.name not in K.JOB_OMIT]
+    if hasattr(K, "job_rows"):  # jobs whose names the job reader does not see
+        jobs += [af.Job(n, c, w, s, "") for n, c, w, s in K.job_rows()]
     d.table(["Job", "Schedule (Manila time)", "What it does"],
             [[j.name, j.time_pht, K.JOBS.get(j.name, _clean(j.summary))] for j in jobs], [3.0, 1.8, 4.4],
             caption="Scheduled jobs")

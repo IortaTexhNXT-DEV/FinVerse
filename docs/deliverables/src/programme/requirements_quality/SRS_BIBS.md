@@ -10,8 +10,8 @@ doc_code: SRS
 brd: BRD-00
 name: System Requirements Specification
 doc_id: BIBS-SRS-BRD-00
-version: "1.0"
-date: 8 October 2026
+version: "1.1"
+date: 16 October 2026
 status: Issued for BDOI review
 header_title: SRS - BIBS System Requirements Specification
 h1_page_break: true
@@ -22,6 +22,12 @@ control:
     reviewer: iorta TechNXT Solution Architect; iorta TechNXT QA lead
     approver: BIBS Product Owner (pending)
     change: First issue, from the BRD versions of 8 October 2026, the FRS of every BRD, the test plans, the programme alignment pack and the IER workbook v20
+  - version: "1.1"
+    date: 16 Oct 2026
+    author: iorta TechNXT Business Analyst lead
+    reviewer: iorta TechNXT Solution Architect; iorta TechNXT QA lead
+    approver: BIBS Product Owner (pending)
+    change: Second issue. The non-functional requirements refer to the Non-Functional and Security Requirements v2.0 (Programme/Common) and its register; traceability matrix v1.1
 distribution:
   - {name: "BIBS Product Owner", role: Approver, organisation: BDOI, purpose: "Programme requirements baseline"}
   - {name: "Program Manager, Business Project Services", role: Approver, organisation: BDO Unibank ESG, purpose: "Scope, drops and acceptance approach"}
@@ -38,7 +44,7 @@ distribution:
 
 This System Requirements Specification (SRS) states, in one document, what BIBS - the BDOI Broker System on iNXT BrokerVerse - must do for BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It is the programme-level view above the Functional Requirements Specifications (FRS) of the thirteen BRDs: it gives the system context, the users, the functional scope of each module with a reference to its FRS, the external interfaces, the data and compliance requirements, the constraints and the way BDOI accepts the system.
 
-The SRS does not repeat the FRS. Each functional requirement, with its rules, fields, messages and acceptance criteria, lives in the FRS of its BRD; where this document and an FRS describe the same behaviour, the FRS governs. The non-functional requirements are summarised here and specified in full in the companion document *Non-Functional Requirements* v{{version}} and its register.
+The SRS does not repeat the FRS. Each functional requirement, with its rules, fields, messages and acceptance criteria, lives in the FRS of its BRD; where this document and an FRS describe the same behaviour, the FRS governs. The non-functional requirements are summarised here and specified in full in the companion document *Non-Functional and Security Requirements* v2.0 (Programme/Common) and its register.
 
 ## Audience
 
@@ -71,7 +77,7 @@ BIBS is the enterprise-wide insurance broking system of BDOI. Phase 1 covers the
 | BRDs of BDOI (versions of 8 October 2026) | Business requirements with IDs and pages | The business need |
 | This SRS | Context, scope, users, interfaces, data, constraints, compliance, acceptance | Programme-level requirements |
 | FRS of each BRD (Data Migration Handbook for BRD-13) | Functional requirements FR-xx-nnn, screens, workflows, reports, messages, user-story view | Functional behaviour |
-| Non-Functional Requirements v{{version}} and register | {{nfr_total}} measurable NFRs with verification, owner and test type | Quality attributes |
+| Non-Functional and Security Requirements v2.0 (Programme/Common) and register | {{nfr_total}} measurable NFRs with verification, owner and test type | Quality attributes |
 | Requirements Traceability Matrix v{{version}} | BRD requirement to FR, test cases, screens and drop | Coverage |
 | Test plans of each BRD and the Test Strategy v{{version}} | Test conditions, cases, levels, environments, criteria | Verification |
 | Technical Specification (reviewed by BDOI IT) | Technical design, interfaces in detail, deployment | Technical realisation |
@@ -85,8 +91,8 @@ BIBS is the enterprise-wide insurance broking system of BDOI. Phase 1 covers the
 | R2 | FRS of BRD-00 to BRD-12 and the Data Migration Handbook (BRD-13) | Versions listed in chapter 4 |
 | R3 | Test plans of BRD-1 to BRD-13 | Versions listed in chapter 4 |
 | R4 | BIBS Non-Functional and Security Requirements (Programme/Common) | v2.0, 16 October 2026 |
-| R5 | BIBS Requirements Traceability Matrix | v{{version}}, 8 October 2026 |
-| R6 | BIBS Test Strategy | v{{version}}, 8 October 2026 |
+| R5 | BIBS Requirements Traceability Matrix | v{{version}}, {{date}} |
+| R6 | BIBS Test Strategy | v{{version}}, {{date}} |
 | R7 | Programme alignment pack: drops, integrations, infrastructure, and the integration inventory | v1.0, 26 September 2026 |
 | R8 | BDOI drop plan and programme timeline; BDOI answers A1 to A6 | 26 September 2026 |
 | R9 | IER workbook v20 (BDO Cloud and Digital Operations Engineering) | v20 |
@@ -286,7 +292,7 @@ All external touch-points are owned by BDOI IT. Every system-to-system interface
 
 # Non-functional requirements
 
-The non-functional requirements are specified in the companion document *Non-Functional Requirements* v{{version}}: {{nfr_total}} NFRs in 18 categories, each with an ID, a measurable target, the verification method, the owner and the test type ({{nfr_aligned}} aligned with the sources, {{nfr_decision}} waiting for a BDOI decision between conflicting BRD values, {{nfr_proposed}} proposed by iorta TechNXT). The headline targets are:
+The non-functional requirements are specified in the companion document *Non-Functional and Security Requirements* v2.0 (Programme/Common): {{nfr_total}} NFRs in 18 categories, each with an ID, a measurable target, the verification method, the owner and the test type ({{nfr_aligned}} aligned with the sources, {{nfr_decision}} waiting for a BDOI decision between conflicting BRD values, {{nfr_proposed}} proposed by iorta TechNXT). The headline targets are:
 
 <!-- rq:nfr_headline -->
 

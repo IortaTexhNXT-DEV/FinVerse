@@ -9,8 +9,8 @@ doc_code: TestStrategy
 brd: BRD-00
 name: Test Strategy
 doc_id: BIBS-TST-BRD-00
-version: "1.0"
-date: 8 October 2026
+version: "1.1"
+date: 16 October 2026
 status: Issued for BDOI review
 header_title: Test Strategy - BIBS
 h1_page_break: true
@@ -21,6 +21,12 @@ control:
     reviewer: iorta TechNXT Solution Architect; iorta TechNXT Project Manager
     approver: BIBS Product Owner (pending)
     change: First issue, aligned with the BDOI programme timeline, the project plan, the test plans of BRD-1 to BRD-13 and the NFR catalogue v1.0
+  - version: "1.1"
+    date: 16 Oct 2026
+    author: iorta TechNXT QA lead
+    reviewer: iorta TechNXT Solution Architect; iorta TechNXT Project Manager
+    approver: BIBS Product Owner (pending)
+    change: Second issue. The non-functional tests refer to the Non-Functional and Security Requirements v2.0 (Programme/Common) and its register; traceability matrix v1.1
 distribution:
   - {name: "BIBS Product Owner", role: Approver, organisation: BDOI, purpose: "Test approach, criteria, UAT organisation"}
   - {name: "Program Manager, Business Project Services", role: Approver, organisation: BDO Unibank ESG, purpose: "Schedule per drop and sign-off"}

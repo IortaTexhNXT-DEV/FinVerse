@@ -386,6 +386,7 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
     roles: dict[str, set[str]] = {}
     unread: list[str] = []
     temp: dict[str, list[str]] = {}  # temporary permission lists of a migration (insert into tmp_x values ...)
+    pair_lists: dict[str, list[tuple[str, str]]] = {}  # (role, permission) lists of a profile seed
     temp_roles: dict[str, set[str]] = {}  # temporary role lists of a migration (create temporary table ... as select)
     for f in files:
         text = re.sub(r"--[^\n]*", "", f.read_text(encoding="utf-8"))
@@ -398,6 +399,37 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
             for m in re.finditer(r"insert into sec_role \(code[^)]*\) values (.*)", s, re.I):
                 for code in re.findall(r"\(\s*'([A-Z][A-Z0-9_]*)'", m.group(1)):
                     roles.setdefault(code, set())
+            # Temporary lists of a profile seed: roles "insert into x (code, name, ...) values" and their grants
+            # "insert into x (code, permission) values" (V2900, BDOI target-state profiles).
+            tpairs = re.match(r"insert into (\w+) \(code, permission\) values (.*)", s, re.I)
+            if tpairs and not tpairs.group(1).lower().startswith("sec_"):
+                pair_lists[tpairs.group(1).lower()] = re.findall(
+                    r"\('([A-Z][A-Z0-9_]*)',\s*'([A-Z][A-Z0-9_]*)'\)", tpairs.group(2))
+                continue
+            troles = re.match(r"insert into (\w+) \(code, name[^)]*\) values (.*)", s, re.I)
+            if troles and not troles.group(1).lower().startswith("sec_"):
+                temp_roles[troles.group(1).lower()] = set(re.findall(r"\(\s*'([A-Z][A-Z0-9_]*)'", troles.group(2)))
+                continue
+            if re.match(r"insert into sec_role \(code[^)]*\) select \w+\.code\b.* from (\w+)", s, re.I):
+                src = re.search(r" from (\w+)", s, re.I).group(1).lower()
+                for code in temp_roles.get(src, set()):
+                    roles.setdefault(code, set())
+                continue
+            sync = re.match(r"delete from sec_role_permission \w+ using sec_role r where \w+\.role_id = r\.id and "
+                            r"r\.code in \(select code from (\w+)\) and not exists \(select 1 from (\w+) ", s, re.I)
+            if sync:
+                keep: dict[str, set[str]] = {}
+                for r, perm in pair_lists.get(sync.group(2).lower(), []):
+                    keep.setdefault(r, set()).add(perm)
+                for r in temp_roles.get(sync.group(1).lower(), set()):
+                    roles.get(r, set()).intersection_update(keep.get(r, set()))
+                continue
+            from_pairs = re.match(r"insert into sec_role_permission \(role_id, permission\) select r\.id, (\w+)\."
+                                  r"permission from (\w+) \1 join sec_role r on r\.code = \1\.code", s, re.I)
+            if from_pairs and from_pairs.group(2).lower() in pair_lists:
+                for r, perm in pair_lists[from_pairs.group(2).lower()]:
+                    roles.setdefault(r, set()).add(perm)
+                continue
             tmp = re.match(r"insert into (tmp_\w+) \(permission\) values (.*)", s, re.I)
             if tmp:
                 temp[tmp.group(1).lower()] = _codes(tmp.group(2))

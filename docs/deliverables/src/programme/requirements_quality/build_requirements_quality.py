@@ -48,8 +48,8 @@ import check_pack  # noqa: E402
 from bdoi_docx import BdoiDocument, lint_source, load_source, meta_from, output_path, render_body  # noqa: E402
 from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 
-VERSION = "1.0"
-DATE = "8 October 2026"
+VERSION = "1.1"
+DATE = "16 October 2026"
 OUT_REQ = brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Requirements"
 OUT_QA = brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Quality"
 RTM_NAME = f"BIBS_RTM_BRD-00_Requirements_Traceability_Matrix_v{VERSION}.xlsx"
@@ -409,7 +409,9 @@ def build_matrix(docs: dict[str, Frs], plans: Plans) -> list[dict[str, Any]]:
             titles = "; ".join(f"{f} {all_frs[f]['title']}" for f in frs if f in all_frs)
             prio = sorted({all_frs[f]["priority"].split("(")[0].strip() for f in known if all_frs[f]["priority"]})
             screen_ids = sorted({c.screen_id for c in cases if getattr(c, "screen_id", "")})
-            screens_tested = sorted({c.screen.split(" > ")[-1] for c in cases if c.screen})
+            # a case that names a route instead of a menu path gives no screen name
+            screens_tested = sorted({c.screen.split(" > ")[-1] for c in cases
+                                     if c.screen and not c.screen.split(" > ")[-1].startswith("/")})
             rows.append({
                 "brd": brd, "module": BRD_TITLES[brd], "drop": drop_of_row(brd, t["id"]), "id": t["id"],
                 "page": t["page"], "req": t["req"] or (titles.split("; ")[0].split(" ", 1)[-1] if titles else ""),

@@ -7,7 +7,7 @@ behind a screen address the check calls and the classes of its module that servi
 check is the first sentence of its description, in business words; its result comes from the test reports of the
 last full build (backend/target/surefire-reports, frontend vitest JSON when given).
 
-Usage: python3 collect_fr_evidence.py [--vitest results.json]
+Usage: python3 collect_fr_evidence.py [--vitest results.json] [--previous fr_evidence.json]
 """
 
 from __future__ import annotations
@@ -184,12 +184,19 @@ def frontend_results(path: str | None) -> dict[str, str]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--vitest")
+    parser.add_argument("--previous", help="fr_evidence.json of the last full build: a check without a report in "
+                        "this build keeps its result there")
     args = parser.parse_args()
     main_frs, fqn = java_classes()
     checks = java_checks(main_frs, api_frs(main_frs, fqn)) + front_checks()
     results = backend_results() | frontend_results(args.vitest)
     for c in checks:
         c["result"] = results.get(c["id"], "not run")
+    if args.previous:
+        before = json.loads(Path(args.previous).read_text(encoding="utf-8"))["checks"]
+        for c in checks:
+            if c["result"] == "not run" and c["id"] in before:
+                c["result"] = before[c["id"]]["result"]
     reqs = requirements()
     for r in reqs:
         keys = {r["id"], *r["brd_ids"]}

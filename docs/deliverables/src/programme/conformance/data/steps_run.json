@@ -6,13 +6,15 @@
   "checks": [
    {
     "screen": "/user-access/requests",
-    "url": "/user-access/requests",
-    "ok": true,
+    "url": "/access/group-profiles",
+    "ok": false,
     "problem": null,
-    "missing": []
+    "missing": [
+     "New Request"
+    ]
    }
   ],
-  "status": "pass"
+  "status": "fail"
  },
  {
   "brd": "BRD-00",
@@ -466,7 +468,7 @@
   "checks": [
    {
     "screen": "/claims-handling/:id",
-    "url": "/claims-handling/8",
+    "url": "/claims-handling/2",
     "ok": true,
     "problem": null,
     "missing": []
@@ -518,7 +520,7 @@
   "checks": [
    {
     "screen": "/claims-handling/:id",
-    "url": "/claims-handling/8",
+    "url": "/claims-handling/2",
     "ok": true,
     "problem": null,
     "missing": []
@@ -540,7 +542,7 @@
   "checks": [
    {
     "screen": "/claims-handling/:id",
-    "url": "/claims-handling/8",
+    "url": "/claims-handling/2",
     "ok": true,
     "problem": null,
     "missing": []
@@ -570,7 +572,7 @@
   "checks": [
    {
     "screen": "/claims-handling/:id",
-    "url": "/claims-handling/8",
+    "url": "/claims-handling/2",
     "ok": true,
     "problem": null,
     "missing": []
@@ -679,7 +681,7 @@
    },
    {
     "screen": "/accounts/:id",
-    "url": "/accounts/49",
+    "url": "/accounts/45",
     "ok": true,
     "problem": null,
     "missing": []
@@ -875,7 +877,7 @@
   "checks": [
    {
     "screen": "/accounts/:id",
-    "url": "/accounts/49",
+    "url": "/accounts/45",
     "ok": true,
     "problem": null,
     "missing": []
@@ -1969,14 +1971,12 @@
    {
     "screen": "/submitted/setup",
     "url": "/submitted/setup",
-    "ok": false,
+    "ok": true,
     "problem": null,
-    "missing": [
-     "Notification Recipients"
-    ]
+    "missing": []
    }
   ],
-  "status": "fail"
+  "status": "pass"
  },
  {
   "brd": "BRD-12",

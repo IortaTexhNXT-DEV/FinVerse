@@ -131,7 +131,7 @@ BRD-12:
   P4.1: {checks: [[/submitted/fees, null, []], [/cashiering/unapplied, null, []]]}
   P4.2: {checks: [[/reports/SBM-SANITATION, null, [Run Report]], [/reports/SBM-DISPOSITION, null, [Run Report]], [/reports/SBM-CONVERSION, null, [Run Report]]]}
   P4.3: {checks: [[/reports/SBM-EXPIRING-UNINSURED, null, [Run Report]]]}
-  P4.4: {checks: [[/submitted/setup, null, [Notification Recipients]]], gap: SBM-RECIPIENTS}
+  P4.4: {checks: [[/submitted/setup, null, [Notification Recipients]]]}
   P4.5: {checks: [[/submitted/masterlist, null, []], [/submitted/policies/:id, /submitted/masterlist, [History]]]}
 
 BRD-13:

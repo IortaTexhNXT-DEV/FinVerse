@@ -3515,7 +3515,14 @@
   "users": "csfagent",
   "action": "Resends the confirmed e-policy (E-policies tab; Resend dialog)",
   "expected": "E-policy dispatched; listed in the e-policy dispatch report",
-  "checks": [],
+  "checks": [
+   {
+    "name": "E-policies tab",
+    "path": "/renewal/epolicies",
+    "list": null,
+    "items": []
+   }
+  ],
   "buttons": []
  },
  {

@@ -183,6 +183,12 @@ def write_register() -> tuple[Path, int]:
             rows.append({"brd": m[1], "kind": "FitGap", "title": m[2].replace("_", " "), "file": p.stem,
                          "fmt": "XLSX", "ver": m[3], "date": _norm(_xlsx_date(p)), "owner": "BIBS Product Owner",
                          "prep": pc.PREPARED, "status": "Issued for BDOI review"})
+    for p in sorted((pc.OUT_PROGRAMME / "Quality").glob("BIBS_Conformance_*.xlsx")):
+        m = re.match(r"BIBS_Conformance_(BRD-\d\d)_(.+)_v(\d+\.\d+)\.xlsx$", p.name)
+        if m:
+            rows.append({"brd": "Programme", "kind": "Conformance", "title": m[2].replace("_", " "), "file": p.stem,
+                         "fmt": "XLSX", "ver": m[3], "date": _norm(_xlsx_date(p)), "owner": "BIBS Product Owner",
+                         "prep": pc.PREPARED, "status": "Issued for BDOI review"})
     wb = pc.workbook("Document Register", "Document register", "BRD-00", G.VERSION, G.DATE,
                      "Current documents of BRD-11, BRD-03, BRD-06 and BRD-02 and the programme documents")
     status = ["Issued for BDOI review", "Signed off", "To be issued", "Superseded"]

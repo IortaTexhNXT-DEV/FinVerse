@@ -11,6 +11,8 @@ Inputs (this folder):
   data/persona_run.json      the persona access check (persona_expected.py, persona_access.cjs)
   data/screen_labels.json    the menu name of every screen (persona_expected.py)
   step_checks.yaml           the screens of each step of the script and the blocked steps
+  data/bdoi_map.json         the requirements of the FRS (FR-XX-nnn) behind each requirement of the BDOI-template FRS
+                             of BRD-02, BRD-03, BRD-06 and BRD-11 (from the FRS Coverage workbooks of Programme/Quality)
   assessment.yaml            the review of the results: step notes, requirement decisions, the fixes made, the open
                              gaps with their proposals and the corrections of the FRS texts
 
@@ -238,7 +240,7 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
     checks = ev["checks"]
     decisions = assess.get("requirements") or {}
     extra = assess.get("extra_checks") or {}
-    gaps = {fr: g for g in assess.get("gaps") or [] for fr in g.get("frs") or []}
+    gaps = {fr: g for g in assess.get("gaps") or [] if g.get("status", "Open") == "Open" for fr in g.get("frs") or []}
     cycle_frs = defaultdict(list)
     cycle = load("cycle_run.json", {"steps": []})
     for s in cycle.get("steps") or []:
@@ -250,7 +252,12 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
         for s in yaml.safe_load(f.read_text(encoding="utf-8")).get("screens") or []:
             screen_frs[s["id"]] = s.get("frs") or []
     wt_by_fr = defaultdict(list)
+    # Steps that did not run for a reason outside the platform (an automated recipe out of date, a step of a
+    # withdrawn requirement) say nothing about the requirements of their screen.
+    outside = {k for k, n in (assess.get("step_notes") or {}).items() if n.get("outside")}
     for r in load("wt_results.json", []):
+        if f"{r['brd']} {r['walkthrough']}.{r['step']}" in outside:
+            continue
         for fr in screen_frs.get(r.get("screen_id") or "", []):
             wt_by_fr[fr].append(r)
     persona = load("persona_run.json", [])
@@ -348,6 +355,94 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
     return rows, summary
 
 
+# ------------------------------------------------------------------ BDOI-template FRS baselines
+
+BDOI_SRC = ROOT / "docs/deliverables/src/programme/bdoi_template_frs"
+
+
+def bdoi_baselines(assess: dict) -> dict[str, dict]:
+    """The requirements of the re-baselined BDOI-template FRS (BRD-02 v3.4, BRD-03 v1.4, BRD-06 v1.3, BRD-11 v1.6):
+    {brd: {"frs": label, "groups": [{id, title, status, items: [(id, text, colour, label)]}]}}."""
+    sys.path.insert(0, str(BDOI_SRC))
+    import brd03_v14_content as b03  # noqa: E402
+    import brd11_v15_content as b11  # noqa: E402
+
+    def from_py(rows):
+        return [{"id": g["id"], "title": g["capability"], "status": g.get("status", ""),
+                 "items": [(r[0], r[1], r[2], r[3]) for r in g["reqs"]]} for g in rows]
+
+    def from_yaml(name):
+        rows = yaml.safe_load((BDOI_SRC / name).read_text(encoding="utf-8"))
+        return [{"id": g["id"], "title": g["capability"], "status": g.get("status", ""),
+                 "items": [(r["id"], r["text"], r["colour"], r["label"]) for r in g["reqs"]]} for g in rows]
+
+    out = {"BRD-02": {"frs": "FRS v3.4", "groups": from_yaml("brd02_v34_requirements.yaml")},
+           "BRD-03": {"frs": "FRS v1.4", "groups": from_py(b03.FRUM)},
+           "BRD-06": {"frs": "FRS v1.3", "groups": from_yaml("brd06_v13_requirements.yaml")},
+           "BRD-11": {"frs": "FRS v1.6", "groups": from_py(b11.FRUM)}}
+    return {k: v for k, v in out.items() if k in (assess.get("bdoi_baselines") or out)}
+
+
+def combine(results: list[str]) -> str:
+    rs = [r for r in results if r]
+    if not rs:
+        return "Not testable yet"
+    if all(r == "Conformant" for r in rs):
+        return "Conformant"
+    if all(r == "Not conformant" for r in rs):
+        return "Not conformant"
+    if all(r == "Not testable yet" for r in rs):
+        return "Not testable yet"
+    if any(r in ("Conformant", "Partly conformant") for r in rs):
+        return "Partly conformant"
+    return "Not conformant"
+
+
+def bdoi_rows(assess: dict, fr_rows: list[dict], fr_summary: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
+    """Replaces the BIBS FRS requirements of the re-baselined BRDs by the requirements of their BDOI-template FRS.
+    An item takes the results of the BIBS FRS requirements behind its group (data/bdoi_map.json), unless the review
+    decides it (assessment.yaml bdoi_decisions, by item or group). Withdrawn groups are listed, not counted."""
+    base = {s["id"]: s for s in fr_summary}
+    evidence = {}
+    for r in fr_rows:
+        evidence.setdefault(r["fr"], r["evidence"])
+    mapping = load("bdoi_map.json", {})
+    decisions = assess.get("bdoi_decisions") or {}
+    baselines = bdoi_baselines(assess)
+    rows = [r for r in fr_rows if r["brd"] not in baselines]
+    summary = [s for s in fr_summary if s["brd"] not in baselines]
+    withdrawn = []
+    for brd, b in baselines.items():
+        for g in b["groups"]:
+            if g["status"] == "Withdrawn":
+                withdrawn.append({"brd": brd, "id": g["id"], "title": g["title"]})
+                continue
+            refs = mapping.get(brd, {}).get(g["id"], [])
+            ref_results = [base[x]["result"] for x in refs if x in base]
+            group_base = combine(ref_results) if ref_results else ""
+            ev = "; ".join(f"{x}: {base[x]['result']}" for x in refs if x in base)
+            ev_text = "\n".join(dict.fromkeys(evidence[x] for x in refs if x in evidence and evidence[x] != "None in this run"))
+            item_results = []
+            for iid, text, colour, label in g["items"]:
+                d = decisions.get(iid) or decisions.get(g["id"]) or {}
+                if not colour and not label and text.lower().rstrip(".").endswith("withdrawn"):
+                    continue
+                result = d.get("result") or group_base or "Not testable yet"
+                reason = d.get("reason") or (
+                    "" if result == "Conformant" else
+                    f"Result of the BIBS FRS requirements behind it ({ev})" if ev else
+                    "No BIBS FRS requirement or check behind it in this run; tested in UAT")
+                item_results.append(result)
+                rows.append({"brd": brd, "fr": g["id"], "title": g["title"], "priority": b["frs"], "ac": iid,
+                             "criterion": text, "evidence": d.get("evidence") or
+                             ("BIBS FRS requirements: " + ev + ("\n" + ev_text if ev_text else "") if ev else "None in this run"),
+                             "result": result, "reason": reason})
+            gr = combine(item_results)
+            summary.append({"brd": brd, "id": g["id"], "result": gr, "acs": len(item_results),
+                            "reason": "No automated check or walkthrough step" if gr == "Not testable yet" else ""})
+    return rows, summary, withdrawn
+
+
 # ------------------------------------------------------------------ workbook
 
 
@@ -368,6 +463,7 @@ def main() -> None:
     labels = load("screen_labels.json", {})
     wt_rows, _ = walkthrough_rows(assess, labels)
     fr_rows, fr_summary = requirement_rows(assess, wt_rows, labels)
+    fr_rows, fr_summary, withdrawn = bdoi_rows(assess, fr_rows, fr_summary)
 
     wb = BdoiWorkbook(TITLE, doc_type="Conformance register", brd="BRD-00", version=version,
                       date=assess.get("date"), subtitle="All BRDs: walkthroughs, broking cycle, requirements and access")
@@ -375,7 +471,9 @@ def main() -> None:
                  ("Partly conformant", "Shown working in part; the rest is confirmed in UAT"),
                  ("Not conformant", "Missing or not working; see Open gaps"),
                  ("Not testable yet", "Cannot be shown on the platform today; the reason is given")]
-    wb.cover_notes = [assess.get("scope", "")]
+    wb.cover_notes = [assess.get("scope", "")] + ([
+        "Withdrawn requirements of the BDOI-template FRS, not counted: " +
+        ", ".join(f"{w['id']} ({w['title']})" for w in withdrawn)] if withdrawn else [])
 
     # Summary
     by_brd = defaultdict(Counter)
@@ -399,7 +497,23 @@ def main() -> None:
                              "nt": c["Not testable yet"], "why": why or "-",
                              "steps": sum(w.values()), "pass": w["Pass"], "fail": w["Fail"], "blocked": w["Blocked"]})
     tot = {k: sum(r[k] for r in summary_rows) for k in ("frs", "acs", "ok", "partly", "nok", "nt", "steps", "pass", "fail", "blocked")}
-    summary_rows.append({"brd": "Total", "module": "", **tot, "why": ""})
+    summary_rows.append({"brd": "Total", "module": "Programme", **tot, "why": ""})
+    prev = assess.get("previous") or {}
+    baselines = assess.get("baselines") or {}
+    for r in summary_rows:
+        r["pct"] = round(100 * r["ok"] / r["frs"], 1) if r["frs"] else 0
+        r["pct_p"] = round(100 * (r["ok"] + r["partly"]) / r["frs"], 1) if r["frs"] else 0
+        r["frs_label"] = baselines.get(r["brd"], "BIBS FRS" if r["brd"] != "Total" else "")
+        p = prev.get(r["brd"])
+        if p:
+            p_pct = 100 * p["ok"] / p["frs"]
+            p_pct_p = 100 * (p["ok"] + p["partly"]) / p["frs"]
+            text = (f"v1.0: {p['frs']} FRs, {p_pct:.1f}% full, {p_pct_p:.1f}% incl. partly; "
+                    f"now {r['pct'] - p_pct:+.1f} / {r['pct_p'] - p_pct_p:+.1f} points")
+            note = (assess.get("changes") or {}).get(r["brd"])
+            r["change"] = text + (f". {note}" if note else "")
+        else:
+            r["change"] = "-"
     wb.sheet("Summary", [
         Column("brd", "BRD", 9, "Business requirements document"),
         Column("module", "Module", 28, "Business area of the BRD"),
@@ -409,6 +523,11 @@ def main() -> None:
         Column("partly", "Partly", 9, "Requirements shown working in part", kind="number"),
         Column("nok", "Not conformant", 11, "Requirements missing or not working", kind="number"),
         Column("nt", "Not testable yet", 11, "Requirements that cannot be shown on the platform today", kind="number"),
+        Column("pct", "% fully conformant", 11, "Conformant requirements in % of the FRs", kind="number"),
+        Column("pct_p", "% incl. partly", 11, "Conformant and partly conformant requirements in % of the FRs",
+               kind="number"),
+        Column("frs_label", "Requirement baseline", 14, "FRS whose requirements are counted"),
+        Column("change", "Change since v1.0", 50, "Results of version 1.0 and the change in percentage points"),
         Column("why", "Why not testable yet", 50, "The main reasons, with the number of requirements"),
         Column("steps", "Walkthrough steps", 11, "Steps of the walkthrough script of the BRD", kind="number"),
         Column("pass", "Passed", 9, "Steps that passed", kind="number"),
@@ -463,7 +582,7 @@ def main() -> None:
         Column("fr", "FR", 12, "Functional requirement"),
         Column("title", "Requirement", 40, "Title of the requirement"),
         Column("priority", "Priority", 11, "Priority in the FRS"),
-        Column("ac", "AC", 5, "Number of the acceptance criterion", kind="number"),
+        Column("ac", "AC / item", 14, "Acceptance criterion (BIBS FRS) or requirement item (BDOI-template FRS)"),
         Column("criterion", "Acceptance criterion", 50, "Acceptance criterion as written in the FRS"),
         Column("evidence", "Evidence", 50, "Automated checks, walkthrough and cycle steps that show it"),
         Column("result", "Result", 16, "Conformance result", values=RESULTS, status=True),
@@ -516,8 +635,12 @@ def main() -> None:
         Column("impact", "Impact", 40, "Effect on the business and on UAT"),
         Column("proposal", "Proposal", 60, "Proposed way to close the gap"),
         Column("size", "Size", 10, "Indicative size", values=["Small", "Medium", "Large"]),
-    ], [{**g, "frs_text": ", ".join(g.get("frs") or []) or g.get("frs_text", "-")} for g in assess.get("gaps") or []],
-        description="Gaps too large to fix during the run, with a proposal each")
+        Column("status", "Status", 9, "Open, or Closed in this version", values=["Open", "Closed"]),
+        Column("closed", "Closure evidence", 60, "How the closure was verified (closed gaps)"),
+    ], [{**g, "status": g.get("status", "Open"), "closed": g.get("closed", ""),
+         "frs_text": ", ".join(g.get("frs") or []) or g.get("frs_text", "-")} for g in assess.get("gaps") or []],
+        description="Gaps found by the conformance runs, with a proposal each; the gaps closed since version 1.0 stay "
+                    "listed with their evidence")
 
     wb.sheet("FRS corrections", [
         Column("id", "No.", 7, "Correction number"),

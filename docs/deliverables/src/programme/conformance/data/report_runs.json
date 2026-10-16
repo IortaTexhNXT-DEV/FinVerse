@@ -31,7 +31,7 @@
  },
  "ADJ-MINBAL-FILE": {
   "status": 200,
-  "data": 0,
+  "data": 1,
   "variant": "Year to Date"
  },
  "ADJ-REGISTER": {
@@ -41,7 +41,7 @@
  },
  "ADJ-VALIDATION-LIST": {
   "status": 200,
-  "data": 0,
+  "data": 5,
   "variant": "Year to Date"
  },
  "BCL-ACTIVITY-LOG": {
@@ -81,7 +81,7 @@
  },
  "BCL-OUTSTANDING-PAST-DUE": {
   "status": 200,
-  "data": 0,
+  "data": 1,
   "variant": "As of Today"
  },
  "BCL-PENDING-ACTIONS": {
@@ -441,7 +441,7 @@
  },
  "EB-PLACEMENT": {
   "status": 200,
-  "data": 0,
+  "data": 2,
   "variant": "Year to Date"
  },
  "EB-PRODUCTION": {
@@ -526,7 +526,7 @@
  },
  "FIN-AR-SOO-FC": {
   "status": 200,
-  "data": 0,
+  "data": 9,
   "variant": "US Dollar - As of Today"
  },
  "FIN-ARAP-SOA-MATCH": {
@@ -536,7 +536,7 @@
  },
  "FIN-BRS-PAYNOTIFY": {
   "status": 200,
-  "data": 0,
+  "data": 1,
   "variant": "This Month"
  },
  "FIN-BRS-STMT": {
@@ -581,7 +581,7 @@
  },
  "FIN-GL-ALLOCJV": {
   "status": 200,
-  "data": 0,
+  "data": 1,
   "variant": "Year to Date"
  },
  "FIN-GL-CONSSUM": {
@@ -1041,7 +1041,7 @@
  },
  "PRC-LEGACY-CHANGES": {
   "status": 200,
-  "data": 0,
+  "data": 5,
   "variant": "Year to Date"
  },
  "PRC-REGISTER": {
@@ -1181,7 +1181,7 @@
  },
  "RNW-RA-DISPATCH": {
   "status": 200,
-  "data": 0,
+  "data": 1,
   "variant": "All Expiries"
  },
  "RNW-SANITATION": {
@@ -1406,12 +1406,12 @@
  },
  "TAX-MAP": {
   "status": 200,
-  "data": 0,
+  "data": 1,
   "variant": "This Year"
  },
  "TAX-QAP": {
   "status": 200,
-  "data": 0,
+  "data": 1,
   "variant": "This Year"
  },
  "TAX-REMIT": {

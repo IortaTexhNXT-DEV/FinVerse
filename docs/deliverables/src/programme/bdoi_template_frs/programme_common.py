@@ -248,6 +248,12 @@ LOG = [
      "PRODUCT_VIEW or PKG_REPORT_VIEW (shared constant name read from another class).", "iorta TechNXT",
      "Corrected in the BRD-03 Developer Specification v1.1: every operation shows the permission its service "
      "checks.", "Closed", "DSP BRD-03 v1.1"),
+    ("O-010", "16 Oct 2026", "Decision", "BRD-00", "End-to-End Conformance Register v1.1", "Conformance "
+     "re-measured on a fresh SIT/UAT environment after the fixes since version 1.0. BRD-02, BRD-03, BRD-06 and BRD-11 are counted on the "
+     "requirements of their BDOI-template FRS (v3.4, v1.4, v1.3, v1.6; BRD-11 on the UIDM-ISC and Entra ID model, "
+     "FRUM.009 and FRUM.011 withdrawn, FRUM.014 new); the other BRDs on their BIBS FRS. Gaps G03 (except TAX-SLS and "
+     "the two FY2027 true-up reports), G07, G10, G12 and G13 closed with evidence.", "iorta TechNXT",
+     "Register v1.1 issued; v1.0 superseded.", "Closed", "Conformance Register v1.1"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

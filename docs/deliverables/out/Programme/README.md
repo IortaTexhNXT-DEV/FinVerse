@@ -108,7 +108,7 @@ Architecture stays current for the conceptual model, lineage, audit and retentio
 | User Story Backlog Drop-2 | BRD-00 | Backlog | 1.0 | [`Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-2_v1.0.xlsx`](Backlog/BIBS_Backlog_BRD-00_User_Story_Backlog_Drop-2_v1.0.xlsx) |
 | Change Management | BRD-00 | Change register summary (Word) | 1.0 | [`Change_Management/BIBS_Change_Register_BRD-00_Change_Management_Summary_v1.0.docx`](Change_Management/BIBS_Change_Register_BRD-00_Change_Management_Summary_v1.0.docx) |
 | Change Management | BRD-00 | Change register workbook (Excel) | 1.0 | [`Change_Management/BIBS_Change_Register_BRD-00_Change_Management_v1.0.xlsx`](Change_Management/BIBS_Change_Register_BRD-00_Change_Management_v1.0.xlsx) |
-| End-to-End Conformance Register | BRD-00 | Quality | 1.0 | [`Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.0.xlsx`](Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.0.xlsx) |
+| End-to-End Conformance Register | BRD-00 | Quality | 1.1 | [`Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.1.xlsx`](Quality/BIBS_Conformance_BRD-00_End-to-End_Conformance_Register_v1.1.xlsx) |
 | Disaster Recovery and Business Continuity Plan | BRD-00 | Operations | 1.0 | [`Operations/BIBS_Continuity_BRD-00_Disaster_Recovery_and_Business_Continuity_Plan_v1.0.docx`](Operations/BIBS_Continuity_BRD-00_Disaster_Recovery_and_Business_Continuity_Plan_v1.0.docx) |
 | Data Dictionary | BRD-00 | Data | 1.0 | [`Data/BIBS_Data_BRD-00_Data_Dictionary_v1.0.xlsx`](Data/BIBS_Data_BRD-00_Data_Dictionary_v1.0.xlsx) |
 | Entity Relationship Diagrams | BRD-00 | Data | 1.0 | [`Data/BIBS_Data_BRD-00_Entity_Relationship_Diagrams_v1.0.docx`](Data/BIBS_Data_BRD-00_Entity_Relationship_Diagrams_v1.0.docx) |

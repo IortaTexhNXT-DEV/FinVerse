@@ -1,13 +1,13 @@
 # BIBS User Provisioning (SCIM 2.0) - OpenAPI 3.0.3. Issued by iorta TechNXT with the User Access
-# Interface Specification v1.0 for BDOI IT and the UIDM-ISC team.
+# Interface Specification v1.1 for BDOI IT and the UIDM-ISC team.
 openapi: 3.0.3
 info:
   title: BIBS User Provisioning (SCIM 2.0)
-  version: '1.0'
+  version: '1.1'
   description: 'SCIM 2.0 service of the BDO Insure Brokering System (BIBS) for UIDM-ISC, reached through the BDOI
     API gateway. Joiner (POST /Users), mover (PUT), status change and rehire (PATCH), leaver (DELETE), user and
     group profile extracts (GET), and the members of a group profile (PATCH /Groups/{id}). Companion of the User
-    Access Interface Specification v1.0. Path inside BIBS: /integration/v1/scim/v2. Sign-in of the users is by OpenID
+    Access Interface Specification v1.1. Path inside BIBS: /integration/v1/scim/v2. Sign-in of the users is by OpenID
     Connect with Microsoft Entra ID; the redirect URI to register is <BIBS address>/api/v1/auth/sso/oidc/callback.'
   contact:
     name: iorta TechNXT Project Team

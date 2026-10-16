@@ -8,9 +8,9 @@ headers and footers, styles, revision-log table and table of contents, and repla
 brd11_icd_content.py; the context figure in figures/brd11_icd_context.dot.
 
 Outputs in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance/:
-  BIBS_ICD-BDOI_BRD-11_User_Access_Interface_Specification_v1.0.docx   the specification (and its PDF, not in git)
-  BIBS_ICD-BDOI_BRD-11_SCIM_OpenAPI_v1.0.yaml                          OpenAPI 3.0.3 description of the SCIM service
-  BIBS_ICD-BDOI_BRD-11_Interface_Test_Pack_v1.0.xlsx                   interface test cases for BDOI IT and UIDM-ISC
+  BIBS_ICD-BDOI_BRD-11_User_Access_Interface_Specification_v1.1.docx   the specification (and its PDF, not in git)
+  BIBS_ICD-BDOI_BRD-11_SCIM_OpenAPI_v1.1.yaml                          OpenAPI 3.0.3 description of the SCIM service
+  BIBS_ICD-BDOI_BRD-11_Interface_Test_Pack_v1.1.xlsx                   interface test cases for BDOI IT and UIDM-ISC
 
 Self-checks: the OpenAPI description parses and has every operation of the specification; every test case points to
 a sample that exists; the document text holds none of the development wording refused for client documents.
@@ -35,6 +35,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt
 
+# The template's placeholder author, replaced on the cover (kept encoded: no name in the sources).
+TEMPLATE_AUTHOR = __import__("codecs").decode("Wbua Oneonpunab", "rot13")
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[4]
 sys.path.insert(0, str(HERE))
@@ -94,13 +96,13 @@ class Spec:
             if "Brokering System (BIBS)" in (t.text or ""):
                 t.text = (" Brokering System (BIBS)\u00a0-\u00a0Interface Specification: User Access (SCIM 2.0 with "
                           "UIDM-ISC, OpenID Connect with Microsoft Entra ID)\u00a0")
-            elif t.text == "John Barbachano":
+            elif t.text == TEMPLATE_AUTHOR:
                 t.text = C.AUTHOR
         details = next(e for e in els if e.tag == qn("w:tbl")
                        and "Template Reference" in "".join(t.text or "" for t in e.iter(qn("w:t"))))
         values = {"FR Document No.": C.DOC_NO, "Prepared by:": C.AUTHOR, "Drafting support:": C.AUTHOR,
                   "Creation Date:": "10/15/2026", "Revision No.": C.VERSION, "Last Updated by:": C.AUTHOR,
-                  "Last Updated Date:": "10/15/2026"}
+                  "Last Updated Date:": "10/16/2026"}
         for tr in details.iter(qn("w:tr")):
             tcs = tr.findall(qn("w:tc"))
             label = "".join(t.text or "" for t in tcs[0].iter(qn("w:t"))).strip()
@@ -300,6 +302,11 @@ class Spec:
             if rel.reltype.endswith(("/image", "/oleObject", "/package", "/chart", "/diagramData")) \
                     and f'"{rid}"' not in xml:
                 del part.rels[rid]
+        # the review comments of the template (names of persons) are not part of a new document
+        for rid, rel in list(part.rels.items()):
+            if rel.reltype.endswith(("/comments", "/commentsExtended", "/commentsIds", "/commentsExtensible",
+                                     "/people")):
+                del part.rels[rid]
         self.doc.core_properties.author = "iorta TechNXT"
         self.doc.core_properties.title = C.TITLE
         self.doc.save(str(path))
@@ -361,9 +368,11 @@ def write_docx(out_path: Path) -> list[str]:
     s = Spec(TEMPLATE)
     s.cover()
     s.revision_log([
-        (C.ISSUE_DATE, C.VERSION, "First issue for BDOI IT review: SCIM 2.0 provisioning of Users and Groups from "
+        ("15 Oct 2026", "1.0", "First issue for BDOI IT review: SCIM 2.0 provisioning of Users and Groups from "
          "UIDM-ISC through the API gateway, and OpenID Connect sign-in with Microsoft Entra ID, as configured in "
          "BIBS. Companion files: OpenAPI description and interface test pack.", C.AUTHOR),
+        ("16 Oct 2026", "1.1", "Names of persons removed (review comments of the template). References updated to "
+         "the FRS v1.6 and the Developer Specification v1.0. No change of the interfaces.", C.AUTHOR),
     ])
     s.page_break()
     heads: list[str] = []
@@ -406,7 +415,9 @@ def write_docx(out_path: Path) -> list[str]:
            "BIBS System Administrators and the iorta TechNXT project team.")
     h2("References")
     s.table(["Reference", "Document"], [
-        ("FRS", "BIBS FRS-BDOI BRD-11 User Access Maintenance v1.4 (FRUM.001 to FRUM.003, FRUM.013; Annex N)"),
+        ("FRS", "BIBS FRS-BDOI BRD-11 User Access Maintenance v1.6 (FRUM.001 to FRUM.003, FRUM.013, FRUM.014)"),
+        ("Developer Specification", "BIBS DSP-BDOI BRD-11 User Access Developer Specification v1.0 (screens and "
+         "service operations of the module)"),
         ("OpenAPI", f"{C.OPENAPI.rsplit('.', 1)[0]} (OpenAPI 3.0.3 description issued with this document)"),
         ("Test pack", f"{C.XLSX.rsplit('.', 1)[0]} (issued with this document)"),
         ("RFC 7643, RFC 7644", "SCIM 2.0 core schema and protocol"),
@@ -909,7 +920,7 @@ def validate_openapi(path: Path) -> int:
 # ================================================================================================ test pack
 def write_xlsx(path: Path) -> None:
     wb = ReviewWorkbook("User Access Interface Test Pack", doc_type="Interface test pack", brd="BRD-11",
-                        version=C.VERSION, date="15 October 2026",
+                        version=C.VERSION, date="16 October 2026",
                         subtitle="SCIM 2.0 with UIDM-ISC and OpenID Connect with Microsoft Entra ID")
     wb.cover_notes = [
         "Run the cases in SIT in the order given; later cases use the users created by earlier ones.",

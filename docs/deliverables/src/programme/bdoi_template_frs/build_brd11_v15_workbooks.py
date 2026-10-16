@@ -1,16 +1,16 @@
-"""The review workbooks v1.2 of BRD-11 User Access Maintenance, aligned with the document set v1.5.
+"""The review workbooks v1.3 of BRD-11 User Access Maintenance, aligned with the document set v1.6.
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd11_v15_workbooks.py
 
 Writes in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance/:
-  BIBS_RTM_BRD-11_Test_Cases_and_Traceability_v1.2.xlsx
-  BIBS_FitGap_BRD-11_BRD_vs_OOTB_vs_Best_Practice_v1.2.xlsx
-  BIBS_CR_BRD-11_Change_Request_Register_v1.2.xlsx
-  BIBS_CR_BRD-11_Effort_Estimate_v1.2.xlsx
-  BIBS_Inputs_BRD-11_Business_Unit_Requirements_Collection_v1.2.xlsx
-  BIBS_UAT_BRD-11_Business_Unit_Walkthrough_Users_v1.2.xlsx
+  BIBS_RTM_BRD-11_Test_Cases_and_Traceability_v1.3.xlsx
+  BIBS_FitGap_BRD-11_BRD_vs_OOTB_vs_Best_Practice_v1.3.xlsx
+  BIBS_CR_BRD-11_Change_Request_Register_v1.3.xlsx
+  BIBS_CR_BRD-11_Effort_Estimate_v1.3.xlsx
+  BIBS_Inputs_BRD-11_Business_Unit_Requirements_Collection_v1.3.xlsx
+  BIBS_UAT_BRD-11_Business_Unit_Walkthrough_Users_v1.3.xlsx
 
-Content from brd11_v15_content.py and brd11_v15_pages.py, so that every number agrees with the FRS v1.5. No password
+Content from brd11_v15_content.py and brd11_v15_pages.py, so that every number agrees with the FRS v1.6. No password
 is written. Self-checks: every FRUM requirement in force has a test case; every BRD row of the mapping has a fit-gap
 row; every open change request has an effort.
 """
@@ -24,13 +24,15 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import brd11_v15_content as C  # noqa: E402
 import brd11_v15_pages as P  # noqa: E402
+import brd11_pack as K  # noqa: E402
+import pack_usr  # noqa: E402
 from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
 
 REPO = HERE.parents[4]
 FOLDER = REPO / "docs" / "deliverables" / "out" / "Programme" / "BDOI_Template_FRS" / "BRD-11_User_Access_Maintenance"
 V = C.WB_VERSION
 DATE = "16 October 2026"
-FRS = "FRS User Access Maintenance v1.5"
+FRS = f"FRS User Access Maintenance v{C.VERSION}"
 COLOUR = {"k": "Black (BRD)", "g": "Green (OOTB)", "o": "Orange (CR)", "b": "Blue (best practice)", "": "-"}
 RESULT = ["Not run", "Pass", "Fail", "Blocked"]
 PERSONA_OF = {"FRUM.001": "Any user", "FRUM.002": "User Access Administrator", "FRUM.003": "User Access Administrator",
@@ -77,16 +79,23 @@ def test_cases():
     return rows
 
 
+def stories_of(rid: str) -> list[dict]:
+    return [st for st in pack_usr.stories(K) if rid in [x.strip() for x in st["frum"].split(",")]]
+
+
 def build_rtm():
     wb = _wb("Test Cases and Traceability", "Requirements traceability")
     tcs = test_cases()
-    cols = [Column("tc", "Test case", 14), Column("frum", "FRUM", 13), Column("brd", "BRD", 22),
+    for t in tcs:
+        t["story"] = ", ".join(st["id"] for st in stories_of(t["frum"])) or "-"
+    cols = [Column("tc", "Test case", 14), Column("frum", "FRUM", 13), Column("story", "User story", 14),
+            Column("brd", "BRD", 22),
             Column("persona", "Persona", 22), Column("screen", "Screen", 24), Column("pre", "Precondition", 30),
             Column("steps", "Steps", 50), Column("expected", "Expected result", 44), Column("colour", "Colour", 16),
             Column("scope", "Delivered by", 16), Column("result", "Result", 12, values=RESULT, status=True),
             Column("tester", "Tester", 16), Column("date", "Date run", 12, kind="date")]
-    wb.sheet("Test Cases", cols, tcs, description="One test case per requirement in force of the FRS v1.5, and "
-             "one per storyboard of the Process and Storyboards v1.5.")
+    wb.sheet("Test Cases", cols, tcs, description="One test case per requirement in force of the FRS v1.6, and "
+             "one per storyboard of the Process and Storyboards v1.6.")
     rtm = []
     for b, req, frum, where, change in C.MAPPING:
         ids = [t.split()[0] for t in frum.replace(";", ",").split(",") if t.strip()]
@@ -100,6 +109,25 @@ def build_rtm():
     for r in rtm:
         if not r["tc"]:
             raise SystemExit(f"no test case for {r['brd']}")
+    screens = K.screens_by_id()
+    trace = []
+    for f in C.FRUM:
+        for rid, text, colour, label, rule, ex in f["reqs"]:
+            sts = stories_of(rid)
+            tc = [t["tc"] for t in tcs if t["frum"] == rid]
+            withdrawn = f["status"] == "Withdrawn" or text.endswith("withdrawn.") or "are withdrawn" in text
+            if not withdrawn and not (sts and tc):
+                raise SystemExit(f"trace incomplete for {rid}")
+            trace.append({"brd": f["brd"], "frum": rid, "req": text,
+                          "story": ", ".join(st["id"] for st in sts) or ("Withdrawn" if withdrawn else "-"),
+                          "screen": "; ".join(dict.fromkeys(f"{st['screen']} {screens[st['screen']]['name']}"
+                                                            for st in sts)) or SCREEN_OF.get(f["id"], "-"),
+                          "tc": ", ".join(tc) or ("Withdrawn: tested in UIDM-ISC" if withdrawn else "-")})
+    wb.sheet("Trace", [Column("brd", "BRD", 22), Column("frum", "FRUM", 13), Column("req", "Requirement", 48),
+                       Column("story", "User story", 18), Column("screen", "Screen", 30),
+                       Column("tc", "Test case", 18)], trace,
+             description="BRD to FRUM requirement to user story (User Stories v1.0) to screen (UX Design v1.6) to "
+             "test case, one row per requirement.")
     return wb.save(FOLDER / f"BIBS_RTM_BRD-11_Test_Cases_and_Traceability_v{V}.xlsx"), len(tcs)
 
 
@@ -115,7 +143,7 @@ def build_fitgap():
     wb.sheet("Fit-Gap", [Column("frum", "FRUM", 13), Column("brd", "BRD", 22), Column("req", "Requirement", 50),
                          Column("colour", "Colour", 16), Column("fit", "Fit", 16,
                          values=["Fit", "Fit (OOTB extra)", "Integration", "Change request", "Withdrawn"]),
-                         Column("note", "Note", 44)], rows, description="Each requirement of the FRS v1.5 against "
+                         Column("note", "Note", 44)], rows, description="Each requirement of the FRS v1.6 against "
              "the BRD and the iNXT BrokerVerse OOTB platform.")
     wb.sheet("Best Practice", [Column("id", "No.", 10), Column("t", "Recommendation", 46),
                                Column("p", "Priority", 10), Column("e", "Man-days", 10, kind="number")],
@@ -142,9 +170,9 @@ def build_cr():
     rows = [{"id": a, "t": b, "s": c, "frs": e, "md": sum(eff), "note": n} for a, b, c, e, eff, n in C.CRS]
     rows += [{"id": a, "t": b, "s": "Closed", "frs": "-", "md": 0, "note": n} for a, b, n in CLOSED]
     rows.sort(key=lambda r: r["id"])
-    wb.sheet("Register", [Column("id", "CR", 12), Column("t", "Title", 40), Column("s", "Status v1.2", 14,
+    wb.sheet("Register", [Column("id", "CR", 12), Column("t", "Title", 40), Column("s", "Status v1.3", 14,
              values=["Open", "Withdrawn", "Closed", "Approved", "Rejected"], status=True),
-             Column("frs", "FRS v1.5", 14), Column("md", "Man-days", 10, kind="number"), Column("note", "Note", 60)],
+             Column("frs", "FRS v1.6", 14), Column("md", "Man-days", 10, kind="number"), Column("note", "Note", 60)],
              rows, description="All change requests of BRD-11. Withdrawn in v1.2: CR-UA-003, CR-UA-011, "
              "CR-UA-014. Rescoped: CR-UA-007.")
     log = [{"d": "11 Oct 2026", "id": "Register v1.1", "e": "Five open change requests after the product owner "
@@ -190,7 +218,7 @@ def build_inputs():
                         Column("owner", "Owner", 20), Column("due", "Needed by", 14),
                         Column("status", "Status", 12, values=["Open", "Received", "Confirmed"], status=True),
                         Column("answer", "Answer", 40)], rows,
-             description="Open questions, dependencies and settings of the FRS v1.5.")
+             description="Open questions, dependencies and settings of the FRS v1.6.")
     return wb.save(FOLDER / f"BIBS_Inputs_BRD-11_Business_Unit_Requirements_Collection_v{V}.xlsx"), len(rows)
 
 
@@ -200,7 +228,7 @@ def build_uat():
               "Team; sign-in through Microsoft Entra ID where the tenant is connected"} for n, d, s, a in C.PERSONAS]
     wb.sheet("Users", [Column("p", "Persona", 24), Column("acct", "Walkthrough account", 24),
                        Column("does", "Does", 50), Column("screens", "Screens", 44), Column("pw", "Sign-in", 40)],
-             users, description="One walkthrough account per persona of the FRS v1.5.")
+             users, description="One walkthrough account per persona of the FRS v1.6.")
     script = []
     for sb in P.STORYBOARDS:
         for k, (who, screen, does, sees, shot) in enumerate(sb["steps"], start=1):
@@ -209,7 +237,7 @@ def build_uat():
     wb.sheet("Script", [Column("sb", "Storyboard", 32), Column("n", "Step", 6, kind="number"),
                         Column("who", "Who", 22), Column("screen", "Screen", 24), Column("does", "Does", 40),
                         Column("sees", "Sees", 40), Column("result", "Result", 12, values=RESULT, status=True)],
-             script, description="The storyboards of the Process and Storyboards v1.5, step by step.")
+             script, description="The storyboards of the Process and Storyboards v1.6, step by step.")
     return wb.save(FOLDER / f"BIBS_UAT_BRD-11_Business_Unit_Walkthrough_Users_v{V}.xlsx"), len(script)
 
 

@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import json
 
-VERSION = "1.0"
-ISSUE_DATE = "15 Oct 2026"
+VERSION = "1.1"
+ISSUE_DATE = "16 Oct 2026"
 DOC_NO = "ICD-BRD-11-UA"
 STEM = "BIBS_ICD-BDOI_BRD-11"
 DOCX = f"{STEM}_User_Access_Interface_Specification_v{VERSION}.docx"

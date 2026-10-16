@@ -1,4 +1,4 @@
-"""Content of the User Access Maintenance document set v1.5 (BRD-11) in BDOI's template: the FRS, the process and
+"""Content of the User Access Maintenance document set v1.6 (BRD-11) in BDOI's template: the FRS, the process and
 storyboards (BPS), the UX design (UXD) and the reports, notifications and outputs (RNO). Read by build_brd11_v15.py
 and build_brd11_v15_workbooks.py. Business wording only.
 
@@ -9,28 +9,28 @@ iNXT BrokerVerse OOTB platform), "o" orange (change request), "b" blue (best pra
 
 from __future__ import annotations
 
-VERSION = "1.5"
-WB_VERSION = "1.2"
+VERSION = "1.6"
+WB_VERSION = "1.3"
 DATE = "16 Oct 2026"
 DATE_US = "10/16/2026"
-AUTHOR = "iorta TechNXT Project Team (drafting support); for review by John Barbachano"
-OWNER = "John Barbachano"
-ICD = "BIBS_ICD-BDOI_BRD-11_User_Access_Interface_Specification_v1.0"
+AUTHOR = "iorta TechNXT Project Team (drafting support); for review by the BDOI Product Owner"
+OWNER = "BDOI Product Owner, User Access Maintenance"
+ICD = "BIBS_ICD-BDOI_BRD-11_User_Access_Interface_Specification_v1.1"
 
 DOCS = {
-    "FRS": {"file": "BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.5.docx",
+    "FRS": {"file": f"BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v{VERSION}.docx",
             "title": "Functional Requirements Specification: User Access Maintenance",
             "cover": "Functional Requirements Specification: User Access Maintenance",
             "header_left": "Functional Requirements Specification", "doc_no": "PRJ0012475"},
-    "BPS": {"file": "BIBS_BPS-BDOI_BRD-11_User_Access_Process_and_Storyboards_v1.5.docx",
+    "BPS": {"file": f"BIBS_BPS-BDOI_BRD-11_User_Access_Process_and_Storyboards_v{VERSION}.docx",
             "title": "User Access Process and Storyboards",
             "cover": "User Access Maintenance: To-Be Process and Storyboards",
             "header_left": "To-Be Process and Storyboards", "doc_no": "PRJ0012475-BPS"},
-    "UXD": {"file": "BIBS_UXD-BDOI_BRD-11_User_Access_UX_Design_v1.5.docx",
+    "UXD": {"file": f"BIBS_UXD-BDOI_BRD-11_User_Access_UX_Design_v{VERSION}.docx",
             "title": "User Access UX Design",
             "cover": "User Access Maintenance: Screens and UX Design",
             "header_left": "Screens and UX Design", "doc_no": "PRJ0012475-UXD"},
-    "RNO": {"file": "BIBS_RNO-BDOI_BRD-11_User_Access_Reports_Notifications_Outputs_v1.5.docx",
+    "RNO": {"file": f"BIBS_RNO-BDOI_BRD-11_User_Access_Reports_Notifications_Outputs_v{VERSION}.docx",
             "title": "User Access Reports, Notifications and Outputs",
             "cover": "User Access Maintenance: Reports, Notifications and Outputs",
             "header_left": "Reports, Notifications and Outputs", "doc_no": "PRJ0012475-RNO"},
@@ -39,7 +39,7 @@ HEADER_RIGHT = "BDO Insure Brokering System (BIBS) - User Access Maintenance"
 
 # Revision log of the FRS (BDOI's v1.1 and the versions since). The companion documents start at 1.5 with the split.
 REVISIONS = [
-    ("26 Aug 2026", "1.1", "BDOI's FRS for User Access Maintenance (FRUM.001 to FRUM-008).", "John Barbachano"),
+    ("26 Aug 2026", "1.1", "BDOI's FRS for User Access Maintenance (FRUM.001 to FRUM-008).", "BDOI"),
     ("09 Oct 2026", "1.2", "Draft for BDOI review: full coverage of the BRD, new items FRUM.009 to FRUM.013.", AUTHOR),
     ("10 Oct 2026", "1.3", "Business Unit review edition: process flows, screens, notices, reports, open questions.", AUTHOR),
     ("11 Oct 2026", "1.4", "Product owner review: three sources only, colour code, change requests with effort, BDOI's "
@@ -50,10 +50,16 @@ REVISIONS = [
      "FRUM-004, FRUM.010 and FRUM.013 changed; FRUM.014 added (identity synchronisation and reconciliation). The "
      "document is split: this FRS, the Process and Storyboards, the UX Design, and the Reports, Notifications and "
      "Outputs. Change requests CR-UA-003, CR-UA-011 and CR-UA-014 withdrawn; CR-UA-007 rescoped.", AUTHOR),
+    (DATE, "1.6", "Names of persons removed. The document set adds the Developer Specification, the Data Dictionary "
+     "and the User Stories; non-functional requirements, glossary and decisions move to the programme documents "
+     "(Programme/Common) and are referenced by ID. No requirement changed.", AUTHOR),
 ]
+
 REVISION_COMPANION = [
     (DATE, "1.5", "First issue as a separate document of the User Access Maintenance set (taken out of the FRS v1.4 "
      "annexes and rewritten for the agreed access model). Numbered 1.5 to match the FRS.", AUTHOR),
+    (DATE, "1.6", "Names of persons removed. References to the new Developer Specification, Data Dictionary, User "
+     "Stories and the programme documents (NFR, Glossary, Decision and Observation Log).", AUTHOR),
 ]
 
 # ================================================================================================ shared facts
@@ -145,10 +151,16 @@ DOC_SET = [
     ("Process and Storyboards (BPS)", "To-be process flows, the 15-step journey and five storyboards with screenshots."),
     ("UX Design (UXD)", "Menu by persona and every screen: fields, validations, actions, states."),
     ("Reports, Notifications and Outputs (RNO)", "Reports, certification extract, exports, notices, e-mails, jobs."),
-    ("Interface Specification (ICD) v1.0", "SCIM 2.0 with UIDM-ISC and OpenID Connect with Entra ID. Referenced, "
+    ("Interface Specification (ICD) v1.1", "SCIM 2.0 with UIDM-ISC and OpenID Connect with Entra ID. Referenced, "
      "not repeated."),
-    ("Workbooks v1.2", "RTM and test cases, Fit-Gap, CR Register and Effort Estimate, Requirements Collection, "
-     "Walkthrough Users."),
+    ("Developer Specification (DSP) v1.0", "Screens, service operations, field checks, rule enforcement, states, "
+     "jobs, audit records, permissions."),
+    ("Data Dictionary (DDI) v1.0", "Tables, columns, lists of values, parameters, status models, indexes."),
+    ("User Stories (USR) v1.0", "Epics and stories with acceptance criteria, ready for the backlog."),
+    ("Workbooks v1.3", "RTM and test cases (trace BRD, FRUM, user story, screen, test case), Fit-Gap, CR Register "
+     "and Effort Estimate, Requirements Collection, Walkthrough Users."),
+    ("Programme documents", "Non-Functional and Security Requirements, Glossary, Decision and Observation Log, "
+     "Document Register (Programme/Common). Non-functional requirements are referenced by NFR ID, not repeated."),
 ]
 
 REFERENCES = [
@@ -156,7 +168,7 @@ REFERENCES = [
     "BRD-00 and the programme-wide non-functional requirements of the Collections, Claims, ReInsurance and "
     "Operations addenda.",
     "FRS - BDOI BROKERSYS User Access Maintenance v1.1 (BDOI), template D051.",
-    "BIBS Interface Specification: User Access (SCIM 2.0 with UIDM-ISC, OpenID Connect with Microsoft Entra ID) v1.0.",
+    "BIBS Interface Specification: User Access (SCIM 2.0 with UIDM-ISC, OpenID Connect with Microsoft Entra ID) v1.1.",
     "BIBS BDOI Feature List vs OOTB and Best Practice v1.0 (baseline of the colour code).",
     "User Access Matrix - Target State (BDOI, Annex C of BDOI's FRS).",
 ]
@@ -522,7 +534,7 @@ STATUSES = {
 
 ASSUMPTIONS = [
     ("A-UA-01", "UIDM-ISC sends every joiner, mover, leaver and membership change to BIBS over SCIM 2.0, as set out "
-     "in the Interface Specification v1.0."),
+     "in the Interface Specification v1.1."),
     ("A-UA-02", "Microsoft Entra ID enforces the second factor and BDOI's device policy for BIBS."),
     ("A-UA-03", "The group-profile codes used in UIDM-ISC are the codes defined in BIBS."),
     ("A-UA-04", "BDOI accepts that BIBS is unavailable for sign-in while Entra ID is unavailable."),

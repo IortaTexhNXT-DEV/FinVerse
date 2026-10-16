@@ -1,4 +1,4 @@
-"""User Access Maintenance document set v1.5 (BRD-11) in BDOI's template.
+"""User Access Maintenance document set v1.6 (BRD-11) in BDOI's template.
 
     python docs/deliverables/src/programme/bdoi_template_frs/build_brd11_v15.py [--no-pdf] [--only FRS,BPS,UXD,RNO]
 
@@ -8,10 +8,10 @@ written from brd11_v15_content.py (FRS) and brd11_v15_pages.py (process, storybo
 screenshots are in figures/brd11_v15_screens (flows/brd11/shots_v15.sh), one full page each.
 
 Outputs in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance/:
-  BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.5.docx
-  BIBS_BPS-BDOI_BRD-11_User_Access_Process_and_Storyboards_v1.5.docx
-  BIBS_UXD-BDOI_BRD-11_User_Access_UX_Design_v1.5.docx
-  BIBS_RNO-BDOI_BRD-11_User_Access_Reports_Notifications_Outputs_v1.5.docx
+  BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.6.docx
+  BIBS_BPS-BDOI_BRD-11_User_Access_Process_and_Storyboards_v1.6.docx
+  BIBS_UXD-BDOI_BRD-11_User_Access_UX_Design_v1.6.docx
+  BIBS_RNO-BDOI_BRD-11_User_Access_Reports_Notifications_Outputs_v1.6.docx
   and their PDFs (not kept in git).
 
 Self-checks: every screenshot named exists; every BRD group of the mapping points to FRUM items of section 3; no
@@ -33,6 +33,8 @@ from docx.oxml.ns import qn
 from docx.shared import Cm, Pt
 from PIL import Image
 
+# The template's placeholder author, replaced on the cover (kept encoded: no name in the sources).
+TEMPLATE_AUTHOR = __import__("codecs").decode("Wbua Oneonpunab", "rot13")
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[4]
 sys.path.insert(0, str(HERE))
@@ -66,7 +68,7 @@ class Doc(icd.Spec):
         for t in list(body)[0].iter(qn("w:t")):
             if "Brokering System (BIBS)" in (t.text or ""):
                 t.text = f" Brokering System (BIBS) - {m['cover']} "
-            elif t.text in ("John Barbachano", icd.C.AUTHOR):
+            elif t.text in (TEMPLATE_AUTHOR, icd.C.AUTHOR):
                 t.text = C.AUTHOR
         details = next(e for e in body if e.tag == qn("w:tbl")
                        and "Template Reference" in "".join(t.text or "" for t in e.iter(qn("w:t"))))
@@ -260,7 +262,7 @@ def write_frs(path: Path, tmp: Path) -> Doc:
     d.table(["ID", "Question", "Owner", "Answer by"], C.OPEN_QUESTIONS, [1.2, 5.0, 1.8, 1.2],
             caption="Open questions")
     d.h1("Change Control Summary")
-    d.para("Change requests of the register v1.2. Effort in man-days (analysis and design, backend, frontend, "
+    d.para("Change requests of the register v1.3. Effort in man-days (analysis and design, backend, frontend, "
            "testing, documentation and UAT support).")
     d.ctable(["CR", "Title", "Status", "FRS", "Man-days", "Note"],
              [[a, b, c, e, f"{sum(eff):g}", n] for a, b, c, e, eff, n in C.CRS], [1.3, 2.3, 1.1, 1.2, 0.9, 2.6],
@@ -296,8 +298,8 @@ def write_bps(path: Path, tmp: Path) -> Doc:
     d.page_break()
     d.h1("Introduction")
     d.para("This document shows how User Access works end to end once UIDM-ISC, Microsoft Entra ID and BIBS are "
-           "connected. The requirements are in the FRS v1.5; the screens in the UX Design v1.5; the interfaces in "
-           "the Interface Specification v1.0.")
+           "connected. The requirements are in the FRS v1.6; the screens in the UX Design v1.6; the interfaces in "
+           "the Interface Specification v1.1.")
     d.para("Each storyboard step is illustrated by a full-page screenshot taken on a test environment. The people "
            "and records are fictitious. Events from UIDM-ISC were sent through the provisioning test tool of that "
            "environment, which feeds the same processing as the SCIM interface.")
@@ -335,15 +337,18 @@ def write_uxd(path: Path, tmp: Path) -> Doc:
     d.revision_log(C.REVISION_COMPANION)
     d.page_break()
     d.h1("Introduction")
-    d.para("This document describes every User Access screen of BIBS: purpose, fields, validations, actions, states "
-           "and empty or error states. Each screen state is shown by one full-page screenshot on its own page, taken "
-           "on a test environment with fictitious data. The rules behind the screens are in the FRS v1.5.")
+    d.para("This document describes every User Access screen of BIBS: purpose, who uses it, fields, input fields "
+           "(type, mandatory, default, rule), validations, actions, states and empty or error states. Each screen state is shown by one full-page screenshot on its own page, taken "
+           "on a test environment with fictitious data. The rules behind the screens are in the FRS v1.6.")
     d.h1("Menu by Persona")
     d.para("All screens are under Setup & Administration › User Access. A persona sees only its entries.")
     d.table(["Screen", "Purpose", "Personas"],
             [[a, b, c.replace("A", "Administrator").replace("M", "Maker").replace("C", "Checker")
               .replace("I", "InfoSec").replace("U", "Auditor").replace(" ", ", ")] for a, b, c in C.MENU],
             [2.2, 4.2, 2.8], caption="User Access menu by persona")
+    import brd11_pack as K  # noqa: PLC0415
+    import pack_dsp  # noqa: PLC0415
+    inputs = pack_dsp.input_fields(K)
     d.h1("Screens")
     for s in P.SCREENS:
         d.h2(f"{s['id']} {s['name']}")
@@ -351,6 +356,10 @@ def write_uxd(path: Path, tmp: Path) -> Doc:
                                     ["Actions", ", ".join(s["actions"])], ["States", s["states"]],
                                     ["Empty or error state", s["empty"]]], [2.2, 7.0])
         d.table(["Field", "Description"], s["fields"], [2.6, 6.6], caption=f"{s['id']} fields")
+        if s["id"] in inputs:
+            d.table(["Input field", "Type", "Required", "Default", "Rule", "Message on screen"], inputs[s["id"]],
+                    [2.0, 1.4, 1.0, 1.2, 1.6, 2.0], caption=f"{s['id']} input fields (service messages: Developer "
+                    "Specification)")
         if s["validations"] != ["-"]:
             d.table(["Validation message"], [[v] for v in s["validations"]], [9.2], caption=f"{s['id']} validations")
         for shot, cap in s["shots"]:

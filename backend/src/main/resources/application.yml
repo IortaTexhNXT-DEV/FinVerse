@@ -596,6 +596,12 @@ brokerverse:
     password: ${BROKERVERSE_SEED_PASSWORD:}
     # true: the SIT/UAT users must change the password at their first sign-in.
     password-must-change: ${BROKERVERSE_SEED_PASSWORD_MUST_CHANGE:false}
+    # Password of the super user Brokerverse (SeedSuperUser), set at deploy from the secret store and
+    # never written into a file. Blank: the user follows BROKERVERSE_SEED_PASSWORD.
+    super-user-password: ${BROKERVERSE_SEED_SUPER_USER_PASSWORD:}
+    # true: the SIT/UAT persona users of the seed scripts are disabled at each start, except the
+    # super user (SeedDemoUserRetirement); for an environment loaded with the client's own users.
+    retire-demo-users: ${BROKERVERSE_SEED_RETIRE_DEMO_USERS:false}
 
 ---
 # Local transports for development, automated tests and seed stacks (INF0): plaintext PostgreSQL,

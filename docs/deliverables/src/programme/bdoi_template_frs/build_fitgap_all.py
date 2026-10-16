@@ -16,8 +16,8 @@ Method (same as the Fit-Gap workbooks of BRD-02, 03, 06 and 11):
             FRS) are outside the fitment; best-practice rows (blue) are recommendations only.
   fitment   (Fit + Configure) / in-scope rows, in-scope = Fit + Configure + Extend + Recommend change.
 
-The four existing Fit-Gap workbooks keep their own classes; the summary maps them: Fit and Fit (OOTB extra) to Fit,
-Change request to Extend, Integration to Integration scope, Withdrawn to Removed from the BRD.
+BRD-02, 03, 06 and 11 are classified with the same method into sheets "Programme method BRD-xx" of the summary;
+their in-pack Fit-Gap workbooks are not changed and keep the pack's delivery view.
 """
 
 from __future__ import annotations
@@ -44,6 +44,7 @@ V = "1.0"
 DATE = "16 October 2026"
 
 NEW = ["BRD-00", "BRD-01", "BRD-04", "BRD-05", "BRD-07", "BRD-08", "BRD-09", "BRD-10", "BRD-12", "BRD-13"]
+PACK = ["BRD-02", "BRD-03", "BRD-06", "BRD-11"]   # programme method computed into the summary only
 EXISTING = {"BRD-02": "BRD-02_Operations_Cashiering", "BRD-03": "BRD-03_Product_Maintenance",
             "BRD-06": "BRD-06_Renewal", "BRD-11": "BRD-11_User_Access_Maintenance"}
 NAMES = {"BRD-00": "Core Replacement", "BRD-01": "New Business", "BRD-02": "Operations Cashiering",
@@ -64,9 +65,21 @@ COLOUR = {"Fit": "Black (BRD)", "Configure": "Black (BRD)", "Extend": "Black (BR
 FONT_COLOUR = {"Grey (Integration)": "616161", "Grey (Data Migration)": "616161", "Blue (best practice)": "1565C0",
                "-": "9E9E9E"}
 
-INTEGRATION = re.compile(r"\b(interface|MFT|API|CCM|LMS|ESB|SAP|Finacle|core banking|host system|Entra|EIAM|UIDM|"
-                         r"LDAP|Active Directory|SMS gateway|e-?mail gateway|SFTP|file transfer|web service|"
-                         r"external system|feed from|feed to|eFPS|eBIRForms|World-Check|Dow Jones|ALeA)\b", re.I)
+INTEGRATION = re.compile(
+    r"\b(interface|MFT|API|CCM|LMS|ESB|SAP|Finacle|core banking|host system|Entra|EIAM|UIDM|SSO|single sign-on|"
+    r"LDAP|Active Directory|SMS gateway|e-?mail gateway|SFTP|file transfer|web service|external system|feed from|"
+    r"feed to|eFPS|eBIRForms|World-Check|Dow Jones|ALeA|LAMD|BDOFC|BDOSOLD|SOLD|OBPCS|CLPC|payment channels?|"
+    r"bank (channel|file|system|portal|statement|upload|feed)s?|insurer (system|portal|file|folder)s?|"
+    r"BIR\W+(\w+\W+){0,3}(submi|upload|transmi|e-?fil|portal|eFPS)\w*|"
+    r"post-dated checks? (from|of) PMS|product master transfer)\b", re.I)
+# External interfaces of the four Interface Specifications (ICD) of BRD-02, 03, 06 and 11; internal flows between
+# BIBS modules (IF-CSH-05 to 08) are not integration. BRD-11 has no IF- row; its identity systems are named above.
+ICD_EXTERNAL = {"IF-CSH-01": "OBPCS Bills Payment", "IF-CSH-02": "PMS post-dated checks",
+                "IF-CSH-03": "Bank channel files", "IF-CSH-04": "Insurer commission schedule",
+                "IF-PM-01": "Product master transfer", "IF-PM-02": "E-mail channel to insurers",
+                "IF-RN-01": "CCM", "IF-RN-02": "MFT outbound", "IF-RN-03": "MFT inbound",
+                "IF-RN-04": "Insurer files", "IF-RN-05": "CLPC billing to LMS", "IF-RN-06": "LAMD and BDOFC / BDOSOLD"}
+ICD_REF = re.compile(r"IF-(CSH|PM|RN|UA)-\d\d")
 MIGRATION = re.compile(r"\bmigrat", re.I)
 CONFIG = re.compile(r"\b(parameter|set-?up|setting|configur|maintain|maintenance|master|template|table|rate|limit|"
                     r"matrix|threshold|code list|lookup|schedule|calendar|approval level|authority)\w*", re.I)
@@ -85,6 +98,10 @@ BEST = {
     "BRD-08": ["EB-033", "EB-034", "EB-035"],
     "BRD-09": ["CSF-024", "CSF-025"],
     "BRD-10": ["CMP-024", "CMP-037"],
+    "BRD-02": [],
+    "BRD-03": [],
+    "BRD-06": [],
+    "BRD-11": [],
     "BRD-12": [("BP-SP-01", "Expiry watch on client-provided policies: the account officer is told before a "
                 "submitted policy expires so that the client is asked for the renewed policy in time.",
                 "Lenders and brokers track the insurance cover of collateral continuously."),
@@ -139,7 +156,11 @@ def classify(brd, r, idx):
                 "delivered by the Data Migration scope." + built
     elif MIGRATION.search(text):
         return "Data Migration scope", fids, "One-time or recurring load of legacy data; Data Migration scope."
-    if INTEGRATION.search(text) or (feats and all(f[0].startswith("INT-") for f in feats)):
+    icd = [m.group(0) for m in ICD_REF.finditer(f"{text} {frs} {r[20] or ''}") if m.group(0) in ICD_EXTERNAL]
+    if icd:
+        return "Integration scope", fids, f"Interface {icd[0]} ({ICD_EXTERNAL[icd[0]]}) of the Interface " \
+            "Specification; Integration scope." + built
+    if INTEGRATION.search(text) or INTEGRATION.search(str(r[6] or "")) or (feats and all(f[0].startswith("INT-") for f in feats)):
         return "Integration scope", fids, "Depends on an interface with another BDO or third-party system; " \
             "Integration scope." + built
     if cov in ("CLARIFICATION", "FR ONLY") or PRACTICE.search(text):
@@ -194,19 +215,27 @@ def file_of(brd):
     return OUT / f"BIBS_FitGap_{brd}_{NAMES[brd].replace(' ', '_')}_BRD_vs_OOTB_vs_Best_Practice_v{V}.xlsx"
 
 
-def build_brd(brd, matrix, fmap, idx):
+def brd_rows(brd, matrix, idx):
     rows = []
     for r in (x for x in matrix if x[0] == brd):
         cls, fids, note = classify(brd, r, idx)
         rows.append({"id": str(r[2]), "fr": r[5] or "-", "req": str(r[4] or "(line removed from the BRD)"),
                      "colour": COLOUR[cls], "fit": cls, "ootb": fids or "-", "note": note})
+    return rows
+
+
+COLS = [Column("id", "BRD requirement", 18), Column("fr", "FR", 22), Column("req", "Requirement", 56),
+        Column("colour", "Colour", 18), Column("fit", "Fit", 20, values=CLASSES),
+        Column("ootb", "OOTB feature", 22), Column("note", "OOTB note and BIBS delivery", 60)]
+
+
+def build_brd(brd, matrix, fmap, idx):
+    rows = brd_rows(brd, matrix, idx)
     c, scope, pct = counts(x["fit"] for x in rows)
     bp = best_rows(brd, fmap)
     wb = ReviewWorkbook("BRD vs Out-of-the-Box vs Best Practice", doc_type="Fit-gap", brd=brd, version=V, date=DATE,
                         subtitle=f"{NAMES[brd]}; each BRD requirement against the iNXT BrokerVerse OOTB platform")
-    cols = [Column("id", "BRD requirement", 18), Column("fr", "FR", 22), Column("req", "Requirement", 56),
-            Column("colour", "Colour", 18), Column("fit", "Fit", 20, values=CLASSES),
-            Column("ootb", "OOTB feature", 22), Column("note", "OOTB note and BIBS delivery", 60)]
+    cols = COLS
     allrows = rows + bp
     ws = wb.sheet("Fit-Gap", cols, allrows,
                   description=f"Each requirement line of the {brd} {NAMES[brd]} BRD (programme RTM v1.1) against the "
@@ -226,21 +255,19 @@ def build_brd(brd, matrix, fmap, idx):
     return path, c, scope, pct, len(bp)
 
 
-def existing_counts(brd):
-    folder = pc.OUT_BDOI / EXISTING[brd]
-    path = sorted(folder.glob("*FitGap*.xlsx"))[-1]
-    wb = openpyxl.load_workbook(path, read_only=True)
-    ws = wb["Fit-Gap"]
-    header = [c for c in next(ws.iter_rows(min_row=4, max_row=4, values_only=True))]
-    col = header.index("Fit")
-    mapping = {"Fit": "Fit", "Fit (OOTB extra)": "Fit", "Change request": "Extend", "Integration": "Integration scope",
-               "Withdrawn": "Removed from the BRD"}
-    classes = [mapping[r[col]] for r in ws.iter_rows(min_row=5, values_only=True) if r[0] and r[col]]
-    bp = sum(1 for r in wb["Best Practice"].iter_rows(min_row=5, values_only=True) if r[0])
-    return path, *counts(classes), bp
+def pack_method(brd, matrix, fmap, idx):
+    """BRD-02, 03, 06, 11 classified with the programme method; the in-pack Fit-Gap workbook is not changed. The
+    blue rows are the best-practice points of the in-pack workbook."""
+    rows = brd_rows(brd, matrix, idx)
+    path = sorted((pc.OUT_BDOI / EXISTING[brd]).glob("*FitGap*.xlsx"))[-1]
+    ws = openpyxl.load_workbook(path, read_only=True)["Best Practice"]
+    bp = [{"id": r[0], "fr": "-", "req": r[1], "colour": COLOUR[BLUE], "fit": BLUE, "ootb": "Not available",
+           "note": f"Best-practice point of {path.name}."} for r in ws.iter_rows(min_row=5, values_only=True) if r[0]]
+    c, scope, pct = counts(x["fit"] for x in rows)
+    return (f"Sheet Programme method {brd} of this workbook", c, scope, pct, len(bp)), rows + bp
 
 
-def build_summary(results):
+def build_summary(results, pack_rows):
     wb = ReviewWorkbook("Fit-Gap Summary of All BRDs", doc_type="Fit-gap", brd="BRD-00", version=V, date=DATE,
                         subtitle="Counts and fitment of the fourteen BRDs against the iNXT BrokerVerse OOTB platform")
     rows, tot = [], Counter()
@@ -261,27 +288,32 @@ def build_summary(results):
              Column("pct", "Fitment %", 11, kind="percent"), Column("src", "Fit-Gap workbook", 60)], rows,
              description="Fitment % = (Fit + Configure) / in scope; grey, excluded and blue rows are outside it.")
     method = [
-        ("Rows", "Every BRD requirement line of the programme RTM v1.1 (BRD-00, 01, 04, 05, 07, 08, 09, 10, 12, 13); "
-         "every FRS requirement of the BDOI-template FRS packs (BRD-02, 03, 06, 11)."),
+        ("Rows", "Every BRD requirement line of the programme RTM v1.1, for all 14 BRDs."),
         ("OOTB", "The iNXT BrokerVerse OOTB platform (BDOI-OOTB, branch brokerverse-platform), through the Feature "
          "List vs OOTB and Best Practice workbook v1.0, which assesses each OOTB feature against the BRD IDs and FRs."),
         ("Fit", "Met by the OOTB platform as delivered."),
         ("Configure", "Met by the OOTB platform through settings, masters, templates or rules, without new code."),
-        ("Extend", "New or changed functions delivered in BIBS; for BRD-02, 03, 06 and 11 the change requests."),
+        ("Extend", "New or changed functions delivered in BIBS."),
         ("Recommend change", "BRD line open-ended or describing a manual practice; to be restated before sign-off."),
-        ("Integration scope", "Grey: depends on an interface; outside the fitment and outside change requests."),
+        ("Integration scope", "Grey: maps to an external interface of the Interface Specifications of BRD-02, 03, 06 "
+         "or 11, or names an external system (bank, insurer system, BIR filing, LMS, CCM, MFT, UIDM, Entra, EIAM, "
+         "SSO, LAMD, BDOFC, SOLD, payment channel); outside the fitment and outside change requests."),
         ("Data Migration scope", "Grey: extraction, load and reconciliation of legacy data (BRD-13)."),
         ("Removed from the BRD", "Excluded: removed by BDOI (or withdrawn change requests)."),
         ("Specified in another FRS", "Excluded: specified and counted in another BRD's FRS (for example BRD-00 "
          "lines covered by a function BRD, or Phase 2 Reinsurance)."),
         ("Best practice", "Blue: in no BRD, FRS or OOTB; recommendation only, outside the fitment."),
-        ("BRD-02, 03, 06, 11", "Mapped from their own Fit-Gap workbooks: Fit and Fit (OOTB extra) to Fit, Change "
-         "request to Extend, Integration to Integration scope, Withdrawn to Removed from the BRD."),
+        ("Same method", "All 14 rows of the Summary use the same programme method; the in-pack Fit-Gap workbooks of "
+         "BRD-02, 03, 06 and 11 keep the pack's delivery view."),
         ("BRD-00", "The umbrella BRD repeats the function BRDs; its fitment is not added to theirs in a business "
          "reading, but it is kept in the total as the RTM keeps it."),
     ]
     wb.sheet("Method", [Column("k", "Term", 26), Column("t", "Meaning", 100)],
              [{"k": a, "t": b} for a, b in method], description="How the classes and the fitment are set.")
+    for brd, rows in pack_rows.items():
+        ws = wb.sheet(f"Programme method {brd}", COLS, rows,
+                      description=f"{brd} {NAMES[brd]} classified with the programme method, for the Summary.")
+        _colour_rows(ws, len(rows), 4)
     return pc.save_workbook(wb, OUT / f"BIBS_FitGap_BRD-00_Summary_All_BRDs_v{V}.xlsx")
 
 
@@ -291,9 +323,10 @@ def main() -> int:
     results = {}
     for brd in NEW:
         results[brd] = build_brd(brd, matrix, fmap, idx)
-    for brd in EXISTING:
-        results[brd] = existing_counts(brd)
-    s = build_summary(results)
+    pack_rows = {}
+    for brd in PACK:
+        results[brd], pack_rows[brd] = pack_method(brd, matrix, fmap, idx)
+    s = build_summary(results, pack_rows)
     for brd in sorted(results):
         _, c, scope, pct, bp = results[brd]
         print(brd, {k: c[k] for k in CLASSES if c[k]}, "in scope", scope, "fitment", pct, "bp", bp)

@@ -54,6 +54,20 @@ export const BOOKING_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Service Invoice Batches',
+      path: '/booking/si-batches',
+      summary:
+        'The service invoices issued to each insurer on a business day, e-mailed to the insurer in one batch with their delivery status.',
+      workflow: [
+        'The daily job generates one batch per insurer and day from the service invoices of the day and e-mails it with every service invoice attached.',
+        'Open a batch to see its service invoices; send a failed batch again with Re-send.',
+      ],
+      controls: [
+        'One batch per insurer and day: running the job again for a day leaves the existing batches unchanged.',
+        'Delivery status: generated, sent, failed (with the reason) or retried.',
+      ],
+    },
+    {
       name: 'Batch Runs',
       path: '/booking/batch-runs',
       summary:

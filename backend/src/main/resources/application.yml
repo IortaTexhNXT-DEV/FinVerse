@@ -391,6 +391,8 @@ brokerverse:
     quotation-request-intake-cron: ${BROKERVERSE_JOB_QUOTATION_REQUEST_INTAKE_CRON:-}
     # End-of-day booking batch (BRNB.036): queued accounts and started multi-year policy years (20:00 PHT).
     booking-batch-cron: ${BROKERVERSE_JOB_BOOKING_BATCH_CRON:0 0 12 * * *}
+    # Daily service-invoice batch per insurer (G09): one e-mail per insurer and date (21:30 PHT).
+    si-daily-batch-cron: ${BROKERVERSE_JOB_SI_DAILY_BATCH_CRON:0 30 13 * * *}
     # ---- Operations (BRD-2), docs/architecture/OPERATIONS_DESIGN.md section 10 ----
     # Copies booked invoices missing from the Operations invoice ledger (the feed listener copies new ones).
     ops-invoice-feed-replay-cron: ${BROKERVERSE_JOB_OPS_INVOICE_FEED_REPLAY_CRON:-}

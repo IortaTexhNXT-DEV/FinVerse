@@ -332,7 +332,7 @@ reasons:
 # Tables never promoted, by reason.
 excluded:
   TRANSACTION:
-    [bkg_incentive_evaluation, sbm_loan_match, sbm_proposal, sbm_proposal_batch,
+    [bkg_incentive_evaluation, bkg_si_batch, bkg_si_batch_item, sbm_loan_match, sbm_proposal, sbm_proposal_batch,
      acc_account, acc_account_legacy, acc_account_pn, acc_account_policy, acc_risk_item,
      acc_risk_item_detail, acsl_case, acsl_correction, acsl_correction_line, acsl_glsl_recon,
      acsl_glsl_run, acsl_recon_result, acsl_recon_run, acsl_soa_line, acsl_soa_upload,

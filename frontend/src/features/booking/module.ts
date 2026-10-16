@@ -1,4 +1,4 @@
-import { BookCheck, FilePen, History, ReceiptText, Settings2, Upload } from 'lucide-react';
+import { BookCheck, FilePen, History, ReceiptText, Send, Settings2, Upload } from 'lucide-react';
 import { lazyWithRetry } from '@/app/loadRecovery';
 import type { FeatureModule } from '@/navigation/types';
 
@@ -72,6 +72,14 @@ export const bookingModule: FeatureModule = {
       permission: VIEW,
       alsoPermissions: ADJUST,
       component: lazyWithRetry(() => import('./ServiceInvoicesPage')),
+    },
+    {
+      path: '/booking/si-batches',
+      label: 'Service Invoice Batches',
+      icon: Send,
+      permission: VIEW,
+      alsoPermissions: ADJUST,
+      component: lazyWithRetry(() => import('./SiBatchesPage')),
     },
     {
       path: '/booking/service-invoices/:id',

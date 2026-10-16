@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import type { SystemParameter } from '@/api/system';
 import { userAccessApi } from '@/api/userAccess';
 import { displayNameOf } from '@/api/users';
@@ -10,7 +11,7 @@ import { CellStack } from '@/components/ui/CellStack';
 import { DataTable } from '@/components/ui/DataTable';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { Field } from '@/components/ui/Field';
+import { Field, InfoTip } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -18,9 +19,78 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
-import { settingGroup, valueHint } from './uamSettings';
+import {
+  formatSettingValue,
+  rangeHint,
+  settingGroup,
+  settingLabel,
+  settingUnit,
+  settingValueError,
+} from './uamSettings';
 
 const pending = (p: SystemParameter) => p.pendingValue !== undefined && p.pendingValue !== null;
+
+/** The new value: Yes / No for a switch, a number with its unit, or a text. */
+function ValueInput({
+  setting,
+  value,
+  error,
+  onChange,
+}: Readonly<{
+  setting: SystemParameter;
+  value: string;
+  error: string | undefined;
+  onChange: (value: string) => void;
+}>) {
+  if (setting.valueType === 'BOOLEAN') {
+    const on = value.toLowerCase() === 'true';
+    return (
+      <fieldset className="field variant-options">
+        <legend>New value</legend>
+        <div className="row" style={{ gap: 'var(--space-4)' }}>
+          <label className="checkbox">
+            <input
+              type="radio"
+              name={`setting-${setting.key}`}
+              checked={on}
+              onChange={() => onChange('true')}
+            />
+            Yes
+          </label>
+          <label className="checkbox">
+            <input
+              type="radio"
+              name={`setting-${setting.key}`}
+              checked={!on}
+              onChange={() => onChange('false')}
+            />
+            No
+          </label>
+        </div>
+      </fieldset>
+    );
+  }
+  const unit = settingUnit(setting.key);
+  const number = setting.valueType === 'INTEGER';
+  return (
+    <Field label="New value" hint={rangeHint(setting)} error={error}>
+      {(id) => (
+        <div className="row" style={{ gap: 'var(--space-2)', alignItems: 'center' }}>
+          <input
+            id={id}
+            className="input"
+            inputMode={number ? 'numeric' : undefined}
+            style={number ? { maxWidth: '10rem' } : undefined}
+            maxLength={1000}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+          />
+          {unit !== undefined && <span>{unit.many}</span>}
+        </div>
+      )}
+    </Field>
+  );
+}
 
 function ChangeDialog({
   setting,
@@ -29,10 +99,13 @@ function ChangeDialog({
   const toast = useToast();
   const queries = useQueryClient();
   const [value, setValue] = useState(setting.value);
+  const [tried, setTried] = useState(false);
+  const label = settingLabel(setting.key);
+  const invalid = settingValueError(setting, value);
   const save = useMutation({
     mutationFn: () => userAccessApi.changeSetting(setting.key, value.trim()),
     onSuccess: async () => {
-      toast.success(`${setting.description}: change sent for approval`);
+      toast.success(`${label}: change sent for approval`);
       await queries.invalidateQueries({ queryKey: ['uam-settings'] });
       onClose();
     },
@@ -40,7 +113,7 @@ function ChangeDialog({
   return (
     <Modal
       open
-      title={`Change ${setting.key}`}
+      title={label}
       onClose={onClose}
       footer={
         <>
@@ -51,7 +124,12 @@ function ChangeDialog({
             variant="accent"
             busy={save.isPending}
             disabled={value.trim() === setting.value}
-            onClick={() => save.mutate()}
+            onClick={() => {
+              setTried(true);
+              if (invalid === undefined) {
+                save.mutate();
+              }
+            }}
           >
             Send for Approval
           </Button>
@@ -60,19 +138,24 @@ function ChangeDialog({
     >
       <div className="stack">
         <ErrorAlert error={save.error} title="The change was not sent" />
-        <p className="muted">{setting.description}</p>
+        <p>{setting.description}</p>
+        <DefinitionGrid
+          label="Current setting"
+          items={[
+            { label: 'Area', value: settingGroup(setting.key) },
+            { label: 'Current value', value: formatSettingValue(setting, setting.value) },
+          ]}
+        />
+        <ValueInput
+          setting={setting}
+          value={value}
+          error={tried ? invalid : undefined}
+          onChange={setValue}
+        />
         <Notice tone="info">The new value applies once another user approves it.</Notice>
-        <Field label="New value" hint={valueHint(setting)}>
-          {(id) => (
-            <input
-              id={id}
-              className="input"
-              maxLength={1000}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-            />
-          )}
-        </Field>
+        <p className="muted" style={{ fontSize: 12 }}>
+          Parameter {setting.key}
+        </p>
       </div>
     </Modal>
   );
@@ -93,7 +176,9 @@ function DecideDialog({
         ? userAccessApi.approveSetting(setting.key)
         : userAccessApi.rejectSetting(setting.key, reason.trim() || undefined),
     onSuccess: async (_p, approve) => {
-      toast.success(approve ? `${setting.description}: change approved` : 'Change not applied');
+      toast.success(
+        approve ? `${settingLabel(setting.key)}: change approved` : 'Change not applied',
+      );
       await queries.invalidateQueries({ queryKey: ['uam-settings'] });
       await queries.invalidateQueries({ queryKey: ['session-policy'] });
       onClose();
@@ -103,7 +188,7 @@ function DecideDialog({
   return (
     <Modal
       open
-      title="UAM Setting to Approve"
+      title={`${settingLabel(setting.key)}: Change to Approve`}
       onClose={onClose}
       footer={
         <>
@@ -132,9 +217,9 @@ function DecideDialog({
         <DefinitionGrid
           label="Change to approve"
           items={[
-            { label: 'Setting', value: setting.key },
-            { label: 'Current value', value: setting.value },
-            { label: 'New value', value: setting.pendingValue },
+            { label: 'Setting', value: settingLabel(setting.key) },
+            { label: 'Current value', value: formatSettingValue(setting, setting.value) },
+            { label: 'Proposed value', value: formatSettingValue(setting, setting.pendingValue) },
             { label: 'Requested by', value: <UserName login={setting.pendingBy ?? ''} /> },
             { label: 'Requested on', value: formatDateTime(setting.pendingAt) },
           ]}
@@ -176,14 +261,39 @@ export default function UamSettingsPage() {
   const checker = can('SECURITY_PARAMETER_APPROVE');
   const mine = (p: SystemParameter) =>
     user !== null && (p.pendingBy ?? '').toLocaleLowerCase() === user.username.toLocaleLowerCase();
-  const open = (p: SystemParameter) => {
-    if (pending(p)) {
-      if ((checker && !mine(p)) || (maker && mine(p))) {
-        setDeciding(p);
-      }
-    } else if (maker) {
-      setEditing(p);
+  /** The buttons of a row: Change, or Approve / Reject for the checker, Withdraw for the maker. */
+  const actionOf = (p: SystemParameter) => {
+    const decide = () => setDeciding(p);
+    let buttons: ReactNode = null;
+    if (!pending(p)) {
+      buttons = maker && (
+        <Button size="sm" variant="secondary" onClick={() => setEditing(p)}>
+          Change
+        </Button>
+      );
+    } else if (checker && !mine(p)) {
+      buttons = (
+        <>
+          <Button size="sm" variant="accent" onClick={decide}>
+            Approve
+          </Button>
+          <Button size="sm" variant="secondary" onClick={decide}>
+            Reject
+          </Button>
+        </>
+      );
+    } else if (maker && mine(p)) {
+      buttons = (
+        <Button size="sm" variant="secondary" onClick={decide}>
+          Withdraw
+        </Button>
+      );
     }
+    return (
+      <span className="row" style={{ gap: 'var(--space-2)', flexWrap: 'nowrap' }}>
+        {buttons}
+      </span>
+    );
   };
   return (
     <div className="stack">
@@ -200,21 +310,27 @@ export default function UamSettingsPage() {
           rows={settings.data ?? []}
           rowKey={(p) => p.key}
           emptyMessage="No UAM setting is installed"
-          onRowClick={maker || checker ? open : undefined}
           columns={[
             { key: 'g', header: 'Area', render: (p) => settingGroup(p.key) },
             {
               key: 'd',
               header: 'Setting',
-              render: (p) => <CellStack main={p.description} sub={p.key} />,
+              render: (p) => (
+                <span className="row" style={{ gap: 'var(--space-1)', flexWrap: 'nowrap' }}>
+                  {settingLabel(p.key)}
+                  <InfoTip text={p.description} />
+                </span>
+              ),
             },
             {
               key: 'v',
               header: 'Value',
               render: (p) => (
                 <CellStack
-                  main={p.value}
-                  sub={pending(p) ? `New value: ${p.pendingValue ?? ''}` : undefined}
+                  main={formatSettingValue(p, p.value)}
+                  sub={
+                    pending(p) ? `Proposed: ${formatSettingValue(p, p.pendingValue)}` : undefined
+                  }
                 />
               ),
             },
@@ -225,7 +341,7 @@ export default function UamSettingsPage() {
               render: (p) =>
                 pending(p) ? (
                   <CellStack
-                    main={<StatusBadge status="PENDING_APPROVAL" />}
+                    main={<StatusBadge status="PENDING_APPROVAL" label="Pending Approval" />}
                     sub={`by ${displayNameOf(p.pendingBy ?? '')}`}
                   />
                 ) : (
@@ -245,6 +361,7 @@ export default function UamSettingsPage() {
                   />
                 ),
             },
+            { key: 'a', header: 'Action', kind: 'actions', render: (p) => actionOf(p) },
           ]}
         />
       </Card>

@@ -221,6 +221,9 @@ class UamOversightIT {
         .andExpect(jsonPath("$[0].code").value(profile))
         .andExpect(jsonPath("$[0].source").value("UIDM-ISC"))
         .andExpect(jsonPath("$[0].requestNo").value("UIDM-OVS-1"));
+    // The effective permissions name the group profile that grants each.
+    api.doGet(UAM_ADMIN, "/api/v1/admin/users/" + user.getId() + "/permissions")
+        .andExpect(jsonPath("$[?(@.permission == 'REPORT_VIEW')].groupProfiles[0]").exists());
     api.doGet(UAM_ADMIN, "/api/v1/admin/users/" + user.getId() + "/access-history")
         .andExpect(jsonPath("$[?(@.requestNo == 'UIDM-OVS-1')]").exists());
     api.doPost(UAM_ADMIN, "/api/v1/admin/sessions/users/" + user.getUsername() + "/end", null)

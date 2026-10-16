@@ -4,34 +4,32 @@ import type { AccessRequest, RoleInfo } from '@/api/nbadmin';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { PermissionName } from '@/components/ui/PermissionName';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime } from '@/utils/format';
 import { CHANGE_LABELS } from './groupProfileChange';
+import { PermissionTable } from './PermissionTable';
 
-/** The permissions of a group profile by area, with the action classes they give. */
+/** The permissions of a group profile with their area and the action classes they give. */
 export function PermissionsTab({ role }: Readonly<{ role: RoleInfo }>) {
   const matrix = useQuery({ queryKey: ['nbadmin', 'matrix'], queryFn: nbadminApi.matrix });
-  const rows = (matrix.data?.permissions ?? []).filter((p) =>
-    role.permissions.includes(p.permission),
-  );
+  const classified = new Map((matrix.data?.permissions ?? []).map((p) => [p.permission, p]));
+  const rows = role.permissions.map((code) => ({
+    permission: code,
+    area: classified.get(code)?.area,
+    actions: classified.get(code)?.actions ?? [],
+  }));
   return (
-    <Card flush>
-      <ErrorAlert error={matrix.error} />
-      <DataTable
-        caption={`Permissions of ${role.name}`}
-        loading={matrix.isLoading}
-        rows={rows}
-        rowKey={(p) => p.permission}
-        emptyMessage="The group profile grants no permission"
-        columns={[
-          { key: 'a', header: 'Area', render: (p) => p.area ?? '' },
-          { key: 'p', header: 'Permission', render: (p) => <PermissionName code={p.permission} /> },
-          { key: 'c', header: 'Actions', render: (p) => p.actions.map(humanize).join(', ') },
-        ]}
-      />
-    </Card>
+    <PermissionTable
+      title={countOf(rows.length, 'permission')}
+      rows={rows}
+      loading={matrix.isLoading}
+      error={matrix.error}
+      fileName={`group_profile_permissions_${role.code}.csv`}
+      caption={`Permissions of ${role.name}`}
+      emptyMessage="The group profile grants no permission"
+      actionClasses
+    />
   );
 }
 

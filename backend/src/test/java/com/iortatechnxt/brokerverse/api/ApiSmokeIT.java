@@ -216,6 +216,7 @@ class ApiSmokeIT {
     "uamadmin, /api/v1/admin/users",
     "uamadmin, /api/v1/admin/users/1/group-profiles",
     "uamadmin, /api/v1/admin/users/1/access-history",
+    "uamadmin, /api/v1/admin/users/1/permissions",
     "uamadmin, /api/v1/admin/identity/status",
     "uamadmin, /api/v1/admin/identity/reconciliation",
     "uamadmin, /api/v1/admin/identity/reconciliation?open=false",

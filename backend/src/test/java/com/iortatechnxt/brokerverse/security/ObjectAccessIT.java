@@ -33,6 +33,7 @@ class ObjectAccessIT {
           "/api/v1/admin/users",
           "/api/v1/admin/users/" + admin + "/group-profiles",
           "/api/v1/admin/users/" + admin + "/access-history",
+          "/api/v1/admin/users/" + admin + "/permissions",
           "/api/v1/admin/sessions?username=admin",
           "/api/v1/admin/identity/users/admin/profile"
         }) {

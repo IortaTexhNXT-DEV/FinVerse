@@ -19,14 +19,14 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { PermissionName } from '@/components/ui/PermissionName';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useTabParam } from '@/components/ui/useTabParam';
 import { SessionsTable } from '@/features/profile/SessionsTable';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, humanize } from '@/utils/format';
 import { DataAccessPanel } from './DataAccessPanel';
+import { PermissionTable } from './PermissionTable';
 import { USER_STATUS_LABELS, statusOf } from './userStatus';
 import { useAuth } from '@/auth/authContext';
 
@@ -126,20 +126,27 @@ function GroupProfilesTab({ user }: Readonly<{ user: UserProfile }>) {
 }
 
 function PermissionsTab({ user }: Readonly<{ user: UserProfile }>) {
-  const codes = [...user.permissions].sort((a, b) => a.localeCompare(b));
-  if (codes.length === 0) {
-    return <EmptyState message="The user's group profiles grant no permission" />;
-  }
+  const permissions = useQuery({
+    queryKey: ['user-access', 'permissions', user.id],
+    queryFn: () => userAccessApi.permissionsOf(user.id),
+  });
+  const held = useQuery({
+    queryKey: ['user-access', 'held', user.id],
+    queryFn: () => userAccessApi.groupProfilesOf(user.id),
+  });
+  const rows = permissions.data ?? [];
+  const active = (held.data ?? []).filter((p) => p.active).length;
   return (
-    <Card title={`${String(codes.length)} permissions through the active group profiles`}>
-      <ul className="tag-list" aria-label="Effective permissions">
-        {codes.map((c) => (
-          <li key={c}>
-            <PermissionName code={c} />
-          </li>
-        ))}
-      </ul>
-    </Card>
+    <PermissionTable
+      title={`${countOf(rows.length, 'permission')} through ${countOf(active, 'active group profile')}`}
+      rows={rows}
+      loading={permissions.isLoading}
+      error={permissions.error ?? held.error}
+      fileName={`effective_permissions_${user.username}.csv`}
+      caption={`Effective permissions of ${user.username}`}
+      emptyMessage="The user's group profiles grant no permission"
+      grantedThrough
+    />
   );
 }
 

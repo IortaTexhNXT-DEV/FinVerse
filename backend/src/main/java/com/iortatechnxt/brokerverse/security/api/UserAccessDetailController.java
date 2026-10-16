@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.security.api;
 
 import com.iortatechnxt.brokerverse.security.api.dto.AccessChangeResponse;
 import com.iortatechnxt.brokerverse.security.service.UserAccessDetail;
+import com.iortatechnxt.brokerverse.security.service.UserAccessDetail.EffectivePermission;
 import com.iortatechnxt.brokerverse.security.service.UserAccessDetail.HeldProfile;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +41,17 @@ public class UserAccessDetailController {
   @GetMapping("/group-profiles")
   public List<HeldProfile> groupProfiles(@PathVariable Long id) {
     return detail.groupProfiles(id);
+  }
+
+  /**
+   * The effective permissions of a user with the group profiles that grant them.
+   *
+   * @param id user
+   * @return permissions by code
+   */
+  @GetMapping("/permissions")
+  public List<EffectivePermission> permissions(@PathVariable Long id) {
+    return detail.permissions(id);
   }
 
   /**

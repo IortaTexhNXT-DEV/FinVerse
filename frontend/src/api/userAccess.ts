@@ -12,6 +12,14 @@ export interface HeldGroupProfile {
   requestNo?: string;
 }
 
+/** A permission a user holds, with the active group profiles that grant it. */
+export interface EffectivePermission {
+  permission: string;
+  /** Functional area; absent when the permission is not classified. */
+  area?: string | null;
+  groupProfiles: string[];
+}
+
 /** One logged change of a user's access. */
 export interface AccessChange {
   id: number;
@@ -84,6 +92,8 @@ const SETTINGS = '/nbadmin/uam-settings';
 export const userAccessApi = {
   groupProfilesOf: (id: number) =>
     api.get<HeldGroupProfile[]>(`${USERS}/${String(id)}/group-profiles`),
+  permissionsOf: (id: number) =>
+    api.get<EffectivePermission[]>(`${USERS}/${String(id)}/permissions`),
   accessHistory: (id: number) => api.get<AccessChange[]>(`${USERS}/${String(id)}/access-history`),
   endSessions: (username: string) =>
     api.post<{ ended: number }>(`/admin/sessions/users/${encodeURIComponent(username)}/end`),

@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.security.domain.AccessChangeLogRepository;
 import com.iortatechnxt.brokerverse.security.domain.AccessSubjectType;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
+import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,14 +16,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The User detail of the User Access screens: the group profiles a user holds with where each came
- * from and since when (read from the access change log), and the access history of the user (every
- * logged change of the user's attributes, newest first).
+ * from and since when (read from the access change log), the effective permissions with the active
+ * group profiles that grant each, and the access history of the user (every logged change of the
+ * user's attributes, newest first).
  */
 @Service
 @Transactional(readOnly = true)
@@ -30,18 +35,52 @@ public class UserAccessDetail {
 
   private static final String ROLES = "roles";
 
+  /** The functional area of each classified permission (PMADD05); the first area seeded wins. */
+  private static final String AREAS =
+      "select permission, area from sec_permission_action order by id desc";
+
   private final AppUserRepository users;
   private final AccessChangeLogRepository changes;
+  private final JdbcTemplate jdbc;
 
   /**
    * Creates the service.
    *
    * @param users users
    * @param changes access change log
+   * @param jdbc JDBC access (functional areas of the permissions)
    */
-  public UserAccessDetail(AppUserRepository users, AccessChangeLogRepository changes) {
+  public UserAccessDetail(
+      AppUserRepository users, AccessChangeLogRepository changes, JdbcTemplate jdbc) {
     this.users = users;
     this.changes = changes;
+    this.jdbc = jdbc;
+  }
+
+  /**
+   * The effective permissions of a user: every permission an active group profile of the user
+   * grants, with the names of those group profiles and the permission's functional area.
+   *
+   * @param id user
+   * @return permissions by code
+   */
+  public List<EffectivePermission> permissions(Long id) {
+    Map<Permission, Set<String>> through = new TreeMap<>(Comparator.comparing(Permission::name));
+    for (Role r : user(id).getRoles()) {
+      if (r.isActive()) {
+        r.getPermissions()
+            .forEach(p -> through.computeIfAbsent(p, k -> new TreeSet<>()).add(r.getName()));
+      }
+    }
+    Map<String, String> areas = new HashMap<>();
+    RowCallbackHandler area = rs -> areas.put(rs.getString("permission"), rs.getString("area"));
+    jdbc.query(AREAS, area);
+    return through.entrySet().stream()
+        .map(
+            e ->
+                new EffectivePermission(
+                    e.getKey().name(), areas.get(e.getKey().name()), List.copyOf(e.getValue())))
+        .toList();
   }
 
   /**
@@ -126,4 +165,13 @@ public class UserAccessDetail {
    */
   public record HeldProfile(
       String code, String name, boolean active, String source, Instant since, String requestNo) {}
+
+  /**
+   * A permission a user holds through the active group profiles.
+   *
+   * @param permission permission code
+   * @param area functional area; null when the permission is not classified
+   * @param groupProfiles names of the active group profiles of the user that grant it
+   */
+  public record EffectivePermission(String permission, String area, List<String> groupProfiles) {}
 }

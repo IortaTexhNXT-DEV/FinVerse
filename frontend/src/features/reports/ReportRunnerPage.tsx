@@ -12,6 +12,7 @@ import { menuFormats } from './exportFormats';
 import { ParameterInput } from './ParameterInput';
 import { PrintOptionsFields } from './PrintOptionsFields';
 import { ReportVariants } from './ReportVariants';
+import { SubscribeButton } from './SubscribeDialog';
 import { ReportTable } from './ReportTable';
 import { DEFAULT_PRINT, filterPairs, reportOptionsApi } from './reportOptions';
 import type { ColumnFilters, PrintOptions } from './reportOptions';
@@ -127,6 +128,14 @@ export default function ReportRunnerPage() {
         backTo={entry.category === 'NEW_BUSINESS' ? '/nb/reports' : '/reports'}
         title={entry.title}
         description={entry.description}
+        actions={
+          <SubscribeButton
+            reportCode={code}
+            title={entry.title}
+            parameters={params}
+            formats={menuFormats(entry)}
+          />
+        }
       />
       <Card title="Parameters">
         <div className="stack">

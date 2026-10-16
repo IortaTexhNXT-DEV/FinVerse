@@ -173,6 +173,20 @@ export const HELP_SECTIONS: HelpSection[] = [
           'Each report has its own permission (e.g. TAX_VIEW for tax reports, BCL_REPORT_VIEW for claims handling, REPORT_FINANCIAL for financial statements); the catalogue lists only the reports you may run.',
         ],
       },
+      {
+        name: 'My Report Subscriptions',
+        path: '/reports/subscriptions',
+        summary:
+          'Reports sent on a schedule: Subscribe on a report screen with the parameters entered, a frequency (daily, weekly or monthly), a file format and the e-mail recipients.',
+        workflow: [
+          'The scheduler runs the subscriptions due each day as their subscriber, keeps the file in the report archive and e-mails it to the recipients.',
+          'Open Runs to see each run: sent, failed, or denied with the reason; Stop ends a subscription.',
+        ],
+        controls: [
+          'At every run the subscriber must still hold the export permission of the report and the companies and branches of the parameters must be in the subscriber data scope; otherwise the run is denied and nothing is sent.',
+          'One run per subscription and day.',
+        ],
+      },
     ],
   },
   BROKING_SETUP_HELP,

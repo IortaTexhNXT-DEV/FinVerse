@@ -435,6 +435,7 @@ excluded:
     [acc_period_close_schedule, acc_period_module_lock, bcl_attribute_change, bulk_job, bulk_row,
      evt_archive, flyway_schema_history, evt_dead_letter, evt_outbox, ops_flow_in_record, ops_flow_in_run, per_fiscal_year,
      per_period, report_batch, report_batch_item, report_run, report_run_file, scr_name_key,
+     report_subscription, report_subscription_run,
      sto_legal_hold_request, yec_year_end_close,
      idn_directory_profile, idn_sim_directory_account, pm_master_sim_inbox]
   PLANNING:

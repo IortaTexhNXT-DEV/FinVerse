@@ -42,8 +42,10 @@ class SeedPasswordGuardTest {
   private static final Pattern SEED_HASH =
       Pattern.compile("\\$2[aby]\\$\\d\\d\\$[./A-Za-z0-9]{53}");
 
+  /** Build output; hidden folders of local tools are skipped too, except the CI workflows. */
   private static final Set<String> SKIPPED_FOLDERS =
-      Set.of(".git", "node_modules", "target", "dist", "build", ".claude", "coverage");
+      Set.of("node_modules", "target", "dist", "build", "coverage");
+
   private static final Set<String> OFFICE = Set.of("docx", "xlsx", "pptx");
   private static final long MAX_SIZE = 32L * 1024 * 1024;
 
@@ -108,8 +110,9 @@ class SeedPasswordGuardTest {
   }
 
   private static boolean skipped(Path relative) {
-    for (Path part : relative) {
-      if (SKIPPED_FOLDERS.contains(part.toString())) {
+    for (int i = 0; i < relative.getNameCount() - 1; i++) {
+      String folder = relative.getName(i).toString();
+      if (SKIPPED_FOLDERS.contains(folder) || folder.startsWith(".") && !".github".equals(folder)) {
         return true;
       }
     }

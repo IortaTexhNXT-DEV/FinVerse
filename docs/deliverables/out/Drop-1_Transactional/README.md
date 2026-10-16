@@ -16,7 +16,7 @@ and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
-For BRD-02 Operations (FRS v3.3); BRD-06 Renewal (FRS v1.3) the FRS in BDOI's format and its review workbooks (business unit requirements collection, fit-gap, test cases and traceability, change request register, walkthrough users) in `../Programme/BDOI_Template_FRS/` are the only documents (decision of the BIBS Product Owner of 10-Oct-2026); the earlier sign-off set of each is withdrawn and its row below points to that folder. The signatories of such a document are on the Signoff Sheet of its FRS.
+For BRD-02 Operations (FRS v3.4); BRD-06 Renewal (FRS v1.3) the FRS in BDOI's format and its review workbooks (business unit requirements collection, fit-gap, test cases and traceability, change request register, walkthrough users) in `../Programme/BDOI_Template_FRS/` are the only documents (decision of the BIBS Product Owner of 10-Oct-2026); the earlier sign-off set of each is withdrawn and its row below points to that folder. The signatories of such a document are on the Signoff Sheet of its FRS.
 
 The sets of BRD-01, BRD-04, BRD-05 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
 
@@ -31,7 +31,7 @@ The sets of BRD-01, BRD-04, BRD-05 also carry the UX screen documents for the BD
 | New Business | BRD-01 | UX screen deck (PowerPoint) | 2.1 | [`BRD-01_New_Business/07_BIBS_UXDeck_BRD-01_New_Business_v2.1.pptx`](BRD-01_New_Business/07_BIBS_UXDeck_BRD-01_New_Business_v2.1.pptx) |
 | New Business | BRD-01 | UX screen register (Excel) | 2.1 | [`BRD-01_New_Business/08_BIBS_UXScreens_BRD-01_New_Business_v2.1.xlsx`](BRD-01_New_Business/08_BIBS_UXScreens_BRD-01_New_Business_v2.1.xlsx) |
 | New Business | BRD-01 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.1 | [`BRD-01_New_Business/09_BIBS_UXScreens_BRD-01_New_Business_v2.1.zip`](BRD-01_New_Business/09_BIBS_UXScreens_BRD-01_New_Business_v2.1.zip) |
-| Operations | BRD-02 | FRS in BDOI's format and the review workbooks | 3.3 | [`../Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering/`](../Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering/) |
+| Operations | BRD-02 | FRS in BDOI's format and the review workbooks | 3.4 | [`../Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering/`](../Programme/BDOI_Template_FRS/BRD-02_Operations_Cashiering/) |
 | Collections | BRD-04 | Start here guide | 2.1 | [`BRD-04_Collections/00_BIBS_StartHere_BRD-04_Collections_v2.1.docx`](BRD-04_Collections/00_BIBS_StartHere_BRD-04_Collections_v2.1.docx) |
 | Collections | BRD-04 | Sign-off pack guide deck | 2.1 | [`BRD-04_Collections/01_BIBS_GuideDeck_BRD-04_Collections_v2.1.pptx`](BRD-04_Collections/01_BIBS_GuideDeck_BRD-04_Collections_v2.1.pptx) |
 | Collections | BRD-04 | FRS | 2.1 | [`BRD-04_Collections/02_BIBS_FRS_BRD-04_Collections_v2.1.docx`](BRD-04_Collections/02_BIBS_FRS_BRD-04_Collections_v2.1.docx) |

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Retires the SIT/UAT persona users of the seed scripts in an environment that now works with the
- * client's own users (seed profile only, with {@code BROKERVERSE_SEED_RETIRE_DEMO_USERS=true}).
+ * client's own users (seed profile only, with {@code BROKERVERSE_SEED_RETIRE_SEED_PERSONAS=true}).
  *
  * <p>The users the seed scripts created (created by {@code SYSTEM}, never created through the
  * identity events or the User Access screens, which log a {@code CREATE_USER} change) are disabled
@@ -25,9 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Profile("seed")
 @Order(2)
-public class SeedDemoUserRetirement implements ApplicationRunner {
+public class SeedPersonaRetirement implements ApplicationRunner {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SeedDemoUserRetirement.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SeedPersonaRetirement.class);
 
   static final String RETIRE =
       "with retired as ("
@@ -50,8 +50,8 @@ public class SeedDemoUserRetirement implements ApplicationRunner {
    * @param jdbc JDBC
    * @param retire whether the persona users of the seed scripts are retired
    */
-  public SeedDemoUserRetirement(
-      JdbcTemplate jdbc, @Value("${brokerverse.seed.retire-demo-users:false}") boolean retire) {
+  public SeedPersonaRetirement(
+      JdbcTemplate jdbc, @Value("${brokerverse.seed.retire-seed-personas:false}") boolean retire) {
     this.jdbc = jdbc;
     this.retire = retire;
   }

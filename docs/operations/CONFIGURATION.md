@@ -28,7 +28,7 @@ are for local development only.
 | `BROKERVERSE_SEED_PASSWORD` | no (seed profile only) | – | Password of the SIT/UAT users of this seed environment (SIT, UAT, training, local stacks), from the secret store; never written into a file. At start the seed profile gives it to every SIT/UAT user still carrying the password hash of the seed scripts (`SeedPasswords`). Blank: the users are left unchanged and a warning is logged. See "Seed data". |
 | `BROKERVERSE_SEED_PASSWORD_MUST_CHANGE` | no | `false` | `true`: the SIT/UAT users given `BROKERVERSE_SEED_PASSWORD` must change it at their first sign-in (each tester then holds an own password; shared personas and the screenshot tools need the unchanged password, hence the default). |
 | `BROKERVERSE_SEED_SUPER_USER_PASSWORD` | no (seed profile only) | – | Password of the super user `Brokerverse` (iorta TechNXT Super User, seed script V2901) in this seed environment, from the secret store; never written into a file. At start `SeedSuperUser` gives it to the user while it still carries the hash of the seed scripts, without a change at the first sign-in; a value that breaks the password rules (10+ characters, upper and lower case, digit, symbol) is not used. Blank: the user follows `BROKERVERSE_SEED_PASSWORD`. See "Seed data". |
-| `BROKERVERSE_SEED_RETIRE_DEMO_USERS` | no (seed profile only) | `false` | `true`: at each start `SeedDemoUserRetirement` disables the SIT/UAT persona users of the seed scripts (walkthrough personas, `SIT Enrolled User`, ...) with a `DISABLE_USER` entry in the access change log; `Brokerverse` and the users created through the identity events or the User Access screens stay. For a DEV/SIT environment loaded with the client's users (`tools/dev/load_personnel.py`). The seed scripts and the automated tests are unchanged. |
+| `BROKERVERSE_SEED_RETIRE_SEED_PERSONAS` | no (seed profile only) | `false` | `true`: at each start `SeedPersonaRetirement` disables the SIT/UAT persona users of the seed scripts (walkthrough personas, `SIT Enrolled User`, ...) with a `DISABLE_USER` entry in the access change log; `Brokerverse` and the users created through the identity events or the User Access screens stay. For a DEV/SIT environment loaded with the client's users (`tools/dev/load_personnel.py`). The seed scripts and the automated tests are unchanged. |
 | `BROKERVERSE_PORT` | no | `8080` | Listener port (`8443` in the Kubernetes deployments, where it serves HTTPS). |
 | `BROKERVERSE_JOB_RECURRING_CRON` | no | `0 0 1 * * *` | Spring cron (UTC) of `RECURRING_JOURNALS`: generates the due recurring and accrual journals. |
 | `BROKERVERSE_JOB_ALERTS_CRON` | no | `0 30 1 * * *` | Spring cron (UTC) of `ALERT_DAILY_CHECKS`: evaluates the scheduled exception codes. |
@@ -451,7 +451,7 @@ the client documents included (a standing test refuses it, `SeedPasswordGuardTes
   platform roles of system administration and User Access. Its password comes from
   `BROKERVERSE_SEED_SUPER_USER_PASSWORD`. Seed script V2900 creates the BDOI target-state group profiles
   (`BDOI_*`, docs/modules/BDOI_TARGET_STATE_PROFILES.md). Once an environment holds the client's own users, set
-  `BROKERVERSE_SEED_RETIRE_DEMO_USERS=true` to disable the persona users of the seed scripts.
+  `BROKERVERSE_SEED_RETIRE_SEED_PERSONAS=true` to disable the persona users of the seed scripts.
 - **Automated tests** never use the SIT/UAT password: `SignInPasswords` (test support) gives the users a test signs
   in as a random password drawn for the test run.
 

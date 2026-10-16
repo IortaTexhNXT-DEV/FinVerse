@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The BDOI target-state group profiles (V2900), the super user (V2901) and the retirement of the
- * SIT/UAT persona users ({@link SeedDemoUserRetirement}) on the seed data. Every test rolls back.
+ * SIT/UAT persona users ({@link SeedPersonaRetirement}) on the seed data. Every test rolls back.
  */
 @IntegrationTest
 @Transactional
@@ -90,10 +90,10 @@ class BdoiSeedAccessIT {
             + " attribute, to_value, done_by) values (now(), 'USER', 'retire_it_joiner',"
             + " 'CREATE_USER', 'enabled', 'true', 'SYSTEM')");
 
-    new SeedDemoUserRetirement(jdbc, false).run(new DefaultApplicationArguments());
+    new SeedPersonaRetirement(jdbc, false).run(new DefaultApplicationArguments());
     assertThat(enabled("uamadmin")).isTrue();
 
-    new SeedDemoUserRetirement(jdbc, true).run(new DefaultApplicationArguments());
+    new SeedPersonaRetirement(jdbc, true).run(new DefaultApplicationArguments());
     assertThat(enabled("uamadmin")).isFalse();
     assertThat(enabled("clmofficer")).isFalse();
     assertThat(enabled(SeedSuperUser.USERNAME)).isTrue();

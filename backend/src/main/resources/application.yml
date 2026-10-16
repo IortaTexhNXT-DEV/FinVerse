@@ -600,8 +600,8 @@ brokerverse:
     # never written into a file. Blank: the user follows BROKERVERSE_SEED_PASSWORD.
     super-user-password: ${BROKERVERSE_SEED_SUPER_USER_PASSWORD:}
     # true: the SIT/UAT persona users of the seed scripts are disabled at each start, except the
-    # super user (SeedDemoUserRetirement); for an environment loaded with the client's own users.
-    retire-demo-users: ${BROKERVERSE_SEED_RETIRE_DEMO_USERS:false}
+    # super user (SeedPersonaRetirement); for an environment loaded with the client's own users.
+    retire-seed-personas: ${BROKERVERSE_SEED_RETIRE_SEED_PERSONAS:false}
 
 ---
 # Local transports for development, automated tests and seed stacks (INF0): plaintext PostgreSQL,

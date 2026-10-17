@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,6 +36,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -48,6 +51,7 @@ class InsurerPageIT {
   @Autowired private AsUser as;
   @Autowired private TestData data;
   @Autowired private MockMvc mvc;
+  @Autowired private JdbcTemplate jdbc;
 
   private InsurerProfile newInsurer() {
     String code = "INS-PG" + Long.toString(System.nanoTime() % 1_000_000L, 36).toUpperCase();
@@ -163,5 +167,29 @@ class InsurerPageIT {
         .andExpect(jsonPath("$.bankAccounts").isArray())
         .andExpect(jsonPath("$.products").isArray())
         .andExpect(jsonPath("$.insurer.remittance").exists());
+  }
+
+  @Test
+  void theAccountsTabShowsTheSubLedgerOfTheInsurer() throws Exception {
+    InsurerProfile insurer = newInsurer();
+    jdbc.update(
+        """
+        insert into sl_open_item (company_id, branch_id, party_id, party_code, direction,
+            document_type, document_no, document_date, due_date, currency, amount, base_amount,
+            settled_amount, status, source_module, created_at, created_by)
+        select p.company_id, b.id, p.id, p.code, 'CREDIT', 'PREMIUM_PAYABLE', ?, current_date,
+            current_date, 'PHP', 1000, 1000, 250, 'PARTIAL', 'TEST', now(), 'SYSTEM'
+        from pty_party p join org_branch b on b.company_id = p.company_id and b.head_office
+        where p.company_id = ? and p.code = ?
+        """,
+        "SL-" + insurer.getPartyCode(),
+        insurer.getCompanyId(),
+        insurer.getPartyCode());
+    mvc.perform(
+            get("/api/v1/catalog/insurers/" + insurer.getId() + "/accounts")
+                .with(user("badmin").authorities(new SimpleGrantedAuthority("MASTER_VIEW"))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.subLedger[0].outstanding").value(750))
+        .andExpect(jsonPath("$.glAccounts").isArray());
   }
 }

@@ -13,10 +13,14 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerPageDtos.RemittanceRe
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerResponse;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.service.InsurerLedgerService;
+import com.iortatechnxt.brokerverse.catalog.service.InsurerLedgerService.InsurerAccounts;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerPageService;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.RateTableService;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
+import com.iortatechnxt.brokerverse.common.security.DataScope;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -39,6 +43,8 @@ public class InsurerController {
   private final InsurerService insurers;
   private final RateTableService rates;
   private final InsurerPageService page;
+  private final InsurerLedgerService ledger;
+  private final DataScope dataScope;
 
   /**
    * Creates the controller.
@@ -46,12 +52,37 @@ public class InsurerController {
    * @param insurers insurers
    * @param rates commission rates
    * @param page contacts, bank accounts, remittance details and linked products
+   * @param ledger accounts of the insurer
+   * @param dataScope data scope of the reader
    */
   public InsurerController(
-      InsurerService insurers, RateTableService rates, InsurerPageService page) {
+      InsurerService insurers,
+      RateTableService rates,
+      InsurerPageService page,
+      InsurerLedgerService ledger,
+      DataScope dataScope) {
     this.insurers = insurers;
     this.rates = rates;
     this.page = page;
+    this.ledger = ledger;
+    this.dataScope = dataScope;
+  }
+
+  /**
+   * The read-only Accounts view of the insurer page: the general ledger accounts posted for the
+   * insurer and its sub-ledger open items (G08). Refused for an insurer of a company outside the
+   * reader's data scope.
+   *
+   * @param id insurer profile
+   * @return accounts
+   */
+  @GetMapping("/{id}/accounts")
+  @PreAuthorize(CatalogAccess.READ)
+  @CompanyScoped("the company of the insurer is checked with DataScope.requireCompany")
+  public InsurerAccounts accounts(@PathVariable Long id) {
+    InsurerProfile insurer = ledger.insurer(id);
+    dataScope.requireCompany(insurer.getCompanyId());
+    return ledger.accounts(insurer);
   }
 
   /**

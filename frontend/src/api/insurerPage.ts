@@ -81,3 +81,40 @@ export const insurerPageApi = {
   updateBankAccount: (accountId: number, input: BankAccountInput) =>
     api.put<InsurerBankAccount>(`${insurers}/bank-accounts/${accountId}`, input),
 };
+
+/** A general ledger account posted for the insurer (read-only Accounts tab). */
+export interface InsurerGlAccount {
+  code: string;
+  name: string;
+  accountClass: string;
+  controlAccount: boolean;
+  subLedgerType: string;
+  entries: number;
+  debit: number;
+  credit: number;
+  balance: number;
+  lastDate: string | null;
+}
+
+/** Sub-ledger open items of the insurer of one kind. */
+export interface InsurerSubLedgerLine {
+  documentType: string;
+  direction: 'DEBIT' | 'CREDIT';
+  currency: string;
+  status: string;
+  items: number;
+  amount: number;
+  settled: number;
+  outstanding: number;
+}
+
+export interface InsurerAccounts {
+  glAccounts: InsurerGlAccount[];
+  subLedger: InsurerSubLedgerLine[];
+}
+
+/** The general ledger and sub-ledger accounts of an insurer (read-only). */
+export const insurerAccountsApi = {
+  accounts: (insurerId: number) =>
+    api.get<InsurerAccounts>(`${insurers}/${String(insurerId)}/accounts`),
+};

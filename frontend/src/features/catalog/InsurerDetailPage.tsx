@@ -21,6 +21,7 @@ import { DetailList } from './DetailList';
 import { BankAccountModal, ContactModal, RemittanceModal } from './InsurerPageModals';
 import { BankAccountsTable, ContactsTable, LinkedProductsTable } from './InsurerPageTables';
 import { remittanceCycleLabel, remittanceModeLabel } from './insurerPageForm';
+import { InsurerAccountsTab } from './InsurerAccountsTab';
 import { InsurerEditorModal } from './InsurerEditorModal';
 import { BranchModal, CommissionModal } from './InsurerRatesModals';
 import { RecordActions } from './RecordActions';
@@ -43,6 +44,7 @@ const TABS = [
   { id: 'remittance', label: 'Payment & Remittance' },
   { id: 'accounts', label: 'Bank Accounts' },
   { id: 'products', label: 'Products' },
+  { id: 'ledger', label: 'Ledger Accounts' },
   { id: 'branches', label: 'Branches & Commissions' },
   { id: 'changes', label: 'Change History' },
 ] as const;
@@ -206,6 +208,8 @@ function TabContent({ tab, detail: d, maintain, onDialog }: Readonly<TabProps>) 
           </Card>
         </>
       );
+    case 'ledger':
+      return <InsurerAccountsTab insurerId={d.insurer.id} />;
     case 'changes':
       return <ChangeHistory entityType="InsurerProfile" entityId={d.insurer.id} />;
     default:

@@ -16,6 +16,8 @@ DATE_US = "10/17/2026"
 AUTHOR = "iorta TechNXT Project Team (drafting support); for review by the BDOI Product Owner"
 OWNER = "BDOI Product Owner, Product Maintenance"
 ICD_VERSION = "1.0"
+# The UX Design alone moved to 1.7 (screenshots of the insurer record tabs and the Master Data Change Log).
+UXD_VERSION = "1.7"
 
 DOCS = {
     "FRS": {"file": f"BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v{VERSION}.docx",
@@ -24,7 +26,7 @@ DOCS = {
     "BPS": {"file": f"BIBS_BPS-BDOI_BRD-03_Product_Maintenance_Process_and_Storyboards_v{VERSION}.docx",
             "cover": "Product Maintenance: To-Be Process and Storyboards",
             "header_left": "To-Be Process and Storyboards", "doc_no": "PRJ0012475-PM-BPS"},
-    "UXD": {"file": f"BIBS_UXD-BDOI_BRD-03_Product_Maintenance_UX_Design_v{VERSION}.docx",
+    "UXD": {"file": f"BIBS_UXD-BDOI_BRD-03_Product_Maintenance_UX_Design_v{UXD_VERSION}.docx",
             "cover": "Product Maintenance: Screens and UX Design",
             "header_left": "Screens and UX Design", "doc_no": "PRJ0012475-PM-UXD"},
     "RNO": {"file": f"BIBS_RNO-BDOI_BRD-03_Product_Maintenance_Reports_Notifications_Outputs_v{VERSION}.docx",

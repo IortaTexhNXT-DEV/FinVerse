@@ -87,6 +87,21 @@ module.exports = (ctx) => {
     step('ux-16-incentives', go('mbs', '/catalog/incentives')),
     step('ux-17-insurers', go('mbs', '/catalog/insurers')),
     step('ux-18-insurer', open('mbs', 'first_insurer')),
+    // v1.7: the read-only Ledger Accounts tab and the Change History tab after a change of the payment terms that
+    // the Business Administrator makes and a second user authorises (the field changes of the Master Data Change Log).
+    step('ux-18-ledger', open('mbs', 'first_insurer', 'Ledger Accounts')),
+    step('ux-18-history', async () => {
+      const id = ctx.one("select id from cat_insurer where party_code = 'INS-MGIC' order by id limit 1");
+      const status = ctx.one(`select record_status from cat_insurer where id = ${id}`);
+      if (status === 'ACTIVE') {
+        await ctx.api('badmin', 'PUT', `/catalog/insurers/${id}/remittance`, {
+          paymentTerms: 'Net premium remitted within 30 days of the end of the month',
+          cycle: 'MONTHLY', mode: 'FUND_TRANSFER', email: 'remittance@mgic-insurance.com.ph', currency: 'PHP',
+        });
+        await ctx.api('approver', 'POST', `/catalog/records/INSURER/${id}/authorize`);
+      }
+      return open('mbs', 'first_insurer', 'Change History')();
+    }),
     step('ux-19-rates', go('mbs', '/catalog/rates')),
     step('ux-20-sales', go('badmin', '/catalog/sales-organisation', recipe.after['scr-pm-20-01-tree'])),
     step('ux-21-calculator', go('ao', '/catalog/calculator', async (p) => {
@@ -100,6 +115,7 @@ module.exports = (ctx) => {
     step('ux-25-transfers', go('mbs', '/product-maintenance/master-changes')),
     step('ux-26-placement', go('tsu', '/product-maintenance/placement-reports')),
     step('ux-27-audit', go('auditor', '/product-maintenance/audit-logs')),
+    step('ux-27-change-log', go('auditor', '/admin/master-change-log')),
     // The non-package proposal request with insurer terms received (New Business, Proposals).
     step('ux-28-proposal', async () => {
       const id = ctx.one("select id from npk_proposal where prf_no in ('PRF-2026-900004', 'PRF-2026-000104') order by id limit 1");

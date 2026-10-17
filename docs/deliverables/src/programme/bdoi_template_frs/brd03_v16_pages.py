@@ -181,7 +181,8 @@ SHOTS = {
     "SCR-PM-15": [("ux-15-coverages", "Coverages"), ("ux-15-clauses", "Clause Library")],
     "SCR-PM-16": [("ux-16-incentives", "Incentive Criteria")],
     "SCR-PM-17": [("ux-17-insurers", "Insurers")],
-    "SCR-PM-18": [("ux-18-insurer", "Insurer record")],
+    "SCR-PM-18": [("ux-18-insurer", "Insurer record"), ("ux-18-ledger", "Insurer record, Ledger Accounts tab"),
+                  ("ux-18-history", "Insurer record, Change History tab")],
     "SCR-PM-19": [("ux-19-rates", "Rates & Taxes")],
     "SCR-PM-20": [("ux-20-sales", "Sales Organisation")],
     "SCR-PM-21": [("ux-21-calculator", "Premium Calculator with a result")],
@@ -191,7 +192,7 @@ SHOTS = {
                   "dialog")],
     "SCR-PM-25": [("ux-25-transfers", "Product Master Transfers")],
     "SCR-PM-26": [("ux-26-placement", "Placement Update Reports")],
-    "SCR-PM-27": [("ux-27-audit", "Audit Logs (Auditor)")],
+    "SCR-PM-27": [("ux-27-audit", "Audit Logs (Auditor)"), ("ux-27-change-log", "Master Data Change Log (Auditor)")],
     "SCR-PM-28": [("ux-28-proposal", "Proposal request, Comparative Table tab")],
     "SCR-PM-29": [("ux-29-routing", "Routing & Approvals tab (ManCom member)")],
 }

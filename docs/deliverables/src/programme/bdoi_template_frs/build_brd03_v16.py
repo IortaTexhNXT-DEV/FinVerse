@@ -59,7 +59,7 @@ class Doc(pc.PackDoc):
 
     def __init__(self, key: str, revisions):
         m = C.DOCS[key]
-        version = C.ICD_VERSION if key == "ICD" else C.VERSION
+        version = {"ICD": C.ICD_VERSION, "UXD": C.UXD_VERSION}.get(key, C.VERSION)
         super().__init__(pc.DocMeta(file=m["file"], cover=m["cover"], header_left=m["header_left"],
                                     header_right=C.HEADER_RIGHT, doc_no=m["doc_no"], version=version,
                                     date_us=C.DATE_US, created_us=CREATED.get(key, C.DATE_US), revisions=revisions))
@@ -282,7 +282,7 @@ def write_bps(tmp: Path) -> Doc:
 
 # ================================================================================================ UXD
 def write_uxd(tmp: Path) -> Doc:
-    d = Doc("UXD", C.REVISION_COMPANION)
+    d = Doc("UXD", C.REVISION_COMPANION + [("17 Oct 2026", C.UXD_VERSION, "Screenshots of the Ledger Accounts and Change History tabs of the Insurer Record (SCR-PM-18) and of the Master Data Change Log (SCR-PM-27); no change of the requirements.", C.AUTHOR)])
     d.h1("Introduction")
     d.para("This document describes every Product Maintenance screen of BIBS: purpose, users, access, rules and "
            "states, fields with their type, whether they are required, format and source, validation and message, "

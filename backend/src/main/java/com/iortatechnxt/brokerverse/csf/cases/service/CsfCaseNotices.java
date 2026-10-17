@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.csf.cases.service;
 
+import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
+import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCase;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCaseSetupStore;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
@@ -13,7 +15,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Notifications of the cases (FR-CSF-050 to 060): the members of the fulfilment unit when a case is
- * routed to it, the owner when the unit resolves, returns or asks for action, the escalation group
+ * routed to it, with a copy to the account officer of the account of the case (FRS BRD-9 v1.2,
+ * BRCSFCM.012), the owner when the unit resolves, returns or asks for action, the escalation group
  * of the unit (default the supervisors) on an escalation, and all of them on the SLA notices. Each
  * notice names the Case ID, the policy number, the case type, the nature of transaction and the due
  * date, and links to the case.
@@ -24,6 +27,7 @@ public class CsfCaseNotices {
   private final NotificationService notifications;
   private final CsfCaseSetupStore setup;
   private final LovService lovs;
+  private final AccountQueryService accounts;
 
   /**
    * Creates the notices.
@@ -31,12 +35,52 @@ public class CsfCaseNotices {
    * @param notifications in-app notices
    * @param setup members and escalation groups
    * @param lovs labels
+   * @param accounts accounts (the account officer of the account of a case)
    */
   public CsfCaseNotices(
-      NotificationService notifications, CsfCaseSetupStore setup, LovService lovs) {
+      NotificationService notifications,
+      CsfCaseSetupStore setup,
+      LovService lovs,
+      AccountQueryService accounts) {
     this.notifications = notifications;
     this.setup = setup;
     this.lovs = lovs;
+    this.accounts = accounts;
+  }
+
+  /**
+   * Notifies the routing of a case to a fulfilment unit: its members, with a copy to the account
+   * officer of the account of the case, so that the BU/AO ownership of the account is kept (FRS
+   * BRD-9 v1.2). An account officer who is a member of the unit is told once.
+   *
+   * @param c case
+   * @param what what happened, e.g. "routed to your unit"
+   */
+  public void routed(CsfCase c, String what) {
+    toUnit(c, what);
+    accountOfficer(c)
+        .filter(
+            ao ->
+                setup.membersOf(c.category().fulfilmentUnit()).stream()
+                    .noneMatch(m -> CurrentUser.sameUser(m, ao)))
+        .ifPresent(
+            ao ->
+                notifications.notifyUser(
+                    ao,
+                    notice(
+                        c,
+                        what.replace("your unit", "the fulfilment unit")
+                            + " (copy for the account officer)")));
+  }
+
+  /** The account officer of the account of a case, when the case names an account. */
+  private Optional<String> accountOfficer(CsfCase c) {
+    Long accountId = c.account() == null ? null : c.account().accountId();
+    if (accountId == null) {
+      return Optional.empty();
+    }
+    String ao = accounts.get(accountId).getSales().accountOfficer();
+    return ao == null || ao.isBlank() ? Optional.empty() : Optional.of(ao);
   }
 
   /**

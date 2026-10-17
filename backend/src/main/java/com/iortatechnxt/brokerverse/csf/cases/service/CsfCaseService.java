@@ -316,7 +316,7 @@ public class CsfCaseService {
     access.requireOwnerOrSupervisor(c);
     CsfCase changed = move(c, CaseStatus.WITH_FULFILMENT, UnaryOperator.identity());
     note(changed, "Re-endorsed to the fulfilment unit", comment);
-    notices.toUnit(changed, "re-endorsed to your unit");
+    notices.routed(changed, "re-endorsed to your unit");
     return changed;
   }
 
@@ -375,7 +375,7 @@ public class CsfCaseService {
           "Reassigned to another fulfilment unit" + CsfCaseInputs.suffix(comment),
           inputs.label(CsfCaseCodes.LOV_UNIT, c.category().fulfilmentUnit()),
           inputs.label(CsfCaseCodes.LOV_UNIT, code));
-      notices.toUnit(changed, "reassigned to your unit");
+      notices.routed(changed, "reassigned to your unit");
     }
     return changed;
   }
@@ -531,7 +531,7 @@ public class CsfCaseService {
         null,
         saved.status().label());
     if (!r.resolveNow()) {
-      notices.toUnit(saved, "routed to your unit");
+      notices.routed(saved, "routed to your unit");
     }
     return saved;
   }

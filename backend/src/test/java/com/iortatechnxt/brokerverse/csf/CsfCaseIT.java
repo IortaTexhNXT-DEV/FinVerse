@@ -198,6 +198,57 @@ class CsfCaseIT {
   }
 
   @Test
+  void theAccountOfficerOfTheAccountHasACopyOfTheRouting() {
+    Map<String, Object> account =
+        jdbc.queryForMap(
+            "select id, client_id, account_officer from acc_account where company_id = ?"
+                + " and account_officer is not null and client_id is not null order by id limit 1",
+            fx.company());
+    Long accountId = ((Number) account.get("id")).longValue();
+    Long clientId = ((Number) account.get("client_id")).longValue();
+    String officer = (String) account.get("account_officer");
+    CsfCase routed =
+        as.run(
+            AGENT,
+            () ->
+                cases.log(
+                    fx.company(),
+                    new LogRequest(
+                        clientId,
+                        accountId,
+                        null,
+                        null,
+                        category("REQUEST", "EPOLICY_RESEND", "PROCESSING"),
+                        "Resend of the e-policy",
+                        "The client asks for the e-policy again",
+                        false,
+                        null,
+                        null)));
+    try {
+      assertThat(
+              jdbc.queryForObject(
+                  "select count(*) from msg_notification where lower(recipient) = lower(?)"
+                      + " and title = ?",
+                  Long.class,
+                  officer,
+                  routed.caseNo()
+                      + " routed to the fulfilment unit (copy for the account officer)"))
+          .isEqualTo(1L);
+      assertThat(
+              jdbc.queryForObject(
+                  "select count(*) from msg_notification where lower(recipient) = ?"
+                      + " and title = ?",
+                  Long.class,
+                  FULFILMENT,
+                  routed.caseNo() + " routed to your unit"))
+          .isEqualTo(1L);
+    } finally {
+      as.run(
+          FULFILMENT, () -> cases.resolve(routed.id(), "E-policy sent again", "REQUEST_COMPLETED"));
+    }
+  }
+
+  @Test
   void aMemberOfAnotherUnitDoesNotSeeTheCase() {
     Client c = fx.client(true);
     CsfCase other = log(c, "REQUEST", "OR_REQUEST", "RENEWAL");

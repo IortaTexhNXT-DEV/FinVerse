@@ -593,7 +593,7 @@ def main() -> int:
     global K, C
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--pack", required=True, choices=sorted(PACKS))
-    ap.add_argument("--only", default="FRS,BPS,UXD,RNO,ICD,WB,DSP,DDI,USR,README")
+    ap.add_argument("--only", default="FRS,BPS,UXD,RNO,ICD,WB,DSP,DDI,USR,ACX,README")
     ap.add_argument("--no-pdf", action="store_true")
     args = ap.parse_args()
     K = importlib.import_module(PACKS[args.pack])
@@ -638,6 +638,10 @@ def main() -> int:
                 print(f"wrote {target.name} ({counts})")
             elif key == "USR":
                 target, counts, _ = pack_usr.write(K, out, K.FIX_VERSION)
+                print(f"wrote {target.name} ({counts})")
+            elif key == "ACX":
+                import pack_access  # noqa: PLC0415
+                target, counts = pack_access.write(K, out)
                 print(f"wrote {target.name} ({counts})")
             elif key == "README":
                 import pack_readme  # noqa: PLC0415

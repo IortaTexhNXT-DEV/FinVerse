@@ -61,6 +61,8 @@ SET = [
 EXT = {"README": "docx", "FRS": "docx", "BPS": "docx", "UXD": "docx", "RNO": "docx", "ICD": "docx", "DSP": "docx",
        "DDI": "xlsx", "USR": "xlsx", "RTM": "xlsx", "FIT": "xlsx", "CRR": "xlsx", "CRE": "xlsx", "INP": "xlsx",
        "WTU": "xlsx"}
+SET.append(("ACX", "Access", "Cashiering_Access_Matrix", "1.0", "Group profile x screen x action, from the permissions, group profiles, menus and server checks of the release.", "BDOI Information Security; UAT lead"))
+EXT["ACX"] = "xlsx"
 
 
 def file_name(key: str) -> str:

@@ -34,6 +34,12 @@ def write(K, out: Path, tmp: Path, pdf: bool = True) -> tuple[Path, int]:
                      purpose, reviewer])
     d.table(["No.", "Document", "Version", "Purpose", "Reviewer"], rows, [0.5, 2.8, 0.7, 3.4, 2.0],
             caption="Documents of the pack, in reading order")
+    if any(k == "ACX" for k, *_ in K.SET):
+        d.para(f"The Access Matrix ({K.file_name('ACX')}) shows, for each group profile assigned in UIDM-ISC, the "
+               "screens of the pack it opens and the actions it may do on each screen, with the permission the "
+               "server checks. It is written from the permissions, group profiles, menus and server checks of the "
+               "release, so it shows the access as delivered; Information Security and the UAT lead review it "
+               "against the persona tables of the FRS.")
     d.table(["Programme document", "Purpose", "Where"],
             [[n, p, PROGRAMME_FILES[n]] for n, p in r["programme"]], [2.6, 4.8, 1.8],
             caption="Programme documents referred to by every pack")

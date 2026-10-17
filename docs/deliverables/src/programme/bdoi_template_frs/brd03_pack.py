@@ -30,7 +30,7 @@ SET = [
      "Marketing)"),
     ("BPS", "BPS-BDOI", "Product_Maintenance_Process_and_Storyboards", C.VERSION, "To-be process flows and "
      "storyboards.", "BDOI Business Unit owners"),
-    ("UXD", "UXD-BDOI", "Product_Maintenance_UX_Design", C.VERSION, "Every screen: purpose, users, fields, actions, "
+    ("UXD", "UXD-BDOI", "Product_Maintenance_UX_Design", C.UXD_VERSION, "Every screen: purpose, users, fields, actions, "
      "states, messages, one screenshot per page.", "BDOI Business Unit owners; UAT lead"),
     ("RNO", "RNO-BDOI", "Product_Maintenance_Reports_Notifications_Outputs", C.VERSION, "Reports, documents, exports, "
      "notices, e-mails and jobs.", "BDOI Business Unit owners; Internal Audit"),
@@ -57,6 +57,8 @@ SET = [
 EXT = {"README": "docx", "FRS": "docx", "BPS": "docx", "UXD": "docx", "RNO": "docx", "ICD": "docx", "DSP": "docx",
        "DDI": "xlsx", "USR": "xlsx", "RTM": "xlsx", "FIT": "xlsx", "CRR": "xlsx", "CRE": "xlsx", "INP": "xlsx",
        "WTU": "xlsx"}
+SET.append(("ACX", "Access", "Access_Matrix", "1.0", "Group profile x screen x action, from the permissions, group profiles, menus and server checks of the release.", "BDOI Information Security; UAT lead"))
+EXT["ACX"] = "xlsx"
 
 
 def file_name(key: str) -> str:

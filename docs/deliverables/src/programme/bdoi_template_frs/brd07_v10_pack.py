@@ -220,7 +220,8 @@ PACKAGES = ["brokerclaims"]
 MESSAGE_PACKAGES = ["brokerclaims"]
 SETTING_CLASSES = ("SystemParameter",)
 CONTROLLERS = ["brokerclaims/" + c for c in (
-    "claim/api/BrokerClaimController.java", "cover/api/CoverController.java", "diary/api/DiaryController.java",
+    "claim/api/BrokerClaimController.java", "claim/api/ClaimHandlingController.java",
+    "setup/api/ClaimsChecklistController.java", "cover/api/CoverController.java", "diary/api/DiaryController.java",
     "home/api/ClaimsHomeController.java", "insurer/api/InsurerClaimController.java",
     "insurer/api/InsurerUpdateController.java", "location/api/ClaimLocationController.java",
     "location/api/LocationRefController.java", "setup/api/ClaimsSetupController.java",

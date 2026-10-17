@@ -14,7 +14,7 @@ import code_facts as cf
 
 EXT = {"README": "docx", "FRS": "docx", "BPS": "docx", "UXD": "docx", "RNO": "docx", "ICD": "docx", "DSP": "docx",
        "DDI": "xlsx", "USR": "xlsx", "RTM": "xlsx", "FIT": "xlsx", "CRR": "xlsx", "CRE": "xlsx", "INP": "xlsx",
-       "WTU": "xlsx"}
+       "WTU": "xlsx", "ACX": "xlsx"}
 
 
 def make_set(C, short: str, reviewers: dict[str, str]) -> list[tuple]:
@@ -53,6 +53,8 @@ def make_set(C, short: str, reviewers: dict[str, str]) -> list[tuple]:
          "Business Unit is asked to give.", "BDOI Business Unit owners"),
         ("WTU", "UAT", f"{short}_Business_Unit_Walkthrough_Users", C.WB_VERSION, "Accounts and script of the "
          "walkthroughs.", "UAT lead"),
+        ("ACX", "Access", f"{short}_Access_Matrix", "1.0", "Group profile x screen x action, from the permissions, "
+         "group profiles, menus and server checks of the release.", "BDOI Information Security; UAT lead"),
     ]
 
 

@@ -207,7 +207,7 @@ MESSAGE_PACKAGES = ["remittance"]
 SETTING_CLASSES = ("SystemParameter",)
 CONTROLLERS = ["remittance/api/" + c for c in (
     "HoldController.java", "RemittanceBatchController.java", "RemittanceController.java",
-    "RemittanceTemplateController.java", "SpecialRemittanceController.java")]
+    "RemittanceTemplateController.java", "SpecialRemittanceController.java", "RemittanceSettingsController.java")]
 SHARED_CONTROLLERS = ["report/api/ReportController.java"]  # read only when a screen calls it
 OMIT_OPS: set[str] = set()
 DSP_TEXT = {

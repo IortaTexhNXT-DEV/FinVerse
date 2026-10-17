@@ -249,6 +249,86 @@ class CsfCaseIT {
   }
 
   @Test
+  void theRoutingNoticeIsEMailedAndCopiedToTheUnitOfTheAccount() {
+    // FRS BRD-9 v1.2, FR-CSF-050 and FR-CSF-060 (BRCSFCM.012): in-app notice and e-mail to the
+    // members of the fulfilment unit, with a copy to the account officer and the unit of the
+    // account
+    Map<String, Object> account =
+        jdbc.queryForMap(
+            "select a.id, a.client_id, a.sales_team from acc_account a join cat_sales_unit u"
+                + " on u.company_id = a.company_id and u.code = a.sales_team"
+                + " where a.company_id = ? and a.client_id is not null order by a.id limit 1",
+            fx.company());
+    Long accountId = ((Number) account.get("id")).longValue();
+    Long clientId = ((Number) account.get("client_id")).longValue();
+    String team = (String) account.get("sales_team");
+    String head = "csfunithead" + System.nanoTime() % 100_000;
+    jdbc.update(
+        "insert into sec_user (username, full_name, email, password_hash, created_at, created_by)"
+            + " values (?, 'Unit Head of the account', ?, '!', now(), 'test')",
+        head,
+        head + "@bibs.example");
+    String previousHead =
+        jdbc.queryForObject(
+            "select head_username from cat_sales_unit where company_id = ? and code = ?",
+            String.class,
+            fx.company(),
+            team);
+    jdbc.update(
+        "update cat_sales_unit set head_username = ? where company_id = ? and code = ?",
+        head,
+        fx.company(),
+        team);
+    try {
+      CsfCase routed =
+          as.run(
+              AGENT,
+              () ->
+                  cases.log(
+                      fx.company(),
+                      new LogRequest(
+                          clientId,
+                          accountId,
+                          null,
+                          null,
+                          category("REQUEST", "EPOLICY_RESEND", "PROCESSING"),
+                          "Copy to the unit of the account",
+                          "The client asks for the e-policy again",
+                          false,
+                          null,
+                          null)));
+      try {
+        assertThat(
+                jdbc.queryForObject(
+                    "select count(*) from msg_notification where recipient = ? and title = ?",
+                    Long.class,
+                    head,
+                    routed.caseNo()
+                        + " routed to the fulfilment unit (copy for the unit of the account)"))
+            .isEqualTo(1L);
+        assertThat(
+                jdbc.queryForObject(
+                    "select count(*) from msg_outbound where purpose = 'CSF_CASE_ROUTED'"
+                        + " and recipients = ? and subject like ?",
+                    Long.class,
+                    head + "@bibs.example",
+                    "%" + routed.caseNo() + "%"))
+            .isEqualTo(1L);
+      } finally {
+        as.run(
+            FULFILMENT,
+            () -> cases.resolve(routed.id(), "E-policy sent again", "REQUEST_COMPLETED"));
+      }
+    } finally {
+      jdbc.update(
+          "update cat_sales_unit set head_username = ? where company_id = ? and code = ?",
+          previousHead,
+          fx.company(),
+          team);
+    }
+  }
+
+  @Test
   void aMemberOfAnotherUnitDoesNotSeeTheCase() {
     Client c = fx.client(true);
     CsfCase other = log(c, "REQUEST", "OR_REQUEST", "RENEWAL");

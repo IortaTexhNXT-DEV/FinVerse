@@ -51,7 +51,7 @@ scope: >-
 # The FRS whose requirements are counted, per BRD (Summary); BIBS FRS when not listed.
 baselines:
   BRD-02: BDOI FRS v3.4 + Remittance v1.0
-  BRD-03: BDOI FRS v1.6
+  BRD-03: BDOI FRS v1.7
   BRD-06: BDOI FRS v1.3
   BRD-07: BDOI FRS v1.0
   BRD-11: BDOI FRS v1.6
@@ -79,7 +79,7 @@ previous:
 changes:
   BRD-00: Co-insurance back in scope (CRQ08); default co-insurance participation on the insurer used as the default
     split of an invoice (FR-OP-007). Only reinsurance stays in Phase 2 (G17).
-  BRD-02: Baseline widened to the Remittance FRS v1.0 (16 requirements, 63 items counted); extract files, settlement
+  BRD-02: Baseline widened to the Remittance FRS v1.0 (15 requirements, 63 items counted); extract files, settlement
     numbering, shared folder copy and Remittance Settings delivered. Not comparable with v1.6.
   BRD-03: Co-insurance / Risk Participation tab on the insurer page.
   BRD-07: Re-baselined to the Claims FRS v1.0 in BDOI's format (24 requirements, 75 items); follow-ups, document

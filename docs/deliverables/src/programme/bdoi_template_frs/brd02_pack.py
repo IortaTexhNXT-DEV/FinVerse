@@ -63,6 +63,8 @@ EXT = {"README": "docx", "FRS": "docx", "BPS": "docx", "UXD": "docx", "RNO": "do
        "WTU": "xlsx"}
 SET.append(("ACX", "Access", "Cashiering_Access_Matrix", "1.0", "Group profile x screen x action, from the permissions, group profiles, menus and server checks of the release.", "BDOI Information Security; UAT lead"))
 EXT["ACX"] = "xlsx"
+SET.append(("SRX", "SRS", "Cashiering_System_Requirements_Extract", "1.2", "The chapter of the BIBS System Requirements Specification v1.2 for this module: system requirements traced to the FRS, common requirements, access and acceptance.", "BDOI Product Owner; BDOI IT"))
+EXT["SRX"] = "docx"
 
 
 def file_name(key: str) -> str:

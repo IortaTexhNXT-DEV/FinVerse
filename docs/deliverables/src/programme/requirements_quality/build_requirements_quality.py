@@ -47,15 +47,18 @@ import brand  # noqa: E402
 import check_pack  # noqa: E402
 from bdoi_docx import BdoiDocument, lint_source, load_source, meta_from, output_path, render_body  # noqa: E402
 from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
+import system_requirements as srq  # noqa: E402
+from system_requirements import system_requirements  # noqa: E402
 
-VERSION = "1.1"
-DATE = "16 October 2026"
+VERSION = "1.2"
+DATE = "17 October 2026"
+TS_VERSION = "1.1"  # the Test Strategy keeps its own version
 OUT_REQ = brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Requirements"
 OUT_QA = brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "Quality"
 RTM_NAME = f"BIBS_RTM_BRD-00_Requirements_Traceability_Matrix_v{VERSION}.xlsx"
 DOCS = {  # source -> output folder and file
     "SRS_BIBS.md": (OUT_REQ, f"BIBS_SRS_BRD-00_System_Requirements_Specification_v{VERSION}.docx"),
-    "TEST_STRATEGY.md": (OUT_QA, f"BIBS_TestStrategy_BRD-00_Test_Strategy_v{VERSION}.docx"),
+    "TEST_STRATEGY.md": (OUT_QA, f"BIBS_TestStrategy_BRD-00_Test_Strategy_v{TS_VERSION}.docx"),
 }
 BRDS = [f"BRD-{n:02d}" for n in range(14)]
 BRD_TITLES = {"BRD-00": "Core Replacement (umbrella)", **brand.BRD_NAMES}
@@ -482,7 +485,7 @@ def _fill_values(ws, col_letter: str, first: int, last: int, fills: dict[str, tu
                                                       font=Font(color=fg, bold=True)))
 
 
-def build_rtm(docs: dict[str, Frs], plans: Plans, matrix, frreg, summ) -> Path:
+def build_rtm(docs: dict[str, Frs], plans: Plans, matrix, frreg, summ, srs=None) -> Path:
     wb = BdoiWorkbook("Requirements Traceability Matrix", doc_type="Requirements traceability matrix",
                       brd="BRD-00", version=VERSION, date=DATE,
                       subtitle="BRD requirement to FR, test cases, screens and drop, for every BRD of BIBS")
@@ -491,7 +494,9 @@ def build_rtm(docs: dict[str, Frs], plans: Plans, matrix, frreg, summ) -> Path:
         f"Generated on {DATE} from the traceability chapter of each FRS and the test cases of each test plan. Each row "
         "names the FRS document and version it comes from; a re-issued FRS updates its rows when the matrix is next generated.",
         "Matrix: one row per BRD requirement ID. FR register: one row per FR (backward trace). Summary: coverage "
-        "per BRD. Sources: the FRS and test plan version of each BRD."]
+        "per BRD. System requirements: the requirements of the SRS v" + VERSION + ", tagged with their BRD and traced "
+        "to their FRS (in BDOI's format for BRD-02, BRD-03, BRD-06, BRD-07 and BRD-11). Sources: the FRS and test plan "
+        "version of each BRD."]
     tot = {k: sum(s[k] for s in summ) for k in ("ids", "covered", "fr_only", "clr", "out", "gap", "frs", "frs_traced",
                                                  "frs_tested", "cases", "conds", "stories", "frames")}
     in_scope = tot["ids"] - tot["out"] - tot["clr"]
@@ -577,6 +582,18 @@ def build_rtm(docs: dict[str, Frs], plans: Plans, matrix, frreg, summ) -> Path:
         Column("tp", "Test plan", 18, "Test plan version"),
     ], [{k: s[k] for k in ("brd", "module", "frs_doc", "frs_version", "frs_date", "tp")} for s in summ],
         description="The FRS and test plan version of each BRD when this matrix was generated")
+    if srs:
+        wb.sheet("System requirements", [
+            Column("sr", "SR ID", 14, "System requirement of the SRS v" + VERSION),
+            Column("brd", "BRD", 9, "BRD the requirement belongs to"),
+            Column("text", "System requirement", 48, "Requirement (title of the FRS requirement)"),
+            Column("trace", "Traces to (FRS)", 16, "FR or requirement of the FRS"),
+            Column("items", "Items or BRD IDs", 30, "Items of the requirement (FRS in BDOI's format) or the BRD IDs "
+                   "the FR meets"),
+            Column("frs", "FRS", 40, "FRS and version"),
+            Column("phase", "Phase", 12, "Current phase or Phase 2 (client decisions of 17-Oct-2026)"),
+        ], [r for b in srs for r in srs[b]],
+            description="The system requirements of the SRS, one per FRS requirement, with their BRD and trace")
     return wb.save(OUT_REQ / RTM_NAME)
 
 
@@ -640,7 +657,9 @@ def figures(d: Data) -> dict[str, Any]:
     cases = [c for p in plans.values() for c in p.cases]
     nfr = d.nfr["nfrs"]
     out = {
-        "version": VERSION, "date": DATE,
+        "version": VERSION, "date": DATE, "ts_version": TS_VERSION,
+        "sr_total": sum(len(v) for v in system_requirements(d).values()),
+        "sr_common": len(system_requirements(d).get("BRD-00", [])),
         "frs_count": len(d.docs), "fr_total": sum(len(x.frs) for x in d.docs.values()),
         "brd_ids": tot("ids"), "covered": tot("covered"), "fr_only": tot("fr_only"), "out_ids": tot("out"),
         "clr_ids": tot("clr"),
@@ -739,7 +758,41 @@ def placeholders(d: Data) -> dict[str, list[str]]:
     }
     for cat in cats:
         blocks[f"nfr_{cat.lower()}"] = nfr_table(cat)
+    srs = system_requirements(d)
+    blocks["module_summaries"] = md_table(
+        ["BRD", "Module", "What it does", "System requirements"],
+        [[b, srq.MODULES[b][0], srq.MODULES[b][1], f"{len(srs[b])} (chapter {b})"] for b in srq.MODULES if b != "BRD-00"],
+        [1.4, 2.8, 10.0, 2.4], "What each module does and its chapter of system requirements", size=7.5)
+    blocks["sr_summary"] = md_table(
+        ["BRD", "Module", "Requirement baseline (FRS)", "System requirements", "Phase 2"],
+        [[b, srq.MODULES[b][0], srq.baseline_text(srs[b]), len(srs[b]),
+          sum(1 for r in srs[b] if r["phase"] == "Phase 2") or "-"] for b in srq.MODULES],
+        [1.4, 3.6, 7.6, 2.2, 1.8], "System requirements per BRD and the FRS they are traced to", size=7.5)
+    blocks["sr_common"] = sr_table(srs["BRD-00"], "Common requirements (BRD-00), traced to the FRS BRD-00")
+    chapters: list[str] = []
+    for b in srq.MODULES:
+        if b == "BRD-00":
+            continue
+        chapters += sr_chapter(b, srs[b])
+    blocks["sr_chapters"] = chapters
     return blocks
+
+
+def sr_table(rows: list[dict[str, Any]], caption: str) -> list[str]:
+    return md_table(["SR ID", "BRD", "System requirement", "Traces to (FRS)", "Items or BRD IDs", "Phase"],
+                    [[r["sr"], r["brd"], r["text"], r["trace"], r["items"], r["phase"]] for r in rows],
+                    [2.0, 1.3, 6.4, 2.4, 3.0, 1.6], caption, size=7.5)
+
+
+def sr_chapter(brd: str, rows: list[dict[str, Any]], level: str = "#") -> list[str]:
+    name, summary_text = srq.MODULES[brd]
+    p2 = sum(1 for r in rows if r["phase"] == "Phase 2")
+    out = [f"{level} {brd} {name}", "", summary_text, "",
+           f"**Requirement baseline.** {srq.baseline_text(rows)}. Each system requirement below is one requirement "
+           f"of that FRS and carries its ID; the FRS gives the rules, fields, messages and acceptance criteria. "
+           f"{len(rows)} system requirements" + (f", {p2} of them deferred to Phase 2 by the client." if p2 else "."),
+           ""]
+    return out + sr_table(rows, f"System requirements of {brd} {name}")
 
 
 def expanded_source(d: Data, src: Path) -> Path:
@@ -771,6 +824,125 @@ def build_doc(d: Data, name: str, pdf: bool, keep_pdf: bool) -> tuple[Path, Path
         return doc.publish(folder / file, pdf=pdf, keep_pdf=keep_pdf)
     finally:
         tmp.unlink(missing_ok=True)
+
+
+# --------------------------------------------------------------------------------------------- SRS extracts
+
+OUT_PACKS = brand.OUT_DIR / brand.DROPS["Programme"]["folder"] / "BDOI_Template_FRS"
+
+
+def extract_name(brd: str, short: str) -> str:
+    name = short or srq.MODULES[brd][0].replace(" ", "_")
+    return f"BIBS_SRS_{brd}_{name}_System_Requirements_Extract_v{VERSION}.docx"
+
+
+def extract_source(d: Data, brd: str, short: str, keep) -> str:
+    srs = system_requirements(d)
+    rows = [r for r in srs[brd] if keep(r["group"])]
+    module = srq.MODULES[brd][0] + (f" - {short}" if short and short not in srq.MODULES[brd][0] else "")
+    blocks = placeholders(d)
+    p2 = sum(1 for r in rows if r["phase"] == "Phase 2")
+    lines = [
+        "---",
+        "title: System Requirements Extract",
+        f"subtitle: {module} ({brd}) - the chapter of the BIBS System Requirements Specification v{VERSION} for this pack",
+        "doc_type: System Requirements Specification",
+        "doc_code: SRS",
+        f"brd: {brd}",
+        f"name: System Requirements Extract {module}",
+        f"doc_id: BIBS-SRS-{brd}{'-' + short.upper()[:3] if short else ''}",
+        f'version: "{VERSION}"',
+        f"date: {DATE}",
+        "status: Issued for BDOI review",
+        f"header_title: SRS extract - {module}",
+        "h1_page_break: false",
+        "control:",
+        f'  - version: "{VERSION}"',
+        "    date: 17 Oct 2026",
+        "    author: iorta TechNXT Business Analyst lead",
+        "    reviewer: iorta TechNXT Solution Architect; iorta TechNXT QA lead",
+        "    approver: BIBS Product Owner (pending)",
+        f"    change: First issue, extract of the System Requirements Specification v{VERSION} for the pack of {brd}",
+        "distribution:",
+        f'  - {{name: "Product owner of {brd}", role: Reviewer, organisation: BDOI, purpose: "System requirements of the module"}}',
+        '  - {name: "BDOI IT; BDOI Information Security", role: Reviewers, organisation: BDOI, purpose: "Common requirements, access and interfaces"}',
+        '  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Specification, test and acceptance"}',
+        "---",
+        "",
+        "# Purpose",
+        "",
+        f"This extract gives the system requirements of {module} from the BIBS System Requirements Specification (SRS) "
+        f"v{VERSION}: the requirements of the module, each tagged with its BRD and traced to the IDs of its FRS, and the "
+        "common requirements of the platform that apply to it. The SRS holds the programme context, the data, "
+        "compliance and acceptance chapters; the FRS of the pack holds the rules, fields, messages and acceptance "
+        "criteria and governs where the two differ.",
+        "",
+        "# Scope and baseline",
+        "",
+        srq.MODULES[brd][1],
+        "",
+        f"**Requirement baseline.** {srq.baseline_text(rows)}. {len(rows)} system requirements"
+        + (f", {p2} deferred to Phase 2." if p2 else "."),
+        "",
+        "**Phase 2.** By the client decisions of 17 October 2026, reinsurance and the Employee Benefits partner portal "
+        "are deferred to Phase 2; co-insurance stays in the current phase.",
+        "",
+        "# System requirements of the module",
+        "",
+        *sr_table(rows, f"System requirements of {module}"),
+        "# Common requirements",
+        "",
+        "Every module meets the common requirements of the platform (BRD-00): menus by persona, notifications, audit "
+        "trail and change log, reports, documents, lists of values, sign-in and access, workflow, bulk processing, "
+        "multi-currency and the BDO brand.",
+        "",
+        *blocks["sr_common"],
+        "# Access",
+        "",
+        "Users and their group-profile membership come from UIDM-ISC and users sign in through Microsoft Entra ID. Every "
+        "action is checked by permission on the server and every record by the data scope of the user; makers never "
+        "approve their own work. The Access Matrix of this pack lists, for each group profile, the screens it opens and "
+        "the actions it may do, with the permission the server checks.",
+        "",
+        "# Interfaces, reports and non-functional requirements",
+        "",
+        "The interfaces of the module are specified in the Interface Specification of the pack and the reports, notices "
+        "and jobs in its Reports, Notifications and Outputs document. The non-functional requirements of the platform "
+        "apply to every module; the headline targets are:",
+        "",
+        *blocks["nfr_headline"],
+        "# Acceptance",
+        "",
+        "- Each system requirement is shown by the test cases of the test plan and the walkthroughs of the pack; the "
+        "End-to-End Conformance Register v1.7 gives its result today.",
+        "- UAT sign-off of the module by its product owner, on the business scenarios of the pack.",
+        "- A change to a requirement passes the change-control process and updates the FRS, this extract and the "
+        "traceability matrix.",
+        "",
+    ]
+    figs = figures(d)
+    return "\n".join(TOKEN.sub(lambda t: str(figs[t.group(1)]), x) for x in lines) + "\n"
+
+
+def build_extracts(d: Data, pdf: bool) -> list[Path]:
+    out = []
+    for brd, folder, short, keep in srq.PACKS:
+        src = HERE / f"_extract_{brd}_{short or 'pack'}.md"
+        src.write_text(extract_source(d, brd, short, keep), encoding="utf-8")
+        try:
+            problems = lint_source(src)
+            if problems:
+                raise SystemExit(f"{src.name}: " + "; ".join(problems))
+            front, lines = load_source(src)
+            doc = BdoiDocument(meta_from(front), h1_page_break=False, base_dir=HERE)
+            doc.cover()
+            doc.front_matter()
+            render_body(doc, lines)
+            path, _ = doc.publish(OUT_PACKS / folder / extract_name(brd, short), pdf=pdf, keep_pdf=False)
+            out.append(path)
+        finally:
+            src.unlink(missing_ok=True)
+    return out
 
 
 # --------------------------------------------------------------------------------------------- checks
@@ -837,7 +1009,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check", action="store_true", help="checks only")
     ap.add_argument("--previews", action="store_true", help="page previews of the outputs")
     ap.add_argument("--no-pdf", action="store_true", help="skip the PDF pass (no page numbers in the TOC)")
-    ap.add_argument("--only", choices=["rtm", "srs", "ts", "docs", "xlsx"], help="build one part only")
+    ap.add_argument("--only", choices=["rtm", "srs", "ts", "docs", "xlsx", "extracts"], help="build one part only")
     args = ap.parse_args(argv)
     d = load_all()
     print(report(d))
@@ -853,7 +1025,9 @@ def main(argv: list[str] | None = None) -> int:
 
     built: list[Path] = []
     if args.only in (None, "rtm", "xlsx"):
-        built.append(build_rtm(d.docs, d.plans, d.matrix, d.frreg, d.summ))
+        built.append(build_rtm(d.docs, d.plans, d.matrix, d.frreg, d.summ, system_requirements(d)))
+    if args.only in (None, "extracts", "srs"):
+        built += build_extracts(d, pdf=not args.no_pdf)
     want = {"srs": ["SRS_BIBS.md"], "ts": ["TEST_STRATEGY.md"]}
     names = list(DOCS) if args.only in (None, "docs") else want.get(args.only or "", [])
     for name in names:

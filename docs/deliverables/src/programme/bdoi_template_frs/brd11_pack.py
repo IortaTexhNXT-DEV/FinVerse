@@ -60,6 +60,8 @@ EXT = {"README": "docx", "FRS": "docx", "BPS": "docx", "UXD": "docx", "RNO": "do
        "WTU": "xlsx"}
 SET.append(("ACX", "Access", "Access_Matrix", "1.0", "Group profile x screen x action, from the permissions, group profiles, menus and server checks of the release.", "BDOI Information Security; UAT lead"))
 EXT["ACX"] = "xlsx"
+SET.append(("SRX", "SRS", "User_Access_Maintenance_System_Requirements_Extract", "1.2", "The chapter of the BIBS System Requirements Specification v1.2 for this module: system requirements traced to the FRS, common requirements, access and acceptance.", "BDOI Product Owner; BDOI IT"))
+EXT["SRX"] = "docx"
 # BRD-11 kept the shorter file names of its workbooks (no "User_Access" in them).
 _WB_PLAIN = {"RTM", "FIT", "CRR", "CRE", "INP", "WTU"}
 

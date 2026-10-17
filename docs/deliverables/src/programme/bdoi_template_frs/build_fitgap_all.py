@@ -38,7 +38,7 @@ from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
 
 PROG = pc.OUT_PROGRAMME
 OUT = PROG / "FitGap"
-RTM = PROG / "Requirements" / "BIBS_RTM_BRD-00_Requirements_Traceability_Matrix_v1.1.xlsx"
+RTM = PROG / "Requirements" / "BIBS_RTM_BRD-00_Requirements_Traceability_Matrix_v1.2.xlsx"
 FEATURES = PROG / "Feature_List" / "BIBS_BDOI_FeatureList_vs_OOTB_and_Best_Practice_v1.0.xlsx"
 V = "1.0"
 DATE = "16 October 2026"
@@ -238,7 +238,7 @@ def build_brd(brd, matrix, fmap, idx):
     cols = COLS
     allrows = rows + bp
     ws = wb.sheet("Fit-Gap", cols, allrows,
-                  description=f"Each requirement line of the {brd} {NAMES[brd]} BRD (programme RTM v1.1) against the "
+                  description=f"Each requirement line of the {brd} {NAMES[brd]} BRD (programme RTM v1.2) against the "
                   "OOTB platform, with the best-practice points in blue at the end.")
     _colour_rows(ws, len(allrows), 4)
     summ = [{"k": k, "n": c[k], "g": g} for k, g in
@@ -288,7 +288,7 @@ def build_summary(results, pack_rows):
              Column("pct", "Fitment %", 11, kind="percent"), Column("src", "Fit-Gap workbook", 60)], rows,
              description="Fitment % = (Fit + Configure) / in scope; grey, excluded and blue rows are outside it.")
     method = [
-        ("Rows", "Every BRD requirement line of the programme RTM v1.1, for all 14 BRDs."),
+        ("Rows", "Every BRD requirement line of the programme RTM v1.2, for all 14 BRDs."),
         ("OOTB", "The iNXT BrokerVerse OOTB platform (BDOI-OOTB, branch brokerverse-platform), through the Feature "
          "List vs OOTB and Best Practice workbook v1.0, which assesses each OOTB feature against the BRD IDs and FRs."),
         ("Fit", "Met by the OOTB platform as delivered."),

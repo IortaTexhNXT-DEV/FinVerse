@@ -10,8 +10,8 @@ doc_code: SRS
 brd: BRD-00
 name: System Requirements Specification
 doc_id: BIBS-SRS-BRD-00
-version: "1.1"
-date: 16 October 2026
+version: "1.2"
+date: 17 October 2026
 status: Issued for BDOI review
 header_title: SRS - BIBS System Requirements Specification
 h1_page_break: true
@@ -28,6 +28,12 @@ control:
     reviewer: iorta TechNXT Solution Architect; iorta TechNXT QA lead
     approver: BIBS Product Owner (pending)
     change: Second issue. The non-functional requirements refer to the Non-Functional and Security Requirements v2.0 (Programme/Common) and its register; traceability matrix v1.1
+  - version: "1.2"
+    date: 17 Oct 2026
+    author: iorta TechNXT Business Analyst lead
+    reviewer: iorta TechNXT Solution Architect; iorta TechNXT QA lead
+    approver: BIBS Product Owner (pending)
+    change: "Third issue, restructured: common requirements (BRD-00) and one chapter per BRD with {{sr_total}} system requirements, each tagged with its BRD and traced to the IDs of its FRS. Brought up to date with the deliveries and client decisions to 17 October 2026: BRD-02, BRD-03, BRD-06, BRD-07 and BRD-11 traced to their FRS in BDOI's format (Cashiering v3.4, Remittance v1.0, Product Maintenance v1.7, Renewal v1.3, Claims v1.0, User Access Maintenance v1.6); users and group profiles from UIDM-ISC with sign-in through Entra ID; customer servicing case management delivered; reinsurance and the partner portal deferred to Phase 2, co-insurance in the current phase; access matrix and SRS extract in each pack; traceability matrix v1.2"
 distribution:
   - {name: "BIBS Product Owner", role: Approver, organisation: BDOI, purpose: "Programme requirements baseline"}
   - {name: "Program Manager, Business Project Services", role: Approver, organisation: BDO Unibank ESG, purpose: "Scope, drops and acceptance approach"}
@@ -42,7 +48,7 @@ distribution:
 
 ## Purpose
 
-This System Requirements Specification (SRS) states, in one document, what BIBS - the BDOI Broker System on iNXT BrokerVerse - must do for BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It is the programme-level view above the Functional Requirements Specifications (FRS) of the thirteen BRDs: it gives the system context, the users, the functional scope of each module with a reference to its FRS, the external interfaces, the data and compliance requirements, the constraints and the way BDOI accepts the system.
+This System Requirements Specification (SRS) states, in one document, what BIBS - the BDOI Broker System on iNXT BrokerVerse - must do for BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It is the programme-level view above the Functional Requirements Specifications (FRS) of the thirteen BRDs: it gives the system context, the users, the common requirements and one chapter of system requirements per BRD, each requirement tagged with its BRD and traced to the IDs of its FRS, the external interfaces, the data and compliance requirements, the constraints and the way BDOI accepts the system. Each pack of a BRD in BDOI's format carries an extract of its chapter.
 
 The SRS does not repeat the FRS. Each functional requirement, with its rules, fields, messages and acceptance criteria, lives in the FRS of its BRD; where this document and an FRS describe the same behaviour, the FRS governs. The non-functional requirements are summarised here and specified in full in the companion document *Non-Functional and Security Requirements* v2.0 (Programme/Common) and its register.
 
@@ -51,10 +57,10 @@ The SRS does not repeat the FRS. Each functional requirement, with its rules, fi
 <!-- table: widths=4.6,12 caption="Readers and what they use the SRS for" -->
 | Reader | Use |
 |---|---|
-| BIBS Product Owner and the product owners of each BRD | Confirm the scope of phase 1 and the summary of their module; decide the open points of chapter 13 |
+| BIBS Product Owner and the product owners of each BRD | Confirm the scope of phase 1 and the summary of their module; decide the open points of the chapter Decisions and open points for BDOI |
 | Program Manager, Business Project Services | Scope per drop, acceptance approach, dependencies |
 | BDOI IT and BDO Cloud and Digital Operations Engineering | System context, interfaces, constraints and the non-functional baseline |
-| BDOI Information Security, Data Protection Officer, Compliance Officer | Security, privacy and regulatory requirements (chapters 7, 8 and 11) |
+| BDOI Information Security, Data Protection Officer, Compliance Officer | Security, privacy and regulatory requirements (chapters Data requirements, Non-functional requirements and Compliance requirements) |
 | iorta TechNXT project team | One reference for specification, development, test and acceptance |
 
 ## Scope
@@ -64,10 +70,10 @@ BIBS is the enterprise-wide insurance broking system of BDOI. Phase 1 covers the
 <!-- table: widths=4,12.6 caption="In and out of scope of phase 1" -->
 | Area | Scope |
 |---|---|
-| In scope | Client onboarding, quotation and proposal, package products, placement, issuance and booking, renewal, submitted policies, customer servicing, sanction screening and risk profiling, cashiering, remittance (including the reinsurance transactions that pass through Remittance), adjustment and cancellation, production reconciliation, commission receivables, collections, accounting, disbursement and ACSL, claims logging and monitoring, employee benefits without the partner portal, user access maintenance, data migration and the cross-cutting platform services |
-| Phase 2 | The reinsurance module (ReInsurance BRD, CORE-15) |
+| In scope | Client onboarding, quotation and proposal, package products, placement, issuance and booking with the co-insurance split of an invoice and the default co-insurance participation of the insurer, renewal, submitted policies, customer servicing with case management, sanction screening and risk profiling, cashiering, remittance, adjustment and cancellation, production reconciliation, commission receivables, collections, accounting, disbursement and ACSL, claims logging and monitoring, employee benefits, user access maintenance, data migration and the cross-cutting platform services |
+| Phase 2 (client decisions of 17 October 2026) | Reinsurance (ReInsurance BRD, CORE-15): the reinsurance functions the platform keeps (reinsurer and reinsurance broker parties, receipts from a reinsurer, reinsurance settlement payments) are hidden from every BDOI group profile until Phase 2. The Employee Benefits partner portal. Co-insurance is not deferred |
 | Not part of BIBS | Insurer-company functions: insurer underwriting, insurer claims processing, reinsurance treaty and cession accounting, actuarial reserves, group consolidation and insurer taxes. BDOI is a broker: the insurers issue the policies, pay the claims and keep their own books |
-| Excluded by BDOI answers | Employee Benefits partner portal (no portal feature on the drop plan); documents in ECM (every BIBS document is held in the S3 document store, answer A4); early renewal release (superseded by the single go-live) |
+| Excluded by BDOI answers | Documents in ECM (every BIBS document is held in the S3 document store, answer A4); early renewal release (superseded by the single go-live) |
 
 ## Document hierarchy
 
@@ -76,10 +82,11 @@ BIBS is the enterprise-wide insurance broking system of BDOI. Phase 1 covers the
 |---|---|---|
 | BRDs of BDOI (versions of 8 October 2026) | Business requirements with IDs and pages | The business need |
 | This SRS | Context, scope, users, interfaces, data, constraints, compliance, acceptance | Programme-level requirements |
-| FRS of each BRD (Data Migration Handbook for BRD-13) | Functional requirements FR-xx-nnn, screens, workflows, reports, messages, user-story view | Functional behaviour |
+| FRS of each BRD (Data Migration Handbook for BRD-13); FRS in BDOI's format for BRD-02, BRD-03, BRD-06, BRD-07 and BRD-11 | Functional requirements (FR-xx-nnn, or the requirements and items of BDOI's format), screens, workflows, reports, messages, user-story view | Functional behaviour |
+| Pack of each BRD in BDOI's format | UX Design, Reports Notifications and Outputs, Developer Specification, Data Dictionary, Access Matrix and the SRS extract of the BRD | Screens, access and the BRD view of this SRS |
 | Non-Functional and Security Requirements v2.0 (Programme/Common) and register | {{nfr_total}} measurable NFRs with verification, owner and test type | Quality attributes |
 | Requirements Traceability Matrix v{{version}} | BRD requirement to FR, test cases, screens and drop | Coverage |
-| Test plans of each BRD and the Test Strategy v{{version}} | Test conditions, cases, levels, environments, criteria | Verification |
+| Test plans of each BRD and the Test Strategy v{{ts_version}} | Test conditions, cases, levels, environments, criteria | Verification |
 | Technical Specification (reviewed by BDOI IT) | Technical design, interfaces in detail, deployment | Technical realisation |
 
 ## References
@@ -88,11 +95,13 @@ BIBS is the enterprise-wide insurance broking system of BDOI. Phase 1 covers the
 | Ref. | Document | Version / date |
 |---|---|---|
 | R1 | BDOI Core Replacement BRD (umbrella) and the function BRDs BRD-1 to BRD-12, Data Migration BRD | Versions held on 8 October 2026 |
-| R2 | FRS of BRD-00 to BRD-12 and the Data Migration Handbook (BRD-13) | Versions listed in chapter 4 |
-| R3 | Test plans of BRD-1 to BRD-13 | Versions listed in chapter 4 |
+| R2 | FRS of BRD-00 to BRD-12 (in BDOI's format for BRD-02, BRD-03, BRD-06, BRD-07 and BRD-11) and the Data Migration Handbook (BRD-13) | Versions listed in the chapter of each BRD |
+| R3 | Test plans of BRD-1 to BRD-13 | Versions listed in the chapter System requirements |
 | R4 | BIBS Non-Functional and Security Requirements (Programme/Common) | v2.0, 16 October 2026 |
 | R5 | BIBS Requirements Traceability Matrix | v{{version}}, {{date}} |
-| R6 | BIBS Test Strategy | v{{version}}, {{date}} |
+| R6 | BIBS Test Strategy | v{{ts_version}}, 16 October 2026 |
+| R15 | BIBS End-to-End Conformance Register | v1.7, 17 October 2026 |
+| R16 | BIBS Decision and Observation Log | v1.0, 17 October 2026 |
 | R7 | Programme alignment pack: drops, integrations, infrastructure, and the integration inventory | v1.0, 26 September 2026 |
 | R8 | BDOI drop plan and programme timeline; BDOI answers A1 to A6 | 26 September 2026 |
 | R9 | IER workbook v20 (BDO Cloud and Digital Operations Engineering) | v20 |
@@ -190,41 +199,36 @@ The umbrella BRD counts 1,344 named and 429 concurrent users (p.42). The functio
 - Every persona sees only the menus and screens of its roles (FR-CR-001) and starts on a role home page with its work (FR-CR-010).
 - Every action is checked against the user's permissions and every record against the user's companies and branches (data scope); a refused access is logged (NFR-SEC-04).
 - Makers never approve their own work; approvals follow the configured matrices of each workflow (NFR-CFG-03).
-- BDO users sign in through EIAM; only the named break-glass administrators keep local passwords with a second factor (NFR-SEC-01, NFR-SEC-02).
-- No insurer, client or partner user signs in to BIBS in phase 1: the Employee Benefits portal is not part of the drop plan.
+- BDO users sign in through EIAM on Microsoft Entra ID; only the named break-glass administrators keep local passwords with a second factor (NFR-SEC-01, NFR-SEC-02).
+- Users and their group-profile membership are orchestrated by UIDM-ISC; BIBS keeps the definitions of the group profiles under maker-checker, the data scope, unlock and session end, segregation-of-duties rules and the reconciliation with UIDM-ISC (FRS BRD-11 v1.6). The Access Matrix of each pack shows, per group profile, the screens and actions of the BRD.
+- No insurer, client or partner user signs in to BIBS in the current phase: the Employee Benefits partner portal is deferred to Phase 2.
+- The reinsurance functions are open only to the super user of the DEV, SIT and UAT environments until Phase 2.
 
-# Functional requirements
+# System requirements
 
 ## Approach
 
-The functional requirements are specified in the FRS of each BRD. Each FR carries the BRD requirement IDs and pages it meets, the actor, the priority, the screens, the main and alternate flows, the business rules (each marked Configurable or Fixed with the place where it is maintained), the validations with their messages, the fields and the acceptance criteria. The {{frs_count}} FRS hold {{fr_total}} FRs. Of their {{all_rules}} business rules, {{cfg_rules}} ({{cfg_pct}}%) are configurable by the business or the System Administrator; the others are fixed by the BRD or by regulation.
+The system requirements of BIBS are stated in this chapter and the chapters that follow: the common requirements of the platform (BRD-00) and one chapter per BRD. Each system requirement has an ID SR-COM-nnn (common) or SR-BRDnn-nnn, is tagged with its BRD and is traced to the IDs of its FRS: a functional requirement FR-xx-nnn with the BRD requirement IDs it meets, or, for the BRDs whose FRS is in BDOI's format, a requirement of that FRS with its items. The FRS gives the rules, fields, messages and acceptance criteria; where this document and an FRS differ, the FRS governs. The {{frs_count}} FRS in BIBS format hold {{fr_total}} FRs; of their {{all_rules}} business rules, {{cfg_rules}} ({{cfg_pct}}%) are configurable by the business or the System Administrator.
+
+<!-- rq:sr_summary -->
+
+The {{sr_total}} system requirements are the requirements the End-to-End Conformance Register v1.7 assesses (an FR removed from scope by its FRS is not listed); the register gives the result of each. Requirements of the functions deferred to Phase 2 are tagged Phase 2 and stay listed.
 
 <!-- rq:frs_summary -->
 
-FRS versions move as BDOI re-issues the BRDs; the traceability matrix states the FRS version of every row. FRS issued at v2.0 move to v2.1 and FRS-only BRDs to the next minor version with the re-base on the BRD versions of 8 October 2026.
+## Common requirements (BRD-00)
 
-## Cross-cutting services (BRD-00)
+The umbrella FRS specifies the services that no function BRD owns: persona menus and the role home page (FR-CR-001, 010, 011), notifications (FR-CR-020), the audit trail and the master-data change log (FR-CR-030, 031), standard, tailored and scheduled reports (FR-CR-040 to 043), document generation from templates (FR-CR-050), lists of values, insurer records with the default co-insurance participation (CRQ08), MIS fields and products (FR-CR-060 to 063), sign-in and access requests (FR-CR-070), document protection (FR-CR-071), workflow routing (FR-CR-080), the insurer invoice batch (FR-CR-081), migrated clients during coexistence (FR-CR-082), bulk and individual processing (FR-CR-083), the Invoice Master List (FR-CR-090), multi-currency (FR-CR-091), the BDO brand and design system (FR-CR-092) and the SOA and service invoice at booking (FR-CR-093). The {{sr_common}} common requirements apply to every module.
 
-The umbrella FRS specifies the services that no function BRD owns: persona menus and the role home page (FR-CR-001, 010, 011), notifications (FR-CR-020), the audit trail and the master-data change log (FR-CR-030, 031), standard, tailored and scheduled reports (FR-CR-040 to 043), document generation from templates (FR-CR-050), lists of values, insurer records, MIS fields and products (FR-CR-060 to 063), sign-in and access requests (FR-CR-070), document protection (FR-CR-071), workflow routing (FR-CR-080), the insurer invoice batch (FR-CR-081), migrated clients during coexistence (FR-CR-082), bulk and individual processing (FR-CR-083), the Invoice Master List (FR-CR-090), multi-currency (FR-CR-091), the BDO brand and design system (FR-CR-092) and the SOA and service invoice at booking (FR-CR-093).
+<!-- rq:sr_common -->
+
+Rules common to every module: every action is checked by permission on the server and every record by the data scope of the user; master data changes pass a second user and are kept in the change log; dates compared with today use the business date of Asia/Manila; lists of values and parameters carry effective dates.
 
 ## Module summaries
 
-<!-- table: widths=3.2,10.4,3 caption="What each module does (summary of the FRS scope chapters)" size=8 -->
-| Module | Summary | FRS |
-|---|---|---|
-| BRD-01 New Business | Client onboarding and KYC, tags and lifecycle rules; quotation and proposal (package and non-package through the TSU); Proposal Request Form, quotation slip and insurer comparatives; placement with the EOPT details of the client, hold cover, issuance and e-policy; booking with GL entry and service invoice; bulk processing; New Business reports | FR-NB |
-| BRD-02 Operations | Invoice ledger and Invoice 360; Cashiering (AR and OR series, payment files, PDC warehouse, application by premium component, unapplied payments); Remittance to insurers (extraction, eligibility, approval, schedule, insurer OR, early remittance incentive, special remittance); Adjustment and Cancellation; Production Reconciliation; Commission Receivables for direct payment; BIR 2307 certificates | FR-OP |
-| BRD-03 Product Maintenance | Package products: product structure and clause library, package request, insurer negotiation and comparatives, ManCom sign-off, set-up and validation, versions and rate schemes, expiry and renewal, incentive criteria | FR-PM |
-| BRD-04 Collections | Premium-receivable worklist per invoice, assignment, collector dispositions, promises to pay, installments, escalation, billing statements, collector side of unapplied payments, scheduled reversal files and daily reports | FR-CL |
-| BRD-05 Accounting, Disbursement and ACSL | Chart of accounts, posting and manual entries, closing and revaluation, bank reconciliation, service fee, report pack and BIR outputs; disbursement vouchers, instruments and BIR 2307 for suppliers; Marketing payment requests; ACSL reconciliation; business and system administration requests | FR-AC, FR-DS, FR-PQ, FR-AS |
-| BRD-06 Renewal | Extraction of expiring accounts, governance rules and buckets, Marketing disposition and review, Processing and insurer round-trip, Renewal Advice and other letters, acceptance and progression to placement and booking, renewal of submitted policies | FR-RN |
-| BRD-07 Claims | Claims logging and monitoring for the client: cover lookup and premium check, locations and insurer claim numbers, insurer reserve and settlement as reported, statuses, follow-up and ageing, claims special remittance, reports | FR-CM |
-| BRD-08 Employee Benefits | Group benefit programmes (HMO, group life, group personal accident): renewal start, broker on record, franchise and TOR, proposals and comparative sign-off, processing, billing and roster servicing, reports; without the partner portal | FR-EB |
-| BRD-09 Customer Servicing Facility | Servicing workspace for the Contact Center: search and view of client, account, invoice and payment; contact-detail updates with audit; resend of renewal advices and e-policies; document upload; CSF reports | FR-CSF |
-| BRD-10 Sanction Screening | Sanctions and PEP list intake, name matching, risk-profile tagging, cases with SLA and escalation, investigation, Unit Head and AML Committee approval, STR in the AMLC format, audit | FR-SS |
-| BRD-11 User Access Maintenance | Sign-in and session rules, user access requests (enrol, modify, deactivate, reactivate, bulk) with approval, group profiles, segregation-of-duties rules, access reports and logs | FR-UA |
-| BRD-12 Submitted Policies | Intake of policies that bank borrowers submit, masterlist, sanitation and classification rules, policy review (IAAF), limits and TOR, renewal hand-off, handling fee, monitoring | FR-SP |
-| BRD-13 Data Migration | Migration Console: data object register, extracts and batches, validation, client matching, code maps, loads, reconciliation L1 to L5, legacy invoices after go-live, legacy inquiry, cut-over and run-off | FR-DM |
+<!-- rq:module_summaries -->
+
+<!-- rq:sr_chapters -->
 
 # User-story approach
 
@@ -307,10 +311,10 @@ The non-functional requirements are specified in the companion document *Non-Fun
 | Application structure | One modular application with a module per business area and separate web, jobs and integration workloads | Architecture option decision |
 | Hosting | AWS ap-southeast-1; production access only by named personnel in the Philippines; DR region named by BDOI IT after the data-residency check | Hosting appendix; IER; IQ26 |
 | Documents | Every document and attachment in the S3 document store; no document storage in ECM | BDOI answer A4 |
-| Identity | Sign-in through EIAM; provisioning from UIDM-ISC; integrations through Apigee X | Drop plan integrations |
+| Identity | Sign-in through EIAM on Entra ID; users and group-profile membership orchestrated by UIDM-ISC; integrations through Apigee X | Drop plan integrations; FRS BRD-11 v1.6 |
 | Environments | DEV, SIT, UAT, Pre-Prod, PROD and DR; non-production runs 12 x 5, production 24 x 7 | IER assumptions 3 and 4 |
 | Devices | Browser only; same functions on mobile and desktop | BRD usage requirements |
-| Reinsurance | Reinsurance module in phase 2; reinsurance transactions through Remittance in phase 1 | BDOI answer A3 |
+| Reinsurance | Reinsurance in Phase 2; its functions are hidden from every BDOI group profile until then. Co-insurance is in the current phase | Client decisions of 17 October 2026 |
 
 # Assumptions and dependencies
 
@@ -390,14 +394,16 @@ A change to an approved requirement goes through the change-control process of t
 |---|---|---|---|---|
 | 1 | Accept this SRS as the programme-level baseline, with the FRS governing functional behaviour | BIBS Product Owner | 23 Oct 2026 | OPEN |
 | 2 | Decide the BIBS-wide NFR values that conflict between BRDs (response time, availability, service and maintenance windows, backup and record retention) - see the NFR document | BIBS Product Owner with the BRD owners | 30 Nov 2026 | OPEN |
-| 3 | Confirm EIAM single sign-on in place of the EUA directory sign-in of BRD-11 (IQ04) and the split of access requests between UIDM-ISC and BIBS (IQ05) | BDOI Information Security; BDOI IT | 31 Jan 2027 | OPEN |
+| 3 | Confirm the model of FRS BRD-11 v1.6: sign-in through Entra ID (IQ04), users and group-profile membership in UIDM-ISC and the group-profile definitions in BIBS (IQ05) | BDOI Information Security; BDOI IT | 31 Jan 2027 | OPEN |
 | 4 | Name the DR region after the data-residency check (IQ26) | BDOI IT | 31 Mar 2027 | OPEN |
 | 5 | Confirm that transmission of service invoices to BIR CAS / e-invoicing is outside phase 1 (CLR-NB-33) | Head, Comptrollership | 30 Nov 2026 | OPEN |
 | 6 | Decide the umbrella rows waiting for a proposed rule: claim cheques held by BDOI (CRQ03), CSF case resolution (CRQ04), emerging capabilities (CRQ10), ALeA e-mail encoding (CRQ20) | BIBS Product Owner | 30 Nov 2026 | OPEN |
-| 7 | Scope and drop of Customer Servicing Case Management (CSF addendum) | Product Owner, CSF; Change Control Board | 30 Oct 2026 | OPEN |
+| 7 | Scope and drop of Customer Servicing Case Management (CSF addendum): delivered with FRS BRD-9 v1.2 | Product Owner, CSF; Change Control Board | 30 Oct 2026 | CLOSED |
 | 8 | Accept WCAG 2.2 level AA as the accessibility level of BIBS | BIBS Product Owner | 30 Nov 2026 | OPEN |
 | 9 | Plan the privacy impact assessment of BIBS by the Data Protection Officer before UAT | Data Protection Officer | 30 Jun 2027 | OPEN |
 | 10 | Confirm the re-issue of the FRS of BRD-06 to BRD-10 and BRD-12 with the user-story view and storyboard index | BIBS Product Owner | 13 Nov 2026 | OPEN |
+| 11 | Reinsurance and the Employee Benefits partner portal deferred to Phase 2; co-insurance kept in the current phase | BIBS Product Owner | 17 Oct 2026 | CLOSED |
+| 12 | Approve or reject the Claims change requests CR-CLM-101 to 112 of the Claims FRS v1.0 | Product Owner, Claims; Change Control Board | 30 Nov 2026 | OPEN |
 
 # Sign-off {-}
 

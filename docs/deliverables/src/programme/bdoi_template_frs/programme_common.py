@@ -370,11 +370,21 @@ LOG = [
      "conformant on the automated checks and the walkthrough steps; the others take the result of their fit-gap "
      "(Fit conformant, Partial partly conformant, Gap not conformant, change request not testable yet until BDOI "
      "approves it, integration partly conformant on the simulator). The two Remittance items specified in another FRS "
-     "are not counted. The change requests CR-CLM-101 to 112 are not delivered. Current phase: 388 of 637 requirements "
-     "conformant (60.9%), 212 partly, 37 not testable yet, none not conformant.", "iorta TechNXT",
+     "are not counted. The change requests CR-CLM-101 to 112 are not delivered. Current phase: 388 of 636 requirements "
+     "conformant (61.0%), 212 partly, 36 not testable yet, none not conformant.", "iorta TechNXT",
      "Conformance Register v1.7 issued; v1.6 superseded. UX Design, Reports Notifications and Outputs, Developer "
      "Specification and Data Dictionary v1.1 issued in both packs with screenshots of the running application.",
      "Closed", "Conformance Register v1.7"),
+    ("O-024", "17 Oct 2026", "Decision", "BRD-00", "System Requirements Specification v1.2: common requirements and "
+     "one chapter per BRD",
+     "The SRS is restructured into the common requirements (BRD-00) and one chapter per BRD; each of its 643 system "
+     "requirements is tagged with its BRD and traced to the IDs of its FRS (the FRS in BDOI's format for BRD-02, "
+     "BRD-03, BRD-06, BRD-07 and BRD-11). It reflects the deliveries and client decisions to 17-Oct-2026: users and "
+     "group profiles from UIDM-ISC with sign-in through Entra ID, case management of the Customer Servicing Facility, "
+     "reinsurance and the partner portal in Phase 2 and co-insurance in the current phase. Each pack in BDOI's "
+     "format carries the extract of its chapter and an access matrix.", "iorta TechNXT",
+     "SRS v1.2 and traceability matrix v1.2 (System requirements sheet) issued; v1.1 superseded. SRS extract v1.2 "
+     "and Access Matrix v1.0 in the six packs.", "Closed", "SRS v1.2"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

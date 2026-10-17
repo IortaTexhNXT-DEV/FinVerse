@@ -396,7 +396,7 @@ def bdoi_baselines(assess: dict) -> dict[str, dict]:
     sys.path.insert(0, str(BDOI_SRC))
     out = {"BRD-02": {"frs": "FRS v3.4 and Remittance FRS v1.0",
                       "groups": from_yaml("brd02_v34_requirements.yaml") + from_frum("brd02r_v10_content")},
-           "BRD-03": {"frs": "FRS v1.6", "groups": from_py(b03.FRUM)},
+           "BRD-03": {"frs": "FRS v1.7", "groups": from_py(b03.FRUM)},
            "BRD-06": {"frs": "FRS v1.3", "groups": from_yaml("brd06_v13_requirements.yaml")},
            "BRD-07": {"frs": "Claims FRS v1.0", "groups": from_frum("brd07_v10_content")},
            "BRD-11": {"frs": "FRS v1.6", "groups": from_py(b11.FRUM)}}
@@ -476,6 +476,8 @@ def bdoi_rows(assess: dict, fr_rows: list[dict], fr_summary: list[dict]) -> tupl
                              "criterion": text, "evidence": d.get("evidence") or
                              ("BIBS FRS requirements: " + ev + ("\n" + ev_text if ev_text else "") if ev else "None in this run"),
                              "result": result, "reason": reason})
+            if not item_results:  # every item is specified in another FRS: not counted
+                continue
             gr = combine(item_results)
             summary.append({"brd": brd, "id": g["id"], "result": gr, "acs": len(item_results),
                             "reason": "No automated check or walkthrough step" if gr == "Not testable yet" else ""})

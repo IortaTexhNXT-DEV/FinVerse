@@ -40,8 +40,11 @@ from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 TITLE = "End-to-End Conformance Register"
 # Screens every persona opens (they say nothing about a requirement on their own).
 GENERIC_SCREENS = {"/", "/approvals", "/my-work", "/notifications", "/reports", "/alerts"}
-RESULTS = ["Conformant", "Partly conformant", "Not conformant", "Not testable yet"]
-STEP_RESULTS = ["Pass", "Fail", "Blocked", "Not run"]
+# Requirements and steps of functions the client deferred to Phase 2 (reinsurance, partner portal; decisions of
+# 17-Oct-2026) are listed with this result and left out of the current-phase counts and percentages.
+DEFERRED = "Deferred to Phase 2"
+RESULTS = ["Conformant", "Partly conformant", "Not conformant", "Not testable yet", DEFERRED]
+STEP_RESULTS = ["Pass", "Fail", "Blocked", "Not run", DEFERRED]
 MODULES = {
     "BRD-00": "Platform (cross-BRD requirements)", "BRD-01": "New Business", "BRD-02": "Operations",
     "BRD-03": "Product Maintenance", "BRD-04": "Collections", "BRD-05": "Accounting, Disbursement and ACSL",
@@ -167,6 +170,9 @@ def walkthrough_rows(assess: dict, labels: dict[str, str]) -> tuple[list[dict], 
             else:
                 observed = clean(r.get("error")) or "The step could not be completed"
             shot = r.get("screenshot") or ""
+        elif spec.get("deferred"):
+            result, observed = DEFERRED, spec["deferred"]
+            evidence = "Scope of the current phase (client decision)"
         elif spec.get("blocked"):
             result, observed = "Blocked", spec["blocked"]
             evidence = "Scope of the release"
@@ -240,7 +246,8 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
     checks = ev["checks"]
     decisions = assess.get("requirements") or {}
     extra = assess.get("extra_checks") or {}
-    gaps = {fr: g for g in assess.get("gaps") or [] if g.get("status", "Open") == "Open" for fr in g.get("frs") or []}
+    gaps = {fr: g for g in assess.get("gaps") or [] if g.get("status", "Open") in ("Open", DEFERRED)
+            for fr in g.get("frs") or []}
     cycle_frs = defaultdict(list)
     cycle = load("cycle_run.json", {"steps": []})
     for s in cycle.get("steps") or []:
@@ -327,6 +334,10 @@ def requirement_rows(assess: dict, wt_rows: list[dict], labels: dict[str, str]) 
         reason = ""
         if fid in decisions:
             result, reason = decisions[fid]["result"], decisions[fid]["reason"]
+        elif fid in gaps and gaps[fid].get("status") == DEFERRED:
+            g = gaps[fid]
+            result = DEFERRED
+            reason = f"{g['id']}: {g.get('decision') or g['gap']}"
         elif fid in gaps:
             g = gaps[fid]
             result = g.get("result", "Not conformant")
@@ -470,7 +481,8 @@ def main() -> None:
     wb.legend = [("Conformant", "Shown working by automated checks and the walkthrough or cycle"),
                  ("Partly conformant", "Shown working in part; the rest is confirmed in UAT"),
                  ("Not conformant", "Missing or not working; see Open gaps"),
-                 ("Not testable yet", "Cannot be shown on the platform today; the reason is given")]
+                 ("Not testable yet", "Cannot be shown on the platform today; the reason is given"),
+                 (DEFERRED, "Function the client deferred to Phase 2; listed, not counted in the current phase")]
     wb.cover_notes = [assess.get("scope", "")] + ([
         "Withdrawn requirements of the BDOI-template FRS, not counted: " +
         ", ".join(f"{w['id']} ({w['title']})" for w in withdrawn)] if withdrawn else [])
@@ -495,8 +507,12 @@ def main() -> None:
         summary_rows.append({"brd": brd, "module": MODULES.get(brd, ""), "frs": sum(c.values()), "acs": acs[brd],
                              "ok": c["Conformant"], "partly": c["Partly conformant"], "nok": c["Not conformant"],
                              "nt": c["Not testable yet"], "why": why or "-",
-                             "steps": sum(w.values()), "pass": w["Pass"], "fail": w["Fail"], "blocked": w["Blocked"]})
-    tot = {k: sum(r[k] for r in summary_rows) for k in ("frs", "acs", "ok", "partly", "nok", "nt", "steps", "pass", "fail", "blocked")}
+                             "deferred": c[DEFERRED], "frs_all": sum(c.values()),
+                             "steps": sum(w.values()) - w[DEFERRED], "pass": w["Pass"], "fail": w["Fail"],
+                             "blocked": w["Blocked"], "steps_deferred": w[DEFERRED]})
+        summary_rows[-1]["frs"] -= c[DEFERRED]
+    tot = {k: sum(r[k] for r in summary_rows) for k in ("frs", "acs", "ok", "partly", "nok", "nt", "deferred", "frs_all",
+                                                         "steps", "pass", "fail", "blocked", "steps_deferred")}
     summary_rows.append({"brd": "Total", "module": "Programme", **tot, "why": ""})
     prev = assess.get("previous") or {}
     pv = str(assess.get("previous_version", "1.0"))
@@ -518,7 +534,11 @@ def main() -> None:
     wb.sheet("Summary", [
         Column("brd", "BRD", 9, "Business requirements document"),
         Column("module", "Module", 28, "Business area of the BRD"),
-        Column("frs", "FRs", 8, "Functional requirements of its FRS", kind="number"),
+        Column("frs_all", "FRs in the FRS", 8, "Functional requirements of its FRS", kind="number"),
+        Column("deferred", "Deferred to Phase 2", 10, "Requirements of functions the client deferred to Phase 2 "
+               "(decisions of 17-Oct-2026); not counted below", kind="number"),
+        Column("frs", "FRs (current phase)", 9, "Requirements of the current phase: the base of the percentages",
+               kind="number"),
         Column("acs", "Acceptance criteria", 12, "Acceptance criteria of those requirements", kind="number"),
         Column("ok", "Conformant", 11, "Requirements shown working", kind="number"),
         Column("partly", "Partly", 9, "Requirements shown working in part", kind="number"),
@@ -534,6 +554,8 @@ def main() -> None:
         Column("pass", "Passed", 9, "Steps that passed", kind="number"),
         Column("fail", "Failed", 9, "Steps that failed", kind="number"),
         Column("blocked", "Blocked", 9, "Steps outside the release or depending on an external party", kind="number"),
+        Column("steps_deferred", "Steps deferred", 9, "Steps of functions deferred to Phase 2; not counted above",
+               kind="number"),
     ], summary_rows, description="Per BRD: the requirements by conformance result and the walkthrough steps by result")
 
     wb.sheet("Walkthrough results", [
@@ -636,7 +658,8 @@ def main() -> None:
         Column("impact", "Impact", 40, "Effect on the business and on UAT"),
         Column("proposal", "Proposal", 60, "Proposed way to close the gap"),
         Column("size", "Size", 10, "Indicative size", values=["Small", "Medium", "Large"]),
-        Column("status", "Status", 9, "Open, or Closed in this version", values=["Open", "Closed"]),
+        Column("status", "Status", 12, "Open, Closed, or Deferred to Phase 2 by a client decision",
+               values=["Open", "Closed", DEFERRED]),
         Column("closed", "Closure evidence", 60, "How the closure was verified (closed gaps)"),
     ], [{**g, "status": g.get("status", "Open"), "closed": g.get("closed", ""),
          "frs_text": ", ".join(g.get("frs") or []) or g.get("frs_text", "-")} for g in assess.get("gaps") or []],

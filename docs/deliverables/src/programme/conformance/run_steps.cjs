@@ -128,9 +128,9 @@ async function check(page, c, shotName) {
       continue;
     }
     const entry = { brd: step.brd, step: step.step, user: spec.user || step.user, checks: [] };
-    if (spec.blocked || (spec.gap && !spec.checks)) {
-      entry.status = spec.blocked ? 'blocked' : 'fail';
-      entry.note = spec.blocked || `gap ${spec.gap}`;
+    if (spec.deferred || spec.blocked || (spec.gap && !spec.checks)) {
+      entry.status = spec.deferred ? 'deferred' : spec.blocked ? 'blocked' : 'fail';
+      entry.note = spec.deferred || spec.blocked || `gap ${spec.gap}`;
       results.push(entry);
       continue;
     }

@@ -2,12 +2,14 @@ package com.iortatechnxt.brokerverse.receivables.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.party.service.ReinsuranceFunctions;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ApplyRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptSearchParams;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptSummaryResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReversalRequest;
+import com.iortatechnxt.brokerverse.receivables.domain.PayerType;
 import com.iortatechnxt.brokerverse.receivables.domain.Receipt;
 import com.iortatechnxt.brokerverse.receivables.service.ReceiptPostingService;
 import com.iortatechnxt.brokerverse.receivables.service.ReceiptService;
@@ -36,16 +38,20 @@ public class ReceiptController {
 
   private final ReceiptService receipts;
   private final ReceiptPostingService posting;
+  private final ReinsuranceFunctions reinsurance;
 
   /**
    * Creates the controller.
    *
    * @param receipts receipt service
    * @param posting receipt posting service
+   * @param reinsurance reinsurance functions (Phase 2): receipts from a reinsurer
    */
-  public ReceiptController(ReceiptService receipts, ReceiptPostingService posting) {
+  public ReceiptController(
+      ReceiptService receipts, ReceiptPostingService posting, ReinsuranceFunctions reinsurance) {
     this.receipts = receipts;
     this.posting = posting;
+    this.reinsurance = reinsurance;
   }
 
   /**
@@ -94,6 +100,7 @@ public class ReceiptController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAuthority('RECEIPT_PAYMENT_MAINTAIN')")
   public ReceiptResponse create(@Valid @RequestBody ReceiptRequest request) {
+    reinsurance.require(request.payerType() == PayerType.REINSURER);
     return ReceiptResponse.from(receipts.get(receipts.create(request).getId()));
   }
 

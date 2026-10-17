@@ -19,6 +19,8 @@ import type { Selection } from './payablesMath';
 import { PAYEE_TYPES, usePayablesLookups } from './usePayablesLookups';
 import { DateInput } from '@/components/ui/DateInput';
 import { Notice } from '@/components/ui/Notice';
+import { useAuth } from '@/auth/authContext';
+import { withoutReinsurance } from '@/features/setup/reinsurance';
 
 const MODES: PaymentMode[] = ['CHEQUE', 'BANK_TRANSFER', 'PDC'];
 const CATEGORIES: ('' | PaymentCategory)[] = [
@@ -33,7 +35,10 @@ const CATEGORIES: ('' | PaymentCategory)[] = [
 /** New payment voucher: pick the payee's open payables, the amounts, the mode and the bank. */
 export default function PaymentEntryPage() {
   const branch = useDefaultBranchId();
-  const { companyId, parties, activeBanks } = usePayablesLookups(PAYEE_TYPES);
+  const { can } = useAuth();
+  const { companyId, parties, activeBanks } = usePayablesLookups(
+    withoutReinsurance(PAYEE_TYPES, can),
+  );
   const toast = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -129,7 +134,7 @@ export default function PaymentEntryPage() {
                 value={category}
                 onChange={(e) => setCategory(CATEGORIES.find((c) => c === e.target.value) ?? '')}
               >
-                {CATEGORIES.map((c) => (
+                {withoutReinsurance(CATEGORIES, can).map((c) => (
                   <option key={c} value={c}>
                     {c === '' ? 'Automatic' : humanize(c)}
                   </option>

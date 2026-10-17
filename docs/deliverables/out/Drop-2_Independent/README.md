@@ -21,7 +21,7 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Claims | BRD-07 | FRS | 1.1 | [`BRD-07_Claims/BIBS_FRS_BRD-07_Claims_v1.1.docx`](BRD-07_Claims/BIBS_FRS_BRD-07_Claims_v1.1.docx) |
 | Claims | BRD-07 | Test plan summary (Word) | 1.1 | [`BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_Summary_v1.1.docx`](BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_Summary_v1.1.docx) |
 | Claims | BRD-07 | Test plan workbook (Excel) | 1.1 | [`BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_v1.1.xlsx`](BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_v1.1.xlsx) |
-| Employee Benefits | BRD-08 | FRS | 1.1 | [`BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.1.docx`](BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.1.docx) |
+| Employee Benefits | BRD-08 | FRS | 1.2 | [`BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.2.docx`](BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.2.docx) |
 | Employee Benefits | BRD-08 | Test plan summary (Word) | 1.1 | [`BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.1.docx`](BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.1.docx) |
 | Employee Benefits | BRD-08 | Test plan workbook (Excel) | 1.1 | [`BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.1.xlsx`](BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.1.xlsx) |
 

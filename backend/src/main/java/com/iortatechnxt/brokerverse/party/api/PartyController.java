@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.party.api.dto.PartyResponse;
 import com.iortatechnxt.brokerverse.party.domain.Party;
 import com.iortatechnxt.brokerverse.party.domain.PartyType;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
+import com.iortatechnxt.brokerverse.party.service.ReinsuranceFunctions;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
@@ -28,14 +29,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class PartyController {
 
   private final PartyService service;
+  private final ReinsuranceFunctions reinsurance;
 
   /**
    * Creates the controller.
    *
    * @param service party service
+   * @param reinsurance reinsurance functions (Phase 2): reinsurer and RI broker parties
    */
-  public PartyController(PartyService service) {
+  public PartyController(PartyService service, ReinsuranceFunctions reinsurance) {
     this.service = service;
+    this.reinsurance = reinsurance;
   }
 
   /**
@@ -79,6 +83,7 @@ public class PartyController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize("hasAuthority('MASTER_MAINTAIN')")
   public PartyResponse create(@Valid @RequestBody PartyRequest request) {
+    reinsurance.requireForType(request.partyType());
     return PartyResponse.from(service.create(request));
   }
 
@@ -92,6 +97,7 @@ public class PartyController {
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('MASTER_MAINTAIN')")
   public PartyResponse update(@PathVariable Long id, @Valid @RequestBody PartyRequest request) {
+    reinsurance.requireForType(request.partyType());
     return PartyResponse.from(service.update(id, request));
   }
 

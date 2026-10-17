@@ -4,11 +4,14 @@ import { humanize } from '@/utils/format';
 import { hasWithholding, isIntermediary } from './partyForm';
 import type { PartyForm } from './partyForm';
 import { SETUP_PARTY_TYPES } from './partyTypes';
+import { REINSURANCE_VALUES } from './reinsurance';
 
 interface Props {
   form: PartyForm;
   errors: Record<string, string>;
   onChange: (form: PartyForm) => void;
+  /** Whether the reinsurance party types are offered (Phase 2; RI_BROKING_TRANSACT). */
+  reinsurance?: boolean;
 }
 
 type TextKey =
@@ -38,7 +41,7 @@ function toNumber(value: string): number | undefined {
 }
 
 /** Fields of the business partner form; intermediary and payee fields follow the party type. */
-export function PartyFormFields({ form, errors, onChange }: Readonly<Props>) {
+export function PartyFormFields({ form, errors, onChange, reinsurance = false }: Readonly<Props>) {
   const set = (patch: Partial<PartyForm>) => onChange({ ...form, ...patch });
   const textFields = isIntermediary(form.partyType)
     ? [...TEXT_FIELDS, { key: 'licenceNo' as const, label: 'Licence no.' }]
@@ -64,7 +67,9 @@ export function PartyFormFields({ form, errors, onChange }: Readonly<Props>) {
             value={form.partyType}
             onChange={(e) => set({ partyType: e.target.value as PartyType })}
           >
-            {SETUP_PARTY_TYPES.map((t) => (
+            {SETUP_PARTY_TYPES.filter(
+              (t) => reinsurance || t === form.partyType || !REINSURANCE_VALUES.includes(t),
+            ).map((t) => (
               <option key={t} value={t}>
                 {humanize(t)}
               </option>

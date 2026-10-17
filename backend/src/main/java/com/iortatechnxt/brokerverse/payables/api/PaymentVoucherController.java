@@ -3,10 +3,12 @@ package com.iortatechnxt.brokerverse.payables.api;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
 import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.party.service.ReinsuranceFunctions;
 import com.iortatechnxt.brokerverse.payables.api.dto.DatedReasonRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.PayableItemResponse;
 import com.iortatechnxt.brokerverse.payables.api.dto.PaymentRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.VoucherResponse;
+import com.iortatechnxt.brokerverse.payables.domain.PaymentCategory;
 import com.iortatechnxt.brokerverse.payables.domain.PaymentVoucher;
 import com.iortatechnxt.brokerverse.payables.domain.VoucherStatus;
 import com.iortatechnxt.brokerverse.payables.service.PaymentApprovalService;
@@ -35,16 +37,22 @@ public class PaymentVoucherController {
 
   private final PaymentVoucherService service;
   private final PaymentApprovalService approvals;
+  private final ReinsuranceFunctions reinsurance;
 
   /**
    * Creates the controller.
    *
    * @param service capture service
    * @param approvals approval service
+   * @param reinsurance reinsurance functions (Phase 2): settlement payments to reinsurers
    */
-  public PaymentVoucherController(PaymentVoucherService service, PaymentApprovalService approvals) {
+  public PaymentVoucherController(
+      PaymentVoucherService service,
+      PaymentApprovalService approvals,
+      ReinsuranceFunctions reinsurance) {
     this.service = service;
     this.approvals = approvals;
+    this.reinsurance = reinsurance;
   }
 
   /**
@@ -121,6 +129,7 @@ public class PaymentVoucherController {
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(PayablesAccess.MAINTAIN)
   public VoucherResponse create(@Valid @RequestBody PaymentRequest request) {
+    requireReinsurance(request);
     return VoucherResponse.from(service.create(request.toCommand()));
   }
 
@@ -134,6 +143,7 @@ public class PaymentVoucherController {
   @PutMapping("/{id}")
   @PreAuthorize(PayablesAccess.MAINTAIN)
   public VoucherResponse update(@PathVariable Long id, @Valid @RequestBody PaymentRequest request) {
+    requireReinsurance(request);
     return VoucherResponse.from(service.update(id, request.toCommand()));
   }
 
@@ -215,5 +225,11 @@ public class PaymentVoucherController {
     return VoucherResponse.from(
         approvals.voidCheque(
             id, request.date(), ApiDefaults.reasonOrDefault(request.reason(), "Cheque voided")));
+  }
+
+  /** Settlement payments to a reinsurer are a Phase 2 function (ReinsuranceFunctions). */
+  private void requireReinsurance(PaymentRequest request) {
+    reinsurance.require(request.category() == PaymentCategory.REINSURANCE);
+    reinsurance.requireForParty(request.companyId(), request.partyCode());
   }
 }

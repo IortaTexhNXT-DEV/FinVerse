@@ -53,3 +53,15 @@ describe('party screens', () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
+
+describe('reinsurance party types (Phase 2)', () => {
+  it('are offered only when the reinsurance functions are in use', () => {
+    const { unmount } = render(
+      <PartyFormFields form={emptyParty(1)} errors={{}} onChange={vi.fn()} />,
+    );
+    expect(screen.queryByRole('option', { name: 'Reinsurer' })).not.toBeInTheDocument();
+    unmount();
+    render(<PartyFormFields form={emptyParty(1)} errors={{}} onChange={vi.fn()} reinsurance />);
+    expect(screen.getByRole('option', { name: 'Reinsurer' })).toBeInTheDocument();
+  });
+});

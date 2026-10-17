@@ -3,6 +3,7 @@
 # (path; a record page is opened from its list), the tabs, buttons or texts the step needs on them, and for a
 # BRD-00 journey the walkthroughs of the BRDs it is made of (their result counts for the journey).
 # blocked: the step cannot be performed on the platform for the reason given (outside the release, external party).
+# deferred: the step belongs to a function the client deferred to Phase 2; listed, not counted in the current phase.
 # Read by run_steps.cjs and build_conformance.py.
 
 BRD-00:
@@ -49,11 +50,11 @@ BRD-07:
 
 BRD-08:
   P1.1: {checks: [[/crm/clients, null, []], [/eb/programmes/new, null, []], [/eb/programmes, null, []]]}
-  P1.2: {blocked: "Portal users come with the partner portal, outside Drop 2 (gap G02; hosting, sign-in and one-time code under EBQ13)"}
+  P1.2: {deferred: "Portal users come with the partner portal, deferred to Phase 2 by the client decision of 17-Oct-2026 (G02)"}
   # P1.3, P3.1 and P3.3: the Drop 2 process of FRS BRD-8 assumption A-EB-06 (until the portal goes live the AO records
   # what the client HR user and the insurer send by e-mail); P1.2 and P1.4 have no Drop 2 counterpart (gap G02).
   P1.3: {user: ebao, checks: [[/eb/programmes/:id, /eb/programmes, [Documents, Cycle]]]}
-  P1.4: {blocked: "The review queue of portal uploads comes with the partner portal, outside Drop 2 (gap G02); the AO's own uploads take effect at once"}
+  P1.4: {deferred: "The review queue of portal uploads comes with the partner portal, deferred to Phase 2 by the client decision of 17-Oct-2026 (G02); the AO's own uploads take effect at once"}
   P2.1: {checks: [[/eb/programmes/:id, /eb/programmes, [Documents]]]}
   P2.2: {checks: [[/eb/programmes/:id, /eb/programmes, [Franchise]]]}
   P2.3: {checks: [[/eb/programmes/:id, /eb/programmes, [TOR]]]}

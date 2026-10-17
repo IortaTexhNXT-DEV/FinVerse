@@ -529,8 +529,13 @@ public enum Permission {
   CONFIG_EXPORT,
   CONFIG_IMPORT_PREPARE,
   CONFIG_IMPORT_APPROVE,
-  CONFIG_BASELINE_MANAGE;
+  CONFIG_BASELINE_MANAGE,
+
+  // Reinsurance functions, deferred to Phase 2 for BDOI (client decision of 17-Oct-2026): reinsurer
+  // and reinsurance broker parties, receipts from a reinsurer and reinsurance settlement payments
+  // (party.service.ReinsuranceFunctions). No BDOI group profile holds it; the super user does.
+  RI_BROKING_TRANSACT;
 
   // The portal permissions of design 6.1 (PORTAL_USER_REQUEST, PORTAL_USER_APPROVE, PORTAL_ADMIN)
-  // are parked with the partner portal (BDOI Drop 2 "Employee Benefits (No Portal Feature)").
+  // are parked with the partner portal, deferred to Phase 2 (client decision of 17-Oct-2026).
 }

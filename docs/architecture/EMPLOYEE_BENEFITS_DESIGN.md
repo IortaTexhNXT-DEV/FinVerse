@@ -329,6 +329,8 @@ first business slice of E1-B and E1-C (16.6, 16.7).
 
 ### 16.1 Scope change: "Employee Benefits (No Portal Feature)"
 
+Client decision of 17-Oct-2026: the partner portal is deferred to **Phase 2** (FRS BRD-8 v1.2, Decision Log O-017). Nothing of it exists on the platform and no BDOI role holds a portal permission.
+
 BDOI's drop plan puts Employee Benefits in Drop 2 **without the partner portal**. Parked with the portal (no seam built;
 the E1-A wave is deferred): the `portal` module and `V1032` (version kept reserved), the portal realm and second filter
 chain (6.3), the portal permissions `PORTAL_USER_REQUEST`, `PORTAL_USER_APPROVE`, `PORTAL_ADMIN` (not added to

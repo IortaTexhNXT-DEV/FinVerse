@@ -7,6 +7,8 @@ import type {
 } from '@/api/receivables';
 import { Field } from '@/components/ui/Field';
 import { humanize } from '@/utils/format';
+import { useAuth } from '@/auth/authContext';
+import { withoutReinsurance } from '@/features/setup/reinsurance';
 import type { ReceiptForm } from './receiptForm';
 import { hasParty, isCheque } from './receiptForm';
 import { bankOptions } from './useReceivablesLookups';
@@ -111,6 +113,7 @@ export function ReceiptFormFields({
   bankAccounts,
   currency,
 }: Readonly<FieldsProps>) {
+  const { can } = useAuth();
   const party = hasParty(form);
   return (
     <div className="form-grid">
@@ -131,7 +134,7 @@ export function ReceiptFormFields({
             value={form.payerType}
             onChange={(e) => set({ payerType: e.target.value as PayerType, partyCode: '' })}
           >
-            {PAYER_TYPES.map((t) => (
+            {withoutReinsurance(PAYER_TYPES, can).map((t) => (
               <option key={t} value={t}>
                 {humanize(t)}
               </option>

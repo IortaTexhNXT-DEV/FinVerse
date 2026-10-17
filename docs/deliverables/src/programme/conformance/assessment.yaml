@@ -343,17 +343,24 @@ gaps:
     frs: [FR-EB-010, FR-EB-011, FR-EB-012, FR-EB-013, FR-EB-014, FR-EB-015, FR-EB-045, FR-EB-056]
     result: Not testable yet
     gap: The insurer and client HR portal is outside Drop 2 (Employee Benefits without the portal feature).
+    decision: Partner portal deferred to Phase 2 by the client decision of 17-Oct-2026; not counted in the current
+      phase
     impact: Insurers and client HR send proposals, confirmations, member changes and billing by e-mail; the EB officer
-      records them in BIBS. Steps P1.2 to P1.4, P3.1 and P3.3 of the walkthrough script are blocked.
+      records them in BIBS (FRS BRD-8 v1.2, assumption A-EB-06). Steps P1.2 and P1.4 of the walkthrough script are
+      deferred with the portal.
     proposal: >-
-      Deliver the portal in the drop agreed with BDOI: external users provisioned through User Access requests,
-      the task inbox and structured proposal form for insurers, the client HR pages, and the staging and review of
-      portal uploads; until then the officer keys in what is received by e-mail.
-      Depends on BDOI input: the portal is outside Drop 2 by BDOI's scope decision, and its hosting, sign-in,
-      one-time code and user administration wait for EBQ13 (BDO Information Security) and the UIDM-ISC provisioning
-      of external users (BRD-11 FRS v1.6). No part of the portal is delivered before these decisions; the Drop 2 process
-      of assumption A-EB-06 is walked in steps P1.3, P3.1 and P3.3, and P1.2 and P1.4 stay blocked.
+      Deliver the portal in Phase 2: external users provisioned through User Access requests, the task inbox and
+      structured proposal form for insurers, the client HR pages, and the staging and review of portal uploads. Its
+      hosting, sign-in, one-time code and user administration (EBQ13, closed for the current phase) and the UIDM-ISC
+      provisioning of external users are taken up again when Phase 2 is planned.
     size: Large
+    status: Deferred to Phase 2
+    closed: >-
+      Client decision of 17-Oct-2026: the partner portal is deferred to Phase 2. Its eight requirements and the two
+      walkthrough steps are listed with the result Deferred to Phase 2 and left out of the current-phase counts. No
+      portal function exists on the platform; the portal permissions are not granted to any BDOI group profile (the
+      automated check of the Phase 2 functions passes). FRS BRD-8 v1.2 records the decision (scope, EBQ13 closed,
+      assumption A-EB-06).
   - id: G03
     brd: BRD-00
     frs_text: "Reports BCL-OUTSTANDING-PAST-DUE, EB-PLACEMENT, RNW-RA-DISPATCH, ADJ-VALIDATION-LIST, ADJ-MINBAL-FILE,
@@ -480,7 +487,9 @@ gaps:
       maker-checker masters authorized from the approval inbox, and a change of the remittance details sends the
       insurer back for authorization. The automated checks of the insurer page pass. Delivered in the release of
       17-Oct-2026: the read-only Ledger Accounts tab with the general ledger accounts posted for the insurer and its
-      sub-ledger open items. Open: Risk Participation (waits for CRQ08).
+      sub-ledger open items. Risk Participation (CRQ08) is a reinsurance and co-insurance participation concept: it
+      is deferred to Phase 2 with reinsurance (client decision of 17-Oct-2026); the co-insurance split of an invoice
+      by insurer share stays in Operations (FR-OP-007).
   - id: G09
     brd: BRD-00
     frs: [FR-CR-081]
@@ -604,6 +613,24 @@ gaps:
     status: Closed
     closed: >-
       Rule checked: BRCLXN.058 asks for a statement of account per applicable billing cycle and sets no earliest date; FRS FR-CL-060 bills a single cycle from its plan (alternate flow) and limits only the billing run to the cycles due in its period, and gives Generate SOA to the Operations billing user (CLX_SOA_ISSUE, CLR-CL-32), not to the Collection Handler. The platform already offers Generate SOA on a cycle not yet due to that user; the walkthrough had signed in as the Collection Handler. The walkthrough now performs D.2 to D.4 as the Cashiering Team Leader and the rule is recorded as FR-CL-060 R6. Run again: SOA-2026-000004 of cycle 1 (due 01-Nov-2026, Not Due) generated and sent; D.1 to D.4 pass.
+  - id: G17
+    brd: BRD-00
+    frs_text: "Capability 15 Reinsurance (CORE-15.01 to 15.10, ReInsurance BRD); risk participation on the insurer (CRQ08)"
+    gap: Reinsurance is not part of the current phase.
+    decision: Reinsurance deferred to Phase 2 by the client decision of 17-Oct-2026
+    impact: No requirement of the current FRSs is affected; the umbrella BRD already places capability 15 in Phase 2.
+      The reinsurance functions of the platform (reinsurer and reinsurance broker parties, receipts from a reinsurer,
+      reinsurance settlement payments) are hidden from every BDOI group profile and refused by the server; the super
+      user of DEV, SIT and UAT keeps them.
+    proposal: >-
+      Build the reinsurance broking of the ReInsurance BRD in Phase 2 on the kept seams (party types, placement slip
+      and SOA templates, open-item matching, accounting events); grant its permission to the BDOI roles then.
+    size: Large
+    status: Deferred to Phase 2
+    closed: >-
+      Client decision of 17-Oct-2026. The reinsurance functions are held through one permission that no BDOI group
+      profile holds; the automated checks of the Phase 2 functions pass (the super user keeps them, every BDOI profile
+      is refused). CRQ08 (risk participation) closed as deferred with reinsurance.
 frs_corrections:
   - id: C01
     brd: BRD-07

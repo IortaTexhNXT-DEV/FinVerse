@@ -1,11 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { partiesApi } from '@/api/parties';
+import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { PartyFormFields } from './PartyFormFields';
+import { reinsuranceInUse } from './reinsurance';
 import { toPartyInput, validateParty } from './partyForm';
 import type { PartyForm } from './partyForm';
 
@@ -17,6 +19,7 @@ interface Props {
 /** Create / edit dialog of a business partner; saving sends it for authorization. */
 export function PartyEditorModal({ initial, onClose }: Readonly<Props>) {
   const toast = useToast();
+  const { can } = useAuth();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<PartyForm>(initial);
   const [touched, setTouched] = useState(false);
@@ -51,7 +54,12 @@ export function PartyEditorModal({ initial, onClose }: Readonly<Props>) {
       }
     >
       <ErrorAlert error={save.error} />
-      <PartyFormFields form={form} errors={errors} onChange={setForm} />
+      <PartyFormFields
+        form={form}
+        errors={errors}
+        onChange={setForm}
+        reinsurance={reinsuranceInUse(can)}
+      />
     </Modal>
   );
 }

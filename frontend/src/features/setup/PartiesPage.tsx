@@ -19,6 +19,7 @@ import { emptyParty } from './partyForm';
 import type { PartyForm } from './partyForm';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { SETUP_PARTY_TYPES } from './partyTypes';
+import { withoutReinsurance } from './reinsurance';
 import { ConfigUploadButton } from '@/features/configpromo/ConfigUploadButton';
 
 /**
@@ -81,7 +82,7 @@ export default function PartiesPage() {
                 onChange={(e) => setType(e.target.value as PartyType | '')}
               >
                 <option value="">All types</option>
-                {SETUP_PARTY_TYPES.map((t) => (
+                {withoutReinsurance(SETUP_PARTY_TYPES, can).map((t) => (
                   <option key={t} value={t}>
                     {humanize(t)}
                   </option>

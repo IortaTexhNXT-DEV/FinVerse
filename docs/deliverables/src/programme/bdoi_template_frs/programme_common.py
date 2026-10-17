@@ -147,6 +147,9 @@ GLOSSARY = [
     ("Parameter", "Setting that changes behaviour without a release; changed under maker-checker.", "Data"),
     ("Permission", "Right to open a screen or take an action; held through group profiles.", "User Access"),
     ("Persona", "Typical user of a pack (for example User Access Administrator, Auditor).", "Method"),
+    ("Phase 2", "Functions the client deferred beyond the current phase (decisions of 17-Oct-2026): reinsurance and "
+     "the partner portal of Employee Benefits. Kept as a baseline, hidden from the BDOI roles and not counted in the "
+     "current-phase conformance figures.", "Scope"),
     ("PHT", "Philippine time (UTC+8).", "Quality"),
     ("Reconciliation", "Daily comparison of the users and group profiles of BIBS with UIDM-ISC.", "User Access"),
     ("RNO", "Reports, Notifications and Outputs of a BRD.", "Document"),
@@ -305,6 +308,24 @@ LOG = [
      "blocked. Open and waiting for BDOI: the partner portal (G02: Drop 2 scope, EBQ13, UIDM-ISC provisioning).",
      "iorta TechNXT", "Register v1.5 issued; v1.4 superseded. Product Maintenance UX Design v1.7 issued; v1.6 "
      "superseded.", "Closed", "Conformance Register v1.5"),
+    ("O-017", "17 Oct 2026", "Decision", "BRD-08", "Partner portal deferred to Phase 2", "The client decided "
+     "that the partner portal of Employee Benefits (insurer and client HR users, portal uploads and their review, "
+     "insurer task inbox and proposal form, client HR pages) is deferred to Phase 2. No portal function exists on "
+     "the platform; the portal permissions are granted to no BDOI role. Gap G02 is recorded as Deferred to Phase 2; "
+     "requirements FR-EB-010 to 015, 045 and 056 and walkthrough steps P1.2 and P1.4 are listed as deferred and "
+     "left out of the current-phase conformance figures. EBQ13 closed; assumption A-EB-06 (the AO records what "
+     "insurers and clients send by e-mail) is the current-phase process.", "Client (BDOI)", "FRS BRD-8 v1.2 "
+     "issued; Conformance Register with the Deferred to Phase 2 result.", "Closed", "FRS BRD-8 v1.2"),
+    ("O-018", "17 Oct 2026", "Decision", "BRD-00", "Reinsurance deferred to Phase 2; risk participation (CRQ08) "
+     "deferred with it", "The client decided that reinsurance is deferred to Phase 2. The platform keeps its "
+     "reinsurance functions (reinsurer and reinsurance broker parties, receipts from a reinsurer, reinsurance "
+     "settlement payments) behind one permission that no BDOI group profile holds: the screens do not offer them "
+     "and the server refuses them to the BDOI roles; the super user of DEV, SIT and UAT keeps them. The Data "
+     "Migration console stays with the migration roles of the FRS and the super user and is not given to the "
+     "business personas. Risk participation on the insurer record (CRQ08) is a reinsurance and co-insurance "
+     "participation concept and is deferred with reinsurance; the co-insurance split of an invoice stays in "
+     "Operations (FR-OP-007).", "Client (BDOI)", "FRS BRD-00 v1.2 issued; gap G17 recorded as Deferred to Phase 2.",
+     "Closed", "FRS BRD-00 v1.2"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

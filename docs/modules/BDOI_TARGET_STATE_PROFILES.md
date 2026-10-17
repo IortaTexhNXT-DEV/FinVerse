@@ -220,6 +220,21 @@ and Information Security. Its password is set per environment (`BROKERVERSE_SEED
 docs/operations/CONFIGURATION.md). The user ID is not checked against `USER_ID_PATTERN`, which applies
 to the joiners of the Enterprise SSO only.
 
+## Functions deferred to Phase 2
+
+Client decisions of 17-Oct-2026 (Decision Log O-017, O-018):
+
+- **Reinsurance.** The reinsurance functions the platform keeps - reinsurer and reinsurance broker parties, receipts
+  from a reinsurer, reinsurance settlement payments - need `RI_BROKING_TRANSACT` (V2914; `party.service.ReinsuranceFunctions`).
+  No profile of this document holds it; the screens do not offer these choices and the server answers 403. The super
+  user holds it (seed V2915).
+- **Partner portal** (BRD-8). Not on the platform; the portal permissions do not exist and no profile holds one.
+- **Data Migration console.** Held by the migration roles of the BRD-13 handbook (Data Migration Lead, Data Steward,
+  Data Owner, Migration Operator, reconciliation approver, go/no-go, legacy inquiry roles) and by the super user; no
+  business profile of this document holds a `MIG_` permission.
+
+`PhaseTwoFunctionsAccessIT` and `navigation/phaseTwo.test.ts` check these rules.
+
 ## Permissions per profile
 
 - `BDOI_MKT_UNIT_HEAD` (80): ACCOUNT_MAINTAIN, ACCOUNT_PROCESS, ACCOUNT_VIEW, ADJ_REQUEST, ATTACHMENT_MANAGE, ATTACHMENT_VIEW, BCL_COVER_VIEW, BCL_VIEW, BILLING_MANAGE, CLIENT_APPROVE, CLIENT_MAINTAIN, CLIENT_VIEW, CLX_BULK_UPDATE, CLX_ESCALATE, CLX_EXPORT, CLX_REPORT_VIEW, CLX_UNAPPLIED_WORK, CLX_VIEW, CLX_WORK, DASHBOARD_VIEW, EPOLICY_SEND, HOLD_APPROVE, HOLD_REQUEST, IAAF_APPROVE, IAAF_PREPARE, INCENTIVE_CRITERIA_MAINTAIN, OPS_VIEW, PKG_ADVISORY, PKG_NEGOTIATE, PKG_REPORT_VIEW, PKG_REQUEST, PKG_REQUEST_APPROVE, PLACEMENT_MANAGE, PRODUCT_MAINTAIN, PRODUCT_VIEW, PROPOSAL_APPROVE, PROPOSAL_REQUEST, PRQ_CREATE, PRQ_REVIEW, PRQ_VIEW, QUOTE_APPROVE, QUOTE_MAINTAIN, QUOTE_VIEW, REPORT_VIEW, RNW_ACCEPT, RNW_ASSIGN, RNW_BUDGET, RNW_CHANNEL_MONITOR, RNW_DISPOSE, RNW_EXPORT, RNW_INSURER, RNW_KYC, RNW_PROCESS, RNW_RA_GENERATE, RNW_RA_SEND, RNW_REPORT_VIEW, RNW_REVIEW, RNW_TEMPLATE_MAINTAIN, RNW_VIEW, SBM_EXPORT, SBM_INTAKE, SBM_LETTER_SEND, SBM_MAINTAIN, SBM_PROCESS, SBM_PROPOSAL, SBM_REPORT_EXPORT, SBM_REPORT_VIEW, SBM_RULE_MAINTAIN, SBM_VIEW, SCR_AUDIT_VIEW, SCR_CASE_APPROVE, SCR_CASE_ASSIGN, SCR_INVESTIGATE, SCR_REPORT_VIEW, SCR_RISK_TAG, SCR_VIEW, TOR_APPROVE, TOR_PREPARE, WORK_ASSIGN, WORK_VIEW

@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-08
 name: Employee Benefits
 doc_id: BIBS-FRS-BRD-08
-version: "1.1"
-date: 08 October 2026
+version: "1.2"
+date: 17 October 2026
 status: Issued for BDOI review
 header_title: FRS BRD-8 Employee Benefits
-output: FRS/BIBS_FRS_BRD-08_Employee_Benefits_v1.1.docx
+output: FRS/BIBS_FRS_BRD-08_Employee_Benefits_v1.2.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -32,6 +32,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: "Re-based on the Employee Benefits BRD v1.0 with the Addendum of 23-Feb-2026 (unchanged; page references unchanged); report frequencies and Placement report fields of the Report List of 13-May-2026 applied; review findings applied (CLR-EB-01 to 03 restated, CLR-EB-09 added); user-story view and storyboard index added."
+  - version: "1.2"
+    date: 17 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Product Owner (pending)
+    change: "Client decision of 17-Oct-2026: the partner portal (FR-EB-010 to 015, the portal parts of FR-EB-045 and 056) is deferred to Phase 2; EBQ13 closed; assumption A-EB-06 is the process of the current phase."
 distribution:
   - {name: "Product Owner, Employee Benefits", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Marketing, Employee Benefits teams", role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -69,6 +75,8 @@ The EB desk of Marketing places group benefit programmes (HMO, Group Life Insura
 | Reports | Production, Renewal, Placement, New Business, TAT, pending items, franchise; business type filter; Word export | BRID-022, 022.01 |
 
 **Out of scope for this phase:**
+
+- The partner portal (FR-EB-010 to FR-EB-015, and the portal steps of FR-EB-045 and FR-EB-056). The client decided on 17-Oct-2026 to defer the portal to Phase 2. In the current phase insurers and client HR send their files by e-mail or an agreed channel, and the EB users record and upload them (assumption A-EB-06). The portal requirements stay in this FRS as the Phase 2 baseline. No portal function is offered to the BDOI roles; the portal permissions are not granted.
 
 - BRID-028, presentation of documents for high-risk accounts. The addendum states that high-risk accounts do not apply to Employee Benefits (Add. p.13).
 - System-to-system interfaces with insurers, e-signature verification of the BOR, HRIS feeds of master lists and reading insurer mailboxes. Each waits for a question to BDOI (section 7).
@@ -385,6 +393,8 @@ acceptance:
 ```
 
 ## Partner portal
+
+> **Deferred to Phase 2 (client decision of 17-Oct-2026).** The requirements of this section are kept as the Phase 2 baseline. They are not part of the current-phase delivery or tests and are not counted in its conformance figures. The current-phase process is assumption A-EB-06.
 
 ```fr
 id: FR-EB-010
@@ -1913,7 +1923,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | A-EB-03 | The BOR is required for new business and for renewals that remarket | EBQ05 |
 | A-EB-04 | The BOR signature check is an attestation by the validator | EBQ06 |
 | A-EB-05 | EB renewals are handled in this module; the general Renewal lists exclude EB lines | D3; EBQ28 |
-| A-EB-06 | Until the portal is approved for go-live, the AO uploads on behalf of insurers and clients | EBQ13 |
+| A-EB-06 | The partner portal is deferred to Phase 2 (client decision of 17-Oct-2026). In the current phase the AO records what insurers and clients send by e-mail and uploads it on their behalf | EBQ13 |
 | A-EB-07 | The roster keeps no health data | EBQ15 |
 
 ## Dependencies
@@ -1945,7 +1955,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | EBQ10 | Comparative factors, scoring, due time, signatories | FR-EB-041 | OPEN |
 | EBQ11 | Threshold values, measure and approver levels | FR-EB-042 | OPEN |
 | EBQ12 | Evidence of client confirmation; separate placement approval | FR-EB-043, 046 | OPEN |
-| EBQ13 | Portal hosting, authentication, user administration, system-to-system interface, virus scanner | FR-EB-010-012 | PARTIAL |
+| EBQ13 | Portal hosting, authentication, user administration, system-to-system interface, virus scanner. Closed: the portal is deferred to Phase 2 (client decision of 17-Oct-2026); asked again when Phase 2 is planned | FR-EB-010-012 | CLOSED |
 | EBQ14 | What "manage policy" adds for client HR users | FR-EB-015 | OPEN |
 | EBQ15 | Master list fields; roster per member; privacy rules | FR-EB-054 | OPEN |
 | EBQ16 | Movement types; pro-rata; MIS Credit; no payment no booking | FR-EB-055 | OPEN |

@@ -156,6 +156,8 @@ export default function InsurerOrPage() {
         <UploadForm
           label="Insurer Schedule"
           columns="Batch No., Invoice No., OR No., OR Date, OR Amount"
+          accept=".xls,.xlsx,.csv,.txt,text/csv,text/plain"
+          hint="The remittance extract returned by the insurer with the OR date, OR number and OR amount filled (Excel or text), or the BIBS template (Batch No., Invoice No., OR No., OR Date, OR Amount)."
           busy={upload.isPending}
           onUpload={(file) => upload.mutate(file)}
         />

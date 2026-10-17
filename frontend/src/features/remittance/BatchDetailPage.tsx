@@ -35,6 +35,7 @@ import { remittanceApi } from './api';
 import type { Batch, DocumentKind } from './api';
 import { ApproveDialog, PreviewDialog, SendScheduleDialog } from './BatchDialogs';
 import { BatchLinesTab } from './BatchLinesTab';
+import { ExtractFilesCard } from './ExtractFilesCard';
 import { BatchSettlementTab } from './BatchSettlementTab';
 import { TotalsStrip, TypeChip } from './RemittanceParts';
 import { batchLine, joinParts } from './remittanceLabels';
@@ -85,6 +86,7 @@ function Summary({ batch }: Readonly<{ batch: Batch }>) {
       chips={
         <>
           <ReferenceChip label="Batch" value={s.batchNo} />
+          {s.settlementRef && <ReferenceChip label="Settlement" value={s.settlementRef} />}
           <StatusBadge status={s.stage} />
         </>
       }
@@ -131,46 +133,49 @@ function DocumentsTab({ batch }: Readonly<{ batch: Batch }>) {
   const download = useFileDownload();
   const r = batch.receipts;
   return (
-    <Card title="Documents and Receipts">
-      <div className="stack">
-        <ErrorAlert error={download.error} />
-        <div className="row">
-          {DOCUMENTS.map((d) => (
-            <Button
-              key={d.kind}
-              variant="secondary"
-              icon={<d.icon size={16} />}
-              busy={download.isPending}
-              onClick={() =>
-                download.mutate(() => remittanceApi.document(batch.summary.id, d.kind))
-              }
-            >
-              {d.label}
-            </Button>
-          ))}
+    <>
+      <Card title="Documents and Receipts">
+        <div className="stack">
+          <ErrorAlert error={download.error} />
+          <div className="row">
+            {DOCUMENTS.map((d) => (
+              <Button
+                key={d.kind}
+                variant="secondary"
+                icon={<d.icon size={16} />}
+                busy={download.isPending}
+                onClick={() =>
+                  download.mutate(() => remittanceApi.document(batch.summary.id, d.kind))
+                }
+              >
+                {d.label}
+              </Button>
+            ))}
+          </div>
+          <dl className="detail-list">
+            <dt>Submitted by</dt>
+            <dd>
+              <UserName login={batch.submittedBy} />
+            </dd>
+            <dt>Approved by</dt>
+            <dd>
+              <UserName login={batch.approvedBy} />
+            </dd>
+            <dt>Payment request</dt>
+            <dd>
+              {batch.disbursement.requestNo ?? '—'} {formatAmount(batch.disbursement.amount)}
+            </dd>
+            <dt>ORs</dt>
+            <dd>{r.message ?? '—'}</dd>
+            <dt>Schedule sent to insurer</dt>
+            <dd>{batch.scheduleSentAt ? formatDateTime(batch.scheduleSentAt) : 'Not sent'}</dd>
+            <dt>Return reason</dt>
+            <dd>{batch.returnReason ?? '—'}</dd>
+          </dl>
         </div>
-        <dl className="detail-list">
-          <dt>Submitted by</dt>
-          <dd>
-            <UserName login={batch.submittedBy} />
-          </dd>
-          <dt>Approved by</dt>
-          <dd>
-            <UserName login={batch.approvedBy} />
-          </dd>
-          <dt>Payment request</dt>
-          <dd>
-            {batch.disbursement.requestNo ?? '—'} {formatAmount(batch.disbursement.amount)}
-          </dd>
-          <dt>ORs</dt>
-          <dd>{r.message ?? '—'}</dd>
-          <dt>Schedule sent to insurer</dt>
-          <dd>{batch.scheduleSentAt ? formatDateTime(batch.scheduleSentAt) : 'Not sent'}</dd>
-          <dt>Return reason</dt>
-          <dd>{batch.returnReason ?? '—'}</dd>
-        </dl>
-      </div>
-    </Card>
+      </Card>
+      <ExtractFilesCard batch={batch} />
+    </>
   );
 }
 

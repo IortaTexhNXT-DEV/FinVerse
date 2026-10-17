@@ -11,11 +11,8 @@ import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
-import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
-import com.iortatechnxt.brokerverse.opsledger.service.port.FileDropPort;
-import com.iortatechnxt.brokerverse.opsledger.service.port.FileDropPort.DropContent;
 import com.iortatechnxt.brokerverse.remittance.domain.EodRequest;
 import com.iortatechnxt.brokerverse.remittance.domain.EodRequestRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRun;
@@ -59,9 +56,7 @@ public class ExtractionService {
   private final RemittanceBatchRepository batches;
   private final EodRequestRepository eod;
   private final InvoiceLedgerQueryService ledger;
-  private final BatchDocuments documents;
-  private final RemittanceSettings settings;
-  private final FileDropPort files;
+  private final ExtractDelivery delivery;
   private final DocumentNumberService numbers;
   private final NotificationService notifications;
   private final AlertService alerts;
@@ -78,9 +73,7 @@ public class ExtractionService {
    * @param batches batches
    * @param eod end-of-day requests
    * @param ledger ledger reads
-   * @param documents extract files
-   * @param settings parameters
-   * @param files shared-drive port
+   * @param delivery extract files, their repository copy and the shared folder
    * @param numbers run numbers
    * @param notifications notifications
    * @param alerts alerts
@@ -96,9 +89,7 @@ public class ExtractionService {
       RemittanceBatchRepository batches,
       EodRequestRepository eod,
       InvoiceLedgerQueryService ledger,
-      BatchDocuments documents,
-      RemittanceSettings settings,
-      FileDropPort files,
+      ExtractDelivery delivery,
       DocumentNumberService numbers,
       NotificationService notifications,
       AlertService alerts,
@@ -111,9 +102,7 @@ public class ExtractionService {
     this.batches = batches;
     this.eod = eod;
     this.ledger = ledger;
-    this.documents = documents;
-    this.settings = settings;
-    this.files = files;
+    this.delivery = delivery;
     this.numbers = numbers;
     this.notifications = notifications;
     this.alerts = alerts;
@@ -211,7 +200,7 @@ public class ExtractionService {
   private ExtractionRun succeeded(Long runId, ExtractionWork.Outcome outcome) {
     ExtractionRun run = runs.findById(runId).orElseThrow();
     for (RemittanceBatch created : outcome.batches()) {
-      storeExtract(run, batches.findWithLinesById(created.getId()).orElseThrow());
+      storeExtract(batches.findWithLinesById(created.getId()).orElseThrow());
     }
     int requests = processRequests(run, outcome.tagged());
     String summary =
@@ -226,20 +215,8 @@ public class ExtractionService {
     return run;
   }
 
-  private void storeExtract(ExtractionRun run, RemittanceBatch batch) {
-    FileDropPort.DroppedFile dropped =
-        files.drop(
-            batch.getCompanyId(),
-            new ExtractFile.Location(
-                "REMITTANCE/" + batch.getRemittanceType().name(),
-                settings.extractFileName(
-                    batch.getBatchNo(),
-                    batch.getInsurerCode(),
-                    batch.getRemittanceType().name(),
-                    run.getBusinessDate().toString())),
-            new DropContent(BatchDocuments.XLSX, documents.scheduleXlsx(batch)),
-            new ExtractFile.Origin(RemittanceSettings.MODULE, batch.getBatchNo()));
-    batch.extractFile(dropped.id());
+  private void storeExtract(RemittanceBatch batch) {
+    batch.extractFile(delivery.created(batch));
   }
 
   private int processRequests(ExtractionRun run, Map<String, ExtractionTag> tagged) {

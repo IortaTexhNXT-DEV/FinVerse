@@ -18,9 +18,9 @@ import org.springframework.stereotype.Component;
 /**
  * The remittance schedules of Annex III (RMTID.011/039): Normal (#3), Special (#4) and With
  * Incentives (#7), one line per account of the batches extracted in the period (or of one batch),
- * grouped by batch. The Mall Assurance columns of the Normal schedule and the incentive expiry date
- * wait for their definitions (OQ42, OQ23). The Origin filter keeps the accounts of migrated or of
- * system invoices.
+ * grouped by batch. The Normal schedule carries the Mall Assurance columns of IF-RMT-01 (FRS BRD-02
+ * FRID.RMT.014.01); the incentive expiry date waits for its definition (OQ23). The Origin filter
+ * keeps the accounts of migrated or of system invoices.
  */
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of the reports
 public final class RemittanceSchedules {
@@ -33,7 +33,10 @@ public final class RemittanceSchedules {
           + " l.commission, l.commission_vat, l.wtax, l.dtip, l.net_due, l.basic_premium,"
           + " l.incentive + l.incentive_vat as incentive,"
           + " l.net_due - l.incentive - l.incentive_vat as net_after_incentive,"
-          + " l.insurer_or_date, l.insurer_or_no, l.insurer_or_amount,"
+          + " l.insurer_or_date, l.insurer_or_no, l.insurer_or_amount, l.mall_payment_mode,"
+          + " l.mall_service_charge, l.mall_card_charge,"
+          + " l.mall_service_charge + l.mall_card_charge as mall_deductions, l.mall_vat, l.mall_wtax,"
+          + " l.net_due - l.mall_service_charge - l.mall_card_charge as net_after_mall,"
           + " coalesce((select i.origin from ops_invoice i where i.invoice_no = l.invoice_no"
           + " limit 1), 'BIBS') as origin"
           + " from rem_batch_line l join rem_batch b on b.id = l.batch_id"
@@ -91,6 +94,16 @@ public final class RemittanceSchedules {
       columns.add(ReportColumn.amount("incentive", "Incentive with VAT"));
       columns.add(ReportColumn.amount("net_after_incentive", "Net Due After Incentives"));
     } else {
+      if (types.contains("NORMAL_PHP")) {
+        columns.add(ReportColumn.text("mall_payment_mode", "Mall Assurance Mode of Payment"));
+        columns.add(ReportColumn.amount("mall_service_charge", "Mall Assurance Service Charge"));
+        columns.add(
+            ReportColumn.amount("mall_card_charge", "Mall Assurance Credit / Debit Card Charge"));
+        columns.add(ReportColumn.amount("mall_deductions", "Mall Assurance Total Deductions"));
+        columns.add(ReportColumn.amount("mall_vat", "Mall Assurance VAT"));
+        columns.add(ReportColumn.amount("mall_wtax", "Mall Assurance WTAX"));
+        columns.add(ReportColumn.amount("net_after_mall", "Net Due After Mall Assurance"));
+      }
       columns.add(ReportColumn.date("insurer_or_date", "Date of Original Receipt"));
       columns.add(ReportColumn.text("insurer_or_no", "Official Receipt Number"));
       columns.add(ReportColumn.amount("insurer_or_amount", "OR Amount"));

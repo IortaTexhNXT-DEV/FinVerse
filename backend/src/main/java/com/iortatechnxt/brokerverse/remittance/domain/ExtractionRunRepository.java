@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.domain;
 
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.ExtractionTrigger;
+import java.time.LocalDate;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,4 +26,15 @@ public interface ExtractionRunRepository extends JpaRepository<ExtractionRun, Lo
    * @return run
    */
   Optional<ExtractionRun> findByRunNo(String runNo);
+
+  /**
+   * Whether a run of a trigger exists for a business date (one scheduled run a day).
+   *
+   * @param companyId company
+   * @param trigger trigger
+   * @param businessDate business date
+   * @return true when one exists
+   */
+  boolean existsByCompanyIdAndTriggerAndBusinessDate(
+      Long companyId, ExtractionTrigger trigger, LocalDate businessDate);
 }

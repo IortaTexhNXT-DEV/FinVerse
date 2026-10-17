@@ -426,7 +426,7 @@ excluded:
      wf_case_history,
      rnw_budget_history, rnw_channel_event, rnw_kyc_activity,
      idn_identity_event, idn_reconciliation_mismatch, pm_final_term_history,
-     idn_event_dismissal, nba_sod_violation, nba_certification_extract]
+     idn_event_dismissal, nba_sod_violation, nba_certification_extract, rem_file_delivery]
   SECRET:
     [sec_mfa_recovery_code, sec_mfa_reset_request, sec_mfa_trusted_device, sec_password_history,
      sec_password_reset_token, sec_revoked_token, sec_sso_request, sec_sso_ticket, sec_user_mfa,
@@ -441,7 +441,7 @@ excluded:
      per_period, report_batch, report_batch_item, report_run, report_run_file, scr_name_key,
      report_subscription, report_subscription_run,
      sto_legal_hold_request, yec_year_end_close,
-     idn_directory_profile, idn_sim_directory_account, pm_master_sim_inbox]
+     idn_directory_profile, idn_sim_directory_account, pm_master_sim_inbox, rem_setting_change]
   PLANNING:
     [bud_budget, bud_budget_amount, bud_budget_line, nbr_sales_target,
      rnw_budget, rnw_budget_month]

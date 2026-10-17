@@ -534,7 +534,11 @@ public enum Permission {
   // Reinsurance functions, deferred to Phase 2 for BDOI (client decision of 17-Oct-2026): reinsurer
   // and reinsurance broker parties, receipts from a reinsurer and reinsurance settlement payments
   // (party.service.ReinsuranceFunctions). No BDOI group profile holds it; the super user does.
-  RI_BROKING_TRANSACT;
+  RI_BROKING_TRANSACT,
+  // Remittance Settings (FRS BRD-02 FRID.RMT.003): the maker of a change of the extraction
+  // schedule, shared folders and file naming, and its approver (the Remittance Team Leader).
+  REMIT_SETTINGS_MAINTAIN,
+  REMIT_SETTINGS_APPROVE;
 
   // The portal permissions of design 6.1 (PORTAL_USER_REQUEST, PORTAL_USER_APPROVE, PORTAL_ADMIN)
   // are parked with the partner portal, deferred to Phase 2 (client decision of 17-Oct-2026).

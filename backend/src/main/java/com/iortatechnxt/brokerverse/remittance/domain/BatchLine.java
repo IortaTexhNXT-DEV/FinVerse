@@ -84,6 +84,21 @@ public class BatchLine extends BaseEntity {
   @Column(name = "cpc2_rate", precision = 9, scale = 4, updatable = false)
   private BigDecimal cpc2Rate;
 
+  @Column(name = "mall_payment_mode", length = 30)
+  private String mallPaymentMode;
+
+  @Column(name = "mall_service_charge", nullable = false, precision = 19, scale = 2)
+  private BigDecimal mallServiceCharge = BigDecimal.ZERO;
+
+  @Column(name = "mall_card_charge", nullable = false, precision = 19, scale = 2)
+  private BigDecimal mallCardCharge = BigDecimal.ZERO;
+
+  @Column(name = "mall_vat", nullable = false, precision = 19, scale = 2)
+  private BigDecimal mallVat = BigDecimal.ZERO;
+
+  @Column(name = "mall_wtax", nullable = false, precision = 19, scale = 2)
+  private BigDecimal mallWtax = BigDecimal.ZERO;
+
   @Column(nullable = false)
   private boolean excluded;
 
@@ -245,6 +260,60 @@ public class BatchLine extends BaseEntity {
    */
   public void remitted(RemittanceStatus status) {
     this.remittedStatus = status;
+  }
+
+  /**
+   * Records the Mall Assurance deductions of the account (columns 25 to 31 of IF-RMT-01; the source
+   * of the charges is to be confirmed, Q-RM-05).
+   *
+   * @param mall mode of payment and charges
+   */
+  public void mallAssurance(MallAssurance mall) {
+    this.mallPaymentMode = mall.paymentMode();
+    this.mallServiceCharge = mall.serviceCharge();
+    this.mallCardCharge = mall.cardCharge();
+    this.mallVat = mall.vat();
+    this.mallWtax = mall.wtax();
+  }
+
+  /**
+   * The Mall Assurance deductions of the account.
+   *
+   * @return deductions, zero when none
+   */
+  public MallAssurance getMallAssurance() {
+    return new MallAssurance(
+        mallPaymentMode, nz(mallServiceCharge), nz(mallCardCharge), nz(mallVat), nz(mallWtax));
+  }
+
+  private static BigDecimal nz(BigDecimal value) {
+    return value == null ? BigDecimal.ZERO : value;
+  }
+
+  /**
+   * Mall Assurance deductions of an account.
+   *
+   * @param paymentMode mode of payment, may be null
+   * @param serviceCharge service charge
+   * @param cardCharge credit or debit card charge
+   * @param vat VAT on the deductions
+   * @param wtax withholding tax on the deductions
+   */
+  public record MallAssurance(
+      String paymentMode,
+      BigDecimal serviceCharge,
+      BigDecimal cardCharge,
+      BigDecimal vat,
+      BigDecimal wtax) {
+
+    /**
+     * Total deductions: service charge and card charge.
+     *
+     * @return total
+     */
+    public BigDecimal totalDeductions() {
+      return serviceCharge.add(cardCharge);
+    }
   }
 
   public RemittanceBatch getBatch() {

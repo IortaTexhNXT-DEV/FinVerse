@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 /**
  * Remittance parameters ({@code sys_parameter}, V760): the check holding period in banking days
  * {@code REMIT_CHECK_HOLD_DAYS} (RMTID.017), the paid AR above DTIP behaviour {@code
- * REMIT_PAIDAR_OVER_DTIP_MODE} = EXCLUDE or CAP (RMTID.014, OQ19) and the extract file naming
- * {@code REMIT_FILE_PATTERN} (RMTID.001, OQ17/OQ18).
+ * REMIT_PAIDAR_OVER_DTIP_MODE} = EXCLUDE or CAP (RMTID.014, OQ19). The naming of the extract files
+ * moved to the Remittance Settings ({@link RemittanceSettingsService}); {@code REMIT_FILE_PATTERN}
+ * is no longer read.
  */
 @Component
 public class RemittanceSettings {
@@ -23,9 +24,6 @@ public class RemittanceSettings {
   /** Paid AR above DTIP parameter. */
   public static final String OVER_DTIP_MODE = "REMIT_PAIDAR_OVER_DTIP_MODE";
 
-  /** Extract file naming parameter. */
-  public static final String FILE_PATTERN = "REMIT_FILE_PATTERN";
-
   /** Withholding tax rate (percent) of the early-incentive service invoice (DIS 3.29.1). */
   public static final String EARLY_INCENTIVE_WTAX_RATE = "EARLY_INCENTIVE_WTAX_RATE";
 
@@ -33,7 +31,6 @@ public class RemittanceSettings {
 
   private static final int DEFAULT_HOLD_DAYS = 3;
   private static final String EXCLUDE = "EXCLUDE";
-  private static final String DEFAULT_PATTERN = "{batchNo}_{date}";
 
   private final SystemParameterService parameters;
 
@@ -81,27 +78,6 @@ public class RemittanceSettings {
     } catch (NumberFormatException ex) {
       return DEFAULT_WTAX_RATE;
     }
-  }
-
-  /**
-   * File name of a batch extract: the pattern with {@code {batchNo}}, {@code {insurer}}, {@code
-   * {type}} and {@code {date}} replaced, plus the extension.
-   *
-   * @param batchNo batch
-   * @param insurer insurer
-   * @param type remittance type
-   * @param date business date (ISO)
-   * @return file name
-   */
-  public String extractFileName(String batchNo, String insurer, String type, String date) {
-    String pattern = parameters.text(FILE_PATTERN, DEFAULT_PATTERN).strip();
-    String base = pattern.isEmpty() ? DEFAULT_PATTERN : pattern;
-    return base.replace("{batchNo}", batchNo)
-            .replace("{insurer}", insurer)
-            .replace("{type}", type)
-            .replace("{date}", date)
-            .replaceAll("[^A-Za-z0-9._-]", "_")
-        + ".xlsx";
   }
 
   /** Treatment of paid AR above the DTIP balance (OQ19). */

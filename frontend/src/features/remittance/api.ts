@@ -84,6 +84,8 @@ export interface BatchSummary {
   approvedAt?: string;
   dvNo?: string;
   specialRequestNo?: string;
+  /** Insurer code and 8-digit settlement number (Batch Number of the extract files). */
+  settlementRef?: string;
 }
 
 export interface Exclusion {

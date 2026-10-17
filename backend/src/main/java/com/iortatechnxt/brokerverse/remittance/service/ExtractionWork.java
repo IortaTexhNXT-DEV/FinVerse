@@ -351,6 +351,8 @@ public class ExtractionWork {
                 run.getId(),
                 specialRequestNo),
             specialRequestNo == null ? currentUser.optionalUsername().orElse(null) : null);
+    batch.settlementNumbered(
+        RemittanceExtractFiles.settlementNo(numbers.next("RMS-" + key.insurerCode())));
     lines.forEach(p -> batch.add(p.line()));
     RemittanceBatch saved = batches.save(batch);
     workflow.start(

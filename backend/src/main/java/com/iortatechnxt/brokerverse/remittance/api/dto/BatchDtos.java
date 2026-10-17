@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.BatchStage;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.OrStatus;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RemittanceType;
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceFileDelivery;
 import com.iortatechnxt.brokerverse.remittance.service.BatchService.Preview;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -90,6 +91,7 @@ public final class BatchDtos {
    * @param approvedAt approved at
    * @param dvNo DV number
    * @param specialRequestNo special remittance request
+   * @param settlementRef insurer code and settlement number, null for a batch before the numbering
    */
   public record BatchSummary(
       Long id,
@@ -105,7 +107,8 @@ public final class BatchDtos {
       Instant submittedAt,
       Instant approvedAt,
       String dvNo,
-      String specialRequestNo) {
+      String specialRequestNo,
+      String settlementRef) {
 
     /**
      * Maps a batch.
@@ -128,7 +131,8 @@ public final class BatchDtos {
           b.getSubmittedAt(),
           b.getApprovedAt(),
           b.getDvNo(),
-          b.getSpecialRequestNo());
+          b.getSpecialRequestNo(),
+          b.getSettlementNo() == null ? null : b.getSettlementRef());
     }
   }
 
@@ -328,6 +332,50 @@ public final class BatchDtos {
           b.getScheduleSentAt(),
           b.getExtractFileId(),
           b.getLines().stream().map(Line::from).toList());
+    }
+  }
+
+  /**
+   * A copy of an extract file to the shared folder.
+   *
+   * @param id id
+   * @param stage created, approved or sent again
+   * @param fileName file
+   * @param folder folder
+   * @param status delivered or failed
+   * @param reference location of the copy
+   * @param error reason of a failure
+   * @param attemptedAt time
+   * @param attemptedBy user, null for the system
+   */
+  public record DeliveryResponse(
+      Long id,
+      RemittanceFileDelivery.Stage stage,
+      String fileName,
+      String folder,
+      RemittanceFileDelivery.Status status,
+      String reference,
+      String error,
+      Instant attemptedAt,
+      String attemptedBy) {
+
+    /**
+     * Maps a copy.
+     *
+     * @param d copy
+     * @return DTO
+     */
+    public static DeliveryResponse from(RemittanceFileDelivery d) {
+      return new DeliveryResponse(
+          d.getId(),
+          d.getStage(),
+          d.getFileName(),
+          d.getFolder(),
+          d.getStatus(),
+          d.getReference(),
+          d.getError(),
+          d.getAttemptedAt(),
+          d.getAttemptedBy());
     }
   }
 

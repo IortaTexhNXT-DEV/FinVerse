@@ -87,11 +87,17 @@ export function UploadForm({
   columns,
   busy,
   onUpload,
+  hint,
+  accept = '.xlsx,.csv,.txt,text/csv,text/plain',
 }: Readonly<{
   label: string;
   /** The columns of the file as the template names them. */
   columns: string;
   busy: boolean;
+  /** Replaces the hint built from the columns. */
+  hint?: string;
+  /** File types offered. */
+  accept?: string;
   onUpload: (file: File) => void;
 }>) {
   const [file, setFile] = useState<File>();
@@ -102,12 +108,15 @@ export function UploadForm({
         label={label}
         required
         error={error}
-        hint={`The Excel template, or a CSV or text file with its columns: ${columns}. Dates as dd-MMM-yyyy.`}
+        hint={
+          hint ??
+          `The Excel template, or a CSV or text file with its columns: ${columns}. Dates as dd-MMM-yyyy.`
+        }
       >
         {(id) => (
           <FileDropZone
             id={id}
-            accept=".xlsx,.csv,.txt,text/csv,text/plain"
+            accept={accept}
             onChange={(files) => {
               setFile(files[0]);
               setError(undefined);

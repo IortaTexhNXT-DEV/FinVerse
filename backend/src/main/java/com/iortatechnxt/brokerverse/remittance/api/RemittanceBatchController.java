@@ -3,10 +3,12 @@ package com.iortatechnxt.brokerverse.remittance.api;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.service.QueuedEmail;
+import com.iortatechnxt.brokerverse.party.service.ReinsuranceFunctions;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.AssignRequest;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.BatchResponse;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.BatchSummary;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.CommentRequest;
+import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.DeliveryResponse;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.ExcludeRequest;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.PreviewResponse;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.QueuedResponse;
@@ -20,6 +22,7 @@ import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.Remittance
 import com.iortatechnxt.brokerverse.remittance.service.BatchDocumentStore;
 import com.iortatechnxt.brokerverse.remittance.service.BatchDocuments;
 import com.iortatechnxt.brokerverse.remittance.service.BatchService;
+import com.iortatechnxt.brokerverse.remittance.service.ExtractDelivery;
 import com.iortatechnxt.brokerverse.remittance.service.RemittanceQueryService;
 import com.iortatechnxt.brokerverse.remittance.service.RemittanceQueryService.BatchSearch;
 import com.iortatechnxt.brokerverse.remittance.service.ScheduleDispatch;
@@ -27,6 +30,9 @@ import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +60,8 @@ public class RemittanceBatchController {
   private final ScheduleDispatch dispatch;
   private final FileDownloads downloads;
   private final BatchDocumentStore store;
+  private final ExtractDelivery delivery;
+  private final ReinsuranceFunctions reinsurance;
 
   /**
    * Creates the controller.
@@ -64,6 +72,8 @@ public class RemittanceBatchController {
    * @param dispatch schedule e-mail
    * @param downloads file download answers
    * @param store stored batch documents
+   * @param delivery extract files and their copies to the shared folder
+   * @param reinsurance batches of reinsurers hidden until Phase 2 (Q-RM-17)
    */
   public RemittanceBatchController(
       BatchService batches,
@@ -71,8 +81,12 @@ public class RemittanceBatchController {
       BatchDocuments documents,
       ScheduleDispatch dispatch,
       FileDownloads downloads,
-      BatchDocumentStore store) {
+      BatchDocumentStore store,
+      ExtractDelivery delivery,
+      ReinsuranceFunctions reinsurance) {
     this.store = store;
+    this.delivery = delivery;
+    this.reinsurance = reinsurance;
     this.downloads = downloads;
     this.batches = batches;
     this.queries = queries;
@@ -104,7 +118,7 @@ public class RemittanceBatchController {
       @RequestParam(defaultValue = "20") int size) {
     return PageResponse.of(
         queries.batches(
-            new BatchSearch(companyId, stage, insurer, type, q),
+            new BatchSearch(companyId, stage, insurer, type, q, reinsurance.allowed()),
             RemittanceAccess.newestFirst(page, size)),
         BatchSummary::from);
   }
@@ -118,7 +132,67 @@ public class RemittanceBatchController {
   @GetMapping("/{id}")
   @PreAuthorize(RemittanceAccess.BATCH_READ)
   public BatchResponse get(@PathVariable Long id) {
-    return response(batches.get(id));
+    return response(visible(batches.get(id)));
+  }
+
+  /**
+   * An extract file of the batch (FRS BRD-02 FRID.RMT.001.03): the Excel 97-2003 extract
+   * (IF-RMT-01) or the pipe-delimited text extract (IF-RMT-02), named by the Remittance Settings.
+   *
+   * @param id batch
+   * @param format excel or text
+   * @return file
+   */
+  @GetMapping("/{id}/extract/{format}")
+  @PreAuthorize(RemittanceAccess.BATCH_READ)
+  public ResponseEntity<byte[]> extract(@PathVariable Long id, @PathVariable ExtractFormat format) {
+    visible(batches.get(id));
+    ExtractDelivery.RenderedFile file = delivery.file(id, format == ExtractFormat.EXCEL);
+    return ResponseEntity.ok()
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.attachment().filename(file.name()).build().toString())
+        .contentType(MediaType.parseMediaType(file.contentType()))
+        .body(file.content());
+  }
+
+  /**
+   * Copies of the extract files of the batch to the shared folder, newest first (IF-RMT-04).
+   *
+   * @param id batch
+   * @return copies
+   */
+  @GetMapping("/{id}/deliveries")
+  @PreAuthorize(RemittanceAccess.BATCH_READ)
+  public List<DeliveryResponse> deliveries(@PathVariable Long id) {
+    visible(batches.get(id));
+    return delivery.history(id).stream().map(DeliveryResponse::from).toList();
+  }
+
+  /**
+   * Copies the extract files of the batch to the shared folder again (after a failed copy).
+   *
+   * @param id batch
+   * @return the copies made
+   */
+  @PostMapping("/{id}/deliveries")
+  @PreAuthorize(RemittanceAccess.PROCESS)
+  public List<DeliveryResponse> resend(@PathVariable Long id) {
+    visible(batches.get(id));
+    return delivery.resend(id).stream().map(DeliveryResponse::from).toList();
+  }
+
+  private RemittanceBatch visible(RemittanceBatch batch) {
+    reinsurance.requireForParty(batch.getCompanyId(), batch.getInsurerCode());
+    return batch;
+  }
+
+  /** Format of an extract file. */
+  public enum ExtractFormat {
+    /** Excel 97-2003 (IF-RMT-01). */
+    EXCEL,
+    /** Pipe-delimited text (IF-RMT-02). */
+    TEXT
   }
 
   /**
@@ -226,7 +300,7 @@ public class RemittanceBatchController {
   @PreAuthorize(RemittanceAccess.BATCH_READ)
   public ResponseEntity<byte[]> document(
       @PathVariable Long id, @PathVariable DocumentKind kind, HttpServletRequest request) {
-    return downloads.respond(store.download(batches.get(id), kind), request);
+    return downloads.respond(store.download(visible(batches.get(id)), kind), request);
   }
 
   /**

@@ -121,6 +121,12 @@ public class RemittanceBatch extends BaseEntity {
   @Column(name = "extract_file_id")
   private Long extractFileId;
 
+  @Column(name = "settlement_no", length = 8, updatable = false)
+  private String settlementNo;
+
+  @Column(name = "settlement_ref", length = 40, updatable = false)
+  private String settlementRef;
+
   @Embedded private final BatchSettlement settlement = new BatchSettlement();
 
   @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -335,6 +341,27 @@ public class RemittanceBatch extends BaseEntity {
         message == null || message.length() <= MAX_MESSAGE
             ? message
             : message.substring(0, MAX_MESSAGE);
+  }
+
+  /**
+   * Gives the batch its settlement number, once, before it is saved (FRID.RMT.001.04).
+   *
+   * @param number 8-digit settlement number
+   */
+  public void settlementNumbered(String number) {
+    if (this.settlementNo == null) {
+      this.settlementNo = number;
+      this.settlementRef = insurerCode + number;
+    }
+  }
+
+  public String getSettlementNo() {
+    return settlementNo;
+  }
+
+  /** Insurer code and settlement number (IF-RMT-01); the batch number for older batches. */
+  public String getSettlementRef() {
+    return settlementRef == null ? batchNo : settlementRef;
   }
 
   /**

@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch.Exclusion;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatchRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.ExtractionTag;
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceFileDelivery;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkAssignmentService;
@@ -59,6 +60,7 @@ public class BatchService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final ExtractDelivery delivery;
 
   /**
    * Creates the service.
@@ -78,6 +80,7 @@ public class BatchService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param delivery copies of the extract files to the shared folder
    */
   @SuppressWarnings("java:S107") // constructor injection
   public BatchService(
@@ -95,7 +98,9 @@ public class BatchService {
       NotificationService notifications,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      ExtractDelivery delivery) {
+    this.delivery = delivery;
     this.batches = batches;
     this.tags = tags;
     this.batchLedger = batchLedger;
@@ -219,6 +224,7 @@ public class BatchService {
     workflow.transition(ENTITY, id.toString(), "approve", TransitionNote.comment(comment));
     posting.post(batch);
     documents.store(batch);
+    delivery.deliver(batch, RemittanceFileDelivery.Stage.APPROVED);
     if (batch.getSpecialRequestNo() != null && batch.getSettlement().getSendCycle() == 1) {
       specials.batchApproved(batch.getSpecialRequestNo());
     }

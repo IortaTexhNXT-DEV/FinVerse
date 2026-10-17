@@ -31,6 +31,22 @@ public interface RemittanceBatchRepository
   Optional<RemittanceBatch> findByBatchNo(String batchNo);
 
   /**
+   * Batches of an insurer code and settlement number (column Batch Number of the extract).
+   *
+   * @param settlementRef insurer code and settlement number
+   * @return batches, one per company
+   */
+  List<RemittanceBatch> findBySettlementRef(String settlementRef);
+
+  /**
+   * Batches of a settlement number (name of a returned text extract).
+   *
+   * @param settlementNo 8-digit settlement number
+   * @return batches
+   */
+  List<RemittanceBatch> findBySettlementNo(String settlementNo);
+
+  /**
    * Batches of a company in some stages.
    *
    * @param companyId company

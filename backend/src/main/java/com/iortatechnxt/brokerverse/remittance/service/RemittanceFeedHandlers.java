@@ -6,6 +6,8 @@ import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine.InsurerOr;
 import com.iortatechnxt.brokerverse.remittance.domain.HoldRequest.Terms;
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatchRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RequestSource;
 import com.iortatechnxt.brokerverse.remittance.service.CsvRows.Row;
 import com.iortatechnxt.brokerverse.remittance.service.SpecialRemittanceService.NewRequest;
@@ -77,21 +79,26 @@ public final class RemittanceFeedHandlers {
   }
 
   /**
-   * {@code INSURER_REMIT_OR} (RMTID.012/013/016): columns batchNo, invoiceNo, orNo, orDate,
-   * orAmount.
+   * {@code INSURER_REMIT_OR} (RMTID.012/013/016, FRS BRD-02 FRID.RMT.008.01): the BIBS template
+   * with the columns batchNo, invoiceNo, orNo, orDate, orAmount, or the extract the insurer returns
+   * with its ORs filled (IF-RMT-03: the Excel extract of IF-RMT-01 or the text extract of
+   * IF-RMT-02, read by {@link InsurerOrReturnReader}).
    */
   @Component
   public static class InsurerOrFeed implements FlowInHandler {
 
     private final InsurerOrService service;
+    private final RemittanceBatchRepository batches;
 
     /**
      * Creates the handler.
      *
      * @param service OR update
+     * @param batches batches by settlement number
      */
-    public InsurerOrFeed(InsurerOrService service) {
+    public InsurerOrFeed(InsurerOrService service, RemittanceBatchRepository batches) {
       this.service = service;
+      this.batches = batches;
     }
 
     @Override
@@ -101,6 +108,10 @@ public final class RemittanceFeedHandlers {
 
     @Override
     public void handle(FlowInFile file, FlowInContext context) {
+      if (InsurerOrReturnReader.isReturnedExtract(file.fileName(), file.content())) {
+        returned(file, context);
+        return;
+      }
       for (Row row :
           CsvRows.parse(file.content(), Set.of("batchNo", INVOICE, "orNo", "orDate", "orAmount"))) {
         context.accept(
@@ -113,6 +124,55 @@ public final class RemittanceFeedHandlers {
                     new InsurerOr(
                         row.require("orNo"), date(row, "orDate"), amount(row, "orAmount")),
                     context.runNo()));
+      }
+    }
+
+    private void returned(FlowInFile file, FlowInContext context) {
+      InsurerOrReturnReader.Result result =
+          InsurerOrReturnReader.read(file.fileName(), file.content());
+      if (result.refusal() != null) {
+        context.accept(
+            file.fileName(),
+            file.fileName(),
+            () -> {
+              throw new BusinessRuleException("REMIT_OR_FILE_REFUSED", result.refusal());
+            });
+        return;
+      }
+      for (InsurerOrReturnReader.Line l : result.lines()) {
+        context.accept(
+            l.batchRef() + "/" + l.invoiceNo() + "/" + l.orNo(),
+            String.join(",", l.batchRef(), l.invoiceNo(), l.orNo(), l.orDate(), l.orAmount()),
+            () -> service.record(batchNo(l), l.invoiceNo(), or(l), context.runNo()));
+      }
+    }
+
+    private String batchNo(InsurerOrReturnReader.Line l) {
+      String ref = l.batchRef();
+      return batches.findBySettlementRef(ref).stream()
+          .findFirst()
+          .or(
+              () ->
+                  batches.findBySettlementNo(InsurerOrReturnReader.settlementNoOf(ref)).stream()
+                      .filter(b -> ref.endsWith(b.getSettlementRef()))
+                      .findFirst())
+          .map(RemittanceBatch::getBatchNo)
+          .orElse(ref);
+    }
+
+    private static InsurerOr or(InsurerOrReturnReader.Line l) {
+      try {
+        return new InsurerOr(
+            l.orNo(),
+            InsurerOrReturnReader.date(l.orDate()),
+            InsurerOrReturnReader.amount(l.orAmount()));
+      } catch (DateTimeParseException | NumberFormatException ex) {
+        throw new BusinessRuleException(
+            "FEED_VALUE_INVALID",
+            "Line "
+                + l.lineNo()
+                + ": the OR date must be a date such as 10/28/2026 and the OR amount an amount",
+            ex);
       }
     }
   }

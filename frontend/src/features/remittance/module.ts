@@ -7,6 +7,7 @@ import {
   Percent,
   Scale,
   Send,
+  SlidersHorizontal,
   Zap,
 } from 'lucide-react';
 import { lazyWithRetry } from '@/app/loadRecovery';
@@ -145,6 +146,14 @@ export const remittanceModule: FeatureModule = {
       permission: 'REMIT_APPROVE',
       alsoPermissions: TEAM,
       component: lazyWithRetry(() => import('./IncentiveRulesPage')),
+    },
+    {
+      path: '/remittance/settings',
+      label: 'Remittance Settings',
+      icon: SlidersHorizontal,
+      permission: 'REMIT_SETTINGS_MAINTAIN',
+      alsoPermissions: ['REMIT_SETTINGS_APPROVE'],
+      component: lazyWithRetry(() => import('./RemittanceSettingsPage')),
     },
   ],
 };

@@ -4,6 +4,8 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.LedgerSearch;
+import com.iortatechnxt.brokerverse.party.domain.Party;
+import com.iortatechnxt.brokerverse.party.service.ReinsuranceFunctions;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLineRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.EodRequest;
@@ -145,6 +147,16 @@ public class RemittanceQueryService {
       if (s.type() != null) {
         where.add(cb.equal(root.get("remittanceType"), s.type()));
       }
+      if (!s.reinsurance()) {
+        var ri = query.subquery(Long.class);
+        var party = ri.from(Party.class);
+        ri.select(party.get("id"))
+            .where(
+                cb.equal(party.get(COMPANY_ID), root.get(COMPANY_ID)),
+                cb.equal(party.get("code"), root.get("insurerCode")),
+                party.get("partyType").in(ReinsuranceFunctions.PARTY_TYPES));
+        where.add(cb.not(cb.exists(ri)));
+      }
       String like = like(s.text());
       if (like != null) {
         var sub = query.subquery(Long.class);
@@ -285,13 +297,16 @@ public class RemittanceQueryService {
    * @param insurerCode insurer
    * @param type remittance type
    * @param text part of the batch or invoice number
+   * @param reinsurance whether batches of reinsurers and reinsurance brokers are shown (Phase 2;
+   *     only to a user who may use the reinsurance functions, Q-RM-17)
    */
   public record BatchSearch(
       Long companyId,
       List<BatchStage> stages,
       String insurerCode,
       RemittanceType type,
-      String text) {}
+      String text,
+      boolean reinsurance) {}
 
   /**
    * An invoice with its current extraction tag.

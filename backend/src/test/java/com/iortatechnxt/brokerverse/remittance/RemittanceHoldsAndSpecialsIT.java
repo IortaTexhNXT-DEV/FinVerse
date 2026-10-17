@@ -82,7 +82,14 @@ class RemittanceHoldsAndSpecialsIT {
     assertThat(held.getRemittanceStatus()).isEqualTo(RemittanceStatus.UNPROCESSED);
 
     fx.extract(paid.getInvoiceNo());
-    assertThat(fx.lineOf(paid.getInvoiceNo())).isNull();
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from rem_batch_line l join rem_batch b on b.id = l.batch_id"
+                    + " where l.invoice_no = ? and b.run_id is not null",
+                Integer.class,
+                paid.getInvoiceNo()))
+        .as("not extracted (seeded report rows have no run)")
+        .isZero();
     assertThat(tags.findFirstByInvoiceNoOrderByIdDesc(paid.getInvoiceNo()))
         .hasValueSatisfying(
             t -> {

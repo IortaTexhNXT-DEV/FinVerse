@@ -60,6 +60,17 @@ class RemittanceIT {
   @Autowired private TransactionTemplate tx;
   @Autowired private JdbcTemplate jdbc;
 
+  /** Lines of an invoice in batches made by an extraction run (seeded report rows have none). */
+  private int extractedLines(String invoiceNo) {
+    Integer count =
+        jdbc.queryForObject(
+            "select count(*) from rem_batch_line l join rem_batch b on b.id = l.batch_id"
+                + " where l.invoice_no = ? and b.run_id is not null",
+            Integer.class,
+            invoiceNo);
+    return count == null ? 0 : count;
+  }
+
   @Test
   void theScheduledExtractionTagsInvoicesAndBatchesTheEligibleOnes() {
     OpsInvoice paid = fx.paidInvoice();
@@ -93,8 +104,8 @@ class RemittanceIT {
               assertThat(t.getTag()).isEqualTo(ExtractionTag.UNEXTRACTED_DUE);
               assertThat(t.getReasons()).contains("CHECK_HOLDING");
             });
-    assertThat(fx.lineOf(holding.getInvoiceNo())).isNull();
-    assertThat(fx.lineOf(unpaid.getInvoiceNo())).isNull();
+    assertThat(extractedLines(holding.getInvoiceNo())).isZero();
+    assertThat(extractedLines(unpaid.getInvoiceNo())).isZero();
     assertThat(fx.reload(unpaid.getInvoiceNo()).getLockOwner()).isNull();
   }
 

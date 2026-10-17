@@ -42,14 +42,19 @@ public final class RemittanceControlReports {
 
   private RemittanceControlReports() {}
 
-  /** REM-REMITTED-BATCH (Annex III #8; layout not specified, OQ42). */
+  /**
+   * REM-REMITTED-BATCH (Annex III #8, FRS BRD-02 FRID.RMT.014.01): the accounts of the approved
+   * batches by batch number (insurer code and settlement number), with the DV and the insurer OR.
+   */
   @Component
   public static class RemittedAccounts implements ReportDefinition {
 
     private static final String SQL =
-        "select b.batch_no as batch, b.insurer_code as insurer, b.remittance_type as type,"
-            + " b.approved_at as approved, b.dv_no, l.invoice_no, l.assured_name, l.paid_ar,"
-            + " l.net_due, l.remitted_status, l.insurer_or_no"
+        "select coalesce(b.settlement_ref, b.batch_no) as batch, b.batch_no as internal_no,"
+            + " b.insurer_code as insurer, b.remittance_type as type,"
+            + " b.approved_at as approved, b.dv_no, l.invoice_no, l.policy_no, l.assured_name,"
+            + " l.paid_ar, l.net_due, l.remitted_status, l.insurer_or_date, l.insurer_or_no,"
+            + " l.insurer_or_amount"
             + " from rem_batch_line l join rem_batch b on b.id = l.batch_id"
             + " where b.company_id = :companyId and not l.excluded"
             + " and b.stage in ('APPROVED', 'PARTIALLY_REMITTED', 'FULLY_REMITTED', 'OR_RECEIVED')"
@@ -81,16 +86,20 @@ public final class RemittanceControlReports {
       return TabularReportBuilder.of(p)
           .columns(
               ReportColumn.text(INSURER, INSURER_LABEL),
+              ReportColumn.text("internal_no", "Internal Batch No."),
               ReportColumn.text("type", "Remit Type"),
               ReportColumn.date("approved", "Approved On"),
               ReportColumn.text("dv_no", "DV No."),
               ReportColumn.text(INVOICE_NO, INVOICE),
+              ReportColumn.text("policy_no", "Policy Number"),
               ReportColumn.text(ASSURED, ASSURED_LABEL),
               ReportColumn.amount(PAID_AR, "Paid AR"),
               ReportColumn.amount("net_due", "Net Due"),
               ReportColumn.text("remitted_status", "Remittance Status"),
-              ReportColumn.text("insurer_or_no", "Insurer OR"))
-          .groupBy(BATCH, BATCH_LABEL)
+              ReportColumn.date("insurer_or_date", "Date of Official Receipt"),
+              ReportColumn.text("insurer_or_no", "Official Receipt Number"),
+              ReportColumn.amount("insurer_or_amount", "OR Amount"))
+          .groupBy(BATCH, "Batch Number")
           .rows(sql.rows(SQL, RemittanceReportSql.args(p)))
           .presorted()
           .build();

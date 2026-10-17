@@ -131,5 +131,15 @@ export const REMITTANCE_HELP: HelpSection = {
         'Only the Remittance team leader maintains the rules.',
       ],
     },
+    {
+      name: 'Remittance Settings',
+      path: '/remittance/settings',
+      summary:
+        'The time of the scheduled extraction, the shared folder of each remittance type and the names of the Excel and text extract files.',
+      controls: [
+        'A change is proposed with a reason and takes effect only when the Remittance Team Leader approves it; the maker cannot approve.',
+        'One change at a time waits for approval; every change stays in the list with its maker and checker.',
+      ],
+    },
   ],
 };

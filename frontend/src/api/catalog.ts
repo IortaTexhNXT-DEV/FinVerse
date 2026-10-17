@@ -1,7 +1,7 @@
 import { api, toQuery } from './client';
 import type { ProductLifecycle, VersionStatus } from './productCatalog';
 import type { RecordStatus, RecordOriginFields } from './types';
-import type { InsurerDetail, RemittanceTerms } from './insurerPage';
+import type { InsurerDetail, InsurerTaxStatus, RemittanceTerms } from './insurerPage';
 import type { ProductMatrixInput } from './pmWorkspace';
 import type {
   SalesAssignment,
@@ -10,7 +10,6 @@ import type {
   SalesUnit,
   SalesUnitInput,
 } from './salesOrganisation';
-
 export type {
   SalesAssignment,
   SalesLevel,
@@ -50,6 +49,7 @@ export type CatalogKind =
   | 'INSURER_BRANCH'
   | 'INSURER_CONTACT'
   | 'INSURER_BANK_ACCOUNT'
+  | 'INSURER_PARTICIPATION'
   | 'COMMISSION_RATE'
   | 'RATE'
   | 'SHORT_PERIOD_RATE'
@@ -223,9 +223,6 @@ export interface Insurer extends Authorizable, RecordOriginFields {
   /** Payment terms and remittance details (G08). */
   remittance?: RemittanceTerms;
 }
-
-/** VAT registration of an insurer: VAT on premium or premium tax. */
-export type InsurerTaxStatus = 'VAT_REGISTERED' | 'NON_VAT';
 
 export interface BranchInput {
   code: string;

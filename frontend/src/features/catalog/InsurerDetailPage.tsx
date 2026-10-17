@@ -22,6 +22,7 @@ import { BankAccountModal, ContactModal, RemittanceModal } from './InsurerPageMo
 import { BankAccountsTable, ContactsTable, LinkedProductsTable } from './InsurerPageTables';
 import { remittanceCycleLabel, remittanceModeLabel } from './insurerPageForm';
 import { InsurerAccountsTab } from './InsurerAccountsTab';
+import { CoinsuranceTab } from './CoinsuranceTab';
 import { InsurerEditorModal } from './InsurerEditorModal';
 import { BranchModal, CommissionModal } from './InsurerRatesModals';
 import { RecordActions } from './RecordActions';
@@ -43,6 +44,7 @@ const TABS = [
   { id: 'contacts', label: 'Contacts' },
   { id: 'remittance', label: 'Payment & Remittance' },
   { id: 'accounts', label: 'Bank Accounts' },
+  { id: 'coinsurance', label: 'Co-insurance / Risk Participation' },
   { id: 'products', label: 'Products' },
   { id: 'ledger', label: 'Ledger Accounts' },
   { id: 'branches', label: 'Branches & Commissions' },
@@ -151,10 +153,11 @@ interface TabProps {
   tab: TabId;
   detail: InsurerDetail;
   maintain: boolean;
+  companyId: number;
   onDialog: (dialog: Dialog) => void;
 }
 
-function TabContent({ tab, detail: d, maintain, onDialog }: Readonly<TabProps>) {
+function TabContent({ tab, detail: d, maintain, companyId, onDialog }: Readonly<TabProps>) {
   const open = (kind: NewKind, label: string) =>
     maintain && (
       <Button
@@ -191,6 +194,8 @@ function TabContent({ tab, detail: d, maintain, onDialog }: Readonly<TabProps>) 
           />
         </Card>
       );
+    case 'coinsurance':
+      return <CoinsuranceTab insurerId={d.insurer.id} companyId={companyId} maintain={maintain} />;
     case 'products':
       return (
         <Card title="Products linked" flush>
@@ -311,7 +316,13 @@ export default function InsurerDetailPage() {
         }
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
-      <TabContent tab={tab} detail={d} maintain={maintain} onDialog={setDialog} />
+      <TabContent
+        tab={tab}
+        detail={d}
+        maintain={maintain}
+        companyId={companyId}
+        onDialog={setDialog}
+      />
       <InsurerDialog
         dialog={dialog}
         detail={d}

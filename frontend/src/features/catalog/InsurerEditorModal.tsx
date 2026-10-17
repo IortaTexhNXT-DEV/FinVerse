@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { catalogApi } from '@/api/catalog';
-import type { Insurer, InsurerInput, InsurerTaxStatus, PlacementChannel } from '@/api/catalog';
+import type { Insurer, InsurerInput, PlacementChannel } from '@/api/catalog';
+import type { InsurerTaxStatus } from '@/api/insurerPage';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';

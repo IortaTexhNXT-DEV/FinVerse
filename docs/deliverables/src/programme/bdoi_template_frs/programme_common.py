@@ -316,16 +316,16 @@ LOG = [
      "left out of the current-phase conformance figures. EBQ13 closed; assumption A-EB-06 (the AO records what "
      "insurers and clients send by e-mail) is the current-phase process.", "Client (BDOI)", "FRS BRD-8 v1.2 "
      "issued; Conformance Register with the Deferred to Phase 2 result.", "Closed", "FRS BRD-8 v1.2"),
-    ("O-018", "17 Oct 2026", "Decision", "BRD-00", "Reinsurance deferred to Phase 2; risk participation (CRQ08) "
-     "deferred with it", "The client decided that reinsurance is deferred to Phase 2. The platform keeps its "
-     "reinsurance functions (reinsurer and reinsurance broker parties, receipts from a reinsurer, reinsurance "
-     "settlement payments) behind one permission that no BDOI group profile holds: the screens do not offer them "
-     "and the server refuses them to the BDOI roles; the super user of DEV, SIT and UAT keeps them. The Data "
-     "Migration console stays with the migration roles of the FRS and the super user and is not given to the "
-     "business personas. Risk participation on the insurer record (CRQ08) is a reinsurance and co-insurance "
-     "participation concept and is deferred with reinsurance; the co-insurance split of an invoice stays in "
-     "Operations (FR-OP-007).", "Client (BDOI)", "FRS BRD-00 v1.2 issued; gap G17 recorded as Deferred to Phase 2.",
-     "Closed", "FRS BRD-00 v1.2"),
+    ("O-018", "17 Oct 2026", "Decision", "BRD-00", "Reinsurance deferred to Phase 2; co-insurance stays in scope",
+     "The client decided that reinsurance is deferred to Phase 2. The platform keeps its reinsurance functions "
+     "(reinsurer and reinsurance broker parties, receipts from a reinsurer, reinsurance settlement payments) behind "
+     "one permission that no BDOI group profile holds: the screens do not offer them and the server refuses them to "
+     "the BDOI roles; the super user of DEV, SIT and UAT keeps them. The Data Migration console stays with the "
+     "migration roles of the FRS and the super user and is not given to the business personas. Co-insurance is not "
+     "deferred: the co-insurer parties, the co-insurance split of an invoice (FR-OP-007) and the default co-insurance "
+     "participation on the insurer (CRQ08 Risk Participation) are in scope (corrected by O-022).", "Client (BDOI)",
+     "FRS BRD-00 v1.2 issued; gap G17 recorded as Deferred to Phase 2; corrected in FRS BRD-00 v1.3.", "Closed",
+     "FRS BRD-00 v1.3"),
     ("O-019", "17 Oct 2026", "Decision", "BRD-02", "Remittance FRS in BDOI's format v1.0: its own set under "
      "BRD-02", "BDOI's FRS of Remittance is issued in BDOI's template as a set of its own under BRD-02 (folder "
      "BRD-02_Operations_Remittance), next to the Operations Cashiering set; the full document set and review "
@@ -352,6 +352,16 @@ LOG = [
      "fail, none blocked, 2 deferred. Current phase: 394 of 636 requirements conformant (61.9%), 208 partly. The "
      "Remittance and Claims FRS in BDOI's format are listed apart as not yet assessed (65 and 75 items).",
      "iorta TechNXT", "Register v1.6 issued; v1.5 superseded.", "Closed", "Conformance Register v1.6"),
+    ("O-022", "17 Oct 2026", "Decision", "BRD-00", "Co-insurance in scope; CRQ08 Risk Participation back in scope",
+     "The client confirmed that co-insurance is in scope of this build; only reinsurance is deferred to Phase 2. "
+     "Sprint 5 had deferred CRQ08 Risk Participation with reinsurance because the BRD-00 FRS described it as default "
+     "co-insurance shares on the insurer; that is reversed. Delivered: the Co-insurance / Risk Participation tab of "
+     "the insurer page (participating insurers, share %, lead insurer flag, effective dates; maker-checker and the "
+     "change log; shares of one period up to 100 %), used as the default co-insurance split of an invoice booked "
+     "without one when the authorized shares in force total 100 % (FR-OP-007). Checked: the switch-off of the "
+     "reinsurance functions hides only reinsurer and reinsurance-broker items; the co-insurer party type and the "
+     "co-insurance functions stay open to the BDOI roles.", "Client (BDOI)", "FRS BRD-00 v1.3 issued; O-018 "
+     "corrected; gaps G08 and G17 restated.", "Closed", "FRS BRD-00 v1.3"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.IncentiveCriteria;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerBankAccount;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerBranch;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerContact;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerParticipation;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.MotorLimit;
 import com.iortatechnxt.brokerverse.catalog.domain.OtherCharge;
@@ -60,6 +61,9 @@ public enum CatalogKind {
   INSURER_BRANCH(InsurerBranch.class, "Insurer branch", Screens.INSURERS, Area.MASTER),
   /** Contact person of an insurer (G08). */
   INSURER_CONTACT(InsurerContact.class, "Insurer contact", Screens.INSURERS, Area.MASTER),
+  /** Participating insurer of an insurer's default co-insurance arrangement (CRQ08). */
+  INSURER_PARTICIPATION(
+      InsurerParticipation.class, "Co-insurance participation", Screens.INSURERS, Area.MASTER),
   /** Bank account of an insurer (G08). */
   INSURER_BANK_ACCOUNT(
       InsurerBankAccount.class, "Insurer bank account", Screens.INSURERS, Area.MASTER),

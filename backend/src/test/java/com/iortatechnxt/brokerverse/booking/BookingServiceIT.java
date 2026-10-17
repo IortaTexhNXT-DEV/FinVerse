@@ -27,6 +27,13 @@ import com.iortatechnxt.brokerverse.booking.service.BookingService;
 import com.iortatechnxt.brokerverse.booking.service.BookingSettings;
 import com.iortatechnxt.brokerverse.booking.service.InvoiceBooked;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceRegister;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerParticipation;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerParticipation.ParticipationDetails;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogKind;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogRecords;
+import com.iortatechnxt.brokerverse.catalog.service.CoinsuranceService;
+import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.subledger.domain.ItemDirection;
 import com.iortatechnxt.brokerverse.support.AsUser;
@@ -57,6 +64,9 @@ class BookingServiceIT {
   @Autowired private SystemParameterService parameters;
   @Autowired private JdbcTemplate jdbc;
   @Autowired private AsUser as;
+  @Autowired private InsurerService insurers;
+  @Autowired private CoinsuranceService coinsurance;
+  @Autowired private CatalogRecords records;
 
   private BookedInvoice book(String arn, BookingOptions options) {
     return as.run("proc", () -> booking.book(arn, options, BookingSource.INDIVIDUAL));
@@ -274,6 +284,41 @@ class BookingServiceIT {
         .isEqualTo("BOOKING_DATE_FUTURE");
     assertThatThrownBy(() -> booking.requireBookable("ARN-1900-000000"))
         .hasMessageContaining("ARN-1900-000000");
+  }
+
+  @Test
+  void theInsurersDefaultCoInsuranceArrangementSplitsAnInvoiceBookedWithoutShares() {
+    Account account = fx.motor();
+    InsurerProfile mgic = insurers.requireInsurer(account.getCompanyId(), "INS-MGIC");
+    LocalDate on = BookingFixtures.BOOKED_ON;
+    List<InsurerParticipation> arrangement =
+        as.run(
+            "badmin",
+            () ->
+                List.of(
+                    coinsurance.add(
+                        mgic.getId(),
+                        new ParticipationDetails("INS-MGIC", new BigDecimal("70"), true, on, on)),
+                    coinsurance.add(
+                        mgic.getId(),
+                        new ParticipationDetails("INS-LAC", new BigDecimal("30"), false, on, on))));
+    try {
+      arrangement.forEach(
+          p ->
+              as.run(
+                  "approver",
+                  () -> records.authorize(CatalogKind.INSURER_PARTICIPATION, p.getId())));
+      BookedInvoice invoice = book(account.getArn(), BookingOptions.of(on, null));
+      assertThat(register.forInvoice(queries.get(invoice.getId()).getInvoiceNo()))
+          .extracting(ServiceInvoice::getRecipientCode)
+          .containsExactly("INS-MGIC", "INS-LAC");
+    } finally {
+      arrangement.forEach(
+          p ->
+              jdbc.update(
+                  "update cat_insurer_participation set record_status = 'INACTIVE' where id = ?",
+                  p.getId()));
+    }
   }
 
   @Test

@@ -9,8 +9,8 @@ iNXT BrokerVerse OOTB platform), "o" orange (change request), "b" blue (best pra
 
 from __future__ import annotations
 
-VERSION = "1.6"
-WB_VERSION = "1.3"
+VERSION = "1.7"
+WB_VERSION = "1.4"
 DATE = "17 Oct 2026"
 DATE_US = "10/17/2026"
 AUTHOR = "iorta TechNXT Project Team (drafting support); for review by the BDOI Product Owner"
@@ -64,6 +64,12 @@ REVISIONS.append(
      "Administration with the changes of every master record, filtered by record type, dates, maker and checker, "
      "within the reader's data access, and exported to Excel; the change history of a record outside the reader's "
      "data access is not shown (FRPM.021.03, gap G05).", AUTHOR))
+REVISIONS.append(
+    ("17 Oct 2026", "1.7", "Insurer page: Co-insurance / Risk Participation tab (BRD-00 CRQ08, client decision of "
+     "17-Oct-2026: co-insurance is in scope, only reinsurance is deferred): the participating insurers of the "
+     "insurer's default co-insurance arrangement with share %, lead insurer flag and effective dates, maker-checker "
+     "with the change log; the authorized shares in force, when they total 100 %, are the default co-insurance split "
+     "of an invoice booked without one (FRPM.023.03).", AUTHOR))
 REVISION_COMPANION = [
     (DATE, "1.4", "First issue as a separate document of the Product Maintenance set (taken out of the annexes of the "
      "FRS v1.3 and aligned with the system delivered). Numbered 1.4 to match the FRS.", AUTHOR),
@@ -72,6 +78,8 @@ REVISION_COMPANION = [
      "product record. Numbered 1.5 to match the FRS.", AUTHOR),
     ("17 Oct 2026", "1.6", "Ledger Accounts tab on the Insurer Record (SCR-PM-18); the Master Data Change Log "
      "screen. Numbered 1.6 to match the FRS.", AUTHOR),
+    ("17 Oct 2026", "1.7", "Co-insurance / Risk Participation tab on the Insurer Record (SCR-PM-18). Numbered 1.7 to "
+     "match the FRS.", AUTHOR),
 ]
 
 # ================================================================================================ shared facts
@@ -485,6 +493,14 @@ FRUM = [
             "balance) and its sub-ledger open items (amount, settled, outstanding). Each addition or change of the "
             "profile, a contact or a bank account is saved for authorization by another user.", "BR-PM-01",
             "An account number already recorded for the insurer is refused.", "g"),
+         _r("FRPM.023.03", "The Co-insurance / Risk Participation tab of the insurer page holds the insurer's "
+            "default co-insurance arrangement: each participating insurer with its share %, the lead insurer flag "
+            "and the effective dates. Each addition or change is saved for authorization by another user and is "
+            "recorded in the change log. Booking uses the authorized shares in force on the booking date as the "
+            "co-insurance split of an invoice when the user enters none (FR-OP-007).", "BR-PM-01 (BRD-00 CRQ08)",
+            "The shares of one period cannot exceed 100 %; a participating insurer appears once per period; only "
+            "one participant leads; an arrangement whose authorized shares in force do not total 100 % or do not "
+            "include the insurer itself is not used.", "k"),
      ]},
     {"id": "FRPM.024", "component": "Package Version", "capability": "Package versions and latest approved rate "
      "scheme", "status": "Kept", "brd": "BRPM.007", "was": "Same", "reqs": [

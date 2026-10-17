@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.booking.domain.InvoiceFlags;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.PremiumComponents;
 import com.iortatechnxt.brokerverse.booking.service.BookingRuleService.RuleFacts;
+import com.iortatechnxt.brokerverse.catalog.service.CoinsuranceService;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService.SalesAssignment;
@@ -53,6 +54,7 @@ public class InvoiceBuilder {
   private final SalesOrganisationService salesOrganisation;
   private final InsurerService insurers;
   private final DimensionService dimensions;
+  private final CoinsuranceService coinsurance;
 
   /**
    * Creates the builder.
@@ -62,13 +64,16 @@ public class InvoiceBuilder {
    * @param salesOrganisation default cost center of the account officer
    * @param insurers insurer panel
    * @param dimensions cost center validation
+   * @param coinsurance default co-insurance split of the insurer (CRQ08, FR-OP-007)
    */
   public InvoiceBuilder(
       BookingSettings settings,
       BookingRuleService rules,
       SalesOrganisationService salesOrganisation,
       InsurerService insurers,
-      DimensionService dimensions) {
+      DimensionService dimensions,
+      CoinsuranceService coinsurance) {
+    this.coinsurance = coinsurance;
     this.settings = settings;
     this.rules = rules;
     this.salesOrganisation = salesOrganisation;
@@ -102,7 +107,7 @@ public class InvoiceBuilder {
     CommissionTerms commission =
         CommissionTerms.of(
             p.commissionRate(), p.commission(), p.vatOnCommission(), settings.wtaxRate());
-    List<InsurerShare> shares = shares(account, options.shares());
+    List<InsurerShare> shares = shares(account, options.shares(), bookingDate);
     Long branchId = settings.branch(account.getCompanyId()).id();
     boolean cwt2 =
         options.cwt2Percent() != null
@@ -239,9 +244,13 @@ public class InvoiceBuilder {
     return center;
   }
 
-  private List<InsurerShare> shares(Account account, List<InsurerShare> requested) {
+  private List<InsurerShare> shares(
+      Account account, List<InsurerShare> requested, LocalDate bookingDate) {
     if (requested.isEmpty()) {
-      return List.of(new InsurerShare(account.getInsurerCode(), HUNDRED));
+      return coinsurance
+          .defaultShares(account.getCompanyId(), account.getInsurerCode(), bookingDate)
+          .map(d -> d.stream().map(s -> new InsurerShare(s.insurerCode(), s.sharePct())).toList())
+          .orElseGet(() -> List.of(new InsurerShare(account.getInsurerCode(), HUNDRED)));
     }
     Set<String> seen = new HashSet<>();
     BigDecimal total = BigDecimal.ZERO;

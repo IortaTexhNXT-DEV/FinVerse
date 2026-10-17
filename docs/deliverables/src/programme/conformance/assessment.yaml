@@ -498,9 +498,12 @@ gaps:
       maker-checker masters authorized from the approval inbox, and a change of the remittance details sends the
       insurer back for authorization. The automated checks of the insurer page pass. Delivered in the release of
       17-Oct-2026: the read-only Ledger Accounts tab with the general ledger accounts posted for the insurer and its
-      sub-ledger open items. Risk Participation (CRQ08) is a reinsurance and co-insurance participation concept: it
-      is deferred to Phase 2 with reinsurance (client decision of 17-Oct-2026); the co-insurance split of an invoice
-      by insurer share stays in Operations (FR-OP-007).
+      sub-ledger open items. Delivered in Sprint 6 (client decision of 17-Oct-2026: co-insurance is in scope, only
+      reinsurance is deferred): the Co-insurance / Risk Participation tab (CRQ08) with the participating insurers,
+      share %, lead insurer flag and effective dates under maker-checker and the change log; shares of one period
+      cannot exceed 100 %, and the authorized shares in force, when they total 100 %, are the default co-insurance
+      split of an invoice booked without one (FR-OP-007). The automated checks of the co-insurance participation
+      pass.
   - id: G09
     brd: BRD-00
     frs: [FR-CR-081]
@@ -626,13 +629,15 @@ gaps:
       Rule checked: BRCLXN.058 asks for a statement of account per applicable billing cycle and sets no earliest date; FRS FR-CL-060 bills a single cycle from its plan (alternate flow) and limits only the billing run to the cycles due in its period, and gives Generate SOA to the Operations billing user (CLX_SOA_ISSUE, CLR-CL-32), not to the Collection Handler. The platform already offers Generate SOA on a cycle not yet due to that user; the walkthrough had signed in as the Collection Handler. The walkthrough now performs D.2 to D.4 as the Cashiering Team Leader and the rule is recorded as FR-CL-060 R6. Run again: SOA-2026-000004 of cycle 1 (due 01-Nov-2026, Not Due) generated and sent; D.1 to D.4 pass.
   - id: G17
     brd: BRD-00
-    frs_text: "Capability 15 Reinsurance (CORE-15.01 to 15.10, ReInsurance BRD); risk participation on the insurer (CRQ08)"
-    gap: Reinsurance is not part of the current phase.
+    frs_text: "Capability 15 Reinsurance (CORE-15.01 to 15.10, ReInsurance BRD)"
+    gap: Reinsurance is not part of the current phase. Co-insurance is not part of this gap.
     decision: Reinsurance deferred to Phase 2 by the client decision of 17-Oct-2026
     impact: No requirement of the current FRSs is affected; the umbrella BRD already places capability 15 in Phase 2.
       The reinsurance functions of the platform (reinsurer and reinsurance broker parties, receipts from a reinsurer,
       reinsurance settlement payments) are hidden from every BDOI group profile and refused by the server; the super
-      user of DEV, SIT and UAT keeps them.
+      user of DEV, SIT and UAT keeps them. Co-insurance stays in the current phase and open to the BDOI roles: the
+      co-insurer parties, the co-insurance split of an invoice (FR-OP-007) and the default co-insurance participation
+      on the insurer (CRQ08, FR-CR-061, gap G08).
     proposal: >-
       Deliver the reinsurance broking of the ReInsurance BRD in Phase 2 on what the platform keeps (party types, placement slip
       and SOA templates, open-item matching, accounting events); grant its permission to the BDOI roles then.
@@ -641,7 +646,8 @@ gaps:
     closed: >-
       Client decision of 17-Oct-2026. The reinsurance functions are held through one permission that no BDOI group
       profile holds; the automated checks of the Phase 2 functions pass (the super user keeps them, every BDOI profile
-      is refused). CRQ08 (risk participation) closed as deferred with reinsurance.
+      is refused). Corrected the same day: CRQ08 (risk participation) was first recorded as deferred with reinsurance;
+      it is the default co-insurance participation on the insurer and is delivered in the current phase (G08).
 frs_corrections:
   - id: C01
     brd: BRD-07

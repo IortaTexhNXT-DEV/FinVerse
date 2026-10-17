@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-00
 name: Core Replacement
 doc_id: BIBS-FRS-BRD-00
-version: "1.2"
+version: "1.3"
 date: 17 October 2026
 status: Issued for BDOI review
 header_title: FRS BRD-00 Core Replacement
-output: FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.2.docx
+output: FRS/BIBS_FRS_BRD-00_Core_Replacement_v1.3.docx
 control:
   - version: "0.9"
     date: 26 Sep 2026
@@ -38,6 +38,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: "Client decisions of 17-Oct-2026: reinsurance and the partner portal are deferred to Phase 2; the platform's reinsurance functions are hidden from the BDOI roles; CRQ08 closed (risk participation deferred with reinsurance)."
+  - version: "1.3"
+    date: 17 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Product Owner (pending)
+    change: "Client decision of 17-Oct-2026 (later the same day): co-insurance is in scope of this build and only reinsurance is deferred to Phase 2. CRQ08 Risk Participation is back in scope as the default co-insurance participation shares on the insurer (tab Co-insurance / Risk Participation, maker-checker, change log), used as the default co-insurance split of an invoice (FR-OP-007) when none is entered. Version 1.2 had deferred it with reinsurance by mistake."
 distribution:
   - {name: "Program Manager, Business Project Services", role: Approver, organisation: BDO Unibank ESG, purpose: Review and sign-off of the umbrella scope}
   - {name: "Head, Comptrollership", role: Approver, organisation: BDOI, purpose: Review of the finance and data-management requirements}
@@ -647,10 +653,11 @@ title: Maintain insurer records in one place
 brd: [BR-171 (p.22), "Capability 17 bullet 2 (p.11)", "MILB volume (p.45)"]
 actor: Authorised user (maker, by tab owner); approver
 priority: Must have
-screens: Insurer page (Catalog > Insurers), tabs Profile, Branches and LGT, Contacts, Products and Packages, Commission Rates, Payment Terms and Remittance, Accounts
+screens: Insurer page (Catalog > Insurers), tabs Profile, Branches and LGT, Contacts, Products and Packages, Commission Rates, Payment Terms and Remittance, Co-insurance / Risk Participation, Accounts
 description:
-  - One page shows everything BIBS holds about an insurer. Profile, branches with LGT rates, commission rates and the placement channel exist today; the page adds contacts, payment terms and the remittance schedule per remittance type, risk participation is deferred to Phase 2 with reinsurance (CRQ08 closed, client decision of 17-Oct-2026), and a read-only view of the products and packages the insurer is on and of its GL and sub-ledger accounts.
+  - One page shows everything BIBS holds about an insurer. Profile, branches with LGT rates, commission rates and the placement channel exist today; the page adds contacts, payment terms and the remittance schedule per remittance type, the default co-insurance participation of the insurer (CRQ08 Risk Participation - participating insurers, share %, lead insurer flag and effective dates; the authorized shares in force must total 100 % to be used), and a read-only view of the products and packages the insurer is on and of its GL and sub-ledger accounts.
   - Changes follow the catalog maker-checker and are logged field by field (FR-CR-031).
+  - Booking uses the insurer's authorized co-insurance shares in force on the booking date as the co-insurance split of an invoice (FR-OP-007) when the user enters none; shares of one period cannot exceed 100 %, only one participant leads, and an arrangement below 100 % is not used.
 preconditions:
   - The insurer exists as a party of type Insurer.
 main_flow:
@@ -1069,7 +1076,7 @@ The umbrella BRD has requirements that no function BRD owns, or that conflict wi
 
 # Reinsurance (phase 2)
 
-Capability 15 (6 bullets, BR-153 to BR-160) and 4 more items of the capability matrix (p.28) belong to the ReInsurance BRD. That BRD is received and is **phase 2**: it is not in phase 1 and its rows are marked "Phase 2" in section 10. The client confirmed on 17-Oct-2026 that reinsurance is deferred to Phase 2. The insurer-side reinsurance module (treaties and cessions of an insurance company) is not the broker model BDOI needs and was removed from the platform. The reinsurance functions the platform keeps - reinsurer and reinsurance broker parties, receipts from a reinsurer and reinsurance settlement payments - are hidden from every BDOI role and refused to them; they are granted to the BDOI roles when Phase 2 starts. The risk participation on the insurer record (CRQ08) is a reinsurance and co-insurance participation concept and is deferred with reinsurance; the co-insurance split of an invoice by insurer share stays in Operations (FR-OP-007).
+Capability 15 (6 bullets, BR-153 to BR-160) and 4 more items of the capability matrix (p.28) belong to the ReInsurance BRD. That BRD is received and is **phase 2**: it is not in phase 1 and its rows are marked "Phase 2" in section 10. The client confirmed on 17-Oct-2026 that reinsurance is deferred to Phase 2. The insurer-side reinsurance module (treaties and cessions of an insurance company) is not the broker model BDOI needs and was removed from the platform. The reinsurance functions the platform keeps - reinsurer and reinsurance broker parties, receipts from a reinsurer and reinsurance settlement payments - are hidden from every BDOI role and refused to them; they are granted to the BDOI roles when Phase 2 starts. Co-insurance is not part of the deferral (client decision of 17-Oct-2026): the co-insurer parties, the co-insurance split of an invoice by insurer share (FR-OP-007) and the default co-insurance participation on the insurer record (CRQ08 Risk Participation, FR-CR-061) are in scope of this build and open to the BDOI roles.
 
 Phase 1 keeps these points open so that the phase 2 module can reuse them: party types for reinsurers and RI brokers; template-driven placement slips and SOAs; the report subscriptions of FR-CR-043 for SOA scheduling; open-item matching for net settlement; accounting event types added without changing existing posting rules; and a claim party model open to reinsurers.
 
@@ -1141,7 +1148,7 @@ Phase 1 keeps these points open so that the phase 2 module can reuse them: party
 | CRQ05 | Is deactivation acceptable for "delete of prospect" (BR-008)? | A-CR-03 | OPEN |
 | CRQ06 | Which figures does each role see on its home page (BR-125, 152, 160)? | FR-CR-010 | OPEN |
 | CRQ07 | Which master data is in the change log; old and new values; approver; who views it? | FR-CR-031 | OPEN |
-| CRQ08 | Meaning of risk participation, payment terms and remittance schedules on the insurer; owners and approval. Closed: payment terms and remittance schedules are on the insurer page; risk participation is deferred to Phase 2 with reinsurance (client decision of 17-Oct-2026) | FR-CR-061 | CLOSED |
+| CRQ08 | Meaning of risk participation, payment terms and remittance schedules on the insurer; owners and approval. Closed: payment terms, remittance schedules and the default co-insurance participation (Risk Participation: participating insurers, share %, lead, effective dates, total 100 %) are on the insurer page; co-insurance is in scope, only reinsurance is deferred (client decision of 17-Oct-2026) | FR-CR-061 | CLOSED |
 | CRQ09 | Is MIS field definition a fixed list per entity or user-defined fields? | FR-CR-062 | OPEN |
 | CRQ10 | List the emerging capabilities or withdraw BR-176 | CLR-CR-09 | OPEN |
 | CRQ11 | Which reports need custom layouts and schedules; formats and delivery; Word for all reports? | FR-CR-042, 043 | OPEN |

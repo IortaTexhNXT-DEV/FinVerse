@@ -3,6 +3,9 @@ import type { Authorizable, Commission, Insurer, InsurerBranch } from './catalog
 
 const insurers = '/catalog/insurers';
 
+/** VAT registration of an insurer: VAT on premium or premium tax. */
+export type InsurerTaxStatus = 'VAT_REGISTERED' | 'NON_VAT';
+
 export type RemittanceCycle = 'DAILY' | 'WEEKLY' | 'SEMI_MONTHLY' | 'MONTHLY';
 export type RemittanceMode = 'CHECK' | 'FUND_TRANSFER' | 'ONLINE_BANKING';
 
@@ -112,6 +115,37 @@ export interface InsurerAccounts {
   glAccounts: InsurerGlAccount[];
   subLedger: InsurerSubLedgerLine[];
 }
+
+/** A participating insurer of the insurer's default co-insurance arrangement (CRQ08). */
+export interface ParticipationInput {
+  participantCode: string;
+  sharePct: number;
+  lead: boolean;
+  effectiveFrom: string;
+  effectiveTo?: string | null;
+}
+
+/** A participation with its maker-checker status. */
+export interface InsurerParticipation extends ParticipationInput, Authorizable {
+  insurerId: number;
+}
+
+/** The arrangement: participations and the total of the authorized shares in force today. */
+export interface CoinsuranceArrangement {
+  participations: InsurerParticipation[];
+  totalToday: number;
+  complete: boolean;
+}
+
+/** Co-insurance / Risk Participation of an insurer (maker-checker). */
+export const coinsuranceApi = {
+  arrangement: (insurerId: number) =>
+    api.get<CoinsuranceArrangement>(`${insurers}/${String(insurerId)}/coinsurance`),
+  create: (insurerId: number, input: ParticipationInput) =>
+    api.post<InsurerParticipation>(`${insurers}/${String(insurerId)}/coinsurance`, input),
+  update: (id: number, input: ParticipationInput) =>
+    api.put<InsurerParticipation>(`${insurers}/coinsurance/${String(id)}`, input),
+};
 
 /** The general ledger and sub-ledger accounts of an insurer (read-only). */
 export const insurerAccountsApi = {

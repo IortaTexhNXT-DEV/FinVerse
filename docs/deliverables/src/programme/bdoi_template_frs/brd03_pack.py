@@ -36,12 +36,12 @@ SET = [
      "notices, e-mails and jobs.", "BDOI Business Unit owners; Internal Audit"),
     ("ICD", "ICD-BDOI", "Product_Maintenance_Interface_Specification", C.ICD_VERSION, "Product master transfer file "
      "and e-mail channel.", "BDOI IT (integration, mail)"),
-    ("DSP", "DSP-BDOI", "Product_Maintenance_Developer_Specification", "1.3", "Screens, service operations, field "
+    ("DSP", "DSP-BDOI", "Product_Maintenance_Developer_Specification", "1.4", "Screens, service operations, field "
      "validations, rules, states, jobs, audit events and permissions, as the system works.", "BDOI IT; iorta "
      "TechNXT developers and testers"),
-    ("DDI", "DDI-BDOI", "Product_Maintenance_Data_Dictionary", "1.1", "Tables, columns, lists of values, parameters, "
+    ("DDI", "DDI-BDOI", "Product_Maintenance_Data_Dictionary", "1.2", "Tables, columns, lists of values, parameters, "
      "status models and indexes.", "BDOI IT (database administration); Data Migration"),
-    ("USR", "USR-BDOI", "Product_Maintenance_User_Stories", "1.2", "User stories with acceptance criteria, ready to "
+    ("USR", "USR-BDOI", "Product_Maintenance_User_Stories", "1.3", "User stories with acceptance criteria, ready to "
      "import into the backlog tool.", "BDOI Product Owner; UAT lead"),
     ("RTM", "RTM", "Test_Cases_and_Traceability", C.WB_VERSION, "Test cases and the trace BRD, FRPM, user story, "
      "screen, test case.", "UAT lead; Internal Audit"),
@@ -82,6 +82,9 @@ DSP_REVISIONS = [
     ("17 October 2026", "1.3", "Ledger Accounts tab of the insurer page (gap G08): the general ledger accounts "
      "posted for the insurer and its sub-ledger open items, read-only. Master Data Change Log screen (gap G05) with "
      "filters and Excel export; the change history follows the reader's data access.", PREPARED),
+    ("17 October 2026", "1.4", "Co-insurance / Risk Participation tab of the insurer page (BRD-00 CRQ08): the "
+     "participations of the insurer's default co-insurance arrangement, maker-checker, and their use as the default "
+     "co-insurance split at booking.", PREPARED),
 ]
 
 DOCS = {
@@ -362,6 +365,7 @@ AUDIT_LABELS = {
     "CatalogKind.INSURER.label()": "Insurer", "CatalogKind.INSURER_BRANCH.label()": "Insurer branch",
     "CatalogKind.INSURER_CONTACT.label()": "Insurer contact",
     "CatalogKind.INSURER_BANK_ACCOUNT.label()": "Insurer bank account",
+    "CatalogKind.INSURER_PARTICIPATION.label()": "Co-insurance participation",
     "CatalogKind.OTHER_CHARGE.label()": "Other charge", "CatalogKind.PRODUCT.label()": "Product",
     "CatalogKind.RATE_SCHEME_EXCEPTION.label()": "Rate exception", "CatalogKind.SALES_OFFICER.label()":
     "Sales officer", "CatalogKind.SALES_UNIT.label()": "Sales unit", "CatalogKind.TSU_RULE.label()": "TSU rule",
@@ -398,6 +402,9 @@ TABLES = {
     "cat_insurer_branch": ("Product catalogue", "Branches of each insurer.", "150", "160"),
     "cat_insurer_contact": ("Product catalogue", "Contact persons of each insurer by role, maker-checker.", "300",
                             "330"),
+    "cat_insurer_participation": ("Product catalogue", "Default co-insurance participation of each insurer: "
+                                  "participating insurer, share %, lead flag, effective dates, maker-checker.",
+                                  "60", "80"),
     "cat_motor_limit": ("Product catalogue", "Motor liability limits and premiums.", "40", "40"),
     "cat_other_charge": ("Product catalogue", "Other charges billed with the premium (switched off by default).", "10",
                          "10"),
@@ -635,6 +642,14 @@ STORIES = [
      [("premiums payable to the insurer are posted and partly remitted", "I open its Ledger Accounts tab",
        "I see the accounts with debit, credit and balance and the open items with the outstanding amount")],
      "FRPM.023.02", "BR-PM-01", "SCR-PM-18", "Medium", 3),
+    ("US-PM-038", "EP-PM-01", "Business Administrator", "the default co-insurance participation of an insurer",
+     "an invoice booked without a co-insurance split takes the insurer's arrangement",
+     [("I add two participations of 60% (lead) and 40%", "another user authorizes them",
+       "the tab shows a complete arrangement of 100%"),
+      ("the shares of the period would exceed 100%", "I save", "it is refused"),
+      ("the arrangement is complete on the booking date", "an invoice is booked without shares",
+       "it is split 60% and 40% with the lead first")],
+     "FRPM.023.03", "BR-PM-01", "SCR-PM-18", "Medium", 5),
     ("US-PM-037", "EP-PM-07", "Auditor", "one log of the changes of every master record",
      "I can review the master data changes of a period without opening each record",
      [("insurers and products were changed in October", "I filter the Master Data Change Log on October and a "

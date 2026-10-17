@@ -2,6 +2,9 @@ package com.iortatechnxt.brokerverse.catalog.api;
 
 import com.iortatechnxt.brokerverse.catalog.api.dto.BranchRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.BranchResponse;
+import com.iortatechnxt.brokerverse.catalog.api.dto.CoinsuranceDtos.ArrangementResponse;
+import com.iortatechnxt.brokerverse.catalog.api.dto.CoinsuranceDtos.ParticipationRequest;
+import com.iortatechnxt.brokerverse.catalog.api.dto.CoinsuranceDtos.ParticipationResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.CommissionRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.CommissionResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerDetailResponse;
@@ -16,7 +19,9 @@ import com.iortatechnxt.brokerverse.catalog.domain.CommissionRate;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerBankAccount;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerBranch;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerContact;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerParticipation;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.service.CoinsuranceService;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerLedgerService;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerLedgerService.InsurerAccounts;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerPageService;
@@ -24,7 +29,10 @@ import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.RateTableService;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
 @OwnedRecord(InsurerProfile.class)
 @OwnedRecord(value = InsurerContact.class, variable = "contactId")
 @OwnedRecord(value = InsurerBankAccount.class, variable = "accountId")
+@OwnedRecord(value = InsurerParticipation.class, variable = "participationId")
 @OwnedRecord(value = InsurerBranch.class, variable = "branchId")
 @OwnedRecord(value = CommissionRate.class, variable = "rateId")
 @RestController
@@ -52,6 +61,8 @@ public class InsurerController {
   private final RateTableService rates;
   private final InsurerPageService page;
   private final InsurerLedgerService ledger;
+  private final CoinsuranceService coinsurance;
+  private final Clock clock;
 
   /**
    * Creates the controller.
@@ -60,12 +71,18 @@ public class InsurerController {
    * @param rates commission rates
    * @param page contacts, bank accounts, remittance details and linked products
    * @param ledger accounts of the insurer
+   * @param coinsurance default co-insurance participation (CRQ08)
+   * @param clock business date of the arrangement total
    */
   public InsurerController(
       InsurerService insurers,
       RateTableService rates,
       InsurerPageService page,
-      InsurerLedgerService ledger) {
+      InsurerLedgerService ledger,
+      CoinsuranceService coinsurance,
+      Clock clock) {
+    this.coinsurance = coinsurance;
+    this.clock = clock;
     this.insurers = insurers;
     this.rates = rates;
     this.page = page;
@@ -136,6 +153,51 @@ public class InsurerController {
   public InsurerResponse updateRemittance(
       @PathVariable Long id, @Valid @RequestBody RemittanceRequest request) {
     return InsurerResponse.from(page.updateRemittance(id, request.terms()));
+  }
+
+  /**
+   * The default co-insurance arrangement of the insurer (CRQ08, Risk Participation).
+   *
+   * @param id insurer profile
+   * @return participations and today's total
+   */
+  @GetMapping("/{id}/coinsurance")
+  @PreAuthorize(CatalogAccess.READ)
+  public ArrangementResponse coinsurance(@PathVariable Long id) {
+    BigDecimal total = coinsurance.totalOn(id, BusinessClock.today(clock));
+    return new ArrangementResponse(
+        coinsurance.participations(id).stream().map(ParticipationResponse::from).toList(),
+        total,
+        total.compareTo(BigDecimal.valueOf(100)) == 0);
+  }
+
+  /**
+   * Adds a participating insurer (maker; pending authorization).
+   *
+   * @param id insurer profile
+   * @param request participation
+   * @return participation
+   */
+  @PostMapping("/{id}/coinsurance")
+  @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize(CatalogAccess.MAINTAIN)
+  public ParticipationResponse addParticipation(
+      @PathVariable Long id, @Valid @RequestBody ParticipationRequest request) {
+    return ParticipationResponse.from(coinsurance.add(id, request.details()));
+  }
+
+  /**
+   * Changes a participating insurer (maker; pending authorization).
+   *
+   * @param participationId participation
+   * @param request participation
+   * @return participation
+   */
+  @PutMapping("/coinsurance/{participationId}")
+  @PreAuthorize(CatalogAccess.MAINTAIN)
+  public ParticipationResponse updateParticipation(
+      @PathVariable Long participationId, @Valid @RequestBody ParticipationRequest request) {
+    return ParticipationResponse.from(coinsurance.update(participationId, request.details()));
   }
 
   /**

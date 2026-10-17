@@ -16,11 +16,11 @@ and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
+For BRD-07 Claims (FRS v1.0) the FRS in BDOI's format and its review workbooks (business unit requirements collection, fit-gap, test cases and traceability, change request register, walkthrough users) in `../Programme/BDOI_Template_FRS/` are the only documents (decision of the BIBS Product Owner of 10-Oct-2026); the earlier sign-off set of each is withdrawn and its row below points to that folder. The signatories of such a document are on the Signoff Sheet of its FRS.
+
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
-| Claims | BRD-07 | FRS | 1.1 | [`BRD-07_Claims/BIBS_FRS_BRD-07_Claims_v1.1.docx`](BRD-07_Claims/BIBS_FRS_BRD-07_Claims_v1.1.docx) |
-| Claims | BRD-07 | Test plan summary (Word) | 1.1 | [`BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_Summary_v1.1.docx`](BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_Summary_v1.1.docx) |
-| Claims | BRD-07 | Test plan workbook (Excel) | 1.1 | [`BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_v1.1.xlsx`](BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_v1.1.xlsx) |
+| Claims | BRD-07 | FRS in BDOI's format and the review workbooks | 1.0 | [`../Programme/BDOI_Template_FRS/BRD-07_Claims/`](../Programme/BDOI_Template_FRS/BRD-07_Claims/) |
 | Employee Benefits | BRD-08 | FRS | 1.2 | [`BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.2.docx`](BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.2.docx) |
 | Employee Benefits | BRD-08 | Test plan summary (Word) | 1.1 | [`BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.1.docx`](BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.1.docx) |
 | Employee Benefits | BRD-08 | Test plan workbook (Excel) | 1.1 | [`BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.1.xlsx`](BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.1.xlsx) |

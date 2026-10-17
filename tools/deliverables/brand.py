@@ -282,6 +282,7 @@ BDOI_FRS_SETS: dict[str, dict[str, str]] = {
     "BRD-03": {"folder": "BRD-03_Product_Maintenance",
                "frs": "BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v1.2.docx", "version": "1.2"},
     "BRD-06": {"folder": "BRD-06_Renewal", "frs": "BIBS_FRS-BDOI_BRD-06_Renewal_v1.2.docx", "version": "1.2"},
+    "BRD-07": {"folder": "BRD-07_Claims", "frs": "BIBS_FRS-BDOI_BRD-07_Claims_v1.0.docx", "version": "1.0"},
     "BRD-11": {"folder": "BRD-11_User_Access_Maintenance",
                "frs": "BIBS_FRS-BDOI_BRD-11_User_Access_Maintenance_v1.4.docx", "version": "1.4"},
 }
@@ -303,7 +304,7 @@ def _current_bdoi_frs() -> None:
 
 _current_bdoi_frs()
 # The last version of the old-format set of each retired BRD (file names of the withdrawn documents).
-RETIRED_SETS = {"BRD-02": "2.1", "BRD-03": "2.1", "BRD-06": "2.0", "BRD-11": "2.1"}
+RETIRED_SETS = {"BRD-02": "2.1", "BRD-03": "2.1", "BRD-06": "2.0", "BRD-07": "1.1", "BRD-11": "2.1"}
 BDOI_FRS_KIND = "BDOI_Template_FRS"
 BDOI_FRS_LABEL = "FRS in BDOI's format and the review workbooks"
 

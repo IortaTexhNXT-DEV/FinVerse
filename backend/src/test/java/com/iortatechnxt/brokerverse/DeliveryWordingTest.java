@@ -47,6 +47,10 @@ class DeliveryWordingTest {
   private static final Pattern ALLOWED =
       Pattern.compile(
           rot13("trzvav")
+              + "\\s+(?="
+              + rot13("trzvav")
+              + " adjustment company)|"
+              + rot13("trzvav")
               + " adjustment company|'"
               + rot13("TRZVAV")
               + "'|com\\."

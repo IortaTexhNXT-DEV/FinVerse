@@ -32,9 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Claims Setup of wave CL1-B (BRCLM.010/012/014, FR-CM-040/041/043): status and settlement type
- * attributes and matrix rows take effect only after another user authorizes them; the phase, the
- * follow-up days and the outcome are validated; the handler register gives the unit.
+ * Claims Setup of wave CL1-B (BRCLM.010/012/014, FR-CM-040/041/043; FR-CM-043 in full: the ten
+ * settlement types of the BRD with their outcome, and an outcome changed without a release): status
+ * and settlement type attributes and matrix rows take effect only after another user authorizes
+ * them; the phase, the follow-up days and the outcome are validated; the handler register gives the
+ * unit.
  */
 @IntegrationTest
 class ClaimsSetupIT {

@@ -46,7 +46,9 @@ import org.springframework.security.access.AccessDeniedException;
 
 /**
  * Customer Search, Servicing View, documents and resends of the Customer Servicing Facility
- * (FR-CSF-010 to 013, 030 to 033, 042; test plan TC-CSF-010 to 013, 030 to 033).
+ * (FR-CSF-010 to 013, 030 to 033, 042; test plan TC-CSF-010 to 013, 030 to 033). The e-policy
+ * resend shows FR-CSF-031 in full: a confirmed e-policy is resent through the dispatch service
+ * (counted in the dispatch report) and an account without one offers no resend.
  */
 @IntegrationTest
 class CsfServicingIT {

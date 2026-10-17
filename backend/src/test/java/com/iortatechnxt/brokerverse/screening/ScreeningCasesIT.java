@@ -50,7 +50,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * KYC form and submits (validated and routed), the unit head concurs, Compliance returns it for
  * rework and escalates it to the AML Committee after the resubmission, the committee approves an
  * STR by majority, the STR is prepared, completed and marked ready, extracted with the STR layout
- * and filed with its AMLC reference, which closes the case.
+ * and filed with its AMLC reference, which closes the case. Requirements: FR-SS-040 (the case is
+ * read-only to the Investigator after submission; the timeline lists every transition with its user
+ * and time), FR-SS-051 (a submitted case goes to the approver of its route), FR-SS-052 (KYC form
+ * named by the pattern), FR-SS-060 (a case without the required KYC document is refused and logged
+ * VALIDATION_FAILED; a valid case is logged VALIDATED and routed) and FR-SS-072 (the AMLC reference
+ * closes the case and the STR is FILED).
  */
 @IntegrationTest
 class ScreeningCasesIT {
@@ -262,6 +267,12 @@ class ScreeningCasesIT {
             CaseEventType.STR_READY,
             CaseEventType.STR_EXTRACTED,
             CaseEventType.FILED);
+    assertThat(timeline.of(c.getId()))
+        .allSatisfy(
+            e -> {
+              assertThat(e.getActor()).isNotBlank();
+              assertThat(e.getOccurredAt()).isNotNull();
+            });
   }
 
   private void vote(String member, ScreeningCase c) {

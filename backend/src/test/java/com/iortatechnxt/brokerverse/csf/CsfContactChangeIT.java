@@ -32,7 +32,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Caller verification, contact changes, refusals and referrals, and the legacy write-back of the
- * Customer Servicing Facility (FR-CSF-020, 021, 022, 040; test plan TC-CSF-020 to 022, 040).
+ * Customer Servicing Facility (FR-CSF-020, FR-CSF-021, FR-CSF-022, FR-CSF-040; test plan TC-CSF-020
+ * to 022, 040).
  */
 @IntegrationTest
 class CsfContactChangeIT {

@@ -28,7 +28,8 @@ import org.springframework.test.context.event.RecordApplicationEvents;
  * The status engine of wave CL1-B (BRCLM.005/010-015/019-021/027/035;
  * FR-CM-041/042/044/045/050/051): the status access matrix, phases and the workflow stage,
  * temporary and permanent closure, reopen, follow-up and action plan, the history and the {@code
- * ClaimStatusChanged} events.
+ * ClaimStatusChanged} events. FR-CM-042 in full: a status change resets the age of the stage and
+ * keeps the age overall, and the history shows the days spent in each earlier status.
  */
 @IntegrationTest
 @RecordApplicationEvents

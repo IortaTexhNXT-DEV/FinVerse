@@ -51,10 +51,13 @@ datasets:
   - {code: DIM_VALUE, name: Cost centres and business lines, group: ORGANISATION, module: dimension, table: dim_value, key: [company_id, dimension_type, code]}
   - {code: CAT_SALES_UNIT, name: Sales units, group: ORGANISATION, module: catalog, table: cat_sales_unit, key: [company_id, code], userColumns: [head_username]}
   - {code: CAT_SALES_OFFICER, name: Account officers of the sales units, group: USERS, module: catalog, table: cat_sales_officer, key: [company_id, username], users: true}
+  - {code: CSF_FULFILMENT_MEMBER, name: Members of the customer service fulfilment units, group: USERS, module: csf, table: csf_fulfilment_member, key: [unit_code, username], userColumns: [username], users: true}
 
   # ---------- Lists of values, parameters and switches ---------------------------------------------
   - {code: LOV_TYPE, name: Lists of values, group: REFERENCE, module: lov, table: lov_type, key: [code]}
   - {code: LOV_VALUE, name: Values of the lists, group: REFERENCE, module: lov, table: lov_value, key: [type_code, code]}
+  - {code: CSF_CASE_TYPE_SETTING, name: Turnaround times of the customer service case types, group: REFERENCE, module: csf, table: csf_case_type_setting, key: [case_type]}
+  - {code: CSF_CASE_ROUTING, name: Customer service case routing, group: REFERENCE, module: csf, table: csf_case_routing, key: [case_type, market_segment, nature]}
   - code: SYS_PARAMETER
     name: System parameters and numbering prefixes
     group: REFERENCE
@@ -404,7 +407,7 @@ excluded:
      pm_terms_option, pm_terms_setting, pm_final_term, pm_proposal_file, pm_client_response,
      pm_placement_report]
   CLIENT_DATA:
-    [crm_client, crm_client_instruction, crm_client_payout_account, crm_client_tag, crm_kyc_document,
+    [crm_client, crm_client_instruction, csf_case, csf_case_note, crm_client_payout_account, crm_client_tag, crm_kyc_document,
      csf_contact_change, csf_contact_change_field, csf_sync_outbox, csf_verification,
      cat_insurer_bank_account, cat_insurer_contact,
      csf_verification_check, dsb_payee, dsb_payee_account, dsb_payee_request, eb_member,

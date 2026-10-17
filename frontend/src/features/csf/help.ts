@@ -38,6 +38,32 @@ export const CSF_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Cases',
+      path: '/csf/cases',
+      summary:
+        'The work queues of the cases: My Cases, Returned to Me, CSR Action Required, the Team Queue of the supervisors, the Fulfilment Unit Queue, All Open and Closed, with the status, due date and SLA indicator of each case.',
+      workflow: [
+        'Log Case: on the Servicing View of a client, or here for a caller who is not a client; choose the channel, case type, nature of transaction, product type, market segment and fulfilment unit, then Submit to Fulfilment Unit or Resolve and Close.',
+        'Open a case to add notes and documents; the fulfilment unit resolves and closes it, returns it to the agent or asks the agent to act with the client.',
+        'The supervisor reassigns, escalates, changes the category or closes an open case; a closed case gives a linked follow-up case.',
+      ],
+      controls: [
+        'The due date counts the turnaround time of the case type in working days from the creation of the case.',
+        'A second open case for the same client, account and nature of transaction is refused.',
+        'Every action is in the History tab of the case and the audit trail.',
+      ],
+    },
+    {
+      name: 'Case Dashboard',
+      path: '/csf/case-dashboard',
+      summary:
+        'Case volume, ageing, SLA compliance rate, breached and approaching cases and the distribution of the cases, from the same cases as the case reports.',
+      workflow: ['Set the period and the filters; open a case from the list of open cases.'],
+      controls: [
+        'The Case Register, Case Ageing and SLA and Case Summary reports give the same figures in PDF, Excel and CSV.',
+      ],
+    },
+    {
       name: 'Contact Changes',
       path: '/csf/changes',
       summary:

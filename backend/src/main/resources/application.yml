@@ -525,6 +525,8 @@ brokerverse:
     # Customer Servicing Facility (BRD-9): contact changes to the legacy systems (FR-CSF-022); manual
     # ("-") until CSF_LEGACY_SYNC_ENABLED is on, then every 15 minutes (0 */15 * * * *).
     csf-legacy-sync-cron: ${BROKERVERSE_JOB_CSF_LEGACY_SYNC_CRON:-}
+    # Case SLA check of the contact centre cases (FR-CSF-057), every 15 minutes.
+    csf-case-sla-cron: ${BROKERVERSE_JOB_CSF_CASE_SLA_CRON:0 */15 * * * *}
 
 management:
   # Separate port of the health probes and the Prometheus metrics (BROKERVERSE_MANAGEMENT_PORT, e.g.

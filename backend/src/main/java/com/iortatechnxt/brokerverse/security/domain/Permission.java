@@ -508,6 +508,17 @@ public enum Permission {
   CSF_DOCUMENT_UPLOAD,
   // Contact Changes and Agent Activity reports (BRCSF-011, usage requirements)
   CSF_REPORT_VIEW,
+  // Case management (CSF addendum BRCSFCM.001-012; FRS BRD-9 FR-CSF-050 to 061). Log a case, add
+  // notes and documents, re-endorse and close own cases, create a follow-up case
+  CSF_CASE_CREATE,
+  // Reassign, escalate, change the category and close any open case
+  CSF_CASE_SUPERVISE,
+  // Resolve, return or request CSR action on the cases of the user's fulfilment units
+  CSF_CASE_FULFIL,
+  // Case dashboard and case reports
+  CSF_CASE_REPORT,
+  // Case routing table and turnaround times of the case types
+  CSF_CASE_ROUTING,
 
   // Configuration Promotion (V1320, docs/modules/CONFIG_PROMOTION.md): export packages; prepare an
   // import (upload, check, dry run, submit); approve and apply it (a second user, never the one who

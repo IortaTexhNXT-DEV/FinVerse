@@ -137,6 +137,8 @@ class PersonaMenusIT {
           Map.entry("/submitted/no-touch", "/api/v1/submitted/no-touch?companyId={c}"),
           Map.entry("/submitted/setup", "/api/v1/submitted/setup/rule-sets?companyId={c}"),
           Map.entry("/csf", "/api/v1/csf/search?companyId={c}&keyType=NAME&q=Santos"),
+          Map.entry("/csf/cases", "/api/v1/csf/cases?companyId={c}"),
+          Map.entry("/csf/case-dashboard", "/api/v1/csf/cases/dashboard?companyId={c}"),
           Map.entry("/csf/changes", "/api/v1/csf/contact-changes?companyId={c}"),
           Map.entry("/csf/reports", "/api/v1/reports"));
 
@@ -156,7 +158,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(51);
+    assertThat(personas).hasSize(52);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));

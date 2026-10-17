@@ -996,7 +996,7 @@
     },
     {
       "id": "BRD-9",
-      "description": "Customer Servicing Facility (V1040 roles and grants; V1940 seed users)",
+      "description": "Customer Servicing Facility (V1040 and V2907 roles and grants; V1940 and V2908 seed users)",
       "sections": ["csf"],
       "sharedGroups": ["home", "client-policy", "reports"],
       "sharedModules": ["help", "admin", "user-access"],
@@ -1005,17 +1005,21 @@
           "seedUser": "csfagent",
           "permissions": [
             "ATTACHMENT_VIEW",
+            "CSF_CASE_CREATE",
             "CSF_CONTACT_UPDATE",
             "CSF_DOCUMENT_UPLOAD",
             "CSF_RESEND",
             "CSF_VIEW"
           ],
-          "screens": ["/csf", "/csf/changes"]
+          "screens": ["/csf", "/csf/cases", "/csf/changes"]
         },
         "CSF_SUPERVISOR": {
           "seedUser": "csfsup",
           "permissions": [
             "ATTACHMENT_VIEW",
+            "CSF_CASE_CREATE",
+            "CSF_CASE_REPORT",
+            "CSF_CASE_SUPERVISE",
             "CSF_CONTACT_UPDATE",
             "CSF_DOCUMENT_UPLOAD",
             "CSF_REPORT_VIEW",
@@ -1024,12 +1028,23 @@
             "CSF_VIEW",
             "REPORT_VIEW"
           ],
-          "screens": ["/csf", "/csf/changes", "/csf/reports"]
+          "screens": ["/csf", "/csf/cases", "/csf/case-dashboard", "/csf/changes", "/csf/reports"]
         },
         "CSF_MANAGEMENT": {
           "seedUser": "csfmgmt",
-          "permissions": ["AUDIT_VIEW", "CSF_REPORT_VIEW", "CSF_VIEW", "REPORT_VIEW"],
-          "screens": ["/csf", "/csf/changes", "/csf/reports"]
+          "permissions": [
+            "AUDIT_VIEW",
+            "CSF_CASE_REPORT",
+            "CSF_REPORT_VIEW",
+            "CSF_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": ["/csf", "/csf/cases", "/csf/case-dashboard", "/csf/changes", "/csf/reports"]
+        },
+        "CSF_FULFILMENT": {
+          "seedUser": "csffu",
+          "permissions": ["ATTACHMENT_VIEW", "CSF_CASE_FULFIL"],
+          "screens": ["/csf/cases"]
         }
       }
     }

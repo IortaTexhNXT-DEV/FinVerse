@@ -1,8 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { Forward, PhoneCall } from 'lucide-react';
+import { ClipboardPlus, Forward, PhoneCall } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { csfApi } from '@/api/csf';
+import { csfCaseApi } from '@/api/csfCases';
+import { Card } from '@/components/ui/Card';
+import { DataTable } from '@/components/ui/DataTable';
 import type { ClientSummary } from '@/api/csf';
 import { useAuth } from '@/auth/authContext';
 import { LovLabel } from '@/components/broking/LovLabel';
@@ -18,6 +21,8 @@ import { useTabParam } from '@/components/ui/useTabParam';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { CSF_SECTION } from '../csfCodes';
+import { CASE_COLUMNS } from '../cases/caseColumns';
+import { LogCaseDialog } from '../cases/LogCaseDialog';
 import { ReferralDialog } from '../dialogs/ReferralDialog';
 import { UpdateContactDialog } from '../dialogs/UpdateContactDialog';
 import { AccountsTab } from './AccountsTab';
@@ -34,6 +39,7 @@ const TABS = [
   { id: 'epolicies', label: 'E-policies' },
   { id: 'documents', label: 'Documents' },
   { id: 'history', label: 'Contact History' },
+  { id: 'cases', label: 'Cases' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -78,15 +84,77 @@ function TabBody({
       );
     case 'history':
       return <HistoryTab companyId={companyId} clientId={summary.id} />;
+    case 'cases':
+      return <CasesTab companyId={companyId} clientId={summary.id} />;
     default:
       return <AccountsTab companyId={companyId} clientId={summary.id} />;
   }
 }
 
+type DialogId = 'contact' | 'referral' | 'case';
+
+function ServicingActions({
+  mayLog,
+  mayChange,
+  onOpen,
+}: Readonly<{ mayLog: boolean; mayChange: boolean; onOpen: (d: DialogId) => void }>) {
+  return (
+    <>
+      {mayLog && (
+        <Button
+          variant="secondary"
+          icon={<ClipboardPlus size={16} aria-hidden="true" />}
+          onClick={() => onOpen('case')}
+        >
+          Log Case
+        </Button>
+      )}
+      {mayChange && (
+        <>
+          <Button
+            variant="secondary"
+            icon={<Forward size={16} aria-hidden="true" />}
+            onClick={() => onOpen('referral')}
+          >
+            Refer to Fulfilment Unit
+          </Button>
+          <Button
+            variant="accent"
+            icon={<PhoneCall size={16} aria-hidden="true" />}
+            onClick={() => onOpen('contact')}
+          >
+            Update Contact
+          </Button>
+        </>
+      )}
+    </>
+  );
+}
+
+function CasesTab({ companyId, clientId }: Readonly<{ companyId: number; clientId: number }>) {
+  const cases = useQuery({
+    queryKey: ['csf-cases', 'client', companyId, clientId],
+    queryFn: () => csfCaseApi.ofClient(companyId, clientId),
+  });
+  return (
+    <Card flush>
+      <DataTable
+        columns={CASE_COLUMNS}
+        rows={cases.data ?? []}
+        rowKey={(c) => c.id}
+        loading={cases.isLoading}
+        emptyMessage="No cases for this client"
+        caption="Cases of the client"
+      />
+    </Card>
+  );
+}
+
 /**
  * Servicing View (FR-CSF-011 to 013, 020 to 022, 030 to 033; BRCSF-002, 005, 008, 009): the client
  * summary with the contact details and the actions Update Contact and Refer to Fulfilment Unit,
- * then the tabs Accounts, Payments, Renewal Advice, E-policies, Documents and Contact History,
+ * Log Case (FR-CSF-050), then the tabs Accounts, Payments, Renewal Advice, E-policies, Documents,
+ * Contact History and Cases,
  * each loaded on its own so one source that does not answer leaves the others working.
  */
 export default function ServicingViewPage() {
@@ -98,14 +166,13 @@ export default function ServicingViewPage() {
     TABS.map((t) => t.id),
     'accounts',
   );
-  const [dialog, setDialog] = useState<'contact' | 'referral' | null>(null);
+  const [dialog, setDialog] = useState<DialogId | null>(null);
   const summary = useQuery({
     queryKey: ['csf', 'summary', companyId, id],
     queryFn: () => csfApi.summary(companyId, id),
     enabled: Number.isFinite(id),
   });
   const s = summary.data;
-  const mayChange = can('CSF_CONTACT_UPDATE');
   return (
     <div className="stack">
       <PageHeader
@@ -114,24 +181,12 @@ export default function ServicingViewPage() {
         title={s ? s.name : 'Servicing View'}
         description={s ? `Client ${s.code}` : undefined}
         actions={
-          s &&
-          mayChange && (
-            <>
-              <Button
-                variant="secondary"
-                icon={<Forward size={16} aria-hidden="true" />}
-                onClick={() => setDialog('referral')}
-              >
-                Refer to Fulfilment Unit
-              </Button>
-              <Button
-                variant="accent"
-                icon={<PhoneCall size={16} aria-hidden="true" />}
-                onClick={() => setDialog('contact')}
-              >
-                Update Contact
-              </Button>
-            </>
+          s && (
+            <ServicingActions
+              mayLog={can('CSF_CASE_CREATE')}
+              mayChange={can('CSF_CONTACT_UPDATE')}
+              onOpen={setDialog}
+            />
           )
         }
       />
@@ -190,6 +245,13 @@ export default function ServicingViewPage() {
               clientName={s.name}
               contact={s.contact}
               verification={s.verification}
+              onClose={() => setDialog(null)}
+            />
+          )}
+          {dialog === 'case' && (
+            <LogCaseDialog
+              companyId={companyId}
+              client={{ id: s.id, name: s.name }}
               onClose={() => setDialog(null)}
             />
           )}

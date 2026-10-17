@@ -78,18 +78,18 @@ BRD-09:
   P1.9: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [E-policies]]]}
   P1.10: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Documents]]]}
   P1.11: {checks: [[/csf/changes, null, []], [/csf/reports, null, []], [/admin/audit, null, []]]}
-  P2.1: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Log Case]]], gap: CSF-CASES}
-  P2.2: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Log Case]]], gap: CSF-CASES}
-  P2.3: {gap: CSF-CASES}
-  P2.4: {gap: CSF-CASES}
-  P2.5: {gap: CSF-CASES}
-  P2.6: {gap: CSF-CASES}
-  P2.7: {gap: CSF-CASES}
-  P2.8: {gap: CSF-CASES}
-  P2.9: {gap: CSF-CASES}
-  P2.10: {gap: CSF-CASES}
-  P2.11: {gap: CSF-CASES}
-  P2.12: {gap: CSF-CASES}
+  P2.1: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Log Case, Cases]]]}
+  P2.2: {checks: [[/csf/clients/:clientId, "/csf?q=Santos", [Log Case]], [/csf/cases, null, [My Cases, Closed]]]}
+  P2.3: {checks: [[/csf/cases, null, [Fulfilment Unit Queue]], [/notifications, null, []]], user: csffu}
+  P2.4: {checks: [[/csf/cases/:id, "/csf/cases?queue=UNIT", [Resolve and Close]]], user: csffu}
+  P2.5: {checks: [[/csf/cases/:id, "/csf/cases?queue=UNIT", [Return to Agent, Request CSR Action]]], user: csffu}
+  P2.6: {checks: [[/csf/cases/:id, "/csf/cases?queue=RETURNED", [Notes, Documents, Re-endorse to Fulfilment Unit, Close Case]]]}
+  P2.7: {checks: [[/csf/cases, null, [Team Queue]], [/csf/cases/:id, "/csf/cases?queue=TEAM", [Reassign, Escalated]]]}
+  P2.8: {checks: [[/csf/case-dashboard, null, [Approaching breach, Breached]], [/notifications, null, []]]}
+  P2.9: {checks: [[/csf/cases/:id, "/csf/cases?queue=CLOSED", [Create Follow-up Case, Linked Cases]]]}
+  P2.10: {checks: [[/csf/cases/:id, "/csf/cases?queue=OPEN", [History]], [/admin/audit, null, []]]}
+  P2.11: {checks: [[/csf/case-dashboard, null, [SLA compliance rate]], [/csf/reports, null, [Case Register, Case Ageing and SLA, Case Summary]]]}
+  P2.12: {checks: [[/broking-setup/lists, null, []], [/broking-setup/case-routing, null, [Turnaround Times, Routing Table]]]}
 
 BRD-10:
   P1.1: {checks: [[/screening-setup/config, null, []], [/screening-setup/templates, null, []]]}

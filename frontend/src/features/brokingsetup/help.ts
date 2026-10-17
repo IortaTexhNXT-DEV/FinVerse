@@ -8,6 +8,21 @@ export const BROKING_SETUP_HELP: HelpSection = {
   intro:
     'Masters and controls of the broking operation: templates, lists of values and the e-mail log.',
   screens: [
+    {
+      name: 'Case Routing',
+      path: '/broking-setup/case-routing',
+      summary:
+        'The turnaround time of each case type of the contact centre, the routing table that proposes the fulfilment unit of a case from its case type, market segment and nature of transaction, and the members of the fulfilment units.',
+      workflow: [
+        'Change the working days of a case type and save the row.',
+        'Add a routing row; a blank case type, market segment or nature matches any value, and the most specific active row applies.',
+        'Add or remove the members of a fulfilment unit; members see the cases of their units only.',
+      ],
+      controls: [
+        'A routing row is deactivated, not deleted.',
+        'Every change is in the audit trail with the values before and after.',
+      ],
+    },
     ...NBADMIN_HELP_SCREENS,
     {
       name: 'Document Templates',

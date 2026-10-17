@@ -32,6 +32,7 @@ describe('Master Data Change Log', () => {
     );
     expect(await screen.findByText('New Mutual')).toBeTruthy();
     await screen.findByRole('option', { name: 'Client' });
+    expect(screen.getAllByText('Insurer').length).toBeGreaterThan(0);
     fireEvent.change(screen.getByLabelText('Record Type'), { target: { value: 'Client' } });
     fireEvent.change(screen.getByLabelText('Maker'), { target: { value: 'badmin' } });
     await waitFor(() =>

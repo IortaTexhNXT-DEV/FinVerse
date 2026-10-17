@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { saveFile } from '@/api/client';
 import { changeHistoryApi } from '@/api/changeHistory';
 import type { ChangeLogFilters, FieldChange } from '@/api/changeHistory';
-import { checkerState, fieldLabel } from '@/components/history/changeLabels';
+import { checkerState, fieldLabel, recordTypeLabel } from '@/components/history/changeLabels';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -75,7 +75,7 @@ export default function MasterChangeLogPage() {
                 <option value="">All</option>
                 {(types.data ?? []).map((t) => (
                   <option key={t} value={t}>
-                    {t}
+                    {recordTypeLabel(t)}
                   </option>
                 ))}
               </select>
@@ -112,7 +112,7 @@ export default function MasterChangeLogPage() {
           emptyMessage="No change matches the filters."
           caption="Master data changes"
           columns={[
-            { key: 'type', header: 'Record Type', render: (c) => c.entityType },
+            { key: 'type', header: 'Record Type', render: (c) => recordTypeLabel(c.entityType) },
             { key: 'id', header: 'Record ID', numeric: true, render: (c) => c.entityId },
             { key: 'field', header: 'Field', render: (c) => fieldLabel(c) },
             { key: 'old', header: 'Old Value', render: (c) => c.oldValue, truncate: true },

@@ -16,3 +16,21 @@ export function checkerState(change: Pick<FieldChange, 'checker'>, makerChecker:
   }
   return makerChecker ? 'Pending authorization' : 'Not subject to authorization';
 }
+
+/** Names of the record types whose class name does not read well on its own. */
+const RECORD_TYPES: Record<string, string> = {
+  InsurerProfile: 'Insurer',
+  RiskProduct: 'Product',
+  LovValue: 'List of values value',
+  GlAccount: 'GL account',
+};
+
+/** The record type of the change log in words: "InsurerProfile" reads "Insurer". */
+export function recordTypeLabel(entityType: string): string {
+  const named = RECORD_TYPES[entityType];
+  if (named !== undefined) {
+    return named;
+  }
+  const words = entityType.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}

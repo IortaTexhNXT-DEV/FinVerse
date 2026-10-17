@@ -1,10 +1,10 @@
-import { Archive, Grid3x3, ListTree, UserCog } from 'lucide-react';
+import { Archive, Columns3, Grid3x3, ListTree, UserCog } from 'lucide-react';
 import { lazyWithRetry } from '@/app/loadRecovery';
 import type { ScreenDef } from '@/navigation/types';
 
 /**
- * Broking Administration screens (nbadmin), shown in the Broking Setup section: lists of values
- * and data retention. The access requests and the user access matrix moved to User Access.
+ * Broking Administration screens (nbadmin), shown in the Broking Setup section: lists of values,
+ * the MIS fields of the reports and data retention. The access requests and the user access matrix moved to User Access.
  */
 export const NBADMIN_SCREENS: ScreenDef[] = [
   {
@@ -33,6 +33,14 @@ export const NBADMIN_SCREENS: ScreenDef[] = [
       import('./legacyRedirects').then((m) => ({ default: m.AccessMatrixRedirect })),
     ),
     hidden: true,
+  },
+  {
+    path: '/broking-setup/mis-fields',
+    label: 'MIS Fields',
+    icon: Columns3,
+    permission: 'MIS_FIELD_MAINTAIN',
+    alsoPermissions: ['MIS_FIELD_AUTHORIZE'],
+    component: lazyWithRetry(() => import('./MisFieldsPage')),
   },
   {
     path: '/broking-setup/retention',

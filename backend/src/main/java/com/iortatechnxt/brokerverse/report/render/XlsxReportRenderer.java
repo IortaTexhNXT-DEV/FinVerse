@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Footer;
@@ -31,6 +32,7 @@ import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
@@ -59,6 +61,11 @@ public class XlsxReportRenderer implements ReportRenderer {
   private static final DateTimeFormatter STAMP =
       DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm", Locale.ENGLISH)
           .withZone(BusinessClock.zone());
+
+  /** Columns and rows the chart picture spans on its sheet. */
+  private static final int CHART_COLUMNS = 14;
+
+  private static final int CHART_ROWS = 30;
 
   @Override
   public ExportFormat format() {
@@ -94,6 +101,9 @@ public class XlsxReportRenderer implements ReportRenderer {
       }
       for (String note : result.notes()) {
         text(sheet.createRow(++r), 0, "Note: " + note, styles.meta);
+      }
+      if (context.chart() != null) {
+        chartSheet(wb, context.chart(), styles);
       }
       wb.write(out);
       return out.toByteArray();
@@ -134,6 +144,20 @@ public class XlsxReportRenderer implements ReportRenderer {
             + PAGE_CODE
             + " of "
             + PAGES_CODE);
+  }
+
+  /** The chart of the report layout (FR-CR-042) on a sheet of its own, after the report. */
+  private static void chartSheet(SXSSFWorkbook wb, ReportChart chart, Styles s) {
+    Sheet sheet = wb.createSheet("Chart");
+    text(sheet.createRow(0), 0, chart.title(), s.title);
+    int picture = wb.addPicture(ChartImage.png(chart), Workbook.PICTURE_TYPE_PNG);
+    ClientAnchor anchor = wb.getCreationHelper().createClientAnchor();
+    anchor.setCol1(0);
+    anchor.setRow1(2);
+    anchor.setCol2(CHART_COLUMNS);
+    anchor.setRow2(2 + CHART_ROWS);
+    anchor.setAnchorType(ClientAnchor.AnchorType.MOVE_AND_RESIZE);
+    sheet.createDrawingPatriarch().createPicture(anchor, picture);
   }
 
   private static int writeHeader(Sheet sheet, ReportResult result, ReportContext ctx, Styles s) {

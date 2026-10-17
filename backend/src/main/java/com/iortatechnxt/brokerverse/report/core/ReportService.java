@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.report.domain.ReportRun;
 import com.iortatechnxt.brokerverse.report.domain.ReportRun.RunFile;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
 import com.iortatechnxt.brokerverse.report.render.PrintOptions;
+import com.iortatechnxt.brokerverse.report.render.ReportChart;
 import com.iortatechnxt.brokerverse.report.render.ReportContext;
 import com.iortatechnxt.brokerverse.report.render.ReportRenderer;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
@@ -24,6 +25,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,7 @@ public class ReportService {
   private final UserDirectory users;
   private final SystemParameterService parameters;
   private final CodeSetSources codeSets;
+  private final MisFieldService misFields;
   private final Clock clock;
 
   /**
@@ -62,6 +65,7 @@ public class ReportService {
    * @param users user directory (the display name of the user in report headers)
    * @param parameters system parameters (report footer)
    * @param codeSets the platform lists, for the names printed in the header
+   * @param misFields MIS fields (the labels of the grouping fields of a report layout)
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -76,7 +80,9 @@ public class ReportService {
       UserDirectory users,
       SystemParameterService parameters,
       CodeSetSources codeSets,
+      MisFieldService misFields,
       Clock clock) {
+    this.misFields = misFields;
     this.registry = registry;
     this.archive = archive;
     renderers.forEach(r -> this.renderers.put(r.format(), r));
@@ -109,9 +115,11 @@ public class ReportService {
   @Transactional
   public ReportResult run(String code, Map<String, String> rawParams) {
     ReportDefinition def = authorized(code);
+    ReportLayoutOptions layout = ReportLayoutOptions.of(rawParams);
+    layout.check(def.metadata());
     ReportParameters params =
         ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
-    ReportResult result = def.generate(params);
+    ReportResult result = laidOut(layout, def.generate(params)).result();
     audit.record("Report", code, AuditAction.RUN, "Ran report " + String.join(", ", params.echo()));
     archive.viewed(def.metadata(), params.echo(), result);
     return result;
@@ -146,10 +154,13 @@ public class ReportService {
     if (!ReportAccess.mayExport(def.metadata())) {
       throw new AccessDeniedException("Not permitted to export report " + code);
     }
+    ReportLayoutOptions layout = ReportLayoutOptions.of(rawParams);
+    layout.check(def.metadata());
     ReportParameters params =
         ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
-    ReportResult result = options.filter(def.generate(params));
-    ReportContext ctx = context(params).withPrint(options.print());
+    LaidOut laid = laidOut(layout, options.filter(def.generate(params)));
+    ReportResult result = laid.result();
+    ReportContext ctx = context(params).withPrint(options.print()).withChart(laid.chart());
     byte[] content = renderers.get(format).render(result, ctx);
     List<String> echo = new ArrayList<>(params.echo());
     if ((format == ExportFormat.PDF || format == ExportFormat.DOCX)
@@ -241,10 +252,13 @@ public class ReportService {
   public ReportRun generate(
       String code, Map<String, String> rawParams, ExportFormat format, Instant availableFrom) {
     ReportDefinition def = registry.get(code);
+    ReportLayoutOptions layout = ReportLayoutOptions.of(rawParams);
+    layout.check(def.metadata());
     ReportParameters params =
         ReportParameters.validate(def.metadata(), rawParams, clock, this::displayValue);
-    ReportResult result = def.generate(params);
-    ReportContext ctx = context(params);
+    LaidOut laid = laidOut(layout, def.generate(params));
+    ReportResult result = laid.result();
+    ReportContext ctx = context(params).withChart(laid.chart());
     return archive.archiveGenerated(
         code,
         params.echo(),
@@ -256,6 +270,32 @@ public class ReportService {
             renderers.get(format).render(result, ctx)),
         availableFrom);
   }
+
+  /**
+   * The result in the layout of the run (FR-CR-042): grouped with subtotals and counts, the layout
+   * named in the notes, and the chart of the PDF and Excel files.
+   */
+  private LaidOut laidOut(ReportLayoutOptions layout, ReportResult result) {
+    if (layout.isEmpty()) {
+      return new LaidOut(result, null);
+    }
+    UnaryOperator<String> labels = misFields.labels().of(result);
+    ReportResult grouped = layout.apply(result, labels);
+    List<String> notes = new ArrayList<>(grouped.notes());
+    layout.note(result, labels).ifPresent(notes::add);
+    return new LaidOut(
+        new ReportResult(
+            grouped.code(),
+            grouped.title(),
+            grouped.parameterEcho(),
+            grouped.columns(),
+            grouped.rows(),
+            notes),
+        layout.chart(result, labels).orElse(null));
+  }
+
+  /** A result in its layout with the chart of the files, null for none. */
+  private record LaidOut(ReportResult result, ReportChart chart) {}
 
   /** The file name of an export: the naming convention of the report, else its code. */
   private String fileName(ReportDefinition def, String code, ExportFormat format) {

@@ -50,6 +50,9 @@ public enum Permission {
   // Reporting
   REPORT_VIEW,
   REPORT_FINANCIAL,
+  // MIS fields catalogue of the reports: maintain and authorize (V2912, FR-CR-062)
+  MIS_FIELD_MAINTAIN,
+  MIS_FIELD_AUTHORIZE,
   DASHBOARD_VIEW,
 
   // Platform features: document attachments, alerts, system monitoring

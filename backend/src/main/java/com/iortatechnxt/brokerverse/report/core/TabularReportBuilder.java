@@ -58,7 +58,9 @@ public final class TabularReportBuilder {
   /** A status or other code: capitals, digits and underscores (DIRECT_BILLED, OUTSTANDING). */
   private static final Pattern CODE = Pattern.compile("[A-Z][A-Z0-9_]*");
 
-  private final ReportParameters params;
+  private final String code;
+  private final String title;
+  private final List<String> echo;
   private final List<ReportColumn> columns = new ArrayList<>();
   private final List<Group> groups = new ArrayList<>();
   private final List<Map<String, Object>> details = new ArrayList<>();
@@ -67,8 +69,10 @@ public final class TabularReportBuilder {
   private boolean grandTotal = true;
   private boolean presorted;
 
-  private TabularReportBuilder(ReportParameters params) {
-    this.params = params;
+  private TabularReportBuilder(String code, String title, List<String> echo) {
+    this.code = code;
+    this.title = title;
+    this.echo = List.copyOf(echo);
   }
 
   /**
@@ -78,7 +82,29 @@ public final class TabularReportBuilder {
    * @return builder
    */
   public static TabularReportBuilder of(ReportParameters params) {
-    return new TabularReportBuilder(params);
+    ReportMetadata meta = params.metadata();
+    return new TabularReportBuilder(meta.code(), meta.title(), params.echo());
+  }
+
+  /**
+   * Starts a builder that lays out the detail rows of a result again (the Layout panel of the
+   * report runner, FR-CR-042): same code, title, parameter echo, columns and notes; the report's
+   * own group headers, subtotals and totals are left out and rebuilt from the groups given.
+   *
+   * @param result result to lay out again
+   * @return builder holding the detail rows and notes of the result
+   */
+  public static TabularReportBuilder regroup(ReportResult result) {
+    TabularReportBuilder b =
+        new TabularReportBuilder(result.code(), result.title(), result.parameterEcho());
+    b.columns(result.columns());
+    b.rows(
+        result.rows().stream()
+            .filter(r -> r.kind() == RowKind.DETAIL)
+            .map(r -> (Map<String, Object>) new LinkedHashMap<>(r.cells()))
+            .toList());
+    result.notes().forEach(b::note);
+    return b;
   }
 
   /**
@@ -204,8 +230,7 @@ public final class TabularReportBuilder {
           new ReportRow(
               RowKind.TOTAL, 0, counted("Grand Total", sorted.size()), new LinkedHashMap<>(total)));
     }
-    ReportMetadata meta = params.metadata();
-    return new ReportResult(meta.code(), meta.title(), params.echo(), columns, out, notes);
+    return new ReportResult(code, title, echo, columns, out, notes);
   }
 
   private Comparator<Map<String, Object>> groupComparator() {

@@ -271,6 +271,7 @@ datasets:
   - {code: FIN_STATEMENT_FORMAT, name: Financial statement formats, group: REPORTS, module: finreport, table: fin_statement_format, key: [company_id, code]}
   - {code: FIN_STATEMENT_FORMAT_LINE, name: Lines of the statement formats, group: REPORTS, module: finreport, table: fin_statement_format_line, key: [format_id, line_no], parent: format_id}
   - {code: FRBS_REPORT_PACK_ENTRY, name: Report pack, group: REPORTS, module: frbs, table: frbs_report_pack_entry, key: [group_code, seq]}
+  - {code: RPT_MIS_FIELD, name: MIS fields of the reports, group: REPORTS, module: report, table: rpt_mis_field, key: [code]}
   - code: NBR_REPORT_STANDARD_VARIANT
     name: Standard report variants
     group: REPORTS

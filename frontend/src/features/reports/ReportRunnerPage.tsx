@@ -9,6 +9,9 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useWorkspace } from '@/context/workspaceContext';
 import { menuFormats } from './exportFormats';
+import { LayoutPanel } from './LayoutPanel';
+import { NO_LAYOUT, layoutParams, splitLayout } from './reportLayout';
+import type { ReportLayout } from './reportLayout';
 import { ParameterInput } from './ParameterInput';
 import { PrintOptionsFields } from './PrintOptionsFields';
 import { ReportVariants } from './ReportVariants';
@@ -41,6 +44,49 @@ function ResultCard({
   );
 }
 
+/** The result of a run with the Layout panel above it (none for a prescribed layout). */
+function RunResult({
+  result,
+  layoutFixed,
+  layout,
+  busy,
+  filters,
+  onLayout,
+  onFilterChange,
+}: Readonly<{
+  result: ReportResult;
+  layoutFixed: boolean;
+  layout: ReportLayout;
+  busy: boolean;
+  filters: ColumnFilters;
+  onLayout: (layout: ReportLayout) => void;
+  onFilterChange: (column: string, text: string) => void;
+}>) {
+  return (
+    <>
+      {!layoutFixed && (
+        <LayoutPanel
+          key={JSON.stringify(layout)}
+          result={result}
+          layout={layout}
+          busy={busy}
+          onApply={onLayout}
+        />
+      )}
+      <ResultCard result={result} filters={filters} onFilterChange={onFilterChange} />
+    </>
+  );
+}
+
+/** The parameters of a run with the layout, unless the layout of the report is prescribed. */
+function withLayout(
+  base: Record<string, string>,
+  entry: { layoutFixed?: boolean } | undefined,
+  layout: ReportLayout,
+): Record<string, string> {
+  return entry?.layoutFixed ? base : { ...base, ...layoutParams(layout) };
+}
+
 /** Opens a PDF in a new tab for the browser's print preview (BRNB.031). */
 function openForPrint(blob: Blob): void {
   const url = URL.createObjectURL(blob);
@@ -66,13 +112,15 @@ export default function ReportRunnerPage() {
   const [checked, setChecked] = useState(false);
   const [filters, setFilters] = useState<ColumnFilters>({});
   const [print, setPrint] = useState<PrintOptions>(DEFAULT_PRINT);
+  const [layout, setLayout] = useState<ReportLayout>(NO_LAYOUT);
 
-  const params = () => runParameters(entry?.parameters ?? [], values, company?.id, branchId);
+  const params = (l: ReportLayout = layout) =>
+    withLayout(runParameters(entry?.parameters ?? [], values, company?.id, branchId), entry, l);
 
   const queryClient = useQueryClient();
   const refreshRuns = () => queryClient.invalidateQueries({ queryKey: ['report-runs', code] });
   const run = useMutation({
-    mutationFn: () => reportApi.run(code, params()),
+    mutationFn: (l?: ReportLayout) => reportApi.run(code, params(l)),
     onSuccess: async () => {
       setFilters({});
       await refreshRuns();
@@ -80,14 +128,16 @@ export default function ReportRunnerPage() {
   });
   const applyVariant = useCallback(
     (saved: Record<string, string>) => {
+      const split = splitLayout(saved);
       const resolved: Record<string, string> = {};
-      Object.entries(saved).forEach(([k, v]) => {
+      Object.entries(split.values).forEach(([k, v]) => {
         resolved[k] = resolveValue(v, branchId);
       });
       setValues(resolved);
+      setLayout(split.layout);
       setChecked(false);
     },
-    [branchId],
+    [branchId, setLayout],
   );
   const exporter = useMutation({
     mutationFn: (format: ExportFormat) =>
@@ -164,7 +214,7 @@ export default function ReportRunnerPage() {
             running={run.isPending}
             exporting={exporter.isPending}
             printing={printer.isPending}
-            onRun={guarded(() => run.mutate())}
+            onRun={guarded(() => run.mutate(layout))}
             onExport={(format) => guarded(() => exporter.mutate(format))()}
             onPrint={guarded(() => printer.mutate())}
           />
@@ -177,9 +227,16 @@ export default function ReportRunnerPage() {
       </Card>
       <ErrorAlert error={run.error ?? exporter.error ?? printer.error} />
       {run.data !== undefined && (
-        <ResultCard
+        <RunResult
           result={run.data}
+          layoutFixed={entry.layoutFixed === true}
+          layout={layout}
+          busy={run.isPending}
           filters={filters}
+          onLayout={(l) => {
+            setLayout(l);
+            guarded(() => run.mutate(l))();
+          }}
           onFilterChange={(column, text) => setFilters((f) => ({ ...f, [column]: text }))}
         />
       )}

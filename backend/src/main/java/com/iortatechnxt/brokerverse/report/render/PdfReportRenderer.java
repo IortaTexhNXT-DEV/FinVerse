@@ -92,6 +92,7 @@ public class PdfReportRenderer implements ReportRenderer {
       for (String note : result.notes()) {
         doc.add(new Paragraph("Note: " + note, META));
       }
+      ChartImage.addTo(doc, context.chart(), size.getWidth() - 2 * MARGIN, END_SPACING);
       Paragraph end = new Paragraph("*** End of Report ***", META);
       end.setAlignment(Element.ALIGN_CENTER);
       end.setSpacingBefore(END_SPACING);

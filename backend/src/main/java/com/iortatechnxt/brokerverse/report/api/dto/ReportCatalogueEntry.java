@@ -19,6 +19,7 @@ import java.util.List;
  * @param archived whether runs and exports are archived
  * @param documentStyle whether the report is a document or schedule (Word export offered)
  * @param formats export formats offered, in menu order (client requirement 16)
+ * @param layoutFixed whether the layout is prescribed (no Layout panel, FR-CR-042)
  */
 public record ReportCatalogueEntry(
     String code,
@@ -30,7 +31,8 @@ public record ReportCatalogueEntry(
     boolean exportable,
     boolean archived,
     boolean documentStyle,
-    List<ExportFormat> formats) {
+    List<ExportFormat> formats,
+    boolean layoutFixed) {
 
   /**
    * Maps metadata.
@@ -50,6 +52,7 @@ public record ReportCatalogueEntry(
         exportable,
         m.archived(),
         m.documentStyle(),
-        m.formats());
+        m.formats(),
+        m.layoutFixed());
   }
 }

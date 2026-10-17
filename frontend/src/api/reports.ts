@@ -40,6 +40,8 @@ export interface CatalogueEntry {
   documentStyle?: boolean;
   /** Export formats offered, in menu order. */
   formats?: ExportFormat[];
+  /** The layout is prescribed (BIR books, forms, statements): no Layout panel (FR-CR-042). */
+  layoutFixed?: boolean;
 }
 
 export type ColumnType = 'TEXT' | 'DATE' | 'NUMBER' | 'AMOUNT' | 'PERCENT';

@@ -19,6 +19,22 @@ export const NBADMIN_HELP_SCREENS: HelpScreen[] = [
     ],
   },
   {
+    name: 'MIS Fields',
+    path: '/broking-setup/mis-fields',
+    summary:
+      'The business label of each data element of the core entities (policy and account, product, insurer, claim, user, transaction). The reports offer the active fields with these labels for grouping on the Layout panel.',
+    workflow: [
+      'New MIS Field: enter the code and label, choose the entity and the data element it reads, and save it for authorization.',
+      'Another System Administrator authorizes it from the row menu; the field becomes active.',
+      'Deactivate a field the reports should no longer offer; Reactivate sends it for authorization again.',
+    ],
+    controls: [
+      'Maker-checker: a new or changed field is pending until another administrator authorizes it.',
+      'One field per data element, so a column has one label across all reports.',
+      'Every change is recorded in the Master Data Change Log.',
+    ],
+  },
+  {
     name: 'Data Retention',
     path: '/broking-setup/retention',
     summary:

@@ -118,6 +118,19 @@ public record ReportMetadata(
   }
 
   /**
+   * Whether the layout of the report is prescribed (FR-CR-042 R2): a document or schedule, a tax
+   * and statutory report (BIR books and forms) or a financial statement keeps its own layout, and
+   * the report runner offers no Layout panel for it.
+   *
+   * @return true when the report cannot be laid out again
+   */
+  public boolean layoutFixed() {
+    return documentStyle
+        || category == ReportCategory.TAX_STATUTORY
+        || category == ReportCategory.FINANCIAL_STATEMENTS;
+  }
+
+  /**
    * Whether the export menus offer a format for the report.
    *
    * @param format format

@@ -9,8 +9,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * A user's subscription to a report (G04): the report with its parameters, run daily, weekly (on a
@@ -24,6 +26,9 @@ public class ReportSubscription extends BaseEntity {
   private static final String SEPARATOR = ",";
   private static final int LAST_DAY = 31;
 
+  /** Time of a run when the subscription names none (business time). */
+  public static final LocalTime DEFAULT_RUN_TIME = LocalTime.of(6, 0);
+
   @Column(name = "report_code", nullable = false, length = 40, updatable = false)
   private String reportCode;
 
@@ -34,7 +39,7 @@ public class ReportSubscription extends BaseEntity {
   private String parameters;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 10)
+  @Column(nullable = false, length = 20)
   private Frequency frequency;
 
   @Column(name = "day_of_week")
@@ -54,6 +59,13 @@ public class ReportSubscription extends BaseEntity {
 
   @Column(name = "last_run_date")
   private LocalDate lastRunDate;
+
+  @Column(name = "run_time")
+  private LocalTime runTime;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "date_period", length = 20)
+  private RelativePeriod datePeriod;
 
   protected ReportSubscription() {}
 
@@ -98,6 +110,8 @@ public class ReportSubscription extends BaseEntity {
     this.frequency = s.frequency();
     this.dayOfWeek = s.frequency() == Frequency.WEEKLY ? s.dayOfWeek().getValue() : null;
     this.dayOfMonth = s.frequency() == Frequency.MONTHLY ? s.dayOfMonth() : null;
+    this.runTime = s.runTime();
+    this.datePeriod = s.datePeriod();
     this.format = s.format();
     this.recipients = String.join(SEPARATOR, s.recipients());
   }
@@ -109,6 +123,18 @@ public class ReportSubscription extends BaseEntity {
    * @return true when active and due
    */
   public boolean isDueOn(LocalDate date) {
+    return isDueOn(date, ReportSubscription::weekday);
+  }
+
+  /**
+   * Whether the subscription runs on a business date, with the working days of its company for the
+   * last working day of the month.
+   *
+   * @param date business date
+   * @param working whether a date is a working day
+   * @return true when active and due
+   */
+  public boolean isDueOn(LocalDate date, Predicate<LocalDate> working) {
     if (!active) {
       return false;
     }
@@ -116,7 +142,31 @@ public class ReportSubscription extends BaseEntity {
       case DAILY -> true;
       case WEEKLY -> date.getDayOfWeek().getValue() == dayOfWeek;
       case MONTHLY -> date.getDayOfMonth() == Math.min(dayOfMonth, date.lengthOfMonth());
+      case LAST_WORKING_DAY -> working.test(date) && lastWorkingDay(date, working);
     };
+  }
+
+  /**
+   * Whether the time of the run has come on its day.
+   *
+   * @param now business time of day
+   * @return true at or after the run time (06:00 when none is set)
+   */
+  public boolean isTimeReached(LocalTime now) {
+    return !now.isBefore(runTime == null ? DEFAULT_RUN_TIME : runTime);
+  }
+
+  private static boolean lastWorkingDay(LocalDate date, Predicate<LocalDate> working) {
+    for (LocalDate d = date.plusDays(1); d.getMonth() == date.getMonth(); d = d.plusDays(1)) {
+      if (working.test(d)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static boolean weekday(LocalDate d) {
+    return d.getDayOfWeek() != DayOfWeek.SATURDAY && d.getDayOfWeek() != DayOfWeek.SUNDAY;
   }
 
   /**
@@ -178,6 +228,14 @@ public class ReportSubscription extends BaseEntity {
     return lastRunDate;
   }
 
+  public LocalTime getRunTime() {
+    return runTime;
+  }
+
+  public RelativePeriod getDatePeriod() {
+    return datePeriod;
+  }
+
   /** How often a subscription runs. */
   public enum Frequency {
     /** Every day. */
@@ -185,7 +243,9 @@ public class ReportSubscription extends BaseEntity {
     /** Once a week. */
     WEEKLY,
     /** Once a month. */
-    MONTHLY
+    MONTHLY,
+    /** On the last working day of every month. */
+    LAST_WORKING_DAY
   }
 
   /**
@@ -197,6 +257,8 @@ public class ReportSubscription extends BaseEntity {
    * @param dayOfMonth day of a monthly run (1 to 31)
    * @param format file format
    * @param recipients e-mail addresses
+   * @param runTime time of day of the run (business time), null for the default
+   * @param datePeriod period of the date parameters, null to keep them as entered
    */
   public record Schedule(
       String parameters,
@@ -204,11 +266,33 @@ public class ReportSubscription extends BaseEntity {
       DayOfWeek dayOfWeek,
       Integer dayOfMonth,
       String format,
-      List<String> recipients) {
+      List<String> recipients,
+      LocalTime runTime,
+      RelativePeriod datePeriod) {
 
     /** Defensive copy. */
     public Schedule {
       recipients = recipients == null ? List.of() : List.copyOf(recipients);
+    }
+
+    /**
+     * A schedule at the default time with the dates as entered.
+     *
+     * @param parameters report parameters
+     * @param frequency frequency
+     * @param dayOfWeek day of a weekly run
+     * @param dayOfMonth day of a monthly run
+     * @param format file format
+     * @param recipients e-mail addresses
+     */
+    public Schedule(
+        String parameters,
+        Frequency frequency,
+        DayOfWeek dayOfWeek,
+        Integer dayOfMonth,
+        String format,
+        List<String> recipients) {
+      this(parameters, frequency, dayOfWeek, dayOfMonth, format, recipients, null, null);
     }
   }
 }

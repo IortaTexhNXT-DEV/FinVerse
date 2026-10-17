@@ -9,12 +9,14 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.security.DataScope;
+import com.iortatechnxt.brokerverse.report.domain.RelativePeriod;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscription;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscription.Schedule;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscriptionRepository;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscriptionRun;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscriptionRunRepository;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -80,6 +82,8 @@ public class ReportSubscriptionService {
    * @param dayOfMonth day of a monthly run
    * @param format file format
    * @param recipients e-mail addresses
+   * @param runTime time of day of the run, null for the default
+   * @param datePeriod period of the date parameters, null to keep them as entered
    */
   public record Request(
       Map<String, String> parameters,
@@ -87,7 +91,9 @@ public class ReportSubscriptionService {
       java.time.DayOfWeek dayOfWeek,
       Integer dayOfMonth,
       ExportFormat format,
-      List<String> recipients) {}
+      List<String> recipients,
+      LocalTime runTime,
+      RelativePeriod datePeriod) {}
 
   /**
    * The subscriptions of the signed-in user.
@@ -219,10 +225,9 @@ public class ReportSubscriptionService {
           request.format().name(),
           request.recipients() == null
               ? List.of()
-              : request.recipients().stream()
-                  .map(String::strip)
-                  .filter(r -> !r.isEmpty())
-                  .toList());
+              : request.recipients().stream().map(String::strip).filter(r -> !r.isEmpty()).toList(),
+          request.runTime(),
+          request.datePeriod());
     } catch (JsonProcessingException e) {
       throw new IllegalStateException("Parameters cannot be stored", e);
     }

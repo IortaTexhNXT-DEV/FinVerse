@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CalendarClock } from 'lucide-react';
 import { useState } from 'react';
-import { recipientsOf, reportSubscriptionApi } from '@/api/reportSubscriptions';
-import type { DayOfWeek, SubscriptionFrequency } from '@/api/reportSubscriptions';
+import { RELATIVE_PERIODS, recipientsOf, reportSubscriptionApi } from '@/api/reportSubscriptions';
+import type { DayOfWeek, RelativePeriod, SubscriptionFrequency } from '@/api/reportSubscriptions';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
@@ -13,7 +14,10 @@ const FREQUENCIES = [
   { value: 'DAILY', label: 'Daily' },
   { value: 'WEEKLY', label: 'Weekly' },
   { value: 'MONTHLY', label: 'Monthly' },
+  { value: 'LAST_WORKING_DAY', label: 'Last working day of the month' },
 ];
+
+const PERIODS = [{ value: '', label: 'As entered on the screen' }, ...RELATIVE_PERIODS];
 
 const DAYS: { value: DayOfWeek; label: string }[] = [
   { value: 'MONDAY', label: 'Monday' },
@@ -35,8 +39,9 @@ interface Props {
 
 /**
  * Subscribes the user to a report with the parameters of the screen: frequency, file format and
- * recipients. The file is sent by the daily scheduler, checked against the user's report rights and
- * data scope at every run.
+ * recipients, the time of day and, for the date parameters, a period relative to each run (previous
+ * month, month to date...). The file is sent by the scheduler, checked against the user's report
+ * rights and data scope at every run; the last working day follows the holiday calendar.
  */
 export function SubscribeDialog({
   reportCode,
@@ -52,6 +57,8 @@ export function SubscribeDialog({
   const [dayOfMonth, setDayOfMonth] = useState<number | undefined>(1);
   const [format, setFormat] = useState(formats[0] ?? 'PDF');
   const [recipients, setRecipients] = useState('');
+  const [runTime, setRunTime] = useState('06:00');
+  const [period, setPeriod] = useState('');
   const save = useMutation({
     mutationFn: () =>
       reportSubscriptionApi.subscribe({
@@ -62,6 +69,8 @@ export function SubscribeDialog({
         dayOfMonth: frequency === 'MONTHLY' ? (dayOfMonth ?? null) : null,
         format,
         recipients: recipientsOf(recipients),
+        runTime: runTime === '' ? null : runTime,
+        datePeriod: period === '' ? null : (period as RelativePeriod),
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['report-subscriptions'] });
@@ -109,6 +118,24 @@ export function SubscribeDialog({
             onChange={setDayOfMonth}
           />
         )}
+        <Field label="Time of day" hint="Business time; the file is sent within the hour">
+          {(id) => (
+            <input
+              id={id}
+              className="input"
+              type="time"
+              value={runTime}
+              onChange={(e) => setRunTime(e.target.value)}
+            />
+          )}
+        </Field>
+        <SelectInput
+          label="Date period"
+          hint="Sets the date parameters from the date of each run"
+          value={period}
+          options={PERIODS}
+          onChange={setPeriod}
+        />
         <SelectInput
           label="Format"
           required

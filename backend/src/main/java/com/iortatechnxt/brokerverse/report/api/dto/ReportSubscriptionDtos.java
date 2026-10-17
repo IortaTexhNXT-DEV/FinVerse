@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.report.api.dto;
 
 import com.iortatechnxt.brokerverse.report.core.ReportSubscriptionService;
+import com.iortatechnxt.brokerverse.report.domain.RelativePeriod;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscription;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscription.Frequency;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscriptionRun;
@@ -15,6 +16,7 @@ import jakarta.validation.constraints.Size;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,8 @@ public final class ReportSubscriptionDtos {
    * @param dayOfMonth day of a monthly run
    * @param format file format
    * @param recipients e-mail addresses
+   * @param runTime time of day of the run (business time), empty for 06:00
+   * @param datePeriod period of the date parameters at each run, empty to keep them as entered
    */
   public record SubscriptionRequest(
       @Size(max = 40) String reportCode,
@@ -41,7 +45,9 @@ public final class ReportSubscriptionDtos {
       DayOfWeek dayOfWeek,
       @Min(1) @Max(31) Integer dayOfMonth,
       @NotNull ExportFormat format,
-      @NotEmpty @Size(max = 20) List<@Email @Size(max = 120) String> recipients) {
+      @NotEmpty @Size(max = 20) List<@Email @Size(max = 120) String> recipients,
+      LocalTime runTime,
+      RelativePeriod datePeriod) {
 
     /**
      * The service request.
@@ -50,7 +56,7 @@ public final class ReportSubscriptionDtos {
      */
     public ReportSubscriptionService.Request toRequest() {
       return new ReportSubscriptionService.Request(
-          parameters, frequency, dayOfWeek, dayOfMonth, format, recipients);
+          parameters, frequency, dayOfWeek, dayOfMonth, format, recipients, runTime, datePeriod);
     }
   }
 
@@ -69,6 +75,8 @@ public final class ReportSubscriptionDtos {
    * @param active whether it still runs
    * @param lastRunDate date of the last run
    * @param createdAt subscription time
+   * @param runTime time of day of the run, null for 06:00
+   * @param datePeriod period of the date parameters, null when kept as entered
    */
   public record SubscriptionResponse(
       Long id,
@@ -82,7 +90,9 @@ public final class ReportSubscriptionDtos {
       List<String> recipients,
       boolean active,
       LocalDate lastRunDate,
-      Instant createdAt) {
+      Instant createdAt,
+      LocalTime runTime,
+      RelativePeriod datePeriod) {
 
     /**
      * Maps a subscription.
@@ -104,7 +114,9 @@ public final class ReportSubscriptionDtos {
           s.getRecipientList(),
           s.isActive(),
           s.getLastRunDate(),
-          s.getCreatedAt());
+          s.getCreatedAt(),
+          s.getRunTime(),
+          s.getDatePeriod());
     }
   }
 

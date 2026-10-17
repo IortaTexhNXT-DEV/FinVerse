@@ -57,6 +57,7 @@ public class ReportSubscriptionRunner implements ManagedJob {
   private final UserDetailsService users;
   private final DataScopeLookup scopes;
   private final MessageService messages;
+  private final SubscriptionCalendar calendar;
   private final TransactionTemplate tx;
   private final String cron;
 
@@ -72,6 +73,7 @@ public class ReportSubscriptionRunner implements ManagedJob {
    * @param users subscribers and their permissions
    * @param scopes data scope of the subscribers
    * @param messages outbox
+   * @param calendar working days, time of day and date periods
    * @param txManager transaction manager
    * @param cron schedule ({@code brokerverse.jobs.report-subscriptions-cron})
    */
@@ -85,8 +87,9 @@ public class ReportSubscriptionRunner implements ManagedJob {
       UserDetailsService users,
       DataScopeLookup scopes,
       MessageService messages,
+      SubscriptionCalendar calendar,
       PlatformTransactionManager txManager,
-      @Value("${brokerverse.jobs.report-subscriptions-cron:0 0 22 * * *}") String cron) {
+      @Value("${brokerverse.jobs.report-subscriptions-cron:0 5 * * * *}") String cron) {
     this.subscriptions = subscriptions;
     this.runs = runs;
     this.service = service;
@@ -96,6 +99,7 @@ public class ReportSubscriptionRunner implements ManagedJob {
     this.users = users;
     this.scopes = scopes;
     this.messages = messages;
+    this.calendar = calendar;
     this.tx = new TransactionTemplate(txManager);
     this.tx.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     this.cron = cron;
@@ -120,8 +124,9 @@ public class ReportSubscriptionRunner implements ManagedJob {
   public JobOutcome execute(LocalDate businessDate) {
     Map<Outcome, Integer> counts = new EnumMap<>(Outcome.class);
     for (ReportSubscription s : subscriptions.findByActiveTrueOrderByIdAsc()) {
-      if (!s.isDueOn(businessDate)
-          || runs.existsBySubscriptionIdAndRunDate(s.getId(), businessDate)) {
+      if (!s.isActive()
+          || runs.existsBySubscriptionIdAndRunDate(s.getId(), businessDate)
+          || !dueNow(s, businessDate)) {
         continue;
       }
       Outcome outcome = runOne(s.getId(), businessDate);
@@ -138,6 +143,23 @@ public class ReportSubscriptionRunner implements ManagedJob {
             + " denied, "
             + counts.getOrDefault(Outcome.FAILED, 0)
             + " failed");
+  }
+
+  /**
+   * Whether a subscription runs now; a subscription whose report or parameters cannot be read runs,
+   * so that its failure is recorded.
+   *
+   * @param s subscription
+   * @param date business date
+   * @return true when due now
+   */
+  private boolean dueNow(ReportSubscription s, LocalDate date) {
+    try {
+      return calendar.runsNow(
+          s, registry.get(s.getReportCode()).metadata(), service.parameters(s), date);
+    } catch (RuntimeException e) {
+      return s.isDueOn(date);
+    }
   }
 
   /**
@@ -170,7 +192,9 @@ public class ReportSubscriptionRunner implements ManagedJob {
       return denied("The subscriber is no longer an enabled user");
     }
     ReportDefinition def = registry.get(subscription.getReportCode());
-    Map<String, String> parameters = service.parameters(subscription);
+    Map<String, String> parameters =
+        SubscriptionCalendar.withPeriod(
+            subscription.getDatePeriod(), def.metadata(), service.parameters(subscription), date);
     SecurityContextHolder.getContext()
         .setAuthentication(
             new UsernamePasswordAuthenticationToken(subscriber, null, subscriber.getAuthorities()));

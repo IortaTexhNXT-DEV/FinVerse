@@ -19,15 +19,28 @@ const SUB: ReportSubscription = {
   active: true,
   lastRunDate: null,
   createdAt: '2026-10-01T00:00:00Z',
+  runTime: null,
+  datePeriod: null,
 };
 
 describe('report subscriptions', () => {
   it('describes schedules and reads recipients', () => {
-    expect(scheduleText(SUB)).toBe('Weekly on Monday');
+    expect(scheduleText(SUB)).toBe('Weekly on Monday at 06:00');
     expect(scheduleText({ frequency: 'MONTHLY', dayOfWeek: null, dayOfMonth: 31 })).toBe(
-      'Monthly on day 31',
+      'Monthly on day 31 at 06:00',
     );
-    expect(scheduleText({ frequency: 'DAILY', dayOfWeek: null, dayOfMonth: null })).toBe('Daily');
+    expect(scheduleText({ frequency: 'DAILY', dayOfWeek: null, dayOfMonth: null })).toBe(
+      'Daily at 06:00',
+    );
+    expect(
+      scheduleText({
+        frequency: 'LAST_WORKING_DAY',
+        dayOfWeek: null,
+        dayOfMonth: null,
+        runTime: '18:30:00',
+        datePeriod: 'PREVIOUS_MONTH',
+      }),
+    ).toBe('Monthly on the last working day at 18:30, previous month');
     expect(recipientsOf('a@x.example, b@x.example;c@x.example')).toHaveLength(3);
   });
 
@@ -48,7 +61,7 @@ describe('report subscriptions', () => {
       .spyOn(reportSubscriptionApi, 'deactivate')
       .mockResolvedValue({ ...SUB, active: false });
     render(ebWrapper(new Set(['REPORT_VIEW']), 'comptrol')(<ReportSubscriptionsPage />));
-    expect(await screen.findByText('Weekly on Monday')).toBeInTheDocument();
+    expect(await screen.findByText('Weekly on Monday at 06:00')).toBeInTheDocument();
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Runs' }));
     expect(await screen.findByText('Company 2 is outside the data scope')).toBeInTheDocument();
@@ -72,14 +85,18 @@ describe('report subscriptions', () => {
     );
     const user = userEvent.setup();
     await user.type(screen.getByLabelText(/Recipients/), 'finance@subscriber.example');
+    await user.selectOptions(screen.getByLabelText(/Date period/), 'PREVIOUS_MONTH');
+    await user.selectOptions(screen.getByLabelText(/Frequency/), 'LAST_WORKING_DAY');
     await user.click(screen.getByRole('button', { name: 'Subscribe' }));
     expect(subscribe).toHaveBeenCalledWith(
       expect.objectContaining({
         reportCode: 'GL-COA',
         parameters: { companyId: '1' },
-        frequency: 'DAILY',
+        frequency: 'LAST_WORKING_DAY',
         format: 'CSV',
         recipients: ['finance@subscriber.example'],
+        runTime: '06:00',
+        datePeriod: 'PREVIOUS_MONTH',
       }),
     );
   });

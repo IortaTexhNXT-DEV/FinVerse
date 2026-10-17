@@ -393,8 +393,9 @@ brokerverse:
     booking-batch-cron: ${BROKERVERSE_JOB_BOOKING_BATCH_CRON:0 0 12 * * *}
     # Daily service-invoice batch per insurer (G09): one e-mail per insurer and date (21:30 PHT).
     si-daily-batch-cron: ${BROKERVERSE_JOB_SI_DAILY_BATCH_CRON:0 30 13 * * *}
-    # Report subscriptions (G04): runs the subscriptions due on the business date (06:00 PHT).
-    report-subscriptions-cron: ${BROKERVERSE_JOB_REPORT_SUBSCRIPTIONS_CRON:0 0 22 * * *}
+    # Report subscriptions (G04): every hour, runs the subscriptions due on the business date whose
+    # time of day has come (06:00 PHT when none is set).
+    report-subscriptions-cron: ${BROKERVERSE_JOB_REPORT_SUBSCRIPTIONS_CRON:0 5 * * * *}
     # ---- Operations (BRD-2), docs/architecture/OPERATIONS_DESIGN.md section 10 ----
     # Copies booked invoices missing from the Operations invoice ledger (the feed listener copies new ones).
     ops-invoice-feed-replay-cron: ${BROKERVERSE_JOB_OPS_INVOICE_FEED_REPLAY_CRON:-}

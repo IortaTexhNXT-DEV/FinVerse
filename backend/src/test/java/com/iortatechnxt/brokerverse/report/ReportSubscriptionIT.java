@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.iortatechnxt.brokerverse.report.core.ReportSubscriptionRunner;
 import com.iortatechnxt.brokerverse.report.core.ReportSubscriptionService;
 import com.iortatechnxt.brokerverse.report.core.ReportSubscriptionService.Request;
+import com.iortatechnxt.brokerverse.report.domain.RelativePeriod;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscription;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscription.Frequency;
 import com.iortatechnxt.brokerverse.report.domain.ReportSubscription.Schedule;
@@ -17,6 +18,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -41,7 +43,34 @@ class ReportSubscriptionIT {
         null,
         null,
         ExportFormat.CSV,
-        List.of("finance@subscriber.example"));
+        List.of("finance@subscriber.example"),
+        null,
+        null);
+  }
+
+  @Test
+  void aSubscriptionWithAPeriodRunsOnTheLastWorkingDayAtItsTime() {
+    ReportSubscription s =
+        as.run(
+            "comptrol",
+            () ->
+                service.subscribe(
+                    REPORT,
+                    new Request(
+                        Map.of("companyId", String.valueOf(data.company().getId())),
+                        Frequency.LAST_WORKING_DAY,
+                        null,
+                        null,
+                        ExportFormat.CSV,
+                        List.of("finance@subscriber.example"),
+                        LocalTime.of(18, 0),
+                        RelativePeriod.MONTH_TO_DATE)));
+    assertThat(s.getDatePeriod()).isEqualTo(RelativePeriod.MONTH_TO_DATE);
+    assertThat(s.getRunTime()).isEqualTo(LocalTime.of(18, 0));
+    // A past business date runs whatever the time of day; 15-Apr-2026 is not the last working day.
+    runner.execute(LocalDate.of(2026, 4, 15));
+    assertThat(as.run("comptrol", () -> service.runs(s.getId()))).isEmpty();
+    assertThat(runner.runOne(s.getId(), LocalDate.of(2026, 4, 30))).isEqualTo(Outcome.SUCCEEDED);
   }
 
   @Test

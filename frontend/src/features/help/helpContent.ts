@@ -179,7 +179,8 @@ export const HELP_SECTIONS: HelpSection[] = [
         summary:
           'Reports sent on a schedule: Subscribe on a report screen with the parameters entered, a frequency (daily, weekly or monthly), a file format and the e-mail recipients.',
         workflow: [
-          'The scheduler runs the subscriptions due each day as their subscriber, keeps the file in the report archive and e-mails it to the recipients.',
+          'The scheduler runs the subscriptions due each day (daily, weekly, monthly on a day or on the last working day of the month on the holiday calendar) at their time of day as their subscriber, keeps the file in the report archive and e-mails it to the recipients.',
+          'A date period (previous day, month to date, previous month, quarter to date, previous quarter, year to date, previous year) sets the date parameters of each run from its date.',
           'Open Runs to see each run: sent, failed, or denied with the reason; Stop ends a subscription.',
         ],
         controls: [

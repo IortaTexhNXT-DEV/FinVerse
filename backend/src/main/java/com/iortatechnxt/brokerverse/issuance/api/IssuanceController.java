@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.issuance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.issuance.api.dto.IssuanceRowResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.PolicyRecordResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.TriggerRuleResponse;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Issuance Workbench (BRNB.073/077/070): tabs and tile counts, the policy record of an account and
  * the document trigger rules (BRNB.105).
  */
+@OwnedRecord(type = "Account", variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/issuance")
 public class IssuanceController {

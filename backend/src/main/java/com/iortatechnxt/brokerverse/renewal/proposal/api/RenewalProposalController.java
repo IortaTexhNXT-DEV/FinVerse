@@ -1,7 +1,10 @@
 package com.iortatechnxt.brokerverse.renewal.proposal.api;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalProposal;
+import com.iortatechnxt.brokerverse.renewal.domain.TsuRequest;
 import com.iortatechnxt.brokerverse.renewal.proposal.service.RenewalProposals;
 import com.iortatechnxt.brokerverse.renewal.proposal.service.TsuRequests;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalRecords;
@@ -28,6 +31,9 @@ import org.springframework.web.multipart.MultipartFile;
  * Proposals and TSU requests of the renewal accounts (FRRN.017, FRRN.018): Quick and Full Proposals
  * with their signatories, their sending through CCM, and the quotation requests to TSU.
  */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
+@OwnedRecord(value = RenewalProposal.class, variable = "proposalNo", key = "proposalNo")
+@OwnedRecord(value = TsuRequest.class, variable = "requestNo", key = "requestNo")
 @RestController
 @RequestMapping("/api/v1/renewal")
 public class RenewalProposalController {

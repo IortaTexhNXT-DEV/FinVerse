@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.renewal.channel.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.channel.domain.ChannelMessage;
 import com.iortatechnxt.brokerverse.renewal.channel.domain.ChannelMessageRepository;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalRecords;
 import java.time.Instant;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The deliveries of a renewal account (FRRN.022.01, FRRN.023.02): each document handed to CCM or
  * MFT with its file name, CCM transaction reference and delivery status.
  */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal/candidates/{ref}/deliveries")
 @PreAuthorize("hasAuthority('RNW_VIEW')")

@@ -1,12 +1,14 @@
 package com.iortatechnxt.brokerverse.migration.object.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.migration.mapping.service.TemplateExport;
 import com.iortatechnxt.brokerverse.migration.object.api.dto.ObjectDtos.CommentRequest;
 import com.iortatechnxt.brokerverse.migration.object.api.dto.ObjectDtos.DecisionResponse;
 import com.iortatechnxt.brokerverse.migration.object.api.dto.ObjectDtos.ObjectRequest;
 import com.iortatechnxt.brokerverse.migration.object.api.dto.ObjectDtos.ObjectResponse;
 import com.iortatechnxt.brokerverse.migration.object.api.dto.ObjectDtos.SubmitRequest;
+import com.iortatechnxt.brokerverse.migration.object.domain.MigObjectDecision;
 import com.iortatechnxt.brokerverse.migration.object.service.DecisionService;
 import com.iortatechnxt.brokerverse.migration.object.service.ObjectRegisterService;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** The data object register and its decisions (FR-DM-001, FR-DM-002; screen Data Objects). */
+@OwnedRecord(value = MigObjectDecision.class, variable = "decisionNo", key = "decisionNo")
 @RestController
 @RequestMapping("/api/v1/migration")
 public class ObjectController {

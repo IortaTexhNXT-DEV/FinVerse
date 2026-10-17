@@ -10,7 +10,6 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 import com.iortatechnxt.brokerverse.audit.api.RecordScopeAdvisor;
 import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
 import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
-import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.security.DataScopeMappings;
@@ -27,7 +26,6 @@ import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import jakarta.persistence.Entity;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -53,7 +51,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -286,9 +283,24 @@ final class ArchitectureTest {
             return;
           }
           Method method = item.reflect();
-          List<String> ids = recordIds(method);
+          List<String> ids = RecordScopeRuleSupport.recordIds(method);
           Map<String, OwnedRecord> declared =
               RecordScopeAdvisor.declarations(method.getDeclaringClass(), method);
+          List<String> keys =
+              RecordScopeRuleSupport.textKeys(method).stream()
+                  .filter(k -> !declared.containsKey(k) || declared.get(k).key().isEmpty())
+                  .toList();
+          if (!keys.isEmpty()) {
+            events.add(
+                SimpleConditionEvent.violated(
+                    item,
+                    item.getFullName()
+                        + " addresses a record by the text key "
+                        + keys
+                        + " without naming it: declare @OwnedRecord(value = <entity>.class,"
+                        + " variable = ..., key = <property>) on the method or its controller, or"
+                        + " @GlobalRecord(<reason>) for a programme-wide record"));
+          }
           if (!ids.isEmpty() && ids.stream().noneMatch(declared::containsKey)) {
             events.add(
                 SimpleConditionEvent.violated(
@@ -302,31 +314,6 @@ final class ArchitectureTest {
           }
         }
       };
-
-  /**
-   * The numeric path variables of an endpoint that address a record (the company itself is checked
-   * by the data scope interceptor).
-   *
-   * @param method endpoint
-   * @return path variable names
-   */
-  static List<String> recordIds(Method method) {
-    List<String> ids = new ArrayList<>();
-    for (Parameter p : method.getParameters()) {
-      PathVariable variable = p.getAnnotation(PathVariable.class);
-      if (variable == null || p.getType() != Long.class && p.getType() != long.class) {
-        continue;
-      }
-      String name =
-          !variable.value().isEmpty()
-              ? variable.value()
-              : !variable.name().isEmpty() ? variable.name() : p.getName();
-      if (!"companyId".equals(name)) {
-        ids.add(name);
-      }
-    }
-    return ids;
-  }
 
   /**
    * Every endpoint of the user APIs that addresses a record by a numeric id names it, so the record
@@ -361,7 +348,19 @@ final class ArchitectureTest {
               events.add(
                   SimpleConditionEvent.violated(
                       item, item.getName() + " names a record by neither or both entity and type"));
-            } else if (r.type().isEmpty() && !ownedByACompany(r.value())) {
+            } else if (r.type().isEmpty()
+                && !r.key().isEmpty()
+                && !RecordScopeRuleSupport.hasProperty(r.value(), r.key())) {
+              events.add(
+                  SimpleConditionEvent.violated(
+                      item,
+                      item.getName()
+                          + " names the key "
+                          + r.key()
+                          + ", which "
+                          + r.value().getName()
+                          + " does not have"));
+            } else if (r.type().isEmpty() && !RecordScopeRuleSupport.ownedByACompany(r.value())) {
               events.add(
                   SimpleConditionEvent.violated(
                       item,
@@ -374,33 +373,6 @@ final class ArchitectureTest {
           }
         }
       };
-
-  /**
-   * Whether a stored record belongs to a company: it carries the company, it is a company, it names
-   * its parent ({@code OwnedBy}), or it links to another record (an attachment).
-   *
-   * @param type entity class
-   * @return true when the record scope check can resolve its company
-   */
-  static boolean ownedByACompany(Class<?> type) {
-    if (!type.isAnnotationPresent(Entity.class)) {
-      return false;
-    }
-    boolean ownCompany =
-        "Company".equals(type.getSimpleName())
-            || hasAccessor(type, "getCompanyId")
-            || hasAccessor(type, "getCompany");
-    boolean linked = hasAccessor(type, "getEntityType") && hasAccessor(type, "getEntityId");
-    return ownCompany || linked || type.isAnnotationPresent(OwnedBy.class);
-  }
-
-  private static boolean hasAccessor(Class<?> type, String name) {
-    try {
-      return type.getMethod(name).getParameterCount() == 0;
-    } catch (NoSuchMethodException ex) {
-      return false;
-    }
-  }
 
   private static final ArchRule NAMED_RECORDS_BELONG_TO_A_COMPANY =
       classes()

@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.renewal.channel.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
+import com.iortatechnxt.brokerverse.renewal.channel.domain.ChannelMessage;
 import com.iortatechnxt.brokerverse.renewal.channel.service.ChannelMonitor;
 import com.iortatechnxt.brokerverse.renewal.channel.service.ChannelService;
 import java.time.Instant;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Channel Monitor: the CCM and MFT messages, their delivery history, resends and connections. */
+@OwnedRecord(value = ChannelMessage.class, variable = "messageNo", key = "messageNo")
 @RestController
 @RequestMapping("/api/v1/renewal/channels")
 @PreAuthorize("hasAuthority('RNW_CHANNEL_MONITOR')")

@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.marketing.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalRemark;
 import com.iortatechnxt.brokerverse.renewal.marketing.service.NbPathService;
 import com.iortatechnxt.brokerverse.renewal.marketing.service.OverrideService;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * remarks, re-opening, the New Business path, the Team Leader's return and post, and the overrides.
  * Actions on several renewals answer with the done and the refused ones.
  */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal")
 public class MarketingController {

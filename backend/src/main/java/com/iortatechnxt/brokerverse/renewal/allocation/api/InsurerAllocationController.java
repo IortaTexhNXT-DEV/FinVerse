@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.renewal.allocation.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.allocation.service.InsurerAllocationService;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Multiple insurer allocation of a renewal account (FRRN.014.03). */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal/candidates/{ref}/insurers")
 public class InsurerAllocationController {

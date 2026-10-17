@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.booking.api.dto.QueueEntryResponse;
 import com.iortatechnxt.brokerverse.booking.api.dto.QueueRequest;
 import com.iortatechnxt.brokerverse.booking.api.dto.WorkbenchCountsResponse;
 import com.iortatechnxt.brokerverse.booking.api.dto.WorkbenchRowResponse;
+import com.iortatechnxt.brokerverse.booking.domain.BatchRun;
 import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.BookingSource;
 import com.iortatechnxt.brokerverse.booking.domain.QueueEntry;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  * and batch runs.
  */
 @OwnedRecord(QueueEntry.class)
+@OwnedRecord(value = BatchRun.class, variable = "runNo", key = "runNo")
 @RestController
 @RequestMapping("/api/v1/booking")
 public class BookingController {

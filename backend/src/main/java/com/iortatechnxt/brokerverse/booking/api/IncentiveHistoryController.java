@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.booking.api;
 
+import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.IncentiveEvaluation;
 import com.iortatechnxt.brokerverse.booking.domain.IncentiveStatus;
 import com.iortatechnxt.brokerverse.booking.domain.IncentiveTrigger;
 import com.iortatechnxt.brokerverse.booking.service.IncentiveEvaluationService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * matched, endorsements considered, result and reason. The indicator has no change endpoint: it is
  * set by the rules only.
  */
+@OwnedRecord(value = BookedInvoice.class, variable = "invoiceNo", key = "invoiceNo")
 @RestController
 @RequestMapping("/api/v1/booking/invoices")
 public class IncentiveHistoryController {

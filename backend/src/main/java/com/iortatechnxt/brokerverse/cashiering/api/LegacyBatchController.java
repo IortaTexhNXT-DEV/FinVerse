@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * balances, each prepared, submitted, approved and posted line by line.
  */
 @OwnedRecord(value = LegacyBatchLine.class, variable = "lineId")
+@OwnedRecord(value = LegacyBatch.class, variable = "batchNo", key = "batchNo")
 @RestController
 @RequestMapping("/api/v1/cashiering/legacy-batches")
 public class LegacyBatchController {

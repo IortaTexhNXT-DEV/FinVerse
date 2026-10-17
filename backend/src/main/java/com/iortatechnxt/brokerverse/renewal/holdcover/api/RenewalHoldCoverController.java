@@ -2,7 +2,9 @@ package com.iortatechnxt.brokerverse.renewal.holdcover.api;
 
 import com.iortatechnxt.brokerverse.account.domain.HoldCoverStatus;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.placement.domain.HoldCover;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.holdcover.service.RenewalHoldCoverService;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * renewal by the Marketing AO or Processing, the insurer's confirmation or decline recorded by
  * Processing, and the cancellation with a reason.
  */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal/candidates/{ref}/hold-cover")
 public class RenewalHoldCoverController {

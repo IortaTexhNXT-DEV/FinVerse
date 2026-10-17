@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.opsledger.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.FlowInDtos.ReplayRequest;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.FlowInDtos.RunResponse;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.Invoice360Response;
@@ -36,6 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Operations invoices (RMTID.026/032/038, ADJID.024): search, the invoice 360 view, movements,
  * status history, the invoices of an account and the replay of the booking feed.
  */
+@OwnedRecord(value = OpsInvoice.class, variable = "invoiceNo", key = "invoiceNo")
+@OwnedRecord(type = "Account", variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/ops")
 public class OpsInvoiceController {

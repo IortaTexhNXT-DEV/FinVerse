@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.booking.api;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceCreditRequest;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceIssueRequest;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceResponse;
+import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.SiKind;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceRegister;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * credit.
  */
 @OwnedRecord(ServiceInvoice.class)
+@OwnedRecord(value = BookedInvoice.class, variable = "invoiceNo", key = "invoiceNo")
 @RestController
 @RequestMapping("/api/v1/booking/service-invoices")
 public class ServiceInvoiceController {

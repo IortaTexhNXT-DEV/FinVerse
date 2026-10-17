@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.trueup.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatchRepository;
 import com.iortatechnxt.brokerverse.migration.trueup.api.dto.TrueUpResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The opening-balance adjustments of the year-end cut-over (FY2027 true-ups, DATA_MIGRATION_DESIGN
  * 17.7): list, prepare, submit, approve or return, reconcile and sign.
  */
+@OwnedRecord(value = MigTrueup.class, variable = "reference", key = "reference")
 @RestController
 @RequestMapping("/api/v1/migration/trueups")
 @Transactional

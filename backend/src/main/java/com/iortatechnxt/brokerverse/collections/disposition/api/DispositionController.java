@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.collections.feed.service.OutboxService;
 import com.iortatechnxt.brokerverse.collections.worklist.api.ClxAccess;
 import com.iortatechnxt.brokerverse.collections.worklist.api.dto.AccountDtos.TimelineResponse;
 import com.iortatechnxt.brokerverse.collections.worklist.api.dto.ItemResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import jakarta.validation.Valid;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  * on one or several accounts, remarks and tagging category, and the account's dispositions,
  * efforts, hand-offs to Operations and timeline.
  */
+@OwnedRecord(type = "BookedInvoice", variable = "invoiceNo", key = "invoiceNo")
 @RestController
 @RequestMapping("/api/v1/collections")
 public class DispositionController {

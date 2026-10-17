@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Renewal FRS FRRN.011.01 to FRRN.011.05).
  */
 @OwnedRecord(RenewalReferral.class)
+@OwnedRecord(value = RenewalCandidate.class, variable = "renewalRef", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal/referrals")
 @PreAuthorize("hasAnyAuthority('RNW_ASSIGN','RNW_DISPOSE')")

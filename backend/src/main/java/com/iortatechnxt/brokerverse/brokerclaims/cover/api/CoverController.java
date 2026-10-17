@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.domain.CoverSnapshot;
 import com.iortatechnxt.brokerverse.brokerclaims.location.api.dto.LocationDtos.LocationRefResponse;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefService;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  * read-only views of any cover of the company. Opening a cover is logged as a view in the audit
  * trail of the account.
  */
+@OwnedRecord(type = "Account", variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/broker-claims/covers")
 @Transactional(readOnly = true)

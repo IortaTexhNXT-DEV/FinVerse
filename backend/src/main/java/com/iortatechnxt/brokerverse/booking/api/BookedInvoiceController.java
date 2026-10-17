@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
  * account, and the published event of an invoice (replay for the Operations feed).
  */
 @OwnedRecord(BookedInvoice.class)
+@OwnedRecord(value = BookedInvoice.class, variable = "invoiceNo", key = "invoiceNo")
+@OwnedRecord(type = "Account", variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/booking")
 public class BookedInvoiceController {

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.lamd.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.LamdLine;
 import com.iortatechnxt.brokerverse.renewal.domain.LamdReport;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** LAMD loan reports and their match results (FR-RN-025); the upload is the bulk handler. */
+@OwnedRecord(value = LamdReport.class, variable = "reportNo", key = "reportNo")
 @RestController
 @RequestMapping("/api/v1/renewal/lamd-reports")
 @PreAuthorize("hasAnyAuthority('RNW_LAMD_UPLOAD','RNW_PROCESS','RNW_REVIEW')")

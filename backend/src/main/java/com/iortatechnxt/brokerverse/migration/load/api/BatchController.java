@@ -24,6 +24,7 @@ import com.iortatechnxt.brokerverse.migration.load.api.dto.BatchDtos.SignoffResp
 import com.iortatechnxt.brokerverse.migration.load.domain.BatchLogRepository;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatchRepository;
+import com.iortatechnxt.brokerverse.migration.load.domain.Resubmission;
 import com.iortatechnxt.brokerverse.migration.load.service.BatchPlanService;
 import com.iortatechnxt.brokerverse.migration.load.service.LoadRunner;
 import com.iortatechnxt.brokerverse.migration.load.service.RejectsFile;
@@ -58,6 +59,8 @@ import org.springframework.web.bind.annotation.RestController;
  * reconciliation and accept the object, and the resubmissions of corrected rows.
  */
 @OwnedRecord(value = MigIssue.class, variable = "issueId")
+@OwnedRecord(value = MigBatch.class, variable = "batchNo", key = "batchNo")
+@OwnedRecord(value = Resubmission.class, variable = "resubmissionNo", key = "resubmissionNo")
 @RestController
 @RequestMapping("/api/v1/migration")
 @Transactional

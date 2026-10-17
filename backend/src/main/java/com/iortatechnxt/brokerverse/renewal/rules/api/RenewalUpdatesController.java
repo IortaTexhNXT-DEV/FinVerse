@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.rules.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.rules.service.RenewalUpdatesService;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Refresh Endorsements (BDOI Renewal FRS FRRN.004.06) and the CBG Motor automatic renewal values of
  * a renewal account (FRRN.009.01) next to its expiring values and its renewal account.
  */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal/candidates/{ref}")
 public class RenewalUpdatesController {

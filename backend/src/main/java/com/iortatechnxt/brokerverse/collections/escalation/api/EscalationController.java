@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * return to the handler run through the workflow API.
  */
 @OwnedRecord(Escalation.class)
+@OwnedRecord(type = "BookedInvoice", variable = "invoiceNo", key = "invoiceNo")
 @RestController
 @RequestMapping("/api/v1/collections/escalations")
 public class EscalationController {

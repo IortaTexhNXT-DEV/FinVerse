@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.collections.legacy.api;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.collections.legacy.domain.LegacyState;
 import com.iortatechnxt.brokerverse.collections.legacy.service.LegacyItemStateService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The follow-up carried from legacy for a legacy invoice (Data Migration object F03), shown on the
  * collection account.
  */
+@OwnedRecord(type = "BookedInvoice", variable = "invoiceNo", key = "invoiceNo")
 @RestController
 @RequestMapping("/api/v1/collections")
 public class LegacyFollowUpController {

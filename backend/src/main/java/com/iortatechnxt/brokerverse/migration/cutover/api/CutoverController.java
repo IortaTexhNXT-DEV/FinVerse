@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * and the decommissioning checklists.
  */
 @OwnedRecord(DecommissionItem.class)
+@OwnedRecord(value = CutoverPlan.class, variable = "planNo", key = "planNo")
 @RestController
 @RequestMapping("/api/v1/migration")
 @Transactional

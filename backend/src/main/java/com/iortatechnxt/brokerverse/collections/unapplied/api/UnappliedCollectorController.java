@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  * of the form and a manual run of the "For Application To Invoice" file.
  */
 @OwnedRecord(ApplicationRequest.class)
+@OwnedRecord(type = "Unapplied", variable = "ref", key = "reference")
 @RestController
 @RequestMapping("/api/v1/collections/unapplied")
 public class UnappliedCollectorController {

@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * actions.
  */
 @OwnedRecord(AcslCase.class)
+@OwnedRecord(type = "BookedInvoice", variable = "invoiceNo", key = "invoiceNo")
 @RestController
 @RequestMapping("/api/v1/acsl")
 public class AcslCaseController {

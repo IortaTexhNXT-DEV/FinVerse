@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.placement.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.placement.api.dto.CancelPlacementRequest;
 import com.iortatechnxt.brokerverse.placement.api.dto.GateResponse;
 import com.iortatechnxt.brokerverse.placement.api.dto.HoldCoverConfirmRequest;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  * workbench lists and tiles, slip readiness, the placement view of an account, insurer returns,
  * resubmission, cancel / reactivate placement and hold cover.
  */
+@OwnedRecord(type = "Account", variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/placement")
 public class PlacementController {

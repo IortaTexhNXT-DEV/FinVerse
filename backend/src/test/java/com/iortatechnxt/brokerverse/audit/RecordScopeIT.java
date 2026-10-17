@@ -246,7 +246,12 @@ class RecordScopeIT {
                     RecordScopeAdvisor.declarations(h.getBeanType(), h.getMethod())
                         .values()
                         .stream())
-            .filter(d -> !d.type().isEmpty() && !recordScope.knowsType(d.type()))
+            .filter(
+                d ->
+                    !d.type().isEmpty()
+                        && !(d.key().isEmpty()
+                            ? recordScope.knowsType(d.type())
+                            : recordScope.knowsEntity(d.type(), d.key())))
             .map(d -> d.type())
             .distinct()
             .toList();

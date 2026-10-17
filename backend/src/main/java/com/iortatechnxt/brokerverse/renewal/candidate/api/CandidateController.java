@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.candidate.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.CandidateRow;
@@ -54,6 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Dispositions, the Team Leader Review Queue, the Processing Worklist and the Letters lists share
  * this endpoint with their tab; the record page reads its tabs here.
  */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal/candidates")
 public class CandidateController {

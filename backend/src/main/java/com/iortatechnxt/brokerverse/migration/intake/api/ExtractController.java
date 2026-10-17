@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.migration.intake.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.migration.intake.api.dto.ExtractResponse;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigExtract;
 import com.iortatechnxt.brokerverse.migration.intake.service.IntakeService;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Extracts (FR-DM-008; screen Extracts): upload of a data file with its control file, the intake
  * checks and the list of extracts with their files.
  */
+@OwnedRecord(value = MigExtract.class, variable = "extractNo", key = "extractNo")
 @RestController
 @RequestMapping("/api/v1/migration/extracts")
 public class ExtractController {

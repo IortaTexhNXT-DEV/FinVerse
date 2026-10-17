@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.ExceptionR
 import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.ExceptionResponse;
 import com.iortatechnxt.brokerverse.catalog.service.RateExceptionDecisions;
 import com.iortatechnxt.brokerverse.catalog.service.RateSchemeExceptionService;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * opens the exception record, where an approver other than the requester approves it (optional
  * comment) or rejects it (reason).
  */
+@GlobalRecord("programme-wide rate scheme exceptions of the product catalog (no company)")
 @RestController
 @RequestMapping("/api/v1/catalog/rate-scheme-exceptions")
 public class RateSchemeExceptionController {

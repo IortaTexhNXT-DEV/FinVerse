@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.opsledger.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.PolicyTransactionService;
 import com.iortatechnxt.brokerverse.opsledger.service.PolicyTransactionService.PolicyTransactions;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
  * adjustments and refunds of a policy with their GL journals, for the invoice 360, the account and
  * the endorsement request pages.
  */
+@OwnedRecord(value = OpsInvoice.class, variable = "invoiceNo", key = "invoiceNo")
+@OwnedRecord(type = "Account", variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/ops")
 public class PolicyTransactionController {

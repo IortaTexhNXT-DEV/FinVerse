@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.location.api.dto.LocationDtos.L
 import com.iortatechnxt.brokerverse.brokerclaims.location.api.dto.LocationDtos.LocationRefResponse;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Insurer location references (BRCLM.042; FR-CM-023): search and maintenance ({@code
  * BCL_LOCATION_REF_MAINTAIN}) and the references of a cover (Cover Lookup, claim locations).
  */
+@OwnedRecord(type = "Account", variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/broker-claims/location-refs")
 public class LocationRefController {

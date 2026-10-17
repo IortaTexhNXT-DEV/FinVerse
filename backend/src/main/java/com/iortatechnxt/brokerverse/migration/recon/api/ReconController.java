@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.migration.recon.api;
 
 import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
 import com.iortatechnxt.brokerverse.migration.load.service.BatchPlanService;
 import com.iortatechnxt.brokerverse.migration.recon.api.dto.ReconDtos.ExplainRequest;
 import com.iortatechnxt.brokerverse.migration.recon.api.dto.ReconDtos.LineResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * loaded batch, shows its lines by level and records the explanation and approval of breaks.
  */
 @OwnedRecord(value = ReconLine.class, variable = "lineId")
+@OwnedRecord(value = MigBatch.class, variable = "batchNo", key = "batchNo")
 @RestController
 @RequestMapping("/api/v1/migration")
 public class ReconController {

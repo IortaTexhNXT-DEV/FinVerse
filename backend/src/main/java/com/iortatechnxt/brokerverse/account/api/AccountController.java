@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  * the workflow API by the workflow panel.
  */
 @OwnedRecord(Account.class)
+@OwnedRecord(value = Account.class, variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/accounts")
 public class AccountController {

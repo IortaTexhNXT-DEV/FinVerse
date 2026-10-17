@@ -5,9 +5,11 @@ import com.iortatechnxt.brokerverse.adjustment.api.dto.BatchResponse;
 import com.iortatechnxt.brokerverse.adjustment.api.dto.ReturnInput;
 import com.iortatechnxt.brokerverse.adjustment.api.dto.ReturnResult;
 import com.iortatechnxt.brokerverse.adjustment.api.dto.WriteOffResponse;
+import com.iortatechnxt.brokerverse.adjustment.domain.PostingBatch;
 import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentQueryService;
 import com.iortatechnxt.brokerverse.adjustment.service.PostingBatchService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Posting batches (ADJID.005/006): return requests that do not qualify, post the selected requests,
  * the batch history; and the minimal balance write-offs (ADJID.026).
  */
+@OwnedRecord(value = PostingBatch.class, variable = "batchNo", key = "batchNo")
 @RestController
 @RequestMapping("/api/v1/adjustment")
 public class PostingBatchController {

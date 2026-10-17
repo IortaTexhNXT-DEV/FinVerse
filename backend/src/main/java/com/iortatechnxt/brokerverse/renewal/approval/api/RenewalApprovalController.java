@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.approval.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.approval.service.BookingOnlyAccounts;
 import com.iortatechnxt.brokerverse.renewal.approval.service.ClientDecisions;
 import com.iortatechnxt.brokerverse.renewal.approval.service.DirectToInsurerTags;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The client's answer, the second approval and the tags of a renewal account (FRRN.014.04,
  * FRRN.014.05, FRRN.019.01, FRRN.025.01, FRRN.26.01, FRRN.028.01).
  */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal")
 public class RenewalApprovalController {

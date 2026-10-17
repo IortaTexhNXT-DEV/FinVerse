@@ -52,6 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
  * workflow. Generic actions (return, void, decline) are run by the workflow panel.
  */
 @OwnedRecord(Quotation.class)
+@OwnedRecord(value = Quotation.class, variable = "arn", key = "arn")
 @RestController("brokingQuotationController")
 @RequestMapping("/api/v1/quotations")
 public class QuotationController {

@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.renewal.holdcover.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.HoldCoverAsk;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.holdcover.service.HoldCoverRequests;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalRecords;
 import java.math.BigDecimal;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Hold cover requests of a renewal account per insurer, extensions and responses (FRRN.036). */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
+@OwnedRecord(value = HoldCoverAsk.class, variable = "requestNo", key = "requestNo")
 @RestController
 @RequestMapping("/api/v1/renewal/candidates/{ref}/hold-cover-requests")
 public class HoldCoverRequestController {

@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.renewal.acceptance.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.acceptance.service.AcceptanceService;
 import com.iortatechnxt.brokerverse.renewal.acceptance.service.FollowupService;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalAcceptance;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalFollowup;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Client acceptance and Contact Center follow-ups of a renewal (FR-RN-084, 085). */
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal/candidates/{ref}")
 public class AcceptanceController {

@@ -25,12 +25,12 @@ import org.springframework.web.servlet.HandlerMapping;
 
 /**
  * The record scope check (DATA_SCOPE_DESIGN.md section 4.1): when an endpoint that addresses a
- * stored record by its id is called, the record named by its {@link OwnedRecord} declarations is
- * loaded and refused with HTTP 404 when it belongs to a company or branch outside the data scope of
- * the signed-in user. The check runs after the permission check of the endpoint ({@code
- * PreAuthorize}), so a caller without the permission is still answered 403, and before the endpoint
- * body, so nothing is read or changed for a record outside the scope. A path value that is not a
- * number is left to the request binding (HTTP 400).
+ * stored record by its id or by a text business key is called, the record named by its {@link
+ * OwnedRecord} declarations is loaded and refused with HTTP 404 when it belongs to a company or
+ * branch outside the data scope of the signed-in user. The check runs after the permission check of
+ * the endpoint ({@code PreAuthorize}), so a caller without the permission is still answered 403,
+ * and before the endpoint body, so nothing is read or changed for a record outside the scope. A
+ * path value that is not a number is left to the request binding (HTTP 400).
  */
 @Configuration(proxyBeanMethods = false)
 public final class RecordScopeAdvisor {
@@ -101,11 +101,15 @@ public final class RecordScopeAdvisor {
       if (!(value instanceof String text)) {
         return;
       }
-      Long id = number(text);
-      if (record.type().isEmpty()) {
-        recordScope.getObject().require(record.value(), id);
+      RecordScope scope = recordScope.getObject();
+      if (!record.key().isEmpty() && record.type().isEmpty()) {
+        scope.requireKey(record.value(), record.key(), text);
+      } else if (!record.key().isEmpty()) {
+        scope.requireKey(record.type(), record.key(), text);
+      } else if (record.type().isEmpty()) {
+        scope.require(record.value(), number(text));
       } else {
-        recordScope.getObject().require(record.type(), id);
+        scope.require(record.type(), number(text));
       }
     }
 

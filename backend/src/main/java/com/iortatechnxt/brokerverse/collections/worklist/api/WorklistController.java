@@ -23,6 +23,7 @@ import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistRefresh
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.util.List;
@@ -44,6 +45,8 @@ import org.springframework.web.bind.annotation.RestController;
  * payments, policy and co-insurance, assignments, field history), the client view, the edit lock
  * and a refresh on demand.
  */
+@OwnedRecord(type = "BookedInvoice", variable = "invoiceNo", key = "invoiceNo")
+@OwnedRecord(type = "Client", variable = "clientCode", key = "clientCode")
 @RestController
 @RequestMapping("/api/v1/collections")
 public class WorklistController {

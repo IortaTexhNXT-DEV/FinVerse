@@ -58,6 +58,18 @@ public class RecordScope {
   }
 
   /**
+   * Whether a record named by its entity name for a text business key is a stored entity with that
+   * key.
+   *
+   * @param entityType entity class simple name
+   * @param property property holding the key
+   * @return true when known
+   */
+  public boolean knowsEntity(String entityType, String property) {
+    return ownership.knowsEntity(entityType, property);
+  }
+
+  /**
    * Refuses a record kept outside the entity model, or a stored record named by its entity name,
    * outside the data scope.
    *
@@ -86,6 +98,50 @@ public class RecordScope {
     UserDataScope scope = restrictedScope(id);
     if (scope != null) {
       refuseOutside(scope, ownership.ownerOf(type, id), type.getSimpleName(), id);
+    }
+  }
+
+  /**
+   * Refuses a record addressed by a text business key (invoice number, account reference, batch
+   * number) when no record with that key is inside the data scope. A key no record carries is left
+   * to the endpoint.
+   *
+   * @param type entity class of the record
+   * @param property the entity property holding the key
+   * @param key key value, null or blank is not checked
+   */
+  public void requireKey(Class<?> type, String property, String key) {
+    UserDataScope scope = restrictedKeyScope(key);
+    if (scope != null) {
+      refuseOutside(scope, ownership.ownersByKey(type, property, key), type.getSimpleName(), key);
+    }
+  }
+
+  /**
+   * Refuses a record of a module this one may not depend on, named by its entity name, addressed by
+   * a text business key.
+   *
+   * @param entityType entity class simple name
+   * @param property the entity property holding the key
+   * @param key key value, null or blank is not checked
+   */
+  public void requireKey(String entityType, String property, String key) {
+    UserDataScope scope = restrictedKeyScope(key);
+    if (scope != null) {
+      refuseOutside(scope, ownership.ownersByKey(entityType, property, key), entityType, key);
+    }
+  }
+
+  private UserDataScope restrictedKeyScope(String key) {
+    UserDataScope scope = key == null || key.isBlank() ? null : dataScope.allowed();
+    return scope == null || scope.allCompanies() ? null : scope;
+  }
+
+  private static void refuseOutside(
+      UserDataScope scope, List<Owner> owners, String recordType, String key) {
+    if (!owners.isEmpty()
+        && owners.stream().noneMatch(o -> RecordOwnership.visible(scope, Optional.of(o)))) {
+      throw new ResourceNotFoundException(recordType, key);
     }
   }
 

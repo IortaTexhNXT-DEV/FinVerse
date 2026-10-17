@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.placement.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.placement.api.dto.ClientConfirmationRequest;
 import com.iortatechnxt.brokerverse.placement.api.dto.GateResponse;
 import com.iortatechnxt.brokerverse.placement.api.dto.GateRuleResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * client confirmation, release of direct-payment accounts and an on-demand sweep of the payment
  * confirmation sources.
  */
+@OwnedRecord(type = "Account", variable = "arn", key = "arn")
 @RestController
 @RequestMapping("/api/v1/placement/gate")
 public class PaymentGateController {

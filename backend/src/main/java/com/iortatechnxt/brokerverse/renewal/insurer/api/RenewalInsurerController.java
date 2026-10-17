@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.renewal.insurer.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerBatch;
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerResponse;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.insurer.service.InsurerBatchService;
 import com.iortatechnxt.brokerverse.renewal.insurer.service.InsurerBatchService.Line;
 import com.iortatechnxt.brokerverse.renewal.insurer.service.InsurerExtract;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Insurer batches and responses (FR-RN-070, 071). */
+@OwnedRecord(value = InsurerBatch.class, variable = "batchNo", key = "batchNo")
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal")
 public class RenewalInsurerController {

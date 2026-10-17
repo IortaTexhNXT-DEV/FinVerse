@@ -2,7 +2,9 @@ package com.iortatechnxt.brokerverse.renewal.letter.api;
 
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.RaNotice;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalLetter;
 import com.iortatechnxt.brokerverse.renewal.letter.service.LetterActions;
 import com.iortatechnxt.brokerverse.renewal.letter.service.LetterService;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Renewal letters (FR-RN-080-082, 024): Renewal Advices, closing letters and their files. */
+@OwnedRecord(value = RenewalLetter.class, variable = "letterNo", key = "letterNo")
+@OwnedRecord(value = RenewalCandidate.class, variable = "ref", key = "renewalRef")
 @RestController
 @RequestMapping("/api/v1/renewal")
 public class LetterController {

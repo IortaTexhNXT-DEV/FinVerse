@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * line by line.
  */
 @OwnedRecord(value = DpprBatchLine.class, variable = "lineId")
+@OwnedRecord(value = DpprBatch.class, variable = "batchNo", key = "batchNo")
 @RestController
 @RequestMapping("/api/v1/commission/dppr-batches")
 public class DpprBatchController {

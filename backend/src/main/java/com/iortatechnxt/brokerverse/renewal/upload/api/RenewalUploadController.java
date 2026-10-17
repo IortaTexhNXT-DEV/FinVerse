@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.renewal.upload.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
+import com.iortatechnxt.brokerverse.renewal.domain.UploadScope;
 import com.iortatechnxt.brokerverse.renewal.upload.service.RenewalUploadCentre;
 import com.iortatechnxt.brokerverse.renewal.upload.service.UploadKind;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Upload outcome summaries and record-level results of the Renewal uploads. */
+@OwnedRecord(value = UploadScope.class, variable = "jobNo", key = "jobNo")
 @RestController
 @RequestMapping("/api/v1/renewal/uploads")
 @PreAuthorize(

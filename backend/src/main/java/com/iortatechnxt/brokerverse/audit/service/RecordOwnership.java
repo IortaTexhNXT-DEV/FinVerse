@@ -5,9 +5,14 @@ import com.iortatechnxt.brokerverse.common.security.UserDataScope;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceUnitUtil;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.EntityType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -29,6 +34,9 @@ public class RecordOwnership {
 
   /** Parent records followed at most, against a loop in the declarations. */
   private static final int MAX_PARENTS = 4;
+
+  /** Records with one text key read at most (a key is unique within a company). */
+  private static final int MAX_KEY_MATCHES = 50;
 
   /** Record type of a company in the log. */
   static final String COMPANY_TYPE = "Company";
@@ -87,6 +95,57 @@ public class RecordOwnership {
    */
   public Optional<Owner> ownerOf(Class<?> type, Long entityId) {
     return resolve(type, entityId, 0);
+  }
+
+  /**
+   * Resolves the owners of the records of a known type that carry a text business key (the invoice
+   * number, the account reference, the batch number). Several companies may use the same key; each
+   * record found gives its owner.
+   *
+   * @param type entity class
+   * @param property the entity property holding the key
+   * @param key key value
+   * @return owners of the records with the key, empty when there is none
+   */
+  public List<Owner> ownersByKey(Class<?> type, String property, String key) {
+    if (key == null || key.isBlank()) {
+      return List.of();
+    }
+    CriteriaBuilder cb = em.getCriteriaBuilder();
+    CriteriaQuery<Object> query = cb.createQuery(Object.class);
+    Root<?> root = query.from(type);
+    query.select(root).where(cb.equal(root.get(property), key.trim()));
+    PersistenceUnitUtil ids = em.getEntityManagerFactory().getPersistenceUnitUtil();
+    return em.createQuery(query).setMaxResults(MAX_KEY_MATCHES).getResultList().stream()
+        .map(row -> ownerOfRow(type, ids.getIdentifier(row), row, 0))
+        .toList();
+  }
+
+  /**
+   * Resolves the owners of the records that carry a text business key, by entity name.
+   *
+   * @param entityType record type (entity class simple name)
+   * @param property the entity property holding the key
+   * @param key key value
+   * @return owners, empty when the type is unknown or no record carries the key
+   */
+  public List<Owner> ownersByKey(String entityType, String property, String key) {
+    Class<?> type = types.get(entityType);
+    return type == null ? List.of() : ownersByKey(type, property, key);
+  }
+
+  /**
+   * Whether a record type is a stored entity with a property.
+   *
+   * @param entityType entity class simple name
+   * @param property property holding a text business key
+   * @return true when known
+   */
+  public boolean knowsEntity(String entityType, String property) {
+    Class<?> type = types.get(entityType);
+    return type != null
+        && em.getMetamodel().entity(type).getAttributes().stream()
+            .anyMatch(a -> a.getName().equals(property));
   }
 
   /**

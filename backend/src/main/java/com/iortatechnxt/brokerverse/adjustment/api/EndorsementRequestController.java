@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  * validation slip.
  */
 @OwnedRecord(EndorsementRequest.class)
+@OwnedRecord(type = "BookedInvoice", variable = "invoiceNo", key = "invoiceNo")
 @RestController
 @RequestMapping("/api/v1/adjustment")
 public class EndorsementRequestController {

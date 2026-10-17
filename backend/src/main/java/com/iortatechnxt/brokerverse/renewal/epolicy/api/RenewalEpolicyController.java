@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.epolicy.api;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.EpolicyReceipt;
 import com.iortatechnxt.brokerverse.renewal.domain.EpolicyReceiptRepository;
 import com.iortatechnxt.brokerverse.renewal.epolicy.service.EpolicyReceipts;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
  * E-policies of the renewal accounts (FRRN.033): upload of the summary and ZIP files, the receipts
  * with their file-level outcome and record-level results, and the sending through CCM.
  */
+@OwnedRecord(value = EpolicyReceipt.class, variable = "receiptNo", key = "receiptNo")
 @RestController
 @RequestMapping("/api/v1/renewal/epolicy")
 public class RenewalEpolicyController {

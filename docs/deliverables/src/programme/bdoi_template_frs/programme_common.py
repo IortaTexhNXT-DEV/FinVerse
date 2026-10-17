@@ -326,6 +326,32 @@ LOG = [
      "participation concept and is deferred with reinsurance; the co-insurance split of an invoice stays in "
      "Operations (FR-OP-007).", "Client (BDOI)", "FRS BRD-00 v1.2 issued; gap G17 recorded as Deferred to Phase 2.",
      "Closed", "FRS BRD-00 v1.2"),
+    ("O-019", "17 Oct 2026", "Decision", "BRD-02", "Remittance FRS in BDOI's format v1.0: its own set under "
+     "BRD-02", "BDOI's FRS of Remittance is issued in BDOI's template as a set of its own under BRD-02 (folder "
+     "BRD-02_Operations_Remittance), next to the Operations Cashiering set; the full document set and review "
+     "workbooks v1.0. The drop plan places reinsurance transactions in Drop 1 Remittance; by the client decision of "
+     "17-Oct-2026 reinsurance is deferred to Phase 2 (O-018), so no reinsurance remittance type is offered at "
+     "go-live; Q-RM-17 asks BDOI to confirm.", "iorta TechNXT", "Remittance set v1.0 issued; document register "
+     "and drop index updated.", "Closed", "BIBS FRS-BDOI BRD-02 Operations Remittance v1.0"),
+    ("O-020", "17 Oct 2026", "Decision", "BRD-07", "Claims FRS in BDOI's format v1.0 is the FRS of BRD-07",
+     "BDOI's FRS of Claims is issued in BDOI's template v1.0 with its full document set and review workbooks; it is "
+     "the FRS of BRD-07 and the earlier sign-off set of Claims (FRS and test plan v1.1) is withdrawn, as for BRD-02, "
+     "03, 06 and 11. FRCLM.002.05 (user profiles maintained by MBS) is restated to the UIDM-ISC and Entra ID model "
+     "of FRS User Access Maintenance v1.6: UIDM-ISC maintains the users and their group-profile membership; the "
+     "claims profile attributes are kept in BIBS under maker-checker. The Conformance Register lists the "
+     "requirements of the Remittance and Claims FRS in BDOI's format as not yet assessed, counted apart.",
+     "iorta TechNXT", "Claims set v1.0 issued; old Claims set v1.1 removed; document register and drop indexes "
+     "updated.", "Closed", "BIBS FRS-BDOI BRD-07 Claims v1.0"),
+    ("O-021", "17 Oct 2026", "Decision", "BRD-00", "End-to-End Conformance Register v1.6: Phase 2 deferrals "
+     "counted apart, text-key data scope, eleven requirements shown in full", "The register gains the result "
+     "Deferred to Phase 2: the partner portal (G02) and reinsurance (G17) are listed and left out of the current-phase "
+     "figures, and v1.5 is restated on the same basis (636 requirements, 60.2% conformant). Delivered: the data scope "
+     "of records addressed by a text business key, the e-mail and the copy to the unit of the account of the case "
+     "routing notice, and automated checks of every acceptance criterion of eleven partly conformant requirements of "
+     "BRD-07, BRD-09 and BRD-10. Walkthrough-script steps run again on a fresh SIT/UAT environment: 351 pass, none "
+     "fail, none blocked, 2 deferred. Current phase: 394 of 636 requirements conformant (61.9%), 208 partly. The "
+     "Remittance and Claims FRS in BDOI's format are listed apart as not yet assessed (65 and 75 items).",
+     "iorta TechNXT", "Register v1.6 issued; v1.5 superseded.", "Closed", "Conformance Register v1.6"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.
@@ -334,6 +360,8 @@ REGISTER_BRDS = [
     ("BRD-03", "BRD-03_Product_Maintenance", "Product Maintenance", "BDOI Product Owner, Product Maintenance"),
     ("BRD-06", "BRD-06_Renewal", "Renewal", "BDOI Product Owner, Renewal"),
     ("BRD-02", "BRD-02_Operations_Cashiering", "Operations Cashiering", "BDOI Product Owner, Operations"),
+    ("BRD-02", "BRD-02_Operations_Remittance", "Operations Remittance", "BDOI Product Owner, Operations"),
+    ("BRD-07", "BRD-07_Claims", "Claims", "BDOI Product Owner, Claims"),
 ]
 STANDARD_SET = [
     ("README", "How to read this pack"), ("FRS", "Functional Requirements Specification"),

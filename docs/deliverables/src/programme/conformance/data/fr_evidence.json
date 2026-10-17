@@ -295,7 +295,7 @@
    "brd": "BRD-00",
    "id": "FR-CR-061",
    "title": "Maintain insurer records in one place",
-   "screens": "Insurer page (Catalog > Insurers), tabs Profile, Branches and LGT, Contacts, Products and Packages, Commission Rates, Payment Terms and Remittance, Risk Participation, Accounts",
+   "screens": "Insurer page (Catalog > Insurers), tabs Profile, Branches and LGT, Contacts, Products and Packages, Commission Rates, Payment Terms and Remittance, Accounts",
    "priority": "Must have",
    "acceptance": [
     "A changed commission rate applies to bookings from its effective date and not before.",
@@ -366,6 +366,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/nbadmin/MisFieldsPage.test.tsx",
@@ -704,6 +705,7 @@
     "QuotationProposalApiIT",
     "RemittanceApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "CatalogIT",
     "CatalogRatingIT",
     "InsurerPageIT",
@@ -750,6 +752,7 @@
     "CatalogAccountApiIT",
     "EbFoundationApiIT",
     "QuotationProposalApiIT",
+    "TextKeyScopeIT",
     "BookingServiceIT",
     "EndorsementIT",
     "UnappliedDispositionIT",
@@ -824,6 +827,7 @@
     "EbMarketApiIT",
     "OperationsSettlementApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingServiceIT",
     "EndorsementIT",
@@ -904,6 +908,7 @@
     "CatalogAccountApiIT",
     "ClaimsEndToEndApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -1261,6 +1266,7 @@
     "EbProgrammesApiIT",
     "QuotationProposalApiIT",
     "ScreeningEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFeedIT",
     "RatingSchemeIT",
     "ClientBulkIT",
@@ -1404,6 +1410,7 @@
     "ScreeningEndToEndApiIT",
     "ScreeningMatchingApiIT",
     "ApprovalInboxIT",
+    "TextKeyScopeIT",
     "ClaimsFeedIT",
     "CatalogIT",
     "CatalogRatingIT",
@@ -1437,6 +1444,7 @@
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT",
     "ScreeningMatchingIT",
+    "PhaseTwoFunctionsAccessIT",
     "OpenItemIT",
     "OpenItemUnmatchIT",
     "features/crm/clientForm.test.ts",
@@ -1620,6 +1628,7 @@
     "PlacementIssuanceApiIT",
     "QuotationProposalApiIT",
     "ScreeningEndToEndApiIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -1843,6 +1852,7 @@
     "ClaimsEndToEndApiIT",
     "EbFoundationApiIT",
     "QuotationProposalApiIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -2111,6 +2121,7 @@
     "AccountRulesIT",
     "CatalogAccountApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "BookingServiceIT",
     "EndorsementIT",
     "RatingSchemeIT",
@@ -2156,6 +2167,7 @@
     "EbProgrammesApiIT",
     "QuotationProposalApiIT",
     "ScreeningEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFeedIT",
     "CatalogIT",
     "RatingSchemeIT",
@@ -2224,6 +2236,7 @@
     "PlacementIssuanceApiIT",
     "RemittanceApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -2303,6 +2316,7 @@
     "EbFoundationApiIT",
     "EbProgrammesApiIT",
     "ScreeningEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFeedIT",
     "CatalogIT",
     "RatingSchemeIT",
@@ -2358,6 +2372,7 @@
     "BrokingFoundationApiIT",
     "CatalogAccountApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "MigrationClientsHeadersApiIT",
     "MigrationInvoice360ApiIT",
     "HoldCoverIT",
@@ -2394,6 +2409,7 @@
     "AccountRulesIT",
     "CatalogAccountApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "MigrationClientsHeadersApiIT",
     "CodeMapExcelTest",
     "HoldCoverIT",
@@ -2450,6 +2466,7 @@
     "EbFoundationApiIT",
     "PlacementIssuanceActionsApiIT",
     "PlacementIssuanceApiIT",
+    "TextKeyScopeIT",
     "MigrationClientsHeadersApiIT",
     "HoldCoverIT",
     "RenewalLettersIT"
@@ -2484,6 +2501,7 @@
     "EbFoundationApiIT",
     "RemittanceApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -2549,6 +2567,7 @@
     "PlacementIssuanceApiIT",
     "RemittanceApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -2778,6 +2797,7 @@
     "PlacementIssuanceActionsApiIT",
     "PlacementIssuanceApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -2920,6 +2940,7 @@
     "PlacementIssuanceApiIT",
     "RemittanceApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3224,6 +3245,7 @@
     "OperationsFoundationApiIT",
     "OperationsSettlementApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3290,6 +3312,7 @@
     "OperationsSettlementApiIT",
     "ApprovalInboxIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3334,6 +3357,7 @@
     "ClaimsEndToEndApiIT",
     "OperationsSettlementApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3378,6 +3402,7 @@
     "CatalogAccountApiIT",
     "ClaimsEndToEndApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3438,6 +3463,7 @@
     "PlacementIssuanceApiIT",
     "RemittanceApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3519,6 +3545,7 @@
     "OperationsFoundationApiIT",
     "OperationsSettlementApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3570,6 +3597,7 @@
     "CatalogAccountApiIT",
     "ClaimsEndToEndApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3632,6 +3660,7 @@
     "OperationsFoundationApiIT",
     "OperationsSettlementApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -3687,6 +3716,7 @@
     "OperationsFoundationApiIT",
     "OperationsSettlementApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingValuesTest",
@@ -3757,6 +3787,7 @@
     "OperationsFoundationApiIT",
     "OperationsSettlementApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingServiceIT",
     "EndorsementIT",
@@ -3819,6 +3850,7 @@
     "NbReportsIT",
     "navigation/access.test.ts",
     "navigation/personaMenus.test.ts",
+    "navigation/phaseTwo.test.ts",
     "navigation/productModules.test.ts"
    ]
   },
@@ -3868,6 +3900,7 @@
     "EbFoundationApiIT",
     "NbReportApiIT",
     "QuotationProposalApiIT",
+    "TextKeyScopeIT",
     "BookingServiceIT",
     "EndorsementIT",
     "UnappliedDispositionIT",
@@ -4707,6 +4740,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ModuleFileAccessIT",
     "ProductModuleSwitchesIT"
@@ -4817,6 +4851,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "DataScopeGuardTest",
     "RedisEnabledPlatformIT",
     "DeviceAccessFilterTest",
@@ -4960,6 +4995,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "DataScopeGuardTest",
     "RedisEnabledPlatformIT",
     "DeviceAccessFilterTest",
@@ -5047,6 +5083,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "DataScopeGuardTest",
     "RedisEnabledPlatformIT",
     "DeviceAccessFilterTest",
@@ -5181,6 +5218,7 @@
     "CatalogAccountApiIT",
     "ClaimsEndToEndApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "BookingServiceIT",
     "EndorsementIT",
     "CashieringAdaptersIT",
@@ -6754,6 +6792,7 @@
     "CatalogAccountApiIT",
     "EbFoundationApiIT",
     "ProdReconApiIT",
+    "TextKeyScopeIT",
     "BookingServiceIT",
     "EndorsementIT",
     "RatingSchemeIT",
@@ -6879,6 +6918,7 @@
     "CollectionsPlansApiIT",
     "OperationsFoundationApiIT",
     "OperationsSettlementApiIT",
+    "TextKeyScopeIT",
     "CollectionsUnappliedApiIT",
     "CollectionsWorklistIT",
     "MigrationCollectionStateApiIT",
@@ -6946,6 +6986,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "CommissionApiIT",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsTextTest",
     "CollectionsUnappliedApiIT",
@@ -6983,6 +7024,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "CommissionApiIT",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsTextTest",
     "CollectionsUnappliedApiIT",
@@ -7019,6 +7061,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "CommissionApiIT",
+    "TextKeyScopeIT",
     "MinimalBalanceIT",
     "PaymentApplicationIT",
     "PrebookedAndPortsIT",
@@ -7242,6 +7285,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/remittance/remittanceLabels.test.ts"
@@ -7356,6 +7400,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "UserAccessEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFoundationIT",
     "ReferenceDataCacheIT",
     "CollectionsUnappliedApiIT",
@@ -7396,6 +7441,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "DataScopeGuardTest",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
@@ -7461,6 +7507,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/adjustment/requestForm.test.ts"
@@ -7547,6 +7594,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "DataScopeGuardTest",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
@@ -7625,6 +7673,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "DataScopeGuardTest",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
@@ -7700,6 +7749,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -7770,6 +7820,7 @@
     "CatalogAccountApiIT",
     "ClaimsEndToEndApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "BookingServiceIT",
     "EndorsementIT",
     "CashieringAdaptersIT",
@@ -7875,6 +7926,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -8128,6 +8180,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/productmaint/businessLabels.test.tsx",
@@ -8208,6 +8261,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/productmaint/businessLabels.test.tsx",
@@ -8850,6 +8904,7 @@
     "RemittanceApiIT",
     "MasterChangeLogIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -8940,6 +8995,7 @@
     "RemittanceApiIT",
     "MasterChangeLogIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -9220,6 +9276,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -9322,6 +9379,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsUnappliedApiIT",
     "MigrationCollectionStateApiIT"
    ]
@@ -9345,6 +9403,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "MasterChangesTest",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsUnappliedApiIT",
     "CollectionsWorklistIT",
@@ -9409,6 +9468,7 @@
     "ApiSmokeIT",
     "CollectionsPlansApiIT",
     "UserAccessEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFoundationIT",
     "ReferenceDataCacheIT",
     "CollectionsFilesIT",
@@ -9446,6 +9506,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/collections/collectionsLogic.test.ts",
@@ -9471,6 +9532,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsUnappliedApiIT",
     "CollectionsUnappliedIT",
@@ -9529,6 +9591,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsUnappliedApiIT",
     "CollectionsWorklistIT",
     "MigrationCollectionStateApiIT"
@@ -9574,6 +9637,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsUnappliedApiIT",
     "MigrationCollectionStateApiIT"
    ]
@@ -9598,6 +9662,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsUnappliedApiIT",
     "CollectionsWorklistIT",
     "MigrationCollectionStateApiIT"
@@ -9622,6 +9687,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsUnappliedApiIT",
     "CollectionsWorklistIT",
@@ -9647,6 +9713,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "UserAccessEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFoundationIT",
     "ReferenceDataCacheIT",
     "CollectionsFilesIT",
@@ -9686,6 +9753,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -9710,6 +9778,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "UserAccessEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFoundationIT",
     "ReferenceDataCacheIT",
     "CollectionsFilesIT",
@@ -9749,6 +9818,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -9774,6 +9844,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsTextTest",
     "CollectionsUnappliedApiIT",
@@ -9803,6 +9874,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsTextTest",
     "CollectionsUnappliedApiIT",
@@ -9853,6 +9925,7 @@
     "ScreeningEndToEndApiIT",
     "UserAccessEndToEndApiIT",
     "AuditTrailBdoiIT",
+    "TextKeyScopeIT",
     "BookingBillingAndBusinessTypeIT",
     "BrokerClaimsReportsIT",
     "ClaimsFoundationIT",
@@ -9933,6 +10006,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "DataScopeGuardTest",
     "RedisEnabledPlatformIT",
     "ModuleFileAccessIT",
@@ -9985,6 +10059,7 @@
     "CollectionsPlansApiIT",
     "UserAccessEndToEndApiIT",
     "MasterChangesTest",
+    "TextKeyScopeIT",
     "ClaimsFoundationIT",
     "ReferenceDataCacheIT",
     "CollectionsEscalationIT",
@@ -10024,6 +10099,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -10052,6 +10128,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "UserAccessEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFoundationIT",
     "ReferenceDataCacheIT",
     "CollectionsEscalationIT",
@@ -10093,6 +10170,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/collections/plans/labels.test.ts",
@@ -10117,6 +10195,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsPlansIT",
     "CollectionsPlansRulesTest",
     "CollectionsUnappliedApiIT",
@@ -10147,6 +10226,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "UserAccessEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFoundationIT",
     "ReferenceDataCacheIT",
     "CollectionsBulkUpdateIT",
@@ -10189,6 +10269,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/collections/plans/labels.test.ts",
@@ -10213,6 +10294,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsUnappliedApiIT",
     "MigrationCollectionStateApiIT"
    ]
@@ -10234,6 +10316,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsUnappliedApiIT",
     "CollectionsWorklistIT",
     "MigrationCollectionStateApiIT"
@@ -10262,6 +10345,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsBulkUpdateIT",
     "CollectionsFilesIT",
     "CollectionsPlansSeedDataIT",
@@ -10296,6 +10380,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsBulkUpdateIT",
     "CollectionsFilesIT",
     "CollectionsPlansSeedDataIT",
@@ -10366,6 +10451,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -10395,6 +10481,7 @@
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
     "UserAccessEndToEndApiIT",
+    "TextKeyScopeIT",
     "ClaimsFoundationIT",
     "ReferenceDataCacheIT",
     "CollectionsBulkUpdateIT",
@@ -10438,6 +10525,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/collections/escalations/labels.test.ts",
@@ -10503,6 +10591,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/collections/billing/labels.test.ts"
@@ -10566,6 +10655,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/collections/billing/labels.test.ts"
@@ -10658,6 +10748,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsUnappliedApiIT",
     "CollectionsUnappliedIT",
     "MigrationCollectionStateApiIT"
@@ -10759,6 +10850,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "DataScopeGuardTest",
     "RedisEnabledPlatformIT",
     "DeviceAccessFilterTest",
@@ -10869,6 +10961,7 @@
     "ScreeningEndToEndApiIT",
     "UserAccessEndToEndApiIT",
     "AuditTrailBdoiIT",
+    "TextKeyScopeIT",
     "BookingBillingAndBusinessTypeIT",
     "BrokerClaimsReportsIT",
     "BudgetIT",
@@ -10957,6 +11050,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsRulesTest",
     "CollectionsUnappliedApiIT",
@@ -10979,6 +11073,7 @@
    "via": [
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "CollectionsFilesIT",
     "CollectionsUnappliedApiIT",
     "MigrationCollectionStateApiIT"
@@ -12184,6 +12279,7 @@
     "PartyApprovalSourceTest",
     "PayablesDomainTest",
     "ReceivablesLogicTest",
+    "PhaseTwoFunctionsAccessIT",
     "OpenItemIT",
     "TaxStatusAndChargesIT",
     "features/disbursement/labels.test.ts"
@@ -12621,6 +12717,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/setup/setupForms.test.ts"
@@ -13361,6 +13458,7 @@
     "ProdReconApiIT",
     "RemittanceApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingBillingAndBusinessTypeIT",
     "BookingServiceIT",
@@ -13836,6 +13934,7 @@
     "AcslAssigneesTest",
     "AcslCorrectionIT",
     "RefundValidationIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT"
    ]
@@ -13967,6 +14066,7 @@
     "RefundValidationIT",
     "PeriodApiIT",
     "RemittanceIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT",
     "features/acsl/acsl.test.ts"
@@ -14234,6 +14334,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -14288,6 +14389,7 @@
     "OperationsSettlementApiIT",
     "UserAccessEndToEndApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingServiceIT",
     "SiBatchIT",
@@ -14357,6 +14459,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "SubmittedPoliciesIT",
     "ProductModuleSwitchesIT",
@@ -14585,6 +14688,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "SubmittedPoliciesIT",
     "ProductModuleSwitchesIT"
@@ -14883,6 +14987,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "SubmittedPoliciesIT",
     "ProductModuleSwitchesIT",
@@ -14928,6 +15033,7 @@
     "AccountRulesIT",
     "CatalogAccountApiIT",
     "EbFoundationApiIT",
+    "TextKeyScopeIT",
     "BookingServiceIT",
     "EndorsementIT",
     "RatingSchemeIT",
@@ -15222,6 +15328,7 @@
     "CatalogAccountApiIT",
     "EbFoundationApiIT",
     "QuotationProposalApiIT",
+    "TextKeyScopeIT",
     "RatingSchemeIT",
     "EbPlacementIT",
     "MigrationClientsHeadersApiIT",
@@ -15606,6 +15713,7 @@
     "OperationsSettlementApiIT",
     "UserAccessEndToEndApiIT",
     "RecordScopeIT",
+    "TextKeyScopeIT",
     "BookingBatchIT",
     "BookingServiceIT",
     "SiBatchIT",
@@ -15653,6 +15761,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -15707,6 +15816,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -15757,6 +15867,7 @@
    "via": [
     "BookingApiIT",
     "OperationsSettlementApiIT",
+    "TextKeyScopeIT",
     "BookingServiceIT"
    ]
   },
@@ -15838,6 +15949,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "SubmittedPoliciesIT",
     "ProductModuleSwitchesIT"
@@ -16141,6 +16253,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/brokerclaims/status/HistoryTab.test.tsx",
@@ -16210,6 +16323,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/brokerclaims/status/HistoryTab.test.tsx"
@@ -16273,6 +16387,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -16341,6 +16456,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/brokerclaims/record/claimPages.test.tsx",
@@ -16402,6 +16518,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -16510,6 +16627,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -16575,6 +16693,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/brokerclaims/module.test.tsx",
@@ -16711,6 +16830,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/brokerclaims/location/locationLogic.test.ts"
@@ -16801,6 +16921,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -16942,9 +17063,10 @@
     "BRCLM.011",
     "BRCLM.027"
    ],
-   "direct": [],
+   "direct": [
+    "ClaimStatusIT"
+   ],
    "via": [
-    "ClaimStatusIT",
     "ClaimsBulkIT",
     "ClaimsSetupIT",
     "ClaimAgeingTest"
@@ -16963,9 +17085,10 @@
    "brd_ids": [
     "BRCLM.014"
    ],
-   "direct": [],
+   "direct": [
+    "ClaimsSetupIT"
+   ],
    "via": [
-    "ClaimsSetupIT",
     "PersonaMenusIT",
     "features/brokerclaims/setup/setupLogic.test.ts"
    ]
@@ -17057,6 +17180,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/brokerclaims/status/HistoryTab.test.tsx",
@@ -17132,6 +17256,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/brokerclaims/module.test.tsx",
@@ -17215,6 +17340,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/brokerclaims/status/statusLogic.test.ts"
@@ -17297,6 +17423,7 @@
     "ClaimsStatusReportsApiIT",
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "ClaimsBulkIT",
     "ClaimsHandlingApiIT",
     "CollectionsUnappliedApiIT",
@@ -17325,6 +17452,7 @@
     "ClaimsStatusReportsApiIT",
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "ClaimInsurersIT",
     "ClaimsBulkIT",
     "ClaimsHandlingApiIT",
@@ -17397,6 +17525,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -17423,6 +17552,7 @@
     "ClaimsStatusReportsApiIT",
     "CollectionsApiIT",
     "CollectionsPlansApiIT",
+    "TextKeyScopeIT",
     "ClaimInsurersIT",
     "ClaimsBulkIT",
     "ClaimsHandlingApiIT",
@@ -17580,6 +17710,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT"
    ]
@@ -18442,11 +18573,12 @@
     "The update is saved within 3 seconds (p.30)."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "CsfContactChangeIT"
+   ],
    "via": [
     "ScreeningSetupApiIT",
     "CsfCaseIT",
-    "CsfContactChangeIT",
     "CsfReportsApiIT",
     "ScreeningWatchlistIT",
     "PersonaMenusIT",
@@ -18464,9 +18596,10 @@
     "The CSF Contact Changes report lists the sync status of each change."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "CsfContactChangeIT"
+   ],
    "via": [
-    "CsfContactChangeIT",
     "IntegrationEventsLocalIT"
    ]
   },
@@ -18501,7 +18634,9 @@
     "An account without a confirmed e-policy offers no resend."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "CsfServicingIT"
+   ],
    "via": [
     "CsfCaseIT",
     "CsfReportsApiIT",
@@ -18549,10 +18684,10 @@
     "No screen allows an audit row to be changed."
    ],
    "brd_ids": [],
-   "direct": [],
-   "via": [
+   "direct": [
     "CsfContactChangeIT"
-   ]
+   ],
+   "via": []
   },
   {
    "brd": "BRD-09",
@@ -18661,6 +18796,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "RedisEnabledPlatformIT",
     "ProductModuleSwitchesIT",
     "features/csf/cases/cases.test.tsx",
@@ -19299,6 +19435,7 @@
     "ScreeningMatchingApiIT",
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCasesIT",
     "ScreeningMatchingIT",
     "ScreeningMatchingTest",
@@ -19341,7 +19478,9 @@
     "The Timeline tab lists every transition with user and time."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "ScreeningCasesIT"
+   ],
    "via": [
     "ScreeningCasesApiIT",
     "ScreeningEndToEndApiIT",
@@ -19349,7 +19488,6 @@
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
     "ScreeningCaseRulesIT",
-    "ScreeningCasesIT",
     "PersonaMenusIT"
    ]
   },
@@ -19372,6 +19510,7 @@
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
     "CsfCaseIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT",
     "PersonaMenusIT",
@@ -19423,6 +19562,7 @@
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
     "RefundValidationIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT",
     "PersonaMenusIT"
@@ -19446,6 +19586,7 @@
     "ScreeningMatchingApiIT",
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT",
     "PersonaMenusIT",
@@ -19485,7 +19626,9 @@
     "Submission with a blank mandatory field is refused and the field is flagged."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "ScreeningCaseRequirementsIT"
+   ],
    "via": [
     "ScreeningCasesApiIT",
     "ScreeningEndToEndApiIT",
@@ -19509,7 +19652,10 @@
     "Only INVESTIGATION dispositions are offered."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "ScreeningCaseRequirementsIT",
+    "ScreeningCasesIT"
+   ],
    "via": [
     "ScreeningCasesApiIT",
     "ScreeningEndToEndApiIT",
@@ -19517,7 +19663,6 @@
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
     "ScreeningCaseRulesIT",
-    "ScreeningCasesIT",
     "PersonaMenusIT"
    ]
   },
@@ -19532,14 +19677,16 @@
     "A document without date received cannot be uploaded."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "ScreeningCaseRequirementsIT",
+    "ScreeningCasesIT"
+   ],
    "via": [
     "ScreeningCasesApiIT",
     "ScreeningEndToEndApiIT",
     "ScreeningMatchingApiIT",
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
-    "ScreeningCasesIT",
     "PersonaMenusIT",
     "features/screening/cases/caseLogic.test.ts"
    ]
@@ -19555,15 +19702,17 @@
     "A valid case is logged VALIDATED and routed to the approver."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "ScreeningCasesIT"
+   ],
    "via": [
     "ScreeningCasesApiIT",
     "ScreeningEndToEndApiIT",
     "ScreeningMatchingApiIT",
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
-    "ScreeningCasesIT",
     "ScreeningConfigIT",
     "ScreeningSetupRulesTest",
     "PersonaMenusIT"
@@ -19609,6 +19758,7 @@
     "ScreeningMatchingApiIT",
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT",
     "PersonaMenusIT"
@@ -19713,14 +19863,15 @@
     "Recording the reference closes the case and shows FILED in the STR register."
    ],
    "brd_ids": [],
-   "direct": [],
+   "direct": [
+    "ScreeningCasesIT"
+   ],
    "via": [
     "ScreeningCasesApiIT",
     "ScreeningEndToEndApiIT",
     "ScreeningMatchingApiIT",
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
-    "ScreeningCasesIT",
     "PersonaMenusIT",
     "features/screening/str/strLogic.test.ts"
    ]
@@ -19756,6 +19907,7 @@
     "ScreeningMatchingApiIT",
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT",
     "PersonaMenusIT"
@@ -19805,6 +19957,7 @@
    "brd_ids": [],
    "direct": [],
    "via": [
+    "ScreeningCaseRequirementsIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT"
    ]
@@ -19860,6 +20013,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "JwtAuthenticationFilterTest",
     "SingleSignOnIT",
     "RedisEnabledPlatformIT"
@@ -19902,6 +20056,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "JwtAuthenticationFilterTest",
     "SingleSignOnIT",
     "RedisEnabledPlatformIT"
@@ -19947,6 +20102,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "JwtAuthenticationFilterTest",
     "SingleSignOnIT",
     "RedisEnabledPlatformIT"
@@ -19991,6 +20147,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "JwtAuthenticationFilterTest",
     "SingleSignOnIT",
     "RedisEnabledPlatformIT"
@@ -20041,6 +20198,7 @@
     "UserAccessExtensionsIT",
     "UserAdminApiIT",
     "BdoiSeedAccessIT",
+    "PhaseTwoFunctionsAccessIT",
     "JwtAuthenticationFilterTest",
     "SingleSignOnIT",
     "RedisEnabledPlatformIT",
@@ -25075,6 +25233,80 @@
    ],
    "result": "passed"
   },
+  "TextKeyScopeIT": {
+   "id": "TextKeyScopeIT",
+   "kind": "backend",
+   "module": "audit",
+   "named": true,
+   "name": "Records addressed by a text business key (invoice number, account reference, batch number) follow the data scope of the caller, like the records addressed by id (DATA_SCOPE_DESIGN.md section 4.1)",
+   "direct": [],
+   "via": [
+    "BRCLM.034",
+    "BRCLXN.001",
+    "BRCLXN.003",
+    "BRCLXN.008",
+    "BRCLXN.013",
+    "BRCLXN.015",
+    "BRCLXN.016",
+    "BRCLXN.017",
+    "BRCLXN.019",
+    "BRCLXN.021",
+    "BRCLXN.024",
+    "BRCLXN.028",
+    "BRCLXN.037",
+    "BRCLXN.043",
+    "BRCLXN.045",
+    "BRCLXN.046",
+    "BRCLXN.049",
+    "BRCLXN.051",
+    "BRCLXN.052",
+    "BRCLXN.053",
+    "BRCLXN.054",
+    "BRCLXN.055",
+    "BRCLXN.056",
+    "BRCLXN.057",
+    "BRNB.019",
+    "BRNB.022",
+    "BRNB.025",
+    "BRNB.027",
+    "BRNB.029",
+    "BRNB.033",
+    "BRNB.036",
+    "BRNB.050",
+    "BRNB.051",
+    "BRNB.054",
+    "BRNB.076",
+    "BRNB.094",
+    "BRNB.097",
+    "BRNB.098",
+    "BRNB.100",
+    "BRNB.102",
+    "BRNB.107",
+    "BRNB.108",
+    "BRNB.111",
+    "BRNB.112",
+    "BRNB.113",
+    "BRNB.114",
+    "BRPM.007",
+    "BRRN.032",
+    "BRRN.033",
+    "BRRN.040",
+    "BRRN.041",
+    "CMRID.001",
+    "CMRID.009",
+    "CSHID.009",
+    "CSHID.020",
+    "CSHID.026",
+    "DIS 3.27.2",
+    "FR-CM-055",
+    "FR-NB-118",
+    "FR-RN-087",
+    "MKTID.012",
+    "MKTID.013",
+    "PRCID.023"
+   ],
+   "result": "passed"
+  },
   "BookingBatchIT": {
    "id": "BookingBatchIT",
    "kind": "backend",
@@ -25384,7 +25616,8 @@
    "name": "The status engine of wave CL1-B (BRCLM.005/010-015/019-021/027/035",
    "direct": [
     "BRCLM.005",
-    "FR-CM-041"
+    "FR-CM-041",
+    "FR-CM-042"
    ],
    "via": [
     "BRCLM.010",
@@ -25393,7 +25626,6 @@
     "BRCLM.020",
     "BRCLM.025",
     "FR-CM-003",
-    "FR-CM-042",
     "FR-CM-044",
     "FR-CM-045",
     "FR-CM-050",
@@ -25578,10 +25810,11 @@
    "kind": "backend",
    "module": "brokerclaims",
    "named": true,
-   "name": "Claims Setup of wave CL1-B (BRCLM.010/012/014, FR-CM-040/041/043)",
+   "name": "Claims Setup of wave CL1-B (BRCLM.010/012/014, FR-CM-040/041/043",
    "direct": [
     "BRCLM.010",
-    "FR-CM-040"
+    "FR-CM-040",
+    "FR-CM-043"
    ],
    "via": [
     "BRCLM.005",
@@ -25590,7 +25823,6 @@
     "BRNB.083",
     "FR-CM-041",
     "FR-CM-042",
-    "FR-CM-043",
     "FR-CM-044",
     "FR-CM-045"
    ],
@@ -28090,6 +28322,7 @@
    "named": true,
    "name": "Case management of the Customer Servicing Facility (FR-CSF-050, FR-CSF-051, FR-CSF-052, FR-CSF-053, FR-CSF-054, FR-CSF-055, FR-CSF-056, FR-CSF-057, FR-CSF-058, FR-CSF-059, FR-CSF-060, FR-CSF-061)",
    "direct": [
+    "BRCSFCM.012",
     "FR-CSF-050",
     "FR-CSF-051",
     "FR-CSF-052",
@@ -28124,9 +28357,12 @@
    "kind": "backend",
    "module": "csf",
    "named": true,
-   "name": "Caller verification, contact changes, refusals and referrals, and the legacy write-back of the Customer Servicing Facility (FR-CSF-020, 021, 022, 040",
+   "name": "Caller verification, contact changes, refusals and referrals, and the legacy write-back of the Customer Servicing Facility (FR-CSF-020, FR-CSF-021, FR-CSF-022, FR-CSF-040",
    "direct": [
-    "FR-CSF-020"
+    "FR-CSF-020",
+    "FR-CSF-021",
+    "FR-CSF-022",
+    "FR-CSF-040"
    ],
    "via": [
     "BRNB.029",
@@ -28138,10 +28374,7 @@
     "BRNB.101",
     "BRNB.110",
     "FR-CSF-011",
-    "FR-CSF-013",
-    "FR-CSF-021",
-    "FR-CSF-022",
-    "FR-CSF-040"
+    "FR-CSF-013"
    ],
    "result": "passed"
   },
@@ -28185,7 +28418,8 @@
    "named": true,
    "name": "Customer Search, Servicing View, documents and resends of the Customer Servicing Facility (FR-CSF-010 to 013, 030 to 033, 042",
    "direct": [
-    "FR-CSF-010"
+    "FR-CSF-010",
+    "FR-CSF-031"
    ],
    "via": [
     "BRNB.026",
@@ -34388,6 +34622,31 @@
    "via": [],
    "result": "passed"
   },
+  "ScreeningCaseRequirementsIT": {
+   "id": "ScreeningCaseRequirementsIT",
+   "kind": "backend",
+   "module": "screening",
+   "named": true,
+   "name": "The acceptance criteria of the investigation step of a screening case that the end-to-end case (ScreeningCasesIT) does not show",
+   "direct": [
+    "FR-SS-050",
+    "FR-SS-051",
+    "FR-SS-052"
+   ],
+   "via": [
+    "ACSL 2.5.4",
+    "ACSL 2.9.0",
+    "FR-SS-034",
+    "FR-SS-041",
+    "FR-SS-043",
+    "FR-SS-044",
+    "FR-SS-060",
+    "FR-SS-062",
+    "FR-SS-081",
+    "FR-SS-091"
+   ],
+   "result": "passed"
+  },
   "ScreeningCaseRulesIT": {
    "id": "ScreeningCaseRulesIT",
    "kind": "backend",
@@ -34430,7 +34689,13 @@
    "module": "screening",
    "named": true,
    "name": "A screening case end to end (SNSRP-303, 401, 501-502, 601, 701-706",
-   "direct": [],
+   "direct": [
+    "FR-SS-040",
+    "FR-SS-051",
+    "FR-SS-052",
+    "FR-SS-060",
+    "FR-SS-072"
+   ],
    "via": [
     "ACSL 2.5.4",
     "ACSL 2.9.0",
@@ -34440,21 +34705,16 @@
     "BRNB.101",
     "BRNB.110",
     "FR-SS-034",
-    "FR-SS-040",
     "FR-SS-041",
     "FR-SS-043",
     "FR-SS-044",
     "FR-SS-050",
-    "FR-SS-051",
-    "FR-SS-052",
-    "FR-SS-060",
     "FR-SS-061",
     "FR-SS-062",
     "FR-SS-063",
     "FR-SS-064",
     "FR-SS-070",
     "FR-SS-071",
-    "FR-SS-072",
     "FR-SS-081",
     "FR-SS-091"
    ],
@@ -35633,6 +35893,63 @@
     "CSHID.026",
     "DBMID.001",
     "DIS 2.2",
+    "DIS 3.30.1",
+    "FR-CR-062",
+    "FR-CSF-050",
+    "FR-UA-001",
+    "FR-UA-002",
+    "FR-UA-003",
+    "FR-UA-004",
+    "FR-UA-005",
+    "FRBS 2.10",
+    "FRBS 2.2",
+    "MKTID.001",
+    "MKTID.008",
+    "MKTID.010"
+   ],
+   "result": "passed"
+  },
+  "PhaseTwoFunctionsAccessIT": {
+   "id": "PhaseTwoFunctionsAccessIT",
+   "kind": "backend",
+   "module": "security",
+   "named": true,
+   "name": "The functions deferred to Phase 2 by the client decisions of 17-Oct-2026 (reinsurance, partner portal) and the Data Migration console",
+   "direct": [],
+   "via": [
+    "ACSL 2.2",
+    "BRCLM.001",
+    "BRCLM.002",
+    "BRCLM.003",
+    "BRCLM.004",
+    "BRCLM.005",
+    "BRCLM.006",
+    "BRCLM.021",
+    "BRCLM.026",
+    "BRCLM.042",
+    "BRCLXN.001",
+    "BRCLXN.030",
+    "BRCLXN.050",
+    "BRCLXN.051",
+    "BRCLXN.052",
+    "BRCLXN.053",
+    "BRCLXN.058",
+    "BRCSFCM.001",
+    "BRNB.090",
+    "BRPM.002",
+    "BRPM.008",
+    "BRPM.018",
+    "BRQID.004",
+    "BRRN.021",
+    "BRRN.024",
+    "BRRN.026",
+    "BRRN.040",
+    "CSHID.001",
+    "CSHID.018",
+    "CSHID.026",
+    "DBMID.001",
+    "DIS 2.2",
+    "DIS 2.2.2",
     "DIS 3.30.1",
     "FR-CR-062",
     "FR-CSF-050",
@@ -39445,6 +39762,16 @@
    "via": [],
    "result": "passed"
   },
+  "features/setup/reinsurance.test.ts": {
+   "id": "features/setup/reinsurance.test.ts",
+   "kind": "frontend",
+   "named": true,
+   "module": "setup",
+   "name": "Reinsurance functions (deferred to Phase 2)",
+   "direct": [],
+   "via": [],
+   "result": "not run"
+  },
   "features/setup/setupForms.test.ts": {
    "id": "features/setup/setupForms.test.ts",
    "kind": "frontend",
@@ -39742,6 +40069,18 @@
     "BRNB.012"
    ],
    "result": "passed"
+  },
+  "navigation/phaseTwo.test.ts": {
+   "id": "navigation/phaseTwo.test.ts",
+   "kind": "frontend",
+   "named": true,
+   "module": "navigation",
+   "name": "Phase 2 functions and the Data Migration menu",
+   "direct": [],
+   "via": [
+    "BRNB.012"
+   ],
+   "result": "not run"
   },
   "navigation/productModules.test.ts": {
    "id": "navigation/productModules.test.ts",

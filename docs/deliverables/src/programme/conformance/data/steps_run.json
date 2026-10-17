@@ -750,8 +750,8 @@
   "step": "P1.2",
   "user": "badmin",
   "checks": [],
-  "status": "blocked",
-  "note": "Portal users come with the partner portal, outside Drop 2 (gap G02; hosting, sign-in and one-time code under EBQ13)"
+  "status": "deferred",
+  "note": "Portal users come with the partner portal, deferred to Phase 2 by the client decision of 17-Oct-2026 (G02)"
  },
  {
   "brd": "BRD-08",
@@ -773,8 +773,8 @@
   "step": "P1.4",
   "user": "ebao",
   "checks": [],
-  "status": "blocked",
-  "note": "The review queue of portal uploads comes with the partner portal, outside Drop 2 (gap G02); the AO's own uploads take effect at once"
+  "status": "deferred",
+  "note": "The review queue of portal uploads comes with the partner portal, deferred to Phase 2 by the client decision of 17-Oct-2026 (G02); the AO's own uploads take effect at once"
  },
  {
   "brd": "BRD-08",

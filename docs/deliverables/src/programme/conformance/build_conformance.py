@@ -457,6 +457,26 @@ def bdoi_rows(assess: dict, fr_rows: list[dict], fr_summary: list[dict]) -> tupl
 # ------------------------------------------------------------------ workbook
 
 
+# FRS in BDOI's format received after the release under test: listed requirement by requirement and counted apart from
+# the current-phase figures until they are assessed (Decision Log O-019, O-020).
+NOT_ASSESSED = "Not yet assessed"
+NEW_BDOI_FRS = [("BRD-02", "Operations Remittance", "brd02r_v10_content"), ("BRD-07", "Claims", "brd07_v10_content")]
+
+
+def new_bdoi_rows() -> list[dict]:
+    """The requirement items of the FRS in BDOI's format not yet assessed against the platform."""
+    sys.path.insert(0, str(BDOI_SRC))
+    rows = []
+    for brd, name, module in NEW_BDOI_FRS:
+        content = __import__(module)
+        for g in content.FRUM:
+            for item in g["reqs"]:
+                rows.append({"brd": brd, "frs": f"{name} FRS v{content.VERSION}", "group": g["id"],
+                             "title": g["capability"], "id": item["id"], "text": item["text"],
+                             "fit": item.get("fit", ""), "result": NOT_ASSESSED})
+    return rows
+
+
 def short_reason(reason: str) -> str:
     """The reason of a requirement not testable yet, in a few words for the summary."""
     if reason.startswith("No automated check"):
@@ -514,10 +534,22 @@ def main() -> None:
     tot = {k: sum(r[k] for r in summary_rows) for k in ("frs", "acs", "ok", "partly", "nok", "nt", "deferred", "frs_all",
                                                          "steps", "pass", "fail", "blocked", "steps_deferred")}
     summary_rows.append({"brd": "Total", "module": "Programme", **tot, "why": ""})
+    new_rows = new_bdoi_rows()
+    for brd, name, _ in NEW_BDOI_FRS:
+        items = [x for x in new_rows if x["brd"] == brd and x["frs"].startswith(name)]
+        summary_rows.append({"brd": brd, "module": f"{name} (FRS in BDOI's format, new)", "frs": 0,
+                             "frs_all": len(items), "deferred": 0, "acs": 0, "ok": 0, "partly": 0, "nok": 0,
+                             "nt": 0, "steps": 0, "pass": 0, "fail": 0, "blocked": 0, "steps_deferred": 0,
+                             "why": f"{len(items)} requirement items not yet assessed; not counted in the Total"})
     prev = assess.get("previous") or {}
     pv = str(assess.get("previous_version", "1.0"))
     baselines = assess.get("baselines") or {}
     for r in summary_rows:
+        if r["frs"] == 0 and r.get("frs_all"):
+            r["pct"] = r["pct_p"] = 0
+            r["frs_label"] = "New, not yet assessed"
+            r["change"] = "-"
+            continue
         r["pct"] = round(100 * r["ok"] / r["frs"], 1) if r["frs"] else 0
         r["pct_p"] = round(100 * (r["ok"] + r["partly"]) / r["frs"], 1) if r["frs"] else 0
         r["frs_label"] = baselines.get(r["brd"], "BIBS FRS" if r["brd"] != "Total" else "")
@@ -640,6 +672,18 @@ def main() -> None:
         Column("denial", "Screen outside the menu", 40, "A screen outside the persona's menu opened by its address"),
         Column("result", "Result", 10, "Result", values=STEP_RESULTS, status=True),
     ], persona_rows, description="Each persona signs in; its sidebar is compared with the FRS menu of the persona")
+
+    wb.sheet("New FRS not assessed", [
+        Column("brd", "BRD", 9, "BRD of the FRS"),
+        Column("frs", "FRS", 24, "FRS in BDOI's format received after the release under test"),
+        Column("group", "Requirement", 14, "Requirement of the FRS"),
+        Column("title", "Capability", 36, "Capability of the requirement"),
+        Column("id", "Item", 14, "Requirement item"),
+        Column("text", "Requirement text", 60, "Text of the item"),
+        Column("fit", "Fit in the FRS", 14, "Fit stated in the FRS"),
+        Column("result", "Result", 16, "Conformance result", values=[NOT_ASSESSED], status=True),
+    ], new_rows, description="Requirement items of the Remittance and Claims FRS in BDOI's format (v1.0, "
+                             "17-Oct-2026), listed and counted apart until they are assessed")
 
     wb.sheet("Fixes made", [
         Column("id", "No.", 7, "Fix number"),

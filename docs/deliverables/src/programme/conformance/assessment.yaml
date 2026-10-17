@@ -1,7 +1,7 @@
 # Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
 # evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
 # fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
-version: "1.5"
+version: "1.6"
 date: 17 October 2026
 scope: >-
   Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
@@ -28,6 +28,15 @@ scope: >-
   (Layout panel of the report runner and the MIS fields catalogue), recipes of BRD-00 J1.3, BRD-08 P1.3, P3.1, P3.3
   and BRD-13 FR-DM-125.1 and .2 corrected; the data scope of records addressed by id checked on every screen action; the
   case routing notice copied to the account officer (BRD-9 FRS v1.2); the other results are carried over from v1.4.
+  Version 1.6 (17-Oct-2026): client decisions of 17-Oct-2026 - the partner portal (G02) and reinsurance (G17) are
+  deferred to Phase 2; their requirements and walkthrough steps are listed with the result Deferred to Phase 2 and left
+  out of the current-phase counts and percentages (the figures of v1.5 below are restated without them). The data
+  scope of records addressed by a text business key is checked; the case routing notice is e-mailed and copied to the
+  unit of the account (BRD-9 FRS v1.2); eleven partly conformant requirements of BRD-07, BRD-09 and BRD-10 are shown in
+  full by automated checks. The walkthrough-script steps of BRD-00, BRD-07, BRD-08, BRD-09, BRD-10, BRD-12 and BRD-13
+  run again on a fresh SIT/UAT environment (152 pass, none fail, 2 deferred); requirement evidence refreshed from the
+  automated checks of the release. The FRS in BDOI's format of Remittance (BRD-02) and Claims (BRD-07), v1.0 of 17-Oct-2026, are listed item
+  by item as not yet assessed and counted apart, so the current-phase figures stay comparable.
 
 # The FRS whose requirements are counted, per BRD (Summary); BIBS FRS when not listed.
 baselines:
@@ -37,9 +46,10 @@ baselines:
   BRD-11: BDOI FRS v1.6
 
 # Results of the previous version (Summary, Change since v<previous_version>).
-previous_version: "1.4"
+previous_version: "1.5"
+# v1.5 restated for the current phase: the eight BRD-08 portal requirements (Not testable yet in v1.5) left out.
 previous:
-  BRD-00: {frs: 25, ok: 19, partly: 1, nok: 2, nt: 3}
+  BRD-00: {frs: 25, ok: 21, partly: 1, nok: 0, nt: 3}
   BRD-01: {frs: 95, ok: 69, partly: 24, nok: 0, nt: 2}
   BRD-02: {frs: 28, ok: 16, partly: 12, nok: 0, nt: 0}
   BRD-03: {frs: 30, ok: 19, partly: 10, nok: 0, nt: 1}
@@ -47,24 +57,25 @@ previous:
   BRD-05: {frs: 119, ok: 66, partly: 52, nok: 0, nt: 1}
   BRD-06: {frs: 49, ok: 27, partly: 22, nok: 0, nt: 0}
   BRD-07: {frs: 39, ok: 27, partly: 10, nok: 0, nt: 2}
-  BRD-08: {frs: 39, ok: 15, partly: 12, nok: 0, nt: 12}
+  BRD-08: {frs: 31, ok: 15, partly: 12, nok: 0, nt: 4}
   BRD-09: {frs: 29, ok: 18, partly: 7, nok: 0, nt: 4}
   BRD-10: {frs: 44, ok: 33, partly: 10, nok: 0, nt: 1}
   BRD-11: {frs: 12, ok: 4, partly: 8, nok: 0, nt: 0}
-  BRD-12: {frs: 35, ok: 13, partly: 20, nok: 0, nt: 2}
+  BRD-12: {frs: 35, ok: 14, partly: 19, nok: 0, nt: 2}
   BRD-13: {frs: 48, ok: 18, partly: 19, nok: 0, nt: 11}
-  Total: {frs: 644, ok: 380, partly: 220, nok: 2, nt: 42}
+  Total: {frs: 636, ok: 383, partly: 219, nok: 0, nt: 34}
 
 # What changed since the previous version, per BRD (Summary).
 changes:
-  BRD-00: Layout panel of the report runner (grouping, subtotals and counts, bar or line chart) and the MIS fields
-    catalogue (gap G06, FR-CR-042, FR-CR-062); data scope of every record addressed by id; recipe of J1.3 corrected.
-  BRD-08: Steps P1.3, P3.1 and P3.3 follow the Drop 2 process of assumption A-EB-06 (the AO records what is received
-    by e-mail); P1.2 and P1.4 stay blocked by the partner portal (G02).
-  BRD-09: The case routing notice is copied to the account officer of the account (FRS BRD-9 v1.2).
-  BRD-12: New Policy on the Masterlist and Edit on the policy record (gap G11, FR-SP-003); step P1.2 passes.
-  BRD-13: Steps FR-DM-125.1 and .2 checked on the load template of layout P03 (compiled and checked outside BIBS by
-    design).
+  BRD-00: Reinsurance deferred to Phase 2 (G17; the platform's reinsurance functions hidden from the BDOI profiles);
+    data scope of records addressed by a text business key.
+  BRD-07: FR-CM-042 and FR-CM-043 shown in full by automated checks; walkthrough-script steps run again. The Claims
+    FRS in BDOI's format v1.0 is listed apart, not yet assessed.
+  BRD-08: Partner portal deferred to Phase 2 (G02); FR-EB-010 to 015, 045 and 056 and steps P1.2 and P1.4 left out of
+    the current phase.
+  BRD-09: The case routing notice is e-mailed and copied to the unit of the account; FR-CSF-021, 022 and 031 shown in
+    full by automated checks.
+  BRD-10: FR-SS-040, 050, 051, 052, 060 and 072 shown in full by automated checks.
 
 # Decisions on requirement items of the BDOI-template FRS (by item or group id): result, reason, evidence.
 bdoi_decisions:
@@ -623,7 +634,7 @@ gaps:
       reinsurance settlement payments) are hidden from every BDOI group profile and refused by the server; the super
       user of DEV, SIT and UAT keeps them.
     proposal: >-
-      Build the reinsurance broking of the ReInsurance BRD in Phase 2 on the kept seams (party types, placement slip
+      Deliver the reinsurance broking of the ReInsurance BRD in Phase 2 on what the platform keeps (party types, placement slip
       and SOA templates, open-item matching, accounting events); grant its permission to the BDOI roles then.
     size: Large
     status: Deferred to Phase 2

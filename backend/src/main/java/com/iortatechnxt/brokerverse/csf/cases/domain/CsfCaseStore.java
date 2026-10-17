@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.csf.cases.domain;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCase.AccountRef;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCase.Category;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCase.Escalation;
@@ -69,8 +70,8 @@ public class CsfCaseStore {
       SELECT
           + " from csf_case where company_id = :company and status in (:statuses)"
           + " and (cast(:owner as text) is null or lower(owner) = lower(cast(:owner as text)))"
-          + " and (cast(:from as date) is null or cast(created_at as date) >= :from)"
-          + " and (cast(:to as date) is null or cast(created_at as date) <= :to)"
+          + " and (cast(:from as date) is null or cast(timezone(:zone, created_at) as date) >= :from)"
+          + " and (cast(:to as date) is null or cast(timezone(:zone, created_at) as date) <= :to)"
           + " and (:allUnits or fulfilment_unit in (:units)) and (not :escalatedOnly or escalated)"
           + " order by created_at desc, id desc limit :limit";
 
@@ -266,6 +267,8 @@ public class CsfCaseStore {
     p.put(OWNER, f.owner());
     p.put("from", f.from() == null ? null : Date.valueOf(f.from()));
     p.put("to", f.to() == null ? null : Date.valueOf(f.to()));
+    // the period is in business dates (Philippine time), not the UTC date of the stored time
+    p.put("zone", BusinessClock.zoneId());
     p.put("limit", limit);
     if (f.units() != null && f.units().isEmpty()) {
       return List.of();

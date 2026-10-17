@@ -21,6 +21,9 @@ VERSION = "1.0"
 DROP = "Drop 1"
 WB_VERSION = "1.0"
 ICD_VERSION = "1.0"
+# Documents issued again after the release of 17 Oct 2026 changed them; the others stay at VERSION.
+DOC_VERSIONS = {"UXD": "1.1", "RNO": "1.1", "DSP": "1.1", "DDI": "1.1"}
+SHOTS_DIR = "brd02r_v11_screens"
 DATE = "17 Oct 2026"
 DATE_LONG = "17 October 2026"
 DATE_US = "10/17/2026"
@@ -42,10 +45,10 @@ DOCS = {
     "BPS": {"file": f"BIBS_BPS-BDOI_BRD-02_Operations_Remittance_Process_and_Storyboards_v{VERSION}.docx",
             "cover": "Operations Remittance: To-Be Process and Storyboards",
             "header_left": "To-Be Process and Storyboards", "doc_no": f"{DOC_NO}-BPS"},
-    "UXD": {"file": f"BIBS_UXD-BDOI_BRD-02_Operations_Remittance_UX_Design_v{VERSION}.docx",
+    "UXD": {"file": f"BIBS_UXD-BDOI_BRD-02_Operations_Remittance_UX_Design_v{DOC_VERSIONS['UXD']}.docx",
             "cover": "Operations Remittance: Screens and UX Design",
             "header_left": "Screens and UX Design", "doc_no": f"{DOC_NO}-UXD"},
-    "RNO": {"file": f"BIBS_RNO-BDOI_BRD-02_Operations_Remittance_Reports_Notifications_Outputs_v{VERSION}.docx",
+    "RNO": {"file": f"BIBS_RNO-BDOI_BRD-02_Operations_Remittance_Reports_Notifications_Outputs_v{DOC_VERSIONS['RNO']}.docx",
             "cover": "Operations Remittance: Reports, Notifications and Outputs",
             "header_left": "Reports, Notifications and Outputs", "doc_no": f"{DOC_NO}-RNO"},
     "ICD": {"file": f"BIBS_ICD-BDOI_BRD-02_Operations_Remittance_Interface_Specification_v{ICD_VERSION}.docx",
@@ -63,6 +66,8 @@ REVISIONS = [
      AUTHOR),
 ]
 REVISION_COMPANION = [(DATE, VERSION, "First issue, with the FRS Operations Remittance v1.0.", AUTHOR)]
+REVISIONS_UXD = REVISION_COMPANION + [(DATE, "1.1", "Second issue with the release of 17 Oct 2026: SCR-RMT-02, 04, 05 and 12 updated for the delivered extract files, settlement numbering, shared folder copy and Mall Assurance columns; SCR-RMT-13 Remittance Settings now available; screenshots captured from the running application on seed data.", AUTHOR)]
+REVISIONS_RNO = REVISION_COMPANION + [(DATE, "1.1", "Second issue with the release of 17 Oct 2026: extract file names (Excel and text), settlement reference, shared folder copy and its alert REMIT_SHARED_FOLDER_FAILED, the scheduled job REMITTANCE_SCHEDULE and the Mall Assurance columns.", AUTHOR)]
 ICD_REVISIONS = [(DATE, ICD_VERSION, "First issue: remittance extract files (Excel and text) read from BDOI's three "
                   "specimen files, insurer OR return, shared folder, e-mail to the insurer and module hand-offs.",
                   AUTHOR)]
@@ -1053,9 +1058,11 @@ REPORTS = [
 REPORT_NOTE = ("Reports run on screen from the Report Centre and export to Excel and PDF; each run is archived. "
                "Names follow BR-RMT-05 for the schedules and <Report Name>_<MMDDYYYY> for the others (BR-RMT-15).")
 DOCUMENTS = [
-    ("DO-01", "Remittance extract, Excel", "YYYYMMDD<insurer code><settlement no>_<type>.xls (IF-RMT-01)",
-     "Shared folder per type; batch", "FRID.RMT.001.03"),
-    ("DO-02", "Remittance extract, text", "Same name with .txt (IF-RMT-02)", "Shared folder per type; batch",
+    ("DO-01", "Remittance extract, Excel", "{date}{insurer}{settlement}_{type}.xls, Excel 97-2003 in the IF-RMT-01 "
+     "layout; pattern set on Remittance Settings", "File repository and shared folder per type; batch",
+     "FRID.RMT.001.03, 001.04"),
+    ("DO-02", "Remittance extract, text", "AM01 + YYMMDD + insurer code + settlement number .txt, header (H) and "
+     "detail (D) records with control totals (IF-RMT-02)", "File repository and shared folder per type; batch",
      "FRID.RMT.001.09"),
     ("DO-03", "Remittance schedule", "PDF and Excel on the batch", "Batch", "FRID.RMT.007.01"),
     ("DO-04", "Payment request", "PDF on the batch, to Disbursement", "Batch", "FRID.RMT.007.01"),
@@ -1066,6 +1073,8 @@ EXPORTS = [
     ("Batch lines", "Excel", "Remittance Batch", "Lines with their amounts and exclusion state"),
     ("DTIP status", "Excel", "DTIP Status", "Invoices with premium due to insurers"),
     ("Extraction tags", "Excel", "Extraction", "Accounts checked by a run with tag and reason"),
+    ("Extract files and deliveries", "Excel (.xls), text", "Remittance Batch, Extract Files",
+     "Download of the extract files of the batch; each delivery to the shared folder with its result; resend"),
 ]
 NOTICES = [
     ("NT-01", "Extraction run ended", "Remittance team", "Run <run>: <n> batches, <m> accounts extracted, <k> not "
@@ -1079,10 +1088,16 @@ NOTICES = [
      "adjustment", "Bell"),
     ("AL-01", "Extraction run failed", "Remittance Team Leaders", "The extraction of <date> failed: <reason>",
      "Alert"),
+    ("AL-02", "Shared folder copy failed (REMIT_SHARED_FOLDER_FAILED)", "Remittance Team Leaders", "File <file> of "
+     "batch <batch> could not be copied to <folder>: <reason>. Resend from the batch.", "Alert"),
+    ("NT-08", "Settings change to approve", "Remittance Team Leaders", "A change of the remittance settings waits "
+     "for your approval", "Bell"),
 ]
 JOBS = [
     ("REMITTANCE_EXTRACTION", "Working days 20:00 (schedule set on Remittance Settings)", "Checks every invoice with "
      "premium due, tags it and creates the batches with their files; processes the end-of-day queue.", "AL-01"),
+    ("REMITTANCE_SCHEDULE", "Every 15 minutes, Manila time", "Starts the extraction at the run days and time of the "
+     "approved Remittance Settings (off by default) and copies the files to the shared folder.", "AL-01, AL-02"),
     ("HOLD_EXPIRY", "Daily 08:15", "Releases the holds whose hold-until date has passed.", "-"),
 ]
 

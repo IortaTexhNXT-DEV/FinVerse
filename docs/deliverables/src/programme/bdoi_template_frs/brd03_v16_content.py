@@ -17,7 +17,7 @@ AUTHOR = "iorta TechNXT Project Team (drafting support); for review by the BDOI 
 OWNER = "BDOI Product Owner, Product Maintenance"
 ICD_VERSION = "1.0"
 # The UX Design alone moved to 1.7 (screenshots of the insurer record tabs and the Master Data Change Log).
-UXD_VERSION = "1.7"
+UXD_VERSION = "1.8"
 
 DOCS = {
     "FRS": {"file": f"BIBS_FRS-BDOI_BRD-03_Product_Maintenance_v{VERSION}.docx",

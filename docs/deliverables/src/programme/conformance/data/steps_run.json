@@ -588,11 +588,18 @@
  {
   "brd": "BRD-07",
   "step": "P4.1",
-  "user": "clmofficer",
+  "user": "clmtl",
   "checks": [
    {
     "screen": "/claims-handling",
     "url": "/claims-handling",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   },
+   {
+    "screen": "/claims-handling/worklist",
+    "url": "/claims-handling/worklist",
     "ok": true,
     "problem": null,
     "missing": []

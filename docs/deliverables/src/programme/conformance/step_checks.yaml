@@ -32,17 +32,17 @@ BRD-00:
 BRD-07:
   P1.1: {checks: [[/claims-handling/covers, null, []]]}
   P1.2: {checks: [[/claims-handling/new, null, []]]}
-  P1.3: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Premium]]]}
+  P1.3: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Premium, Documents]]]}
   P1.4: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Send Loss Advice]]]}
   P1.5: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Insurers]]]}
-  P2.1: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Details, Reserve]]]}
+  P2.1: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Details, Reserve, Follow-ups]]]}
   P2.2: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Change Status]]]}
   P2.3: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Diary]], [/claims-handling/diary, null, []]]}
   P2.4: {checks: [[/claims-handling/:id, /claims-handling/worklist, []], [/remittance, null, []]], user: clmtl}
   P3.1: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Settlement]]]}
   P3.2: {checks: [[/claims-handling/:id, /claims-handling/worklist, [Close]]]}
   P3.3: {checks: [[/claims-handling/:id, /claims-handling/worklist, []]]}
-  P4.1: {checks: [[/claims-handling, null, []], [/reports/BCL-PENDING-ACTIONS, null, [Run Report]]]}
+  P4.1: {checks: [[/claims-handling, null, []], [/claims-handling/worklist, null, [Export Excel, Export PDF]], [/reports/BCL-PENDING-ACTIONS, null, [Run Report]]], user: clmtl}
   P4.2: {checks: [[/reports/BCL-AGEING, null, [Run Report]], [/reports/BCL-OUTSTANDING, null, [Run Report]], [/reports/BCL-SETTLED, null, [Run Report]], [/reports/BCL-LOSS-EXPERIENCE, null, [Run Report]], [/reports/BCL-LOSS-RATIO, null, [Run Report]]]}
   P4.3: {checks: [[/reports/BCL-PRONE-LOCATIONS, null, [Run Report]], [/reports/BCL-DATA-EXTRACT, null, [Run Report]]]}
   P4.4: {checks: [[/reports/BCL-LOSS-EXPERIENCE, null, [Run Report]], [/accounts/:id, /accounts, []]]}

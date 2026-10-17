@@ -21,22 +21,23 @@ def make_set(C, short: str, reviewers: dict[str, str]) -> list[tuple]:
     """The documents of the pack: key, kind, title in the file name, version, purpose, reviewer. The review workbooks
     carry the module name so that they stay apart from the workbooks of another FRS of the same BRD."""
     n = C.NAME.replace(" ", "_")
+    v = getattr(C, "DOC_VERSIONS", {})
     return [
-        ("README", "Inputs", f"{short}_How_to_Read_this_Pack", "1.0", "This note: the documents of the pack and who "
+        ("README", "Inputs", f"{short}_How_to_Read_this_Pack", v.get("README", "1.0"), "This note: the documents of the pack and who "
          "reviews them.", "All reviewers"),
         ("FRS", "FRS-BDOI", n, C.VERSION, "Requirements, business rules, validations, personas and permissions, "
          "settings and lists of values, statuses, review of BDOI's FRS.", reviewers["FRS"]),
         ("BPS", "BPS-BDOI", f"{n}_Process_and_Storyboards", C.VERSION, "Journey, to-be processes and storyboards.",
          "BDOI Business Unit owners"),
-        ("UXD", "UXD-BDOI", f"{n}_UX_Design", C.VERSION, "Every screen: purpose, users, fields, actions, states, "
+        ("UXD", "UXD-BDOI", f"{n}_UX_Design", v.get("UXD", C.VERSION), "Every screen: purpose, users, fields, actions, states, "
          "messages.", "BDOI Business Unit owners; UAT lead"),
-        ("RNO", "RNO-BDOI", f"{n}_Reports_Notifications_Outputs", C.VERSION, "Reports, documents and files, exports, "
+        ("RNO", "RNO-BDOI", f"{n}_Reports_Notifications_Outputs", v.get("RNO", C.VERSION), "Reports, documents and files, exports, "
          "notices, alerts and jobs.", "BDOI Business Unit owners; Internal Audit"),
         ("ICD", "ICD-BDOI", f"{n}_Interface_Specification", C.ICD_VERSION, reviewers["ICD"], "BDOI IT (integration)"),
-        ("DSP", "DSP-BDOI", f"{n}_Developer_Specification", "1.0", "Screens, service operations, field validations, "
+        ("DSP", "DSP-BDOI", f"{n}_Developer_Specification", v.get("DSP", "1.0"), "Screens, service operations, field validations, "
          "rules, states, jobs, audit events and permissions, as the platform works today.", "BDOI IT; iorta TechNXT "
          "developers and testers"),
-        ("DDI", "DDI-BDOI", f"{n}_Data_Dictionary", "1.0", "Tables, columns, lists of values, parameters, status "
+        ("DDI", "DDI-BDOI", f"{n}_Data_Dictionary", v.get("DDI", "1.0"), "Tables, columns, lists of values, parameters, status "
          "models and indexes" + reviewers.get("DDI", "."), "BDOI IT (database administration); Data Migration"),
         ("USR", "USR-BDOI", f"{n}_User_Stories", "1.0", "User stories with acceptance criteria, ready to import into "
          "the backlog tool.", "BDOI Product Owner; UAT lead"),

@@ -282,7 +282,7 @@ def write_bps(tmp: Path) -> Doc:
 
 # ================================================================================================ UXD
 def write_uxd(tmp: Path) -> Doc:
-    d = Doc("UXD", C.REVISION_COMPANION + [("17 Oct 2026", C.UXD_VERSION, "Screenshots of the Ledger Accounts and Change History tabs of the Insurer Record (SCR-PM-18) and of the Master Data Change Log (SCR-PM-27); no change of the requirements.", C.AUTHOR)])
+    d = Doc("UXD", C.REVISION_COMPANION + [("17 Oct 2026", "1.7", "Screenshots of the Ledger Accounts and Change History tabs of the Insurer Record (SCR-PM-18) and of the Master Data Change Log (SCR-PM-27); no change of the requirements.", C.AUTHOR), ("17 Oct 2026", "1.8", "Screenshot of the Co-insurance / Risk Participation tab of the Insurer Record (SCR-PM-18), captured from the running application on seed data.", C.AUTHOR)])
     d.h1("Introduction")
     d.para("This document describes every Product Maintenance screen of BIBS: purpose, users, access, rules and "
            "states, fields with their type, whether they are required, format and source, validation and message, "

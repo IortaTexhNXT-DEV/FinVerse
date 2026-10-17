@@ -35,6 +35,13 @@ def file_name(key: str) -> str:
     return common.file_name(SET, BRD, key)
 
 
+DSP_REVISIONS = [
+    (C.DATE, "1.0", "First issue. Describes the screens, service operations, validations, rules, states, jobs, "
+     "audit records and permissions of the release.", PREPARED),
+    (C.DATE, "1.1", "Second issue with the release of 17 Oct 2026: follow-ups, document checklist and its setup, motor details, return to account officer, worklist sort and export, home trend, loss advice preview and the claims report heading, presentation and grouping.", PREPARED),
+]
+
+
 def version(key: str) -> str:
     return next(v for k, _, _, v, *_ in SET if k == key)
 
@@ -53,12 +60,13 @@ DOCS = {
 AV = "Available"
 CH = "Available; changes of the FRS v1.0 to deliver ({})"
 NEW = "Proposed screen ({})"
+DEL = "Available; delivered in the release of 17 Oct 2026 ({})"
 UX_SCREENS = [
     {"id": "SCR-CLM-01", "name": "Claims Home", "route": "claims-handling", "page": "home/ClaimsHomePage.tsx",
      "purpose": "Dashboard of the user's role: my open claims, follow-ups due today and overdue, diary due, "
                 "temporarily closed, unpaid premium, awaiting premium remittance, claims by status and ageing "
                 "brackets.", "access": "Claims personas", "frrn": "FRCLM.001", "outcome": "The user opens a list.",
-     "state": CH.format("FRCLM.001.01 trend; FRCLM.001.02 to .04 with CR-CLM-103"),
+     "state": DEL.format("FRCLM.001.01 trend; FRCLM.001.02 to .04 wait for CR-CLM-103"),
      "rules": ["Figures follow the user's claims (handler), team (Team Leader) or all (Team Head) with CR-CLM-104.",
                "Each tile opens the worklist filtered on it.",
                "Pending approvals show for the Team Leader and Team Head with CR-CLM-102."],
@@ -66,7 +74,7 @@ UX_SCREENS = [
     {"id": "SCR-CLM-02", "name": "Claims Worklist", "route": "claims-handling/worklist",
      "page": "worklist/WorklistPage.tsx", "purpose": "Follow-up list with tabs My Claims, Open, Temporarily Closed, "
      "Closed, Follow-ups Due, All; search; quick view.", "access": "Claims personas", "frrn": "FRCLM.009",
-     "outcome": "A claim opened or reassigned.", "state": CH.format("FRCLM.009.01 columns, 009.02, 009.08"),
+     "outcome": "A claim opened or reassigned.", "state": DEL.format("FRCLM.009.01 columns, 009.08 sort and export"),
      "rules": ["Search by claim number, insurer claim number, ARN, policy number or assured, at least 3 characters.",
                "Columns: claim, claimant, follow-up count, last follow-up, aging since last follow-up, in status and "
                "overall, plate number, client, handler."],
@@ -97,7 +105,7 @@ UX_SCREENS = [
                 "Reserve and Settlement, Documents, Diary, History.", "access": "Claims personas; Marketing read "
      "(FRCLM.002.02)", "frrn": "FRCLM.003, 006, 008, 009, 021 to 024",
      "outcome": "Claim followed up, settled, closed or reopened.",
-     "state": CH.format("FRCLM.006 checklist, 008.08 preview, 009.04 fields, 010 approval"),
+     "state": DEL.format("FRCLM.006 checklist, 007.02 and 007.03 follow-ups, 008.08 preview, 009.04 motor and return to account officer; 010 approval waits for CR-CLM-102"),
      "rules": ["Change Status lists only the statuses of the user's role and unit.",
                "A settlement type that closes needs the closing permission.",
                "Flags: Unpaid premium, Awaiting premium remittance, Newer cover version, Multi-location, "
@@ -147,7 +155,7 @@ UX_SCREENS = [
     {"id": "SCR-CLM-08", "name": "Claims Reports", "route": "claims-handling/reports",
      "page": "reports/ClaimsReportsPage.tsx", "purpose": "The claims reports.", "access": "Report permission; "
      "Marketing on screen, Marketing Team Leader export", "frrn": "FRCLM.011 to 019", "outcome": "Report run.",
-     "state": CH.format("BDOI heading, filters and grouping; RPT-CLM-08 to 10 with their change requests"),
+     "state": DEL.format("BDOI heading, filters, presentation and grouping; RPT-CLM-08 to 10 wait for their change requests"),
      "rules": ["Heading of BR-CLM-10; each run archived."],
      "fields": [["Report", "List", "Y", "-", "Claims category", "-"],
                 ["As of / period", "Date", "Y", "Today", "-", "-"],
@@ -158,7 +166,7 @@ UX_SCREENS = [
     {"id": "SCR-CLM-09", "name": "Claims Setup", "route": "claims-handling/setup", "page": "setup/ClaimsSetupPage.tsx",
      "purpose": "Status attributes, settlement types, status access matrix, claims handler register, claims lists.",
      "access": "Claims Unit Head", "frrn": "FRCLM.002.06, 003, 004, 007", "outcome": "Setup changed under "
-     "maker-checker.", "state": CH.format("FRCLM.002.06 reporting lines; FRCLM.004.02 with CR-CLM-106"),
+     "maker-checker.", "state": DEL.format("FRCLM.002.06 team lead and team head; document checklist setup; FRCLM.004.02 waits for CR-CLM-106"),
      "rules": ["Every change applies after another user approves it."],
      "fields": [["Role", "List", "Y", "-", "Claims roles", "-"], ["Unit", "List", "N", "Any", "Claims units", "-"],
                 ["Status", "List", "Y", "-", "-", "The role and unit already have this status"]],
@@ -314,7 +322,7 @@ WORKFLOWS = {
         ("CLOSED", "Closed", "Settlement type that closes", "IN_PROGRESS (reopen)")]),
 }
 STATUSES = C.STATUSES
-AUDIT_LABELS = {"BrokerClaimAttribute": "Status or settlement type attribute", "BrokerClaimDiary": "Diary entry",
+AUDIT_LABELS = {"BrokerClaimDocumentRequirement": "Required claim document", "BrokerClaimFollowUp": "Claim follow-up", "BrokerClaimAttribute": "Status or settlement type attribute", "BrokerClaimDiary": "Diary entry",
                 "BrokerClaimHandler": "Claims handler register", "BrokerClaimLocationRef": "Insurer location reference",
                 "BrokerClaimStatusAccess": "Status access matrix row"}
 AUDIT_OMIT = {"Entity Type", "currentUser.username()"}
@@ -332,6 +340,8 @@ TABLES = {t: ("Claims", p, "-", "-") for t, p in {
     "bcl_claim_location": "Insured locations linked to a claim.",
     "bcl_diary_entry": "Diary entries of the claims handlers.",
     "bcl_handler": "Claims handler register: user, unit, team.",
+    "bcl_document_requirement": "Documents required per claim type for the checklist (setup, maker-checker).",
+    "bcl_follow_up": "Follow-ups of a claim with the insurer, client or account officer: type, date, remarks, next date.",
     "bcl_insurer_claim": "Insurer lines of a claim: share, insurer claim number, reserve, settlement, adjuster.",
     "bcl_insurer_update": "Updates received from the insurers.",
     "bcl_location_ref": "Insurer references of the insured locations with effective dates.",

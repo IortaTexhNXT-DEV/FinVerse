@@ -37,6 +37,13 @@ def file_name(key: str) -> str:
     return common.file_name(SET, BRD, key)
 
 
+DSP_REVISIONS = [
+    (C.DATE, "1.0", "First issue. Describes the screens, service operations, validations, rules, states, jobs, "
+     "audit records and permissions of the release.", PREPARED),
+    (C.DATE, "1.1", "Second issue with the release of 17 Oct 2026: Remittance Settings screen and service, extract files and deliveries, settlement numbering, the REMITTANCE_SCHEDULE job and the shared folder copy.", PREPARED),
+]
+
+
 def version(key: str) -> str:
     return next(v for k, _, _, v, *_ in SET if k == key)
 
@@ -55,6 +62,7 @@ DOCS = {
 AV = "Available"
 CH = "Available; changes of the FRS v1.0 to deliver ({})"
 NEW = "Proposed screen ({})"
+DEL = "Available; delivered in the release of 17 Oct 2026 ({})"
 UX_SCREENS = [
     {"id": "SCR-RMT-01", "name": "Remittance Workbench", "route": "remittance", "page": "RemittanceHomePage.tsx",
      "purpose": "The work waiting by stage: batches to review, to approve, holds and special requests for decision, "
@@ -67,7 +75,7 @@ UX_SCREENS = [
      "purpose": "Extraction runs, manual extraction per insurer and type or per invoice, the end-of-day queue and the "
                 "tags of each run.", "access": "Remittance Processor, Remittance Team Leader",
      "frrn": "FRID.RMT.001, 003, 004, 005", "outcome": "Batches created; tags and reasons per account.",
-     "state": CH.format("FRID.RMT.001.03, 001.04, 001.08, 001.09"),
+     "state": DEL.format("FRID.RMT.001.03, 001.04, 001.08, 001.09"),
      "rules": ["A manual extraction applies the rules of the scheduled run (BR-RMT-02).",
                "An invoice queued twice for the end of day is kept once.",
                "Each run lists its tags: Extracted, Unextracted - not yet due, Unextracted - due (reason), Returned."],
@@ -87,7 +95,7 @@ UX_SCREENS = [
     {"id": "SCR-RMT-04", "name": "Remittance Batch", "route": "remittance/batches/:id", "page": "BatchDetailPage.tsx",
      "purpose": "One batch: its lines, exclusions, preview, documents, settlement and history.",
      "access": "Remittance personas", "frrn": "FRID.RMT.002, 006, 007, 015",
-     "outcome": "Batch submitted, approved, returned or sent.", "state": CH.format("FRID.RMT.002.02, 007.01"),
+     "outcome": "Batch submitted, approved, returned or sent.", "state": DEL.format("FRID.RMT.002.02, 007.01: extract files, settlement reference, shared folder copy and resend"),
      "rules": ["Amounts are read-only; exclusion and restore while Review in Process (BR-RMT-06).",
                "The submitter cannot approve (BR-RMT-01).",
                "The schedule is sent after approval; a second sending asks for a confirmation."],
@@ -107,7 +115,7 @@ UX_SCREENS = [
     {"id": "SCR-RMT-05", "name": "Insurer OR Upload", "route": "remittance/insurer-or", "page": "InsurerOrPage.tsx",
      "purpose": "Upload of the insurer's returned schedule, results and exception report.",
      "access": "Remittance Processor, Remittance Team Leader", "frrn": "FRID.RMT.008",
-     "outcome": "Invoices updated with the insurer OR.", "state": CH.format("FRID.RMT.008.01"),
+     "outcome": "Invoices updated with the insurer OR.", "state": DEL.format("FRID.RMT.008.01: Excel and text OR return with control totals"),
      "rules": ["Each account is processed on its own; refused accounts are listed with the reason.",
                "The same OR number is not recorded twice for a client."],
      "fields": [["File", "File", "Y", "-", "Excel or text of IF-RMT-03; at most 10 MB", "The file must have the "
@@ -168,16 +176,16 @@ UX_SCREENS = [
      "actions": [["Save", "Remittance Team Leader", "Always", "Saves the rule", "Rule"]]},
     {"id": "SCR-RMT-12", "name": "Report Centre (Remittance)", "route": "reports", "page": None,
      "purpose": "The remittance reports of Annex III and the control reports.", "access": "Report permission",
-     "frrn": "FRID.RMT.014", "outcome": "Report run and exported.", "state": CH.format("FRID.RMT.014"),
+     "frrn": "FRID.RMT.014", "outcome": "Report run and exported.", "state": DEL.format("FRID.RMT.014.01, 014.02: Mall Assurance columns, remitted batch by settlement reference"),
      "rules": ["Each run is archived; names follow BR-RMT-05 and BR-RMT-15."],
      "fields": [["Report", "List", "Y", "-", "Remittance category", "-"], ["Period", "Dates", "Cond.", "-",
                                                                          "From not after to", "-"]],
      "actions": [["Run", "Report users", "Parameters given", "Runs on screen", "Report"],
                  ["Export", "Report users", "Report run", "Excel or PDF", "File"]]},
-    {"id": "SCR-RMT-13", "name": "Remittance Settings", "route": None, "page": None,
+    {"id": "SCR-RMT-13", "name": "Remittance Settings", "route": "remittance/settings", "page": "RemittanceSettingsPage.tsx",
      "purpose": "Extraction schedule (days and time), output folders per type and file name pattern.",
      "access": "Remittance Team Leader; approved by another user", "frrn": "FRID.RMT.003.01, 001.04, 001.05",
-     "outcome": "Settings applied after approval.", "state": NEW.format("FRID.RMT.003.01"),
+     "outcome": "Settings applied after approval.", "state": DEL.format("FRID.RMT.003.01"),
      "rules": ["A change applies after another user approves it.", "The schedule keeps the run off-peak."],
      "fields": [["Run days", "Days", "Y", "Working days", "-", "-"], ["Run time", "Time", "Y", "20:00",
                                                                      "18:00 to 05:00", "-"],
@@ -313,7 +321,7 @@ WORKFLOWS = {
         ("REJECTED", "Rejected", "Reject", "-"), ("RETURNED", "Returned", "Return", "-")]),
 }
 STATUSES = C.STATUSES
-AUDIT_LABELS = {"Package version": "Template version", "RemittanceBatch": "Remittance batch",
+AUDIT_LABELS = {"Package version": "Template version", "RemittanceSettings": "Remittance settings change", "RemittanceBatch": "Remittance batch",
                 "RemittanceDeduction": "Remittance deduction (Accounting)", "RemittanceEodRequest": "End-of-day request",
                 "RemittanceExtractionRun": "Extraction run", "RemittanceHold": "Hold request",
                 "RemittanceIncentiveRule": "Incentive rule", "SpecialRemittance": "Special remittance request"}
@@ -329,6 +337,8 @@ TABLES = {t: ("Remittance", p, "-", "-") for t, p in {
     "rem_batch": "Remittance batches: insurer, type, currency, stage, processor, totals, documents.",
     "rem_batch_document": "Documents stored on a batch (schedule, payment request).",
     "rem_batch_line": "Accounts of a batch with their amounts, exclusion state and insurer OR.",
+    "rem_file_delivery": "Each copy of an extract file to the shared folder: file, folder, result, reason, when and by whom.",
+    "rem_setting_change": "Proposed changes of the remittance settings with their maker-checker decision.",
     "rem_deduction": "Insurer-confirmed deductions from a later remittance (Accounting, BRD-05).",
     "rem_deduction_application": "Deductions consumed by approved batches (Accounting, BRD-05).",
     "rem_eod_request": "Invoices queued for the end-of-day extraction.",

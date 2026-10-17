@@ -353,8 +353,8 @@ LOG = [
      "Remittance and Claims FRS in BDOI's format are listed apart as not yet assessed (65 and 75 items).",
      "iorta TechNXT", "Register v1.6 issued; v1.5 superseded.", "Closed", "Conformance Register v1.6"),
     ("O-022", "17 Oct 2026", "Decision", "BRD-00", "Co-insurance in scope; CRQ08 Risk Participation back in scope",
-     "The client confirmed that co-insurance is in scope of this build; only reinsurance is deferred to Phase 2. "
-     "Sprint 5 had deferred CRQ08 Risk Participation with reinsurance because the BRD-00 FRS described it as default "
+     "The client confirmed that co-insurance is in scope of the current phase; only reinsurance is deferred to Phase 2. "
+     "The earlier decision of 17-Oct-2026 had deferred CRQ08 Risk Participation with reinsurance because the BRD-00 FRS described it as default "
      "co-insurance shares on the insurer; that is reversed. Delivered: the Co-insurance / Risk Participation tab of "
      "the insurer page (participating insurers, share %, lead insurer flag, effective dates; maker-checker and the "
      "change log; shares of one period up to 100 %), used as the default co-insurance split of an invoice booked "
@@ -362,6 +362,19 @@ LOG = [
      "reinsurance functions hides only reinsurer and reinsurance-broker items; the co-insurer party type and the "
      "co-insurance functions stay open to the BDOI roles.", "Client (BDOI)", "FRS BRD-00 v1.3 issued; O-018 "
      "corrected; gaps G08 and G17 restated.", "Closed", "FRS BRD-00 v1.3"),
+    ("O-023", "17 Oct 2026", "Decision", "BRD-02, BRD-07", "Remittance and Claims FRS in BDOI's format assessed and "
+     "counted",
+     "The items of the Remittance FRS v1.0 and the Claims FRS v1.0, listed apart in register v1.6 as not yet "
+     "assessed, are assessed and counted from register v1.7: BRD-02 against the Cashiering FRS v3.4 and the "
+     "Remittance FRS v1.0, BRD-07 against the Claims FRS v1.0. Items delivered in the release of 17-Oct-2026 are "
+     "conformant on the automated checks and the walkthrough steps; the others take the result of their fit-gap "
+     "(Fit conformant, Partial partly conformant, Gap not conformant, change request not testable yet until BDOI "
+     "approves it, integration partly conformant on the simulator). The two Remittance items specified in another FRS "
+     "are not counted. The change requests CR-CLM-101 to 112 are not delivered. Current phase: 388 of 637 requirements "
+     "conformant (60.9%), 212 partly, 37 not testable yet, none not conformant.", "iorta TechNXT",
+     "Conformance Register v1.7 issued; v1.6 superseded. UX Design, Reports Notifications and Outputs, Developer "
+     "Specification and Data Dictionary v1.1 issued in both packs with screenshots of the running application.",
+     "Closed", "Conformance Register v1.7"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

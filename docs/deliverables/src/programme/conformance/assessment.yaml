@@ -1,7 +1,7 @@
 # Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
 # evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
 # fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
-version: "1.6"
+version: "1.7"
 date: 17 October 2026
 scope: >-
   Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
@@ -37,17 +37,27 @@ scope: >-
   run again on a fresh SIT/UAT environment (152 pass, none fail, 2 deferred); requirement evidence refreshed from the
   automated checks of the release. The FRS in BDOI's format of Remittance (BRD-02) and Claims (BRD-07), v1.0 of 17-Oct-2026, are listed item
   by item as not yet assessed and counted apart, so the current-phase figures stay comparable.
+  Version 1.7 (17-Oct-2026): co-insurance is in scope (client decision of 17-Oct-2026; only reinsurance stays in
+  Phase 2): the default co-insurance participation of the insurer delivered (CRQ08, FR-OP-007). The Remittance FRS
+  (BRD-02, v1.0) and the Claims FRS (BRD-07, v1.0) in BDOI's format are assessed item by item and counted: BRD-02 is
+  measured against the Cashiering FRS v3.4 and the Remittance FRS v1.0, BRD-07 against the Claims FRS v1.0. Items
+  delivered in the release of 17-Oct-2026 (extract files, settlement numbering, shared folder copy and Remittance
+  Settings; claim follow-ups, document checklist, motor details, return to the account officer, worklist export and
+  the BDOI heading, presentation and grouping of the claims reports) are shown by automated checks and the new
+  walkthrough steps; the other items take the result of their fit-gap in the FRS (Fit conformant, Partial partly
+  conformant, Gap not conformant, change requests not testable yet until BDOI approves them); the two items specified
+  in another FRS are not counted.
 
 # The FRS whose requirements are counted, per BRD (Summary); BIBS FRS when not listed.
 baselines:
-  BRD-02: BDOI FRS v3.4
+  BRD-02: BDOI FRS v3.4 + Remittance v1.0
   BRD-03: BDOI FRS v1.6
   BRD-06: BDOI FRS v1.3
+  BRD-07: BDOI FRS v1.0
   BRD-11: BDOI FRS v1.6
 
 # Results of the previous version (Summary, Change since v<previous_version>).
-previous_version: "1.5"
-# v1.5 restated for the current phase: the eight BRD-08 portal requirements (Not testable yet in v1.5) left out.
+previous_version: "1.6"
 previous:
   BRD-00: {frs: 25, ok: 21, partly: 1, nok: 0, nt: 3}
   BRD-01: {frs: 95, ok: 69, partly: 24, nok: 0, nt: 2}
@@ -56,29 +66,185 @@ previous:
   BRD-04: {frs: 52, ok: 36, partly: 13, nok: 0, nt: 3}
   BRD-05: {frs: 119, ok: 66, partly: 52, nok: 0, nt: 1}
   BRD-06: {frs: 49, ok: 27, partly: 22, nok: 0, nt: 0}
-  BRD-07: {frs: 39, ok: 27, partly: 10, nok: 0, nt: 2}
+  BRD-07: {frs: 39, ok: 29, partly: 8, nok: 0, nt: 2}
   BRD-08: {frs: 31, ok: 15, partly: 12, nok: 0, nt: 4}
-  BRD-09: {frs: 29, ok: 18, partly: 7, nok: 0, nt: 4}
-  BRD-10: {frs: 44, ok: 33, partly: 10, nok: 0, nt: 1}
+  BRD-09: {frs: 29, ok: 21, partly: 4, nok: 0, nt: 4}
+  BRD-10: {frs: 44, ok: 39, partly: 4, nok: 0, nt: 1}
   BRD-11: {frs: 12, ok: 4, partly: 8, nok: 0, nt: 0}
   BRD-12: {frs: 35, ok: 14, partly: 19, nok: 0, nt: 2}
   BRD-13: {frs: 48, ok: 18, partly: 19, nok: 0, nt: 11}
-  Total: {frs: 636, ok: 383, partly: 219, nok: 0, nt: 34}
+  Total: {frs: 636, ok: 394, partly: 208, nok: 0, nt: 34}
 
 # What changed since the previous version, per BRD (Summary).
 changes:
-  BRD-00: Reinsurance deferred to Phase 2 (G17; the platform's reinsurance functions hidden from the BDOI profiles);
-    data scope of records addressed by a text business key.
-  BRD-07: FR-CM-042 and FR-CM-043 shown in full by automated checks; walkthrough-script steps run again. The Claims
-    FRS in BDOI's format v1.0 is listed apart, not yet assessed.
-  BRD-08: Partner portal deferred to Phase 2 (G02); FR-EB-010 to 015, 045 and 056 and steps P1.2 and P1.4 left out of
-    the current phase.
-  BRD-09: The case routing notice is e-mailed and copied to the unit of the account; FR-CSF-021, 022 and 031 shown in
-    full by automated checks.
-  BRD-10: FR-SS-040, 050, 051, 052, 060 and 072 shown in full by automated checks.
+  BRD-00: Co-insurance back in scope (CRQ08); default co-insurance participation on the insurer used as the default
+    split of an invoice (FR-OP-007). Only reinsurance stays in Phase 2 (G17).
+  BRD-02: Baseline widened to the Remittance FRS v1.0 (16 requirements, 63 items counted); extract files, settlement
+    numbering, shared folder copy and Remittance Settings delivered. Not comparable with v1.6.
+  BRD-03: Co-insurance / Risk Participation tab on the insurer page.
+  BRD-07: Re-baselined to the Claims FRS v1.0 in BDOI's format (24 requirements, 75 items); follow-ups, document
+    checklist, motor details, return to the account officer, worklist export and report heading delivered; the 21
+    change-request items wait for BDOI's approval. Not comparable with v1.6.
 
 # Decisions on requirement items of the BDOI-template FRS (by item or group id): result, reason, evidence.
 bdoi_decisions:
+  # Remittance FRS v1.0 and Claims FRS v1.0: items delivered or shown working in the release of 17-Oct-2026.
+  FRID.RMT.001.03:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: Excel (.xls) and text files per batch"
+  FRID.RMT.001.04:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: file names with date, insurer code, settlement number and type"
+  FRID.RMT.001.05:
+    result: Partly conformant
+    reason: "Copied to the shared folder through the simulator of BDOI's file share; the share itself is confirmed in SIT"
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: shared folder copy, failure alert and resend"
+  FRID.RMT.001.08:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: heading and columns of the current report, Mall Assurance columns"
+  FRID.RMT.001.09:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: header and detail records with control totals"
+  FRID.RMT.002.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: batch lines in the columns of the extract"
+  FRID.RMT.003.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: Remittance Settings under maker-checker; REMITTANCE_SCHEDULE job"
+  FRID.RMT.006.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: settlement number and unique settlement reference per company"
+  FRID.RMT.007.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: extract files and schedule on the batch after submission"
+  FRID.RMT.008.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: insurer OR return read from Excel and text with control totals"
+  FRID.RMT.014.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: Mall Assurance columns on the Normal schedule; remitted batch report"
+  FRID.RMT.014.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: names follow the convention set on Remittance Settings"
+  FRCLM.001.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: outstanding, due and trend on the handler dashboard"
+  FRCLM.002.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: loss advice preview and claim view for the Marketing unit"
+  FRCLM.002.06:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: team lead and team head on the handler register"
+  FRCLM.003.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: statuses of Annex F with their status type"
+  FRCLM.005.01:
+    result: Partly conformant
+    reason: "The claim types of Annex M are loaded; the codes of the core system are confirmed with BDOI before go-live"
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: claim types of Annex M"
+  FRCLM.006.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: document checklist setup per claim type under maker-checker"
+  FRCLM.006.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: status Complete Documents blocked until the required documents are uploaded"
+  FRCLM.007.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: accredited repair shops (GARAGE) chosen on the motor details"
+  FRCLM.008.02:
+    result: Partly conformant
+    reason: "The common fields of Annex P are captured; the risk-code blocks other than Motor come with CR-CLM-108"
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: motor details on the claim"
+  FRCLM.008.04:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: unpaid or partly paid policy flagged; claims authorization code kept"
+  FRCLM.008.08:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: Formal Loss Advice previewed in PDF before sending"
+  FRCLM.009.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: follow-up count, last follow-up and days since on the worklist"
+  FRCLM.009.04:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: follow-up recorded with the fields of Annex Q"
+  FRCLM.009.08:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: worklist exported to Excel and PDF with its filters and sort"
+  FRCLM.017.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: prone locations by barangay with several location filters"
+  FRCLM.011.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.011.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.012.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.012.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.013.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.013.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.014.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.014.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.015.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.015.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.016.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.016.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
   FRUM.001.01:
     result: Conformant
     reason: ""
@@ -498,7 +664,7 @@ gaps:
       maker-checker masters authorized from the approval inbox, and a change of the remittance details sends the
       insurer back for authorization. The automated checks of the insurer page pass. Delivered in the release of
       17-Oct-2026: the read-only Ledger Accounts tab with the general ledger accounts posted for the insurer and its
-      sub-ledger open items. Delivered in Sprint 6 (client decision of 17-Oct-2026: co-insurance is in scope, only
+      sub-ledger open items. Delivered in the release of 17-Oct-2026 (client decision of 17-Oct-2026: co-insurance is in scope, only
       reinsurance is deferred): the Co-insurance / Risk Participation tab (CRQ08) with the participating insurers,
       share %, lead insurer flag and effective dates under maker-checker and the change log; shares of one period
       cannot exceed 100 %, and the authorized shares in force, when they total 100 %, are the default co-insurance
@@ -635,7 +801,7 @@ gaps:
     impact: No requirement of the current FRSs is affected; the umbrella BRD already places capability 15 in Phase 2.
       The reinsurance functions of the platform (reinsurer and reinsurance broker parties, receipts from a reinsurer,
       reinsurance settlement payments) are hidden from every BDOI group profile and refused by the server; the super
-      user of DEV, SIT and UAT keeps them. Co-insurance stays in the current phase and open to the BDOI roles: the
+      user of DEV, SIT and UAT keeps them. Co-insurance stays in the current phase and open to the BDOI roles, namely the
       co-insurer parties, the co-insurance split of an invoice (FR-OP-007) and the default co-insurance participation
       on the insurer (CRQ08, FR-CR-061, gap G08).
     proposal: >-

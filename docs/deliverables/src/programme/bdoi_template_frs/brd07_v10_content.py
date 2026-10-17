@@ -20,6 +20,9 @@ VERSION = "1.0"
 DROP = "Drop 2"
 WB_VERSION = "1.0"
 ICD_VERSION = "1.0"
+# Documents issued again after the release of 17 Oct 2026 changed them; the others stay at VERSION.
+DOC_VERSIONS = {"UXD": "1.1", "RNO": "1.1", "DSP": "1.1", "DDI": "1.1"}
+SHOTS_DIR = "brd07_v11_screens"
 DATE = "17 Oct 2026"
 DATE_LONG = "17 October 2026"
 DATE_US = "10/17/2026"
@@ -41,10 +44,10 @@ DOCS = {
     "BPS": {"file": f"BIBS_BPS-BDOI_BRD-07_Claims_Process_and_Storyboards_v{VERSION}.docx",
             "cover": "Claims: To-Be Process and Storyboards", "header_left": "To-Be Process and Storyboards",
             "doc_no": f"{DOC_NO}-BPS"},
-    "UXD": {"file": f"BIBS_UXD-BDOI_BRD-07_Claims_UX_Design_v{VERSION}.docx",
+    "UXD": {"file": f"BIBS_UXD-BDOI_BRD-07_Claims_UX_Design_v{DOC_VERSIONS['UXD']}.docx",
             "cover": "Claims: Screens and UX Design", "header_left": "Screens and UX Design",
             "doc_no": f"{DOC_NO}-UXD"},
-    "RNO": {"file": f"BIBS_RNO-BDOI_BRD-07_Claims_Reports_Notifications_Outputs_v{VERSION}.docx",
+    "RNO": {"file": f"BIBS_RNO-BDOI_BRD-07_Claims_Reports_Notifications_Outputs_v{DOC_VERSIONS['RNO']}.docx",
             "cover": "Claims: Reports, Notifications and Outputs", "header_left": "Reports, Notifications and Outputs",
             "doc_no": f"{DOC_NO}-RNO"},
     "ICD": {"file": f"BIBS_ICD-BDOI_BRD-07_Claims_Interface_Specification_v{ICD_VERSION}.docx",
@@ -62,6 +65,8 @@ REVISIONS = [
      "of BDOI's FRS with the points to align. Names of persons replaced by roles.", AUTHOR),
 ]
 REVISION_COMPANION = [(DATE, VERSION, "First issue, with the FRS Claims v1.0.", AUTHOR)]
+REVISIONS_UXD = REVISION_COMPANION + [(DATE, "1.1", "Second issue with the release of 17 Oct 2026: SCR-CLM-01, 02, 04, 08 and 09 updated for the delivered follow-ups, document checklist, motor details, return to account officer, worklist sort and export, home trend, report heading and grouping, and team lead and team head on the handlers; screenshots captured from the running application on seed data. The screens of the change requests CR-CLM-101 to 112 stay proposed.", AUTHOR)]
+REVISIONS_RNO = REVISION_COMPANION + [(DATE, "1.1", "Second issue with the release of 17 Oct 2026: worklist export, loss advice preview, follow-up and return-to-account-officer notices, and the BDOI heading, presentation and grouping of the claims reports.", AUTHOR)]
 ICD_REVISIONS = [(DATE, ICD_VERSION, "First issue: loss advice to the insurer, insurer claim updates and references "
                   "by upload, claim documents, module hand-offs and the legacy claims load.", AUTHOR)]
 
@@ -1094,13 +1099,15 @@ REPORTS = [
 REPORT_NOTE = ("Reports run on screen from Claims Reports and export to Excel and PDF with the heading of BR-CLM-10; "
                "each run is archived. RPT-CLM-08 to 10 come with their change requests.")
 DOCUMENTS = [
-    ("DO-01", "Formal Loss Advice", "PDF on the letterhead, per insurer or consolidated", "Claim, account, client",
-     "FRCLM.008.08"),
+    ("DO-01", "Formal Loss Advice", "PDF on the letterhead, per insurer or consolidated; preview before sending",
+     "Claim, account, client", "FRCLM.008.08"),
     ("DO-02", "Claims Reporting Form", "PDF of the form (proposed)", "Claim", "FRCLM.008.01"),
     ("DO-03", "Certificate of No Claim", "PDF (Annex T, to define)", "Account", "FRCLM.023.03"),
 ]
 EXPORTS = [
-    ("Follow-up list", "Excel, PDF", "Claims Worklist", "Rows, filters and grouping of the screen"),
+    ("Follow-up list", "Excel, PDF", "Claims Worklist", "Rows, filters and sort of the screen, with the follow-up "
+     "count, last follow-up and days since"),
+    ("Claims reports", "Excel, PDF", "Claims Reports", "BDOI heading, detailed or summary presentation, grouping"),
     ("Claims data extract", "Excel, CSV", "Claims Reports", "Every claim field"),
 ]
 NOTICES = [
@@ -1112,6 +1119,8 @@ NOTICES = [
     ("NT-06", "Follow-up to approve (proposed)", "Team Leader, Team Head", "Follow-up of claim <claim> waits for your "
      "approval", "Bell"),
     ("NT-07", "CRF submitted (proposed)", "Handlers of the unit", "Claims reporting form <ref> is submitted", "Bell"),
+    ("NT-08", "Claim returned to the account officer", "Account officer", "Claim <claim> is returned to you: "
+     "<reason>", "Bell"),
     ("AL-01", "Claim on an unpaid cover", "Handler, Team Leader", "Claim <claim> is on an unpaid cover", "Alert"),
     ("AL-02", "Follow-up overdue", "Handler, Team Leader", "Follow-up of claim <claim> is overdue", "Alert"),
     ("AL-03", "Claim past due", "Handler, Team Leader", "Claim <claim> is older than <n> days", "Alert"),

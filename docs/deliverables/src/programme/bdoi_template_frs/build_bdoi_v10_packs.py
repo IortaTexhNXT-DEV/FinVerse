@@ -47,7 +47,7 @@ class Doc(B6.Doc):
 
     def __init__(self, key: str, revisions):
         m = C.DOCS[key]
-        version = C.ICD_VERSION if key == "ICD" else C.VERSION
+        version = C.ICD_VERSION if key == "ICD" else getattr(C, "DOC_VERSIONS", {}).get(key, C.VERSION)
         pc.PackDoc.__init__(self, pc.DocMeta(file=m["file"], cover=m["cover"], header_left=m["header_left"],
                                              header_right=C.HEADER_RIGHT, doc_no=m["doc_no"], version=version,
                                              date_us=C.DATE_US, created_us=C.CREATED_US.get(key, C.DATE_US),
@@ -263,8 +263,23 @@ def write_bps(tmp: Path) -> Doc:
 
 
 # ================================================================================================ UXD
+def _shot(d: Doc, png: Path, caption: str) -> None:
+    """A screenshot scaled to the text width, kept with its caption."""
+    from docx.shared import Cm  # noqa: PLC0415
+    from PIL import Image  # noqa: PLC0415
+
+    with Image.open(png) as im:
+        w, h = im.size
+    p = d.doc.add_paragraph()
+    p.paragraph_format.keep_with_next = True
+    p.alignment = 1
+    p.add_run().add_picture(str(png), width=Cm(min(16.0, 21.0 * w / h)))
+    d.caption(caption, kind="Figure")
+    d.shots += 1
+
+
 def write_uxd(tmp: Path) -> Doc:
-    d = Doc("UXD", C.REVISION_COMPANION)
+    d = Doc("UXD", getattr(C, "REVISIONS_UXD", C.REVISION_COMPANION))
     d.h1("Introduction")
     d.para(f"This document describes every {C.NAME} screen of BIBS: purpose, users, access, rules and states, fields "
            "with their type, whether they are required, default, rule and message, and the actions. The "
@@ -282,6 +297,13 @@ def write_uxd(tmp: Path) -> Doc:
         d.h2(f"{s['id']} {s['name']}")
         d.table(["Item", "Value"], [["Purpose", s["purpose"]], ["Access", s["access"]], ["Requirements", s["frrn"]],
                                     ["Outcome", s["outcome"] or "-"], ["Availability", s["state"]]], [2.2, 7.0])
+        shots_dir = getattr(C, "SHOTS_DIR", None)
+        if shots_dir:
+            folder = HERE / "figures" / shots_dir
+            for png in sorted(folder.glob(f"{s['id']}*.png")):
+                view = png.stem[len(s["id"]):].lstrip("-").replace("-", " ")
+                _shot(d, png, f"{s['id']} {s['name']}" + (f" ({view})" if view else "")
+                      + ", captured from the running application on seed data")
         if s["rules"]:
             d.para("Rules and states:")
             d.bullets(s["rules"])
@@ -296,7 +318,7 @@ def write_uxd(tmp: Path) -> Doc:
 
 # ================================================================================================ RNO
 def write_rno(tmp: Path) -> Doc:
-    d = Doc("RNO", C.REVISION_COMPANION)
+    d = Doc("RNO", getattr(C, "REVISIONS_RNO", C.REVISION_COMPANION))
     d.h1("Introduction")
     d.para(f"This document lists the reports, the documents and files produced, the exports, the notices and alerts "
            f"and the scheduled jobs of {C.NAME}. Times are Manila time.")

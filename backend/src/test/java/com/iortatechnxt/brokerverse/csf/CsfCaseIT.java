@@ -41,11 +41,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
- * Case management of the Customer Servicing Facility (FR-CSF-050 to 061): logging with the
- * mandatory fields, the duplicate rule and Resolve and Close; routing to the fulfilment unit,
- * resolution, return, CSR action and re-endorsement; reassignment, escalation and change of
- * category by the supervisor; notes, follow-up cases and the history; the access of the fulfilment
- * units; the dashboard and the Case Summary on the same figures.
+ * Case management of the Customer Servicing Facility (FR-CSF-050, FR-CSF-051, FR-CSF-052,
+ * FR-CSF-053, FR-CSF-054, FR-CSF-055, FR-CSF-056, FR-CSF-057, FR-CSF-058, FR-CSF-059, FR-CSF-060,
+ * FR-CSF-061): logging with the mandatory fields, the duplicate rule and Resolve and Close; routing
+ * to the fulfilment unit, resolution, return, CSR action and re-endorsement; reassignment,
+ * escalation and change of category by the supervisor; notes, follow-up cases and the history; the
+ * access of the fulfilment units; the dashboard and the Case Summary on the same figures.
  */
 @IntegrationTest
 class CsfCaseIT {

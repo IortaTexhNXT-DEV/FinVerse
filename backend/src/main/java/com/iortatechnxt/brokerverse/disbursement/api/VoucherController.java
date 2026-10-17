@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.disbursement.api;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.InstrumentDtos.CwtTagRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.InstrumentDtos.ReceiptTagRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.RequestDtos.ReasonComment;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  * submit for approval, approve single or multiple, reject, cancel), the DV document and the OR / AR
  * and CWT tags. The return to the processor runs through the workflow panel.
  */
+@OwnedRecord(Voucher.class)
 @RestController
 @RequestMapping("/api/v1/disbursement/vouchers")
 public class VoucherController {

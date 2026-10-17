@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.security.api.dto.AccessChangeResponse;
 import com.iortatechnxt.brokerverse.security.service.UserAccessDetail;
 import com.iortatechnxt.brokerverse.security.service.UserAccessDetail.EffectivePermission;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * date, and the access history of the user. Read-only: users and their group profiles are
  * maintained in UIDM-ISC.
  */
+@GlobalRecord("users, roles and access requests are programme-wide")
 @RestController
 @RequestMapping("/api/v1/admin/users/{id}")
 @PreAuthorize("hasAnyAuthority('USER_MANAGE','USER_VIEW')")

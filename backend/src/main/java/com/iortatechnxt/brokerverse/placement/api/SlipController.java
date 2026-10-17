@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.placement.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.placement.api.dto.AccountsRequest;
 import com.iortatechnxt.brokerverse.placement.api.dto.SlipEmailRequest;
 import com.iortatechnxt.brokerverse.placement.api.dto.SlipResponse;
+import com.iortatechnxt.brokerverse.placement.domain.PlacementSlip;
 import com.iortatechnxt.brokerverse.placement.domain.SlipStatus;
 import com.iortatechnxt.brokerverse.placement.service.PlacementBatchService;
 import com.iortatechnxt.brokerverse.placement.service.PlacementBatchService.ItemResult;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Placement slips (BRNB.069/071): list, generate, regenerate after a return, download the PDF and
  * XLSX, proposed e-mail, send and resend.
  */
+@OwnedRecord(PlacementSlip.class)
 @RestController
 @RequestMapping("/api/v1/placement/slips")
 public class SlipController {

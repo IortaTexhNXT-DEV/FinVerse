@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.cutover.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.migration.common.service.Workbooks;
 import com.iortatechnxt.brokerverse.migration.cutover.api.dto.CutoverDtos.CohortResponse;
 import com.iortatechnxt.brokerverse.migration.cutover.api.dto.CutoverDtos.CriterionResponse;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  * no-go criteria, the board's decision, the runbook export, the run-off of the migrated policies
  * and the decommissioning checklists.
  */
+@OwnedRecord(DecommissionItem.class)
 @RestController
 @RequestMapping("/api/v1/migration")
 @Transactional

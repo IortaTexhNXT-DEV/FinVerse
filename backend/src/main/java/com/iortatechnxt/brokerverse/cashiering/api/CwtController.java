@@ -5,10 +5,12 @@ import com.iortatechnxt.brokerverse.cashiering.api.dto.CwtDtos.CwtBatchResponse;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.CwtDtos.CwtTagRequest;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.CwtDtos.CwtTagResponse;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.CwtDtos.ExpectedResponse;
+import com.iortatechnxt.brokerverse.cashiering.domain.CwtBatch;
 import com.iortatechnxt.brokerverse.cashiering.domain.CwtTag;
 import com.iortatechnxt.brokerverse.cashiering.domain.CwtTag.CwtDetails;
 import com.iortatechnxt.brokerverse.cashiering.service.CwtService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import jakarta.validation.Valid;
@@ -125,6 +127,7 @@ public class CwtController {
    */
   @PostMapping("/{id}/receive")
   @PreAuthorize(CashAccess.CWT_PROCESS)
+  @OwnedRecord(CwtTag.class)
   public CwtTagResponse receive(
       @PathVariable Long id, @RequestParam(defaultValue = "false") boolean copyReceived) {
     return CwtTagResponse.from(cwt.receive(id, copyReceived));
@@ -139,6 +142,7 @@ public class CwtController {
    */
   @PostMapping("/{id}/checklist")
   @PreAuthorize(CashAccess.CWT_PROCESS)
+  @OwnedRecord(CwtTag.class)
   public CwtTagResponse checklist(@PathVariable Long id, @RequestParam boolean copyReceived) {
     return CwtTagResponse.from(cwt.checklist(id, copyReceived));
   }
@@ -152,6 +156,7 @@ public class CwtController {
    */
   @PostMapping("/{id}/settle-cash")
   @PreAuthorize(CashAccess.CWT_PROCESS)
+  @OwnedRecord(CwtTag.class)
   public CwtTagResponse settleCash(@PathVariable Long id, @RequestParam Long branchId) {
     return CwtTagResponse.from(cwt.settleCash(id, branchId));
   }
@@ -188,6 +193,7 @@ public class CwtController {
    */
   @GetMapping("/batches/{id}/tags")
   @PreAuthorize(CashAccess.CWT_VIEW)
+  @OwnedRecord(CwtBatch.class)
   public List<CwtTagResponse> batchTags(@PathVariable Long id) {
     List<CwtTag> tags = cwt.tagsOf(id);
     Map<String, OpsInvoice> invoices =
@@ -203,6 +209,7 @@ public class CwtController {
    */
   @PostMapping("/batches/{id}/route")
   @PreAuthorize(CashAccess.CWT_PROCESS)
+  @OwnedRecord(CwtBatch.class)
   public CwtBatchResponse route(@PathVariable Long id) {
     return CwtBatchResponse.from(cwt.route(id));
   }
@@ -215,6 +222,7 @@ public class CwtController {
    */
   @PostMapping("/batches/{id}/release")
   @PreAuthorize(CashAccess.DISBURSEMENT)
+  @OwnedRecord(CwtBatch.class)
   public CwtBatchResponse release(@PathVariable Long id) {
     return CwtBatchResponse.from(cwt.release(cwt.batch(id).getBatchNo(), false));
   }

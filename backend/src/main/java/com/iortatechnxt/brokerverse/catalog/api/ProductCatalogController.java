@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQuerie
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueries.VersionFacts;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Product lines, cover types and BDOI risk products (BRNB.001). */
+@GlobalRecord("programme-wide product catalog master")
 @RestController
 @RequestMapping("/api/v1/catalog")
 public class ProductCatalogController {

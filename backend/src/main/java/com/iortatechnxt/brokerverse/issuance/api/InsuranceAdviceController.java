@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.issuance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.issuance.api.dto.AdviceResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.AdviceSendRequest;
 import com.iortatechnxt.brokerverse.issuance.api.dto.ArnsRequest;
+import com.iortatechnxt.brokerverse.issuance.domain.InsuranceAdvice;
 import com.iortatechnxt.brokerverse.issuance.service.AdviceDispatchService;
 import com.iortatechnxt.brokerverse.issuance.service.InsuranceAdviceService;
 import com.iortatechnxt.brokerverse.issuance.service.IssuanceBatchService;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Insurance Advice register (BRNB.060/070/095/035): search and list, view and download, generate
  * single or multiple, send single or multiple password protected.
  */
+@OwnedRecord(InsuranceAdvice.class)
 @RestController
 @RequestMapping("/api/v1/issuance/insurance-advice")
 public class InsuranceAdviceController {

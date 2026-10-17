@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.investment.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.investment.api.dto.InvestmentRunResponse;
 import com.iortatechnxt.brokerverse.investment.api.dto.RunPreviewResponse;
 import com.iortatechnxt.brokerverse.investment.api.dto.RunPreviewResponse.Line;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for month-end interest accrual and amortization runs. */
+@OwnedRecord(InvestmentRun.class)
 @RestController
 @RequestMapping("/api/v1/investments/runs")
 public class InvestmentRunController {

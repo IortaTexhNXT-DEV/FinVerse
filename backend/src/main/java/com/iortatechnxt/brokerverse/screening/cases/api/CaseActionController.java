@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.cases.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.screening.cases.api.dto.CaseDetail;
 import com.iortatechnxt.brokerverse.screening.cases.api.dto.CaseRequests;
 import com.iortatechnxt.brokerverse.screening.cases.api.dto.VoteDto;
@@ -12,6 +13,7 @@ import com.iortatechnxt.brokerverse.screening.cases.service.CaseQueries;
 import com.iortatechnxt.brokerverse.screening.cases.service.CaseSubmissionService;
 import com.iortatechnxt.brokerverse.screening.cases.service.CommitteeService;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.MatchRow;
+import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningMatch;
 import com.iortatechnxt.brokerverse.screening.risk.api.dto.RiskProfileRow;
 import jakarta.validation.Valid;
 import java.time.Clock;
@@ -31,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
  * the case with the user's actions after the step (and the warnings of non-blocking validation
  * rules).
  */
+@OwnedRecord(ScreeningCase.class)
+@OwnedRecord(value = ScreeningMatch.class, variable = "matchId")
 @RestController
 @RequestMapping("/api/v1/screening/cases/{id}")
 public class CaseActionController {

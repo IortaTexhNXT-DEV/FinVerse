@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -9,6 +10,7 @@ import jakarta.persistence.Table;
  * A view of the account history of a renewal (BRRN.027 AC 4): who opened it (created by), when, and
  * which sections; the disposition is refused until the user has viewed it.
  */
+@OwnedBy(value = RenewalCandidate.class, key = "candidateId")
 @Entity
 @Table(name = "rnw_history_view")
 public class HistoryView extends BaseEntity {

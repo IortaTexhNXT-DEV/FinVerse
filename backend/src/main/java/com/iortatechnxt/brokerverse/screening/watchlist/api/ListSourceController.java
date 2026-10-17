@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.screening.watchlist.api;
 
 import com.iortatechnxt.brokerverse.bulk.service.BulkService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.screening.common.service.ScreeningPermissions;
 import com.iortatechnxt.brokerverse.screening.watchlist.api.dto.RunDetail;
 import com.iortatechnxt.brokerverse.screening.watchlist.api.dto.RunDto;
@@ -38,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
  * list file template, "Upload List File" (a run whose changes wait for a checker), staging a file
  * for the scheduled run, and the run log with failed records.
  */
+@GlobalRecord("watch lists are programme-wide")
 @RestController
 @RequestMapping("/api/v1/screening/watchlist")
 public class ListSourceController {

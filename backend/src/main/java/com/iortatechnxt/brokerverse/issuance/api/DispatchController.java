@@ -1,10 +1,12 @@
 package com.iortatechnxt.brokerverse.issuance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.issuance.api.dto.DispatchBatchRequest;
 import com.iortatechnxt.brokerverse.issuance.api.dto.DispatchLogResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.DispatchRequest;
 import com.iortatechnxt.brokerverse.issuance.api.dto.EpolicyResponse;
+import com.iortatechnxt.brokerverse.issuance.domain.Epolicy;
 import com.iortatechnxt.brokerverse.issuance.service.EpolicyDispatchService;
 import com.iortatechnxt.brokerverse.issuance.service.EpolicyDispatchService.DispatchEmail;
 import com.iortatechnxt.brokerverse.issuance.service.IssuanceBatchService;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * E-policy dispatch to the client (BRNB.077/035): proposed e-mail, single send, batch send, and the
  * dispatch report from the messaging log.
  */
+@OwnedRecord(value = Epolicy.class, variable = "epolicyId")
 @RestController
 @RequestMapping("/api/v1/issuance/dispatch")
 public class DispatchController {

@@ -1,9 +1,12 @@
 package com.iortatechnxt.brokerverse.tax.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.tax.api.dto.CertificateBatchRequest;
 import com.iortatechnxt.brokerverse.tax.api.dto.CertificateBatchResponse;
 import com.iortatechnxt.brokerverse.tax.api.dto.CertificateResponse;
+import com.iortatechnxt.brokerverse.tax.domain.Certificate2307;
+import com.iortatechnxt.brokerverse.tax.domain.Certificate2307Batch;
 import com.iortatechnxt.brokerverse.tax.service.Certificate2307Service;
 import com.iortatechnxt.brokerverse.tax.service.Certificate2307Service.BatchResult;
 import jakarta.validation.Valid;
@@ -87,6 +90,7 @@ public class Certificate2307Controller {
    */
   @PostMapping("/certificates/{id}/cancel")
   @PreAuthorize(TaxAccess.MANAGE)
+  @OwnedRecord(Certificate2307.class)
   public CertificateResponse cancel(
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return CertificateResponse.from(service.cancel(id, request.reason()));
@@ -100,6 +104,7 @@ public class Certificate2307Controller {
    */
   @GetMapping("/certificates/{id}/pdf")
   @PreAuthorize(TaxAccess.VIEW)
+  @OwnedRecord(Certificate2307.class)
   public ResponseEntity<byte[]> pdf(@PathVariable Long id) {
     return TaxAccess.file(
         "BIR2307-" + service.get(id).getCertificateNo() + ".pdf",
@@ -114,6 +119,7 @@ public class Certificate2307Controller {
    * @return PDF
    */
   @GetMapping("/batches/{id}/pdf")
+  @OwnedRecord(Certificate2307Batch.class)
   @PreAuthorize(TaxAccess.VIEW)
   public ResponseEntity<byte[]> batchPdf(@PathVariable Long id) {
     return TaxAccess.file(

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.crm.api;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientListItem;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientRequest;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientResponse;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Client master (BRNB.029/030/032/046/048/049): search, details, create and update, and duplicate
  * candidates for live warnings while the user types.
  */
+@OwnedRecord(Client.class)
 @RestController
 @RequestMapping("/api/v1/crm/clients")
 public class ClientController {

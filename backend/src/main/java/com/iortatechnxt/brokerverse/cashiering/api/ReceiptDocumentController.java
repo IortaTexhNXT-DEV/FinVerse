@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.service.BatchPrintService;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import com.iortatechnxt.brokerverse.storage.domain.StoredFile;
 import com.iortatechnxt.brokerverse.storage.service.FileDownload;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The documents kept with a receipt (FRS.CSH.02.04.17): the company's copies printed, listed on the
  * Documents tab of the receipt and opened from there.
  */
+@OwnedRecord(Receipt.class)
 @RestController
 @RequestMapping("/api/v1/cashiering/receipts/{id}/documents")
 public class ReceiptDocumentController {

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.common.security.UserDataScope;
 import com.iortatechnxt.brokerverse.security.api.dto.DataScopeRequest;
 import com.iortatechnxt.brokerverse.security.api.dto.DataScopeResponse;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * change needs the user maintenance permission (the emergency direct edit of the Users screen), the
  * regular path is an access request.
  */
+@GlobalRecord("users, roles and access requests are programme-wide")
 @RestController
 @RequestMapping("/api/v1/admin")
 public class DataScopeController {

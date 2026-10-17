@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.nonpackage.api;
 import com.iortatechnxt.brokerverse.account.api.dto.CommentRequest;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalBody;
 import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalDtos.AcceptBody;
 import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalDtos.ChecklistView;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * the acceptance and create the accounts. TSU actions are in {@link ProposalTsuController}; the
  * generic actions (TSU accept, return, decline, void) run from the workflow panel.
  */
+@OwnedRecord(ProposalRequest.class)
 @RestController
 @RequestMapping("/api/v1/proposals")
 public class ProposalController {

@@ -1,9 +1,12 @@
 package com.iortatechnxt.brokerverse.payables.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.payables.api.dto.BankAccountRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.BankAccountResponse;
 import com.iortatechnxt.brokerverse.payables.api.dto.ChequeBookRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.ChequeBookResponse;
+import com.iortatechnxt.brokerverse.payables.domain.BankAccount;
+import com.iortatechnxt.brokerverse.payables.domain.ChequeBook;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountQueryService;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountService;
 import jakarta.validation.Valid;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Company bank accounts and cheque books. */
+@OwnedRecord(BankAccount.class)
+@OwnedRecord(value = ChequeBook.class, variable = "bookId")
 @RestController
 @RequestMapping("/api/v1/payables/bank-accounts")
 public class BankAccountController {

@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.closing.service.PeriodCloseScheduleService;
 import com.iortatechnxt.brokerverse.closing.service.YearEndCloseDueCheck;
 import com.iortatechnxt.brokerverse.closing.service.YearEndService;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.period.domain.PeriodModuleLock;
 import com.iortatechnxt.brokerverse.period.service.PeriodModuleLockService;
 import com.iortatechnxt.brokerverse.period.service.PeriodService;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  * FRBS close controls: scheduled month-end close (FRBS 2.6.0 / 2.6.1), cut-off of the broking books
  * (FRBS 3.4.0 / 3.4.1) and the year-end verification and deadline (FRBS 2.7.0 / 2.7.1).
  */
+@OwnedRecord(PeriodCloseSchedule.class)
 @RestController
 @RequestMapping("/api/v1/closing")
 public class CloseScheduleController {

@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.setup.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.renewal.domain.PackageChoice;
 import com.iortatechnxt.brokerverse.renewal.setup.api.dto.SetupDtos.PackageChoiceView;
 import com.iortatechnxt.brokerverse.renewal.setup.service.PackageChoiceService;
 import jakarta.validation.Valid;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Package choices of migrated renewals in the Exception bucket (DMQ36): the Renewal processing team
  * chooses the BIBS package version, another member approves it.
  */
+@OwnedRecord(PackageChoice.class)
 @RestController
 @RequestMapping("/api/v1/renewal")
 public class PackageChoiceController {

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.marketing.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalTransfer;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Transfers of renewals between Marketing units (FR-RN-031, 032). */
+@OwnedRecord(RenewalTransfer.class)
 @RestController
 @RequestMapping("/api/v1/renewal/transfers")
 @PreAuthorize("hasAuthority('RNW_ASSIGN')")

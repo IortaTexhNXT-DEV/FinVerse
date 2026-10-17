@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.acsl.api.dto.AcslInputs.ResultInput;
 import com.iortatechnxt.brokerverse.acsl.api.dto.AcslInputs.ReversalInput;
 import com.iortatechnxt.brokerverse.acsl.api.dto.AcslViews.CaseView;
 import com.iortatechnxt.brokerverse.acsl.api.dto.AcslViews.CorrectionView;
+import com.iortatechnxt.brokerverse.acsl.domain.AcslCase;
 import com.iortatechnxt.brokerverse.acsl.domain.CaseStage;
 import com.iortatechnxt.brokerverse.acsl.domain.CaseType;
 import com.iortatechnxt.brokerverse.acsl.service.AcslQueryService;
@@ -16,6 +17,7 @@ import com.iortatechnxt.brokerverse.acsl.service.CaseLinks;
 import com.iortatechnxt.brokerverse.acsl.service.CaseService;
 import com.iortatechnxt.brokerverse.acsl.service.CorrectionService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  * payment reversal and message the Account Officer. Start and send-back are generic workflow
  * actions.
  */
+@OwnedRecord(AcslCase.class)
 @RestController
 @RequestMapping("/api/v1/acsl")
 public class AcslCaseController {

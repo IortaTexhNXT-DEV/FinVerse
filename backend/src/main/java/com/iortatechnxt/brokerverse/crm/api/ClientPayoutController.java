@@ -1,6 +1,9 @@
 package com.iortatechnxt.brokerverse.crm.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.crm.api.dto.PayoutAccountResponse;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
+import com.iortatechnxt.brokerverse.crm.domain.ClientPayoutAccount;
 import com.iortatechnxt.brokerverse.crm.service.ClientPayoutAccounts;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
  * CA / SA information of a client (MKT 2.25.0-2.25.1): captured from approved refund requests,
  * listed on the client record, deactivated when no longer valid.
  */
+@OwnedRecord(Client.class)
+@OwnedRecord(value = ClientPayoutAccount.class, variable = "accountId")
 @RestController
 @RequestMapping("/api/v1/crm/clients/{id}/payout-accounts")
 public class ClientPayoutController {

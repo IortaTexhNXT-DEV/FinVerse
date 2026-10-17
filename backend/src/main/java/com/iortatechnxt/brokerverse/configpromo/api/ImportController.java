@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.configpromo.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.DecisionRequest;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.ImportDatasetResponse;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.ImportResponse;
@@ -46,6 +47,7 @@ import org.springframework.web.multipart.MultipartFile;
  * deployment pipelines (a service user with the prepare permission): dry run first, then submit, or
  * apply its own dry run outside production when the environment allows it.
  */
+@GlobalRecord("configuration promotion is programme-wide")
 @RestController
 @RequestMapping("/api/v1/config-promotion/imports")
 @PreAuthorize(PromotionController.ANY_PERMISSION)

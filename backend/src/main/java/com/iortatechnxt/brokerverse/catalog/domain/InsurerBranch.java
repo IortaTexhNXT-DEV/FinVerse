@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
  * Branch of a panel insurer with its Local Government Tax rate (Appendix A: "LGT value is dependent
  * on the Insurer Branch") and optional placement mailbox.
  */
+@OwnedBy(value = InsurerProfile.class, key = "insurerId")
 @Entity
 @Table(name = "cat_insurer_branch")
 public class InsurerBranch extends AuthorizableEntity implements CatalogRecord {

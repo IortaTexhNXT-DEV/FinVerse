@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.security.api.dto.PasswordChangeRequest;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleRequest;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * are guarded (PQ17, {@link RoleEditGuard}): they carry the number of an approved group-profile
  * request, or use the audited emergency path {@code UAM_DIRECT_ROLE_EDIT}.
  */
+@GlobalRecord("users, roles and access requests are programme-wide")
 @RestController
 @RequestMapping("/api/v1/admin")
 public class UserAdminController {

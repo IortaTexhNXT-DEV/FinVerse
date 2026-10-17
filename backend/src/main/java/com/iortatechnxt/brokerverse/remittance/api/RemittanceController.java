@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.remittance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
@@ -18,6 +20,8 @@ import com.iortatechnxt.brokerverse.remittance.api.dto.RemittanceDtos.IncentiveR
 import com.iortatechnxt.brokerverse.remittance.api.dto.RemittanceDtos.OrUploadResponse;
 import com.iortatechnxt.brokerverse.remittance.api.dto.RemittanceDtos.RunResponse;
 import com.iortatechnxt.brokerverse.remittance.api.dto.RemittanceDtos.TagResponse;
+import com.iortatechnxt.brokerverse.remittance.domain.EarlyIncentiveRule;
+import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRun;
 import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRun.Scope;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.ExtractionTrigger;
 import com.iortatechnxt.brokerverse.remittance.service.ExtractionService;
@@ -106,6 +110,7 @@ public class RemittanceController {
    */
   @GetMapping("/runs/{id}")
   @PreAuthorize(RemittanceAccess.TEAM)
+  @OwnedRecord(ExtractionRun.class)
   public RunResponse run(@PathVariable Long id) {
     return RunResponse.from(queries.run(id));
   }
@@ -120,6 +125,7 @@ public class RemittanceController {
    */
   @GetMapping("/runs/{id}/tags")
   @PreAuthorize(RemittanceAccess.TEAM)
+  @OwnedRecord(ExtractionRun.class)
   public PageResponse<TagResponse> tags(
       @PathVariable Long id,
       @RequestParam(defaultValue = "0") int page,
@@ -261,6 +267,7 @@ public class RemittanceController {
    */
   @PutMapping("/incentive-rules/{id}")
   @PreAuthorize(RemittanceAccess.APPROVE)
+  @OwnedRecord(EarlyIncentiveRule.class)
   public IncentiveRuleResponse updateRule(
       @PathVariable Long id, @Valid @RequestBody IncentiveRuleRequest request) {
     return IncentiveRuleResponse.from(incentives.update(id, request.terms()));
@@ -303,6 +310,7 @@ public class RemittanceController {
    */
   @GetMapping("/insurer-or/runs/{id}")
   @PreAuthorize(RemittanceAccess.TEAM)
+  @GlobalRecord("an insurer OR upload run carries the files of every company")
   public OrUploadResponse insurerOrRun(@PathVariable Long id) {
     return OrUploadResponse.from(insurerOrs.result(id));
   }

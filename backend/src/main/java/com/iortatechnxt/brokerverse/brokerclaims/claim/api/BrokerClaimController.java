@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.claim.service.PremiumCheckServi
 import com.iortatechnxt.brokerverse.brokerclaims.cover.api.dto.CoverDtos.CoverClaimDto;
 import com.iortatechnxt.brokerverse.brokerclaims.cover.api.dto.CoverDtos.PremiumDto;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  * refresh the cover data, use the latest cover version, re-check the premium and generate the
  * claims authorization code ({@code BCL_AUTHORIZE}). Every call is scoped to the company.
  */
+@OwnedRecord(Claim.class)
 @RestController
 @RequestMapping("/api/v1/broker-claims")
 public class BrokerClaimController {

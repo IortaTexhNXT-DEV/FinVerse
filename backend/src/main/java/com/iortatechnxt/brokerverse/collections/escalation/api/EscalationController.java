@@ -2,9 +2,11 @@ package com.iortatechnxt.brokerverse.collections.escalation.api;
 
 import com.iortatechnxt.brokerverse.collections.escalation.api.dto.EscalationDtos.ActionRequest;
 import com.iortatechnxt.brokerverse.collections.escalation.api.dto.EscalationDtos.EscalationResponse;
+import com.iortatechnxt.brokerverse.collections.escalation.domain.Escalation;
 import com.iortatechnxt.brokerverse.collections.escalation.domain.EscalationEnums.Stage;
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import jakarta.validation.Valid;
 import java.time.Clock;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * resubmit). Manual escalation is {@code POST /api/v1/collections/bulk/escalate}; acknowledge and
  * return to the handler run through the workflow API.
  */
+@OwnedRecord(Escalation.class)
 @RestController
 @RequestMapping("/api/v1/collections/escalations")
 public class EscalationController {

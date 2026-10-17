@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.adjustment.service.PolicyLinks;
 import com.iortatechnxt.brokerverse.adjustment.service.PostingBatchService;
 import com.iortatechnxt.brokerverse.adjustment.service.RequestWorkflowService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * validate, approve (four eyes), post (a batch of one), re-apply payments and link the quotation of
  * a TSI increase. Returns and cancellations are generic workflow actions.
  */
+@OwnedRecord(EndorsementRequest.class)
 @RestController
 @RequestMapping("/api/v1/adjustment/requests/{id}")
 public class RequestActionController {

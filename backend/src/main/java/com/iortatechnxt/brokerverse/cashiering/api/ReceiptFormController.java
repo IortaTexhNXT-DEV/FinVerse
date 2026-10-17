@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.cashiering.api;
 import com.iortatechnxt.brokerverse.cashiering.domain.FormText;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptForm;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptFormService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The AR and OR forms set up online (FRS.CSH.02.06.01 to 02.06.03): the versions with their
  * effective dates, a change proposed by one user and approved or rejected by another.
  */
+@OwnedRecord(ReceiptForm.class)
 @RestController
 @RequestMapping("/api/v1/cashiering/receipt-forms")
 public class ReceiptFormController {

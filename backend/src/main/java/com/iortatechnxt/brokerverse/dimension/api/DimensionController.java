@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.dimension.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.dimension.api.dto.DimensionValueRequest;
 import com.iortatechnxt.brokerverse.dimension.api.dto.DimensionValueResponse;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
+import com.iortatechnxt.brokerverse.dimension.domain.DimensionValue;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for financial dimensions (cost centres, business lines, departments...). */
+@OwnedRecord(DimensionValue.class)
 @RestController
 @RequestMapping("/api/v1/dimensions")
 public class DimensionController {

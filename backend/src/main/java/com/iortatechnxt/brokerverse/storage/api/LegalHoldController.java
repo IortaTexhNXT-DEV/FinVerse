@@ -2,10 +2,13 @@ package com.iortatechnxt.brokerverse.storage.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.dto.HoldFileResponse;
 import com.iortatechnxt.brokerverse.storage.api.dto.LegalHoldCommand;
 import com.iortatechnxt.brokerverse.storage.api.dto.LegalHoldRequestResponse;
 import com.iortatechnxt.brokerverse.storage.domain.LegalHoldRequest;
+import com.iortatechnxt.brokerverse.storage.domain.StoredFile;
 import com.iortatechnxt.brokerverse.storage.service.LegalHoldService;
 import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
 import jakarta.validation.Valid;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * request with {@code FILE_LEGAL_HOLD_REQUEST}, approve or reject with {@code
  * FILE_LEGAL_HOLD_APPROVE} (the DOA roles; the requester cannot decide).
  */
+@OwnedRecord(StoredFile.class)
 @RestController
 @RequestMapping("/api/v1/files")
 public class LegalHoldController {
@@ -116,6 +120,7 @@ public class LegalHoldController {
    */
   @PostMapping("/legal-hold-requests/{requestId}/approve")
   @PreAuthorize(APPROVE)
+  @GlobalRecord("legal holds are administered for the whole programme")
   public LegalHoldRequestResponse approve(
       @PathVariable Long requestId, @Valid @RequestBody ReasonRequest body) {
     return LegalHoldRequestResponse.from(holds.decide(requestId, true, body.reason()));
@@ -130,6 +135,7 @@ public class LegalHoldController {
    */
   @PostMapping("/legal-hold-requests/{requestId}/reject")
   @PreAuthorize(APPROVE)
+  @GlobalRecord("legal holds are administered for the whole programme")
   public LegalHoldRequestResponse reject(
       @PathVariable Long requestId, @Valid @RequestBody ReasonRequest body) {
     return LegalHoldRequestResponse.from(holds.decide(requestId, false, body.reason()));

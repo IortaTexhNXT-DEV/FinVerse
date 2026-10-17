@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.submitted.renewal.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import com.iortatechnxt.brokerverse.storage.service.FileDownload;
@@ -49,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  * within the user's scope, Renew with BDOI, the re-assignment of the insurer, the expiry scan and
  * the letter dispatch started by hand, the letters of a record and the print batches.
  */
+@OwnedRecord(value = SbmPolicy.class, variable = "policyId")
 @RestController
 @RequestMapping("/api/v1/submitted")
 public class RenewalController {
@@ -253,6 +255,7 @@ public class RenewalController {
   @PostMapping("/letters/{id}/resend")
   @PreAuthorize(LETTERS)
   @Transactional
+  @OwnedRecord(SbmLetter.class)
   public LetterView resend(@PathVariable Long id) {
     SbmLetter l = services.letterService().resend(id);
     return LetterView.from(l, sbmNo(l.getPolicyId()));
@@ -268,6 +271,7 @@ public class RenewalController {
   @GetMapping("/letters/{id}/pdf")
   @PreAuthorize(MasterlistController.VIEW)
   @Transactional(readOnly = true)
+  @OwnedRecord(SbmLetter.class)
   public ResponseEntity<byte[]> letterPdf(@PathVariable Long id, HttpServletRequest request) {
     SbmLetter l =
         letters.findById(id).orElseThrow(() -> new ResourceNotFoundException("Letter", id));
@@ -317,6 +321,7 @@ public class RenewalController {
    */
   @GetMapping("/print-batches/{id}/{part}")
   @PreAuthorize(LETTERS)
+  @OwnedRecord(SbmPrintBatch.class)
   public ResponseEntity<byte[]> printBatchFile(
       @PathVariable Long id, @PathVariable String part, HttpServletRequest request) {
     SbmPrintBatch b =

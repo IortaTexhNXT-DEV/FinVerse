@@ -2,8 +2,10 @@ package com.iortatechnxt.brokerverse.migration.load.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigExtract;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigExtractRepository;
+import com.iortatechnxt.brokerverse.migration.intake.domain.MigIssue;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigIssueRepository;
 import com.iortatechnxt.brokerverse.migration.intake.domain.RowStatus;
 import com.iortatechnxt.brokerverse.migration.intake.domain.StageRowRepository;
@@ -55,6 +57,7 @@ import org.springframework.web.bind.annotation.RestController;
  * the validation, approve and run the load, rerun, roll back, download the rejects, sign the
  * reconciliation and accept the object, and the resubmissions of corrected rows.
  */
+@OwnedRecord(value = MigIssue.class, variable = "issueId")
 @RestController
 @RequestMapping("/api/v1/migration")
 @Transactional

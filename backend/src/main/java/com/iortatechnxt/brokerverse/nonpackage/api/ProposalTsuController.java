@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.account.api.dto.CommentRequest;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalDtos.ComparativeView;
 import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalDtos.HistoryView;
@@ -14,6 +15,7 @@ import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalDtos.SlipSubmitBo
 import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalDtos.TermsBody;
 import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalDtos.TermsCompleteBody;
 import com.iortatechnxt.brokerverse.nonpackage.api.dto.ProposalResponse;
+import com.iortatechnxt.brokerverse.nonpackage.domain.InsurerResponse;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest;
 import com.iortatechnxt.brokerverse.nonpackage.service.InsurerResponseService;
 import com.iortatechnxt.brokerverse.nonpackage.service.ProposalDocuments;
@@ -43,6 +45,8 @@ import org.springframework.web.multipart.MultipartFile;
  * recommended insurer, terms complete, the comparative table (JSON, PDF, Excel) and the proposal
  * slip submission and approval.
  */
+@OwnedRecord(ProposalRequest.class)
+@OwnedRecord(value = InsurerResponse.class, variable = "responseId")
 @RestController
 @RequestMapping("/api/v1/proposals/{id}")
 public class ProposalTsuController {

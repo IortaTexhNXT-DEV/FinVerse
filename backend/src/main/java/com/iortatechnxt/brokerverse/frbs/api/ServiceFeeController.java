@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.frbs.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.CommentBody;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.ComputeBody;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.ItemResponse;
@@ -8,6 +9,8 @@ import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.LineResponse;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.ReleaseBody;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.RunResponse;
 import com.iortatechnxt.brokerverse.frbs.domain.FrbsEnums.RunStage;
+import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeLine;
+import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeRun;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeQueryService;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeRunService;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeTagService;
@@ -36,6 +39,8 @@ import org.springframework.web.multipart.MultipartFile;
  * and the RELEASED / LIQUIDATED tags with the unit's liquidation report. Return and cancel are the
  * generic actions of the workflow panel.
  */
+@OwnedRecord(ServiceFeeRun.class)
+@OwnedRecord(value = ServiceFeeLine.class, variable = "lineId")
 @RestController
 @RequestMapping("/api/v1/frbs/service-fee")
 public class ServiceFeeController {

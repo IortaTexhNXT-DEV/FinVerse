@@ -1,9 +1,12 @@
 package com.iortatechnxt.brokerverse.frbs.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.RecipientBody;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.RecipientResponse;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.RuleBody;
 import com.iortatechnxt.brokerverse.frbs.api.dto.ServiceFeeDtos.RuleResponse;
+import com.iortatechnxt.brokerverse.frbs.domain.ServiceFeeRecipient;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeSetupService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -68,6 +71,7 @@ public class ServiceFeeSetupController {
    */
   @PutMapping("/rules/{id}")
   @PreAuthorize(FrbsAccess.SETUP)
+  @GlobalRecord("service fee rules are programme-wide")
   public RuleResponse updateRule(@PathVariable Long id, @Valid @RequestBody RuleBody body) {
     return RuleResponse.from(setup.updateRule(id, body.values()));
   }
@@ -108,6 +112,7 @@ public class ServiceFeeSetupController {
    */
   @PutMapping("/recipients/{id}")
   @PreAuthorize(FrbsAccess.SETUP)
+  @OwnedRecord(ServiceFeeRecipient.class)
   public RecipientResponse updateRecipient(
       @PathVariable Long id, @Valid @RequestBody RecipientBody body) {
     return RecipientResponse.from(setup.updateRecipient(id, body.values()));

@@ -2,13 +2,16 @@ package com.iortatechnxt.brokerverse.screening.str.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentFormat;
 import com.iortatechnxt.brokerverse.screening.cases.api.dto.ReviewDto;
+import com.iortatechnxt.brokerverse.screening.cases.domain.ScreeningCase;
 import com.iortatechnxt.brokerverse.screening.cases.service.CaseQueries;
 import com.iortatechnxt.brokerverse.screening.str.api.dto.StrDtos;
 import com.iortatechnxt.brokerverse.screening.str.api.dto.StrDtos.ExtractionDto;
 import com.iortatechnxt.brokerverse.screening.str.api.dto.StrDtos.StrDetail;
 import com.iortatechnxt.brokerverse.screening.str.api.dto.StrDtos.StrRow;
+import com.iortatechnxt.brokerverse.screening.str.domain.StrExtraction;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrStatus;
 import com.iortatechnxt.brokerverse.screening.str.domain.SuspiciousTransactionReport;
 import com.iortatechnxt.brokerverse.screening.str.service.StrDocumentService;
@@ -38,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
  * case (prepare, save, completeness, mark ready, PDF / Word), the extraction of committee-approved
  * STRs with the file download, and the AMLC filing reference.
  */
+@OwnedRecord(value = ScreeningCase.class, variable = "caseId")
 @RestController
 @RequestMapping("/api/v1/screening")
 public class StrController {
@@ -138,6 +142,7 @@ public class StrController {
    */
   @PutMapping("/str/{id}")
   @PreAuthorize(HAS_PREPARE)
+  @OwnedRecord(SuspiciousTransactionReport.class)
   public StrDetail save(@PathVariable Long id, @Valid @RequestBody StrDtos.Save request) {
     return detail(strs.save(id, request.edit()));
   }
@@ -150,6 +155,7 @@ public class StrController {
    */
   @PostMapping("/str/{id}/ready")
   @PreAuthorize(HAS_PREPARE)
+  @OwnedRecord(SuspiciousTransactionReport.class)
   public StrDetail ready(@PathVariable Long id) {
     return detail(strs.markReady(id));
   }
@@ -163,6 +169,7 @@ public class StrController {
    */
   @GetMapping("/str/{id}/document")
   @PreAuthorize(HAS_REGISTER)
+  @OwnedRecord(SuspiciousTransactionReport.class)
   public ResponseEntity<byte[]> document(
       @PathVariable Long id, @RequestParam(required = false) DocumentFormat format) {
     StrDocumentService.Rendered file =
@@ -229,6 +236,7 @@ public class StrController {
    */
   @GetMapping("/str/extractions/{id}/file")
   @PreAuthorize(HAS_EXTRACT)
+  @OwnedRecord(StrExtraction.class)
   public ResponseEntity<byte[]> file(@PathVariable Long id, HttpServletRequest request) {
     return downloads.respond(extractions.file(id), request);
   }
@@ -242,6 +250,7 @@ public class StrController {
    */
   @PostMapping("/str/{id}/filing")
   @PreAuthorize(HAS_EXTRACT)
+  @OwnedRecord(SuspiciousTransactionReport.class)
   public StrRow filing(@PathVariable Long id, @Valid @RequestBody StrDtos.Filing request) {
     return StrRow.from(filings.file(id, request.reference(), request.filedOn()));
   }

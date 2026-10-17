@@ -2,10 +2,13 @@ package com.iortatechnxt.brokerverse.remittance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.CommentRequest;
 import com.iortatechnxt.brokerverse.remittance.api.dto.DeductionDtos.ApplicationResponse;
 import com.iortatechnxt.brokerverse.remittance.api.dto.DeductionDtos.DeductionRequest;
 import com.iortatechnxt.brokerverse.remittance.api.dto.DeductionDtos.DeductionResponse;
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
+import com.iortatechnxt.brokerverse.remittance.domain.RemittanceDeduction;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceDeduction.DeductionStage;
 import com.iortatechnxt.brokerverse.remittance.service.DeductionService;
 import jakarta.validation.Valid;
@@ -27,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
  * confirm, the consumptions by batches and the deductions waiting for the next batch of an insurer.
  * Cancel (draft) and return (for confirmation) are generic workflow actions.
  */
+@OwnedRecord(RemittanceDeduction.class)
+@OwnedRecord(value = RemittanceBatch.class, variable = "batchId")
 @RestController
 @RequestMapping("/api/v1/remittance/deductions")
 public class DeductionController {

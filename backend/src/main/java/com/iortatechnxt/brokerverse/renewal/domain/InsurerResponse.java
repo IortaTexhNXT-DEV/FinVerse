@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
  * response drives the renewal; a mismatched row is kept but never progresses it; a late or
  * conflicting response blocks straight-through progress.
  */
+@OwnedBy(value = RenewalCandidate.class, key = "candidateId")
 @Entity(name = "RnwInsurerResponse")
 @Table(name = "rnw_insurer_response")
 public class InsurerResponse extends BaseEntity {

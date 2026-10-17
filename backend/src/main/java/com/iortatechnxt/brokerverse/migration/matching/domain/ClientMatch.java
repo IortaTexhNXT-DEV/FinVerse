@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.migration.matching.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
+import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +16,7 @@ import java.time.Instant;
  * decision (merged automatically, waiting for review, merged or kept separate by the Data Steward)
  * and the values that lost to the survivor.
  */
+@OwnedBy(value = MigBatch.class, key = "batchId")
 @Entity
 @Table(name = "mig_client_match")
 public class ClientMatch extends BaseEntity {

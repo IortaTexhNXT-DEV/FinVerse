@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.collections.billing.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -10,6 +11,7 @@ import jakarta.persistence.Table;
  * content is in the file store ({@code stored_file}, build step ST1); PDFs rendered before ST1 keep
  * their bytes in {@code content} until {@code FILE_BYTEA_MIGRATION} copies them.
  */
+@OwnedBy(value = BillingStatement.class, key = "statementId")
 @Entity
 @Table(name = "clx_billing_document")
 public class BillingDocument extends BaseEntity {

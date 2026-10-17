@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.OtherChargeDtos.OtherChargeR
 import com.iortatechnxt.brokerverse.catalog.api.dto.OtherChargeDtos.OtherChargeResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.OtherChargeDtos.OtherChargesView;
 import com.iortatechnxt.brokerverse.catalog.service.OtherChargeService;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Other charges billed with the premium (template PM-04 Charges): the rows and whether they are
  * billed, and their maintenance under maker-checker (authorized on the catalog records).
  */
+@GlobalRecord("programme-wide product catalog master")
 @RestController
 @RequestMapping("/api/v1/catalog/rates/other-charges")
 public class OtherChargeController {

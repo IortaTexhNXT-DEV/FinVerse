@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.events.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.events.api.dto.ArchivedEventResponse;
 import com.iortatechnxt.brokerverse.events.api.dto.DeadLetterResponse;
 import com.iortatechnxt.brokerverse.events.api.dto.OutboxEventResponse;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * the topic catalogue, the outbox (inspect, requeue a FAILED event), the event archive
  * (traceability by key or correlation id) and the dead letters (list, retry, discard).
  */
+@GlobalRecord("platform event administration")
 @RestController
 @RequestMapping("/api/v1/admin/events")
 @PreAuthorize("hasAuthority('SYSTEM_PARAMETER_MANAGE')")

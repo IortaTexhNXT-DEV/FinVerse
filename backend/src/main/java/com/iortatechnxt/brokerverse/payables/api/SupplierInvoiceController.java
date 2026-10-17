@@ -2,9 +2,11 @@ package com.iortatechnxt.brokerverse.payables.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.payables.api.dto.InvoiceRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.InvoiceResponse;
 import com.iortatechnxt.brokerverse.payables.domain.InvoiceStatus;
+import com.iortatechnxt.brokerverse.payables.domain.SupplierInvoice;
 import com.iortatechnxt.brokerverse.payables.service.SupplierInvoiceService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Supplier invoices (accounts payable) with maker-checker approval. */
+@OwnedRecord(SupplierInvoice.class)
 @RestController
 @RequestMapping("/api/v1/payables/invoices")
 public class SupplierInvoiceController {

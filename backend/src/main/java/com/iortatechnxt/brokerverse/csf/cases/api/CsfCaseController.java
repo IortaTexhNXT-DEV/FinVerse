@@ -1,7 +1,10 @@
 package com.iortatechnxt.brokerverse.csf.cases.api;
 
+import com.iortatechnxt.brokerverse.attachment.domain.Attachment;
 import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCase;
 import com.iortatechnxt.brokerverse.csf.cases.service.CsfCaseDocumentService;
 import com.iortatechnxt.brokerverse.csf.cases.service.CsfCaseQueryService;
@@ -45,6 +48,9 @@ import org.springframework.web.multipart.MultipartFile;
  * supervisor ({@code CSF_CASE_SUPERVISE}) and the fulfilment unit ({@code CSF_CASE_FULFIL}), and
  * the Case Dashboard ({@code CSF_CASE_REPORT}).
  */
+@OwnedRecord(value = Client.class, variable = "clientId")
+@OwnedRecord(type = "CsfCase")
+@OwnedRecord(value = Attachment.class, variable = "attachmentId")
 @RestController
 @RequestMapping("/api/v1/csf/cases")
 public class CsfCaseController {

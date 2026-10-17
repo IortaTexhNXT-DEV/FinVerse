@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -20,6 +21,7 @@ import java.util.List;
  * template version, notes, reply date), the insurers approached, the four-eyes approval and the
  * send time. A round is locked at the ManCom sign-off (QS editable until then, BRPM.012).
  */
+@OwnedBy(value = PackageRequest.class, key = "requestId")
 @Entity
 @Table(name = "pm_negotiation_round")
 public class NegotiationRound extends BaseEntity {

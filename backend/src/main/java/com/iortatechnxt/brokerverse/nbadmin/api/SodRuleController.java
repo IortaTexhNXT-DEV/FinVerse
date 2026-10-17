@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.SodRuleRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.SodRuleResponse;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * deactivates the pairs of group profiles one user may not hold; Information Security authorises
  * each change.
  */
+@GlobalRecord("separation of duties rules are programme-wide")
 @RestController
 @RequestMapping("/api/v1/nbadmin/sod-rules")
 public class SodRuleController {

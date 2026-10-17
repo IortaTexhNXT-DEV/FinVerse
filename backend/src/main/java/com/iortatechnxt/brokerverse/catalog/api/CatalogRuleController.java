@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.TsuRuleRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.TsuRuleResponse;
 import com.iortatechnxt.brokerverse.catalog.service.ProductRuleService;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Minimum-field matrix, document checklist (BRNB.002/003/093) and TSU routing rules (BRNB.098). */
+@GlobalRecord("programme-wide product catalog master")
 @RestController
 @RequestMapping("/api/v1/catalog")
 public class CatalogRuleController {

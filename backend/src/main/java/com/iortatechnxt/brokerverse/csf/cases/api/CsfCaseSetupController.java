@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.csf.cases.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCaseSetupStore.Member;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCaseSetupStore.Route;
 import com.iortatechnxt.brokerverse.csf.cases.domain.CsfCaseSetupStore.TypeSetting;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * case types, the routing table and the members of the fulfilment units. The turnaround times are
  * read by every user who logs or supervises cases.
  */
+@GlobalRecord("the case routing set-up is programme-wide")
 @RestController
 @RequestMapping("/api/v1/csf/case-setup")
 public class CsfCaseSetupController {

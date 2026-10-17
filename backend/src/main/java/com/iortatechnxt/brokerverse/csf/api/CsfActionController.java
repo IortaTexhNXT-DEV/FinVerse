@@ -1,8 +1,11 @@
 package com.iortatechnxt.brokerverse.csf.api;
 
+import com.iortatechnxt.brokerverse.attachment.domain.Attachment;
 import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.csf.api.dto.CsfRequests;
 import com.iortatechnxt.brokerverse.csf.service.ContactChangeService;
 import com.iortatechnxt.brokerverse.csf.service.CsfDocumentService;
@@ -41,6 +44,8 @@ import org.springframework.web.multipart.MultipartFile;
  * uploads under {@code CSF_DOCUMENT_UPLOAD}, and logged downloads under {@code CSF_VIEW} with
  * {@code ATTACHMENT_VIEW}.
  */
+@OwnedRecord(value = Client.class, variable = "clientId")
+@OwnedRecord(value = Attachment.class, variable = "attachmentId")
 @RestController
 @RequestMapping("/api/v1/csf/clients/{clientId}")
 public class CsfActionController {

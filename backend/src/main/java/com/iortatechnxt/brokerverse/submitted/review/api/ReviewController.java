@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.submitted.review.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmApprovalMatrix;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmDocStatus;
@@ -51,6 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
  * with approvals and sending, the TORs with approvals, and the download that releases a TOR to its
  * Account Officer.
  */
+@OwnedRecord(value = SbmPolicy.class, variable = "policyId")
 @RestController
 @RequestMapping("/api/v1/submitted")
 public class ReviewController {
@@ -193,6 +195,7 @@ public class ReviewController {
   @GetMapping("/iaaf/{id}")
   @PreAuthorize(MasterlistController.VIEW)
   @Transactional(readOnly = true)
+  @OwnedRecord(SbmIaaf.class)
   public IaafView iaaf(@PathVariable Long id) {
     return view(iaafService.get(id));
   }
@@ -206,6 +209,7 @@ public class ReviewController {
   @PostMapping("/iaaf/{id}/submit")
   @PreAuthorize(PREPARE_IAAF)
   @Transactional
+  @OwnedRecord(SbmIaaf.class)
   public IaafView submitIaaf(@PathVariable Long id) {
     return view(iaafService.submit(id));
   }
@@ -219,6 +223,7 @@ public class ReviewController {
   @PostMapping("/iaaf/{id}/approve")
   @PreAuthorize(APPROVE_IAAF)
   @Transactional
+  @OwnedRecord(SbmIaaf.class)
   public IaafView approveIaaf(@PathVariable Long id) {
     return view(iaafService.approve(id));
   }
@@ -233,6 +238,7 @@ public class ReviewController {
   @PostMapping("/iaaf/{id}/return")
   @PreAuthorize(APPROVE_IAAF)
   @Transactional
+  @OwnedRecord(SbmIaaf.class)
   public IaafView returnIaaf(@PathVariable Long id, @RequestBody ReturnRequest r) {
     return view(iaafService.returned(id, r.reasonCode(), r.comment()));
   }
@@ -246,6 +252,7 @@ public class ReviewController {
   @PostMapping("/iaaf/{id}/issue")
   @PreAuthorize(PREPARE_IAAF)
   @Transactional
+  @OwnedRecord(SbmIaaf.class)
   public IaafView issue(@PathVariable Long id) {
     return view(iaafService.issue(id));
   }
@@ -260,6 +267,7 @@ public class ReviewController {
   @PostMapping("/iaaf/{id}/cancel")
   @PreAuthorize(PREPARE_IAAF)
   @Transactional
+  @OwnedRecord(SbmIaaf.class)
   public IaafView cancelIaaf(@PathVariable Long id, @RequestBody ReturnRequest r) {
     return view(iaafService.cancel(id, r.reasonCode()));
   }
@@ -330,6 +338,7 @@ public class ReviewController {
   @GetMapping("/tors/{id}")
   @PreAuthorize(VIEW_TOR)
   @Transactional(readOnly = true)
+  @OwnedRecord(SbmTor.class)
   public TorView tor(@PathVariable Long id) {
     return view(torService.get(id));
   }
@@ -344,6 +353,7 @@ public class ReviewController {
   @PutMapping("/tors/{id}")
   @PreAuthorize(PREPARE_TOR)
   @Transactional
+  @OwnedRecord(SbmTor.class)
   public TorView changeTor(@PathVariable Long id, @Valid @RequestBody TorRequest r) {
     return view(torService.change(id, r.proposedTerms(), r.aoUsername()));
   }
@@ -357,6 +367,7 @@ public class ReviewController {
   @PostMapping("/tors/{id}/submit")
   @PreAuthorize(PREPARE_TOR)
   @Transactional
+  @OwnedRecord(SbmTor.class)
   public TorView submitTor(@PathVariable Long id) {
     return view(torService.submit(id));
   }
@@ -370,6 +381,7 @@ public class ReviewController {
   @PostMapping("/tors/{id}/approve")
   @PreAuthorize(APPROVE_TOR)
   @Transactional
+  @OwnedRecord(SbmTor.class)
   public TorView approveTor(@PathVariable Long id) {
     return view(torService.approve(id));
   }
@@ -384,6 +396,7 @@ public class ReviewController {
   @PostMapping("/tors/{id}/return")
   @PreAuthorize(APPROVE_TOR)
   @Transactional
+  @OwnedRecord(SbmTor.class)
   public TorView returnTor(@PathVariable Long id, @RequestBody ReturnRequest r) {
     return view(torService.returned(id, r.reasonCode(), r.comment()));
   }
@@ -398,6 +411,7 @@ public class ReviewController {
   @PostMapping("/tors/{id}/cancel")
   @PreAuthorize(PREPARE_TOR)
   @Transactional
+  @OwnedRecord(SbmTor.class)
   public TorView cancelTor(@PathVariable Long id, @RequestBody ReturnRequest r) {
     return view(torService.cancel(id, r.reasonCode()));
   }
@@ -412,6 +426,7 @@ public class ReviewController {
   @GetMapping("/tors/{id}/pdf")
   @PreAuthorize(VIEW_TOR)
   @Transactional
+  @OwnedRecord(SbmTor.class)
   public ResponseEntity<byte[]> torPdf(@PathVariable Long id, HttpServletRequest request) {
     return downloads.respond(torService.download(id), request);
   }

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.payrequest.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestInputs.AssignInput;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestInputs.CommentInput;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestInputs.LiquidationAccountInput;
@@ -10,6 +11,7 @@ import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.Liquidati
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.RequestView;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestViews.ValidationView;
 import com.iortatechnxt.brokerverse.payrequest.domain.PaymentRequest;
+import com.iortatechnxt.brokerverse.payrequest.domain.RefundValidation;
 import com.iortatechnxt.brokerverse.payrequest.service.LiquidationAccounts;
 import com.iortatechnxt.brokerverse.payrequest.service.LiquidationService;
 import com.iortatechnxt.brokerverse.payrequest.service.PayRequestWorkflowService;
@@ -31,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
  * handed-over validation result; the liquidation of a cash advance (Appendix D, AQ18) and the
  * accounts of its event roles. Returns and cancellations are generic workflow actions.
  */
+@OwnedRecord(PaymentRequest.class)
+@OwnedRecord(value = RefundValidation.class, variable = "validationId")
 @RestController
 @RequestMapping("/api/v1/payment-requests")
 public class PayRequestActionController {

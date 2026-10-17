@@ -1,7 +1,10 @@
 package com.iortatechnxt.brokerverse.renewal.setup.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.BucketRule;
+import com.iortatechnxt.brokerverse.renewal.domain.BucketRuleSet;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckSeverity;
+import com.iortatechnxt.brokerverse.renewal.domain.DecisionMatrix;
 import com.iortatechnxt.brokerverse.renewal.domain.DecisionRule;
 import com.iortatechnxt.brokerverse.renewal.domain.NonRenewableRiskCode;
 import com.iortatechnxt.brokerverse.renewal.domain.PackageMapEntry;
@@ -95,6 +98,7 @@ public class RenewalSetupController {
    */
   @PutMapping("/risk-codes/{id}")
   @PreAuthorize(SETUP)
+  @OwnedRecord(NonRenewableRiskCode.class)
   public RiskCodeView updateRiskCode(
       @RequestParam Long companyId,
       @PathVariable Long id,
@@ -112,6 +116,7 @@ public class RenewalSetupController {
    */
   @PostMapping("/risk-codes/{id}/{action}")
   @PreAuthorize(SETUP)
+  @OwnedRecord(NonRenewableRiskCode.class)
   public RiskCodeView riskCodeAction(
       @RequestParam Long companyId, @PathVariable Long id, @PathVariable RecordAction action) {
     return RiskCodeView.of(
@@ -196,6 +201,7 @@ public class RenewalSetupController {
    */
   @PostMapping("/bucket-rules/{id}/{step}")
   @PreAuthorize(SETUP)
+  @OwnedRecord(BucketRuleSet.class)
   public VersionView<BucketRule.Data> decideBucketRules(
       @RequestParam Long companyId,
       @PathVariable Long id,
@@ -242,6 +248,7 @@ public class RenewalSetupController {
    */
   @PostMapping("/matrix/{id}/{step}")
   @PreAuthorize(SETUP)
+  @OwnedRecord(DecisionMatrix.class)
   public VersionView<DecisionRule.Data> decideMatrix(
       @RequestParam Long companyId,
       @PathVariable Long id,
@@ -286,6 +293,7 @@ public class RenewalSetupController {
    */
   @PutMapping("/package-map/{id}")
   @PreAuthorize(MAP)
+  @OwnedRecord(PackageMapEntry.class)
   public PackageMapView updateMapEntry(
       @RequestParam Long companyId, @PathVariable Long id, @RequestBody PackageMapEntry.Data data) {
     return PackageMapView.of(map.update(companyId, id, data));
@@ -301,6 +309,7 @@ public class RenewalSetupController {
    */
   @PostMapping("/package-map/{id}/{action}")
   @PreAuthorize(MAP)
+  @OwnedRecord(PackageMapEntry.class)
   public PackageMapView mapEntryAction(
       @RequestParam Long companyId, @PathVariable Long id, @PathVariable RecordAction action) {
     return PackageMapView.of(

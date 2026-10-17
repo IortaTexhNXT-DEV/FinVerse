@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.screening.cases.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -11,6 +12,7 @@ import java.time.Instant;
  * COMMITTEE_RETURN with remarks. One vote per member and round; insert-only (a vote cannot be
  * changed, FR-SS-064 R1).
  */
+@OwnedBy(value = ScreeningCase.class, key = "caseId")
 @Entity
 @Table(name = "scr_committee_vote")
 public class CommitteeVote extends BaseEntity {

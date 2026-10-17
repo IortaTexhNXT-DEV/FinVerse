@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.payables.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.payables.api.dto.DatedReasonRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.IssuedPdcResponse;
 import com.iortatechnxt.brokerverse.payables.api.dto.PdcEventResponse;
 import com.iortatechnxt.brokerverse.payables.api.dto.ReplaceChequeRequest;
+import com.iortatechnxt.brokerverse.payables.domain.IssuedPdc;
 import com.iortatechnxt.brokerverse.payables.domain.IssuedPdcStatus;
 import com.iortatechnxt.brokerverse.payables.service.IssuedPdcService;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Register of post-dated cheques issued and its lifecycle actions. */
+@OwnedRecord(IssuedPdc.class)
 @RestController
 @RequestMapping("/api/v1/payables/pdc-issued")
 public class IssuedPdcController {

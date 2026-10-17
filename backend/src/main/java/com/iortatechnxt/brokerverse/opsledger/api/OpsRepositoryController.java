@@ -2,8 +2,10 @@ package com.iortatechnxt.brokerverse.opsledger.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.QueueDtos.ExtractFileResponse;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.QueueDtos.HandoffResponse;
+import com.iortatechnxt.brokerverse.opsledger.domain.ExtractFile;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsHandoff;
 import com.iortatechnxt.brokerverse.opsledger.service.ExtractRepositoryService;
 import com.iortatechnxt.brokerverse.opsledger.service.HandoffService;
@@ -72,6 +74,7 @@ public class OpsRepositoryController {
    */
   @GetMapping("/extracts/{id}/file")
   @PreAuthorize(OpsAccess.VIEW)
+  @OwnedRecord(ExtractFile.class)
   public ResponseEntity<byte[]> extract(@PathVariable Long id, HttpServletRequest request) {
     return downloads.respond(extracts.downloadable(id), request);
   }
@@ -109,6 +112,7 @@ public class OpsRepositoryController {
    */
   @PostMapping("/handoffs/{id}/close")
   @PreAuthorize(OpsAccess.HANDOFF_CLOSE)
+  @OwnedRecord(OpsHandoff.class)
   public HandoffResponse close(@PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return HandoffResponse.from(handoffs.close(id, request.reason()));
   }

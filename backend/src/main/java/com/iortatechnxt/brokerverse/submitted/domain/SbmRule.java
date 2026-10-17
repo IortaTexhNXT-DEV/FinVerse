@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.submitted.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -18,6 +19,7 @@ import java.util.List;
  * rules of a step are tried highest priority first; the first match with {@code stop} ends the
  * step.
  */
+@OwnedBy(value = SbmRuleSet.class, key = "ruleSetId")
 @Entity
 @Table(name = "sbm_rule")
 public class SbmRule extends BaseEntity {

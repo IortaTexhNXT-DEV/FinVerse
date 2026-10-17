@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.extraction.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.ApprovalStatus;
 import com.iortatechnxt.brokerverse.renewal.domain.ExtractionRun;
 import com.iortatechnxt.brokerverse.renewal.domain.RaSentRequest;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Extraction (FR-RN-001, 002, 070): the runs, a manual extraction of an expiry range, the go-live
  * take-over and the maker-checker corrections of the Renewal Advices already sent before go-live.
  */
+@OwnedRecord(RaSentRequest.class)
 @RestController
 @RequestMapping("/api/v1/renewal/extraction")
 public class ExtractionController {

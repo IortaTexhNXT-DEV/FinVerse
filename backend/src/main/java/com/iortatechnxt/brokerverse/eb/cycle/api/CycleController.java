@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.eb.cycle.api;
 
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.eb.bor.service.BorService;
 import com.iortatechnxt.brokerverse.eb.cycle.api.dto.CycleDtos.AccountResponse;
 import com.iortatechnxt.brokerverse.eb.cycle.api.dto.CycleDtos.BorChecklistRequest;
@@ -12,8 +13,11 @@ import com.iortatechnxt.brokerverse.eb.cycle.service.CycleService;
 import com.iortatechnxt.brokerverse.eb.document.service.EbDocumentQuery;
 import com.iortatechnxt.brokerverse.eb.document.service.EbDocumentQuery.DocumentView;
 import com.iortatechnxt.brokerverse.eb.document.service.EbDocumentService;
+import com.iortatechnxt.brokerverse.eb.domain.EbBor;
+import com.iortatechnxt.brokerverse.eb.domain.EbCycle;
 import com.iortatechnxt.brokerverse.eb.domain.EbDocumentSource;
 import com.iortatechnxt.brokerverse.eb.domain.EbFeedbackChannel;
+import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.placement.service.EbPlacementService;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeView;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeViewService;
@@ -42,6 +46,9 @@ import org.springframework.web.multipart.MultipartFile;
  * cycle, the requirement steps, client feedback, the document register, the Broker on Record and
  * the accounts created at placement.
  */
+@OwnedRecord(EbProgramme.class)
+@OwnedRecord(value = EbCycle.class, variable = "cycleId")
+@OwnedRecord(value = EbBor.class, variable = "borId")
 @RestController
 @RequestMapping("/api/v1/eb")
 public class CycleController {

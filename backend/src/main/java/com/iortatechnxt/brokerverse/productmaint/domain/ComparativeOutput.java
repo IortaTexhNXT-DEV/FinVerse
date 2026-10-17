@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +17,7 @@ import java.util.List;
  * compiled table is kept as JSON ({@code content}) so every file is rendered from the values the
  * output was generated with; the PDF is attached to the request with its SHA-256.
  */
+@OwnedBy(value = PackageRequest.class, key = "requestId")
 @Entity
 @Table(name = "pm_comparative_output")
 public class ComparativeOutput extends BaseEntity {

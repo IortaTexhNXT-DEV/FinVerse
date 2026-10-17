@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.screening.risk.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.screening.risk.api.dto.ManualRiskRequest;
 import com.iortatechnxt.brokerverse.screening.risk.api.dto.RiskProfileRow;
 import com.iortatechnxt.brokerverse.screening.risk.service.RiskOverrideService;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The client risk profile set by screening (SNSRP-302, 304; FR-SS-033, 035): the history of every
  * change (rule or manual) and "Update Risk Tag" with justification and evidence.
  */
+@OwnedRecord(value = Client.class, variable = "clientId")
 @RestController
 @RequestMapping("/api/v1/screening/clients/{clientId}/risk-profile")
 public class RiskProfileController {

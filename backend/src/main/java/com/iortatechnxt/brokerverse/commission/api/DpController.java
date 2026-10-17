@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.commission.api.dto.DpDtos.SubmissionResponse
 import com.iortatechnxt.brokerverse.commission.domain.CommissionEnums.DpTag;
 import com.iortatechnxt.brokerverse.commission.domain.CommissionEnums.Sanitation;
 import com.iortatechnxt.brokerverse.commission.domain.DpBilling;
+import com.iortatechnxt.brokerverse.commission.domain.DpItem;
 import com.iortatechnxt.brokerverse.commission.service.DpBillingSender;
 import com.iortatechnxt.brokerverse.commission.service.DpBillingService;
 import com.iortatechnxt.brokerverse.commission.service.DpCollectionService;
@@ -24,6 +25,7 @@ import com.iortatechnxt.brokerverse.commission.service.DpIntakeService;
 import com.iortatechnxt.brokerverse.commission.service.DpItemFilter;
 import com.iortatechnxt.brokerverse.commission.service.DpListService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -227,6 +229,7 @@ public class DpController {
    */
   @PostMapping("/items/{id}/revalidate")
   @PreAuthorize(CommissionAccess.PROCESS)
+  @OwnedRecord(DpItem.class)
   public DpItemResponse revalidate(@PathVariable Long id) {
     return DpItemResponse.from(intake.revalidate(id));
   }
@@ -239,6 +242,7 @@ public class DpController {
    */
   @PostMapping("/items/{id}/reverse")
   @PreAuthorize(CommissionAccess.PROCESS)
+  @OwnedRecord(DpItem.class)
   public DpItemResponse reverse(@PathVariable Long id) {
     return DpItemResponse.from(collection.reverse(id));
   }
@@ -252,6 +256,7 @@ public class DpController {
    */
   @PostMapping("/items/{id}/reinstate")
   @PreAuthorize(CommissionAccess.PROCESS)
+  @OwnedRecord(DpItem.class)
   public DpItemResponse reinstate(
       @PathVariable Long id, @Valid @RequestBody ReinstateRequest request) {
     return DpItemResponse.from(collection.reinstate(id, request.reasonCode(), request.comment()));
@@ -300,6 +305,7 @@ public class DpController {
    */
   @GetMapping("/billings/{id}")
   @PreAuthorize(CommissionAccess.READ)
+  @OwnedRecord(DpBilling.class)
   public BillingResponse billing(@PathVariable Long id) {
     return view(billings.require(id));
   }
@@ -312,6 +318,7 @@ public class DpController {
    */
   @GetMapping("/billings/{id}/items")
   @PreAuthorize(CommissionAccess.READ)
+  @OwnedRecord(DpBilling.class)
   public List<DpItemResponse> billingItems(@PathVariable Long id) {
     return billings.itemsOf(id).stream().map(DpItemResponse::from).toList();
   }
@@ -325,6 +332,7 @@ public class DpController {
    */
   @PostMapping("/billings/{id}/send")
   @PreAuthorize(CommissionAccess.PROCESS)
+  @OwnedRecord(DpBilling.class)
   public BillingResponse send(@PathVariable Long id, @Valid @RequestBody SendRequest request) {
     return view(sender.send(id, request.to(), request.cc()));
   }
@@ -338,6 +346,7 @@ public class DpController {
    */
   @PostMapping("/billings/{id}/cancel")
   @PreAuthorize(CommissionAccess.PROCESS)
+  @OwnedRecord(DpBilling.class)
   public BillingResponse cancel(@PathVariable Long id, @Valid @RequestBody CommentRequest request) {
     return view(billings.cancel(id, request.comment()));
   }
@@ -351,6 +360,7 @@ public class DpController {
    */
   @PostMapping("/billings/{id}/answers")
   @PreAuthorize(CommissionAccess.PROCESS)
+  @OwnedRecord(DpBilling.class)
   public BillingResponse answer(@PathVariable Long id, @Valid @RequestBody AnswersRequest request) {
     return view(
         feedback.answer(
@@ -370,6 +380,7 @@ public class DpController {
    */
   @PostMapping("/billings/{id}/collect")
   @PreAuthorize(CommissionAccess.PROCESS)
+  @OwnedRecord(DpBilling.class)
   public BillingResponse collect(
       @PathVariable Long id, @Valid @RequestBody CollectRequest request) {
     return view(

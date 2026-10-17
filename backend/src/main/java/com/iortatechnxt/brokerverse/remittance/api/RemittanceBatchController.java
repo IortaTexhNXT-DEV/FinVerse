@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.service.QueuedEmail;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.AssignRequest;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.BatchResponse;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  * re-assignment, the schedule and payment request documents and the schedule e-mail to the insurer.
  * Generic actions (hold, release, send back) run through the workflow panel.
  */
+@OwnedRecord(RemittanceBatch.class)
 @RestController
 @RequestMapping("/api/v1/remittance/batches")
 public class RemittanceBatchController {

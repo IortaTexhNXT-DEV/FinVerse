@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.quotation.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.quotation.api.dto.QuotationRequestDtos.CloseRequest;
 import com.iortatechnxt.brokerverse.quotation.api.dto.QuotationRequestDtos.IntakeRequest;
 import com.iortatechnxt.brokerverse.quotation.api.dto.QuotationRequestDtos.RequestResponse;
+import com.iortatechnxt.brokerverse.quotation.domain.QuotationRequest;
 import com.iortatechnxt.brokerverse.quotation.domain.RequestStatus;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationRequestService;
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * request through the attachments API, document type REQUEST_EMAIL), uploaded or received from
  * source systems; prospect creation and closing.
  */
+@OwnedRecord(QuotationRequest.class)
 @RestController
 @RequestMapping("/api/v1/quotation-requests")
 public class QuotationRequestController {

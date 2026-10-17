@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nonpackage.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 /** Insert-only snapshot of an insurer response after each change (BRNB.009 version history). */
+@OwnedBy(value = InsurerResponse.class, key = "responseId")
 @Entity
 @Table(name = "npk_insurer_response_history")
 public class InsurerResponseHistory {

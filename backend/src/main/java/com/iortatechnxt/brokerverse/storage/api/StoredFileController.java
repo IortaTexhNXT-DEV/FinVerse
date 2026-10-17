@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.storage.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.dto.FileLinkResponse;
 import com.iortatechnxt.brokerverse.storage.api.dto.InboundUploadRequest;
 import com.iortatechnxt.brokerverse.storage.api.dto.StoredFileResponse;
@@ -42,6 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
  * FileOwnerAccess} (the permission of the record the file belongs to); owner types without a
  * resolver are refused.
  */
+@OwnedRecord(StoredFile.class)
 @RestController
 @RequestMapping("/api/v1/files")
 public class StoredFileController {

@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.commission.api.dto.IncentiveDtos.Certificate
 import com.iortatechnxt.brokerverse.commission.api.dto.IncentiveDtos.EstimateRequest;
 import com.iortatechnxt.brokerverse.commission.api.dto.IncentiveDtos.EstimatedResponse;
 import com.iortatechnxt.brokerverse.commission.api.dto.IncentiveDtos.ReasonRequest;
+import com.iortatechnxt.brokerverse.commission.domain.CertificateSubmission;
 import com.iortatechnxt.brokerverse.commission.domain.CertificateSubmission.OrLink;
 import com.iortatechnxt.brokerverse.commission.domain.DpBilling;
 import com.iortatechnxt.brokerverse.commission.service.CertificateService;
@@ -17,6 +18,7 @@ import com.iortatechnxt.brokerverse.commission.service.FeedbackCalendar;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.domain.FlowInRun;
 import com.iortatechnxt.brokerverse.opsledger.service.ExtractRepositoryService;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
@@ -117,6 +119,7 @@ public class CommissionController {
    */
   @GetMapping("/certificates/{id}")
   @PreAuthorize(CommissionAccess.CERT_READ)
+  @OwnedRecord(CertificateSubmission.class)
   public CertificateResponse certificate(@PathVariable Long id) {
     return CertificateResponse.from(certificates.require(id));
   }
@@ -162,6 +165,7 @@ public class CommissionController {
    */
   @PutMapping("/certificates/{id}")
   @PreAuthorize(CommissionAccess.CERT_SUBMIT)
+  @OwnedRecord(CertificateSubmission.class)
   public CertificateResponse resubmit(
       @PathVariable Long id, @Valid @RequestBody CertificateRequest request) {
     return CertificateResponse.from(certificates.resubmit(id, request.toCertificate()));
@@ -176,6 +180,7 @@ public class CommissionController {
    */
   @PostMapping("/certificates/{id}/acknowledge")
   @PreAuthorize(CommissionAccess.CERT_ACK)
+  @OwnedRecord(CertificateSubmission.class)
   public CertificateResponse acknowledge(
       @PathVariable Long id, @Valid @RequestBody CommentRequest request) {
     return CertificateResponse.from(certificates.acknowledge(id, request.comment()));
@@ -190,6 +195,7 @@ public class CommissionController {
    */
   @PostMapping("/certificates/{id}/reject")
   @PreAuthorize(CommissionAccess.CERT_ACK)
+  @OwnedRecord(CertificateSubmission.class)
   public CertificateResponse reject(
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return CertificateResponse.from(certificates.reject(id, request.reason()));
@@ -236,6 +242,7 @@ public class CommissionController {
    */
   @GetMapping("/dp/billings/{id}/file")
   @PreAuthorize(CommissionAccess.READ)
+  @OwnedRecord(DpBilling.class)
   public ResponseEntity<byte[]> billingFile(@PathVariable Long id, HttpServletRequest request) {
     DpBilling billing = billings.require(id);
     if (billing.getFileId() == null) {

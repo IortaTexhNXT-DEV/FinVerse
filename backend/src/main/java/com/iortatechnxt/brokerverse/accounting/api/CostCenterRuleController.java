@@ -2,7 +2,9 @@ package com.iortatechnxt.brokerverse.accounting.api;
 
 import com.iortatechnxt.brokerverse.accounting.api.dto.CostCenterRuleRequest;
 import com.iortatechnxt.brokerverse.accounting.api.dto.CostCenterRuleResponse;
+import com.iortatechnxt.brokerverse.accounting.domain.CostCenterRule;
 import com.iortatechnxt.brokerverse.accounting.service.CostCenterRuleService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Cost-centre rules of the accounting engine (FRBS 3.1.1, DIS 3.30.0). */
+@OwnedRecord(CostCenterRule.class)
 @RestController
 @RequestMapping("/api/v1/accounting/cost-center-rules")
 public class CostCenterRuleController {

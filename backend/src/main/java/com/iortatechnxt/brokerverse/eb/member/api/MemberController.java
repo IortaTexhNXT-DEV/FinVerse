@@ -2,8 +2,11 @@ package com.iortatechnxt.brokerverse.eb.member.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.eb.document.api.EbUploads;
 import com.iortatechnxt.brokerverse.eb.domain.EbMemberChange;
+import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
+import com.iortatechnxt.brokerverse.eb.domain.EbRosterVersion;
 import com.iortatechnxt.brokerverse.eb.member.api.dto.MemberDtos.MemberChangeRequest;
 import com.iortatechnxt.brokerverse.eb.member.api.dto.MemberDtos.MemberChangeResponse;
 import com.iortatechnxt.brokerverse.eb.member.api.dto.MemberDtos.MemberResponse;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /** The member roster and the member changes (FR-EB-054 to 056). */
+@OwnedRecord(value = EbRosterVersion.class, variable = "versionId")
 @RestController
 @RequestMapping("/api/v1/eb")
 @Transactional
@@ -77,6 +81,7 @@ public class MemberController {
    */
   @GetMapping("/programmes/{id}/roster")
   @PreAuthorize(VIEW)
+  @OwnedRecord(EbProgramme.class)
   public List<RosterResponse> versions(@PathVariable Long id, @RequestParam Long companyId) {
     return roster.versions(companyId, id).stream().map(RosterResponse::from).toList();
   }
@@ -186,6 +191,7 @@ public class MemberController {
    */
   @GetMapping("/member-changes/{id}")
   @PreAuthorize(VIEW)
+  @OwnedRecord(EbMemberChange.class)
   public MemberChangeResponse get(@PathVariable Long id, @RequestParam Long companyId) {
     return map(changes.require(companyId, id));
   }
@@ -204,6 +210,7 @@ public class MemberController {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(MARKET)
+  @OwnedRecord(EbProgramme.class)
   public MemberChangeResponse capture(
       @PathVariable Long id,
       @RequestParam Long companyId,
@@ -233,6 +240,7 @@ public class MemberController {
    */
   @PostMapping("/member-changes/{id}/relay")
   @PreAuthorize(MARKET)
+  @OwnedRecord(EbMemberChange.class)
   public MemberChangeResponse relay(@PathVariable Long id, @RequestParam Long companyId) {
     return map(changes.relay(companyId, id));
   }
@@ -252,6 +260,7 @@ public class MemberController {
   @PostMapping(value = "/member-changes/{id}/bill", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize(EITHER)
   @SuppressWarnings("java:S107") // one parameter per form field
+  @OwnedRecord(EbMemberChange.class)
   public MemberChangeResponse bill(
       @PathVariable Long id,
       @RequestParam Long companyId,
@@ -278,6 +287,7 @@ public class MemberController {
    */
   @PostMapping("/member-changes/{id}/validate")
   @PreAuthorize(PROCESS)
+  @OwnedRecord(EbMemberChange.class)
   public MemberChangeResponse validate(@PathVariable Long id, @RequestParam Long companyId) {
     return map(changes.validate(companyId, id));
   }
@@ -291,6 +301,7 @@ public class MemberController {
    */
   @PostMapping("/member-changes/{id}/close")
   @PreAuthorize(EITHER)
+  @OwnedRecord(EbMemberChange.class)
   public MemberChangeResponse close(@PathVariable Long id, @RequestParam Long companyId) {
     return map(changes.close(companyId, id));
   }

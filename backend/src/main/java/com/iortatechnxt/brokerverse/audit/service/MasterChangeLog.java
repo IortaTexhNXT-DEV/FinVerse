@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.audit.service;
 
-import com.iortatechnxt.brokerverse.audit.service.RecordOwnership.Owner;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.DataScope;
 import com.iortatechnxt.brokerverse.common.security.UserDataScope;
@@ -9,7 +8,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,23 +53,11 @@ public class MasterChangeLog {
    */
   public List<Entry> scopedHistory(String entityType, Long entityId) {
     UserDataScope scope = dataScope.allowed();
-    if (!scope.allCompanies() && !visible(scope, ownership.ownerOf(entityType, entityId))) {
+    if (!scope.allCompanies()
+        && !RecordOwnership.visible(scope, ownership.ownerOf(entityType, entityId))) {
       throw new ResourceNotFoundException("change history", entityType + " " + entityId);
     }
     return history(entityType, entityId);
-  }
-
-  static boolean visible(UserDataScope scope, Optional<Owner> owner) {
-    if (owner.isEmpty()) {
-      return false;
-    }
-    Owner o = owner.get();
-    if (o.company() == null) {
-      return true;
-    }
-    return o.branch() == null
-        ? scope.allowsCompany(o.company())
-        : scope.allowsBranch(o.company(), o.branch());
   }
 
   /**

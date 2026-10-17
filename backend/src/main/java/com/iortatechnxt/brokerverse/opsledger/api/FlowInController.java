@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.opsledger.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.FlowInDtos.FeedConfigRequest;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.FlowInDtos.FeedResponse;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.FlowInDtos.RecordResponse;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
  * activation, and the manual upload transport. Interface administrators only ({@code
  * FLOWIN_MANAGE}).
  */
+@GlobalRecord("a flow-in run carries the feeds of every company")
 @RestController
 @RequestMapping("/api/v1/ops/flow-in")
 @PreAuthorize(OpsAccess.FLOWIN)

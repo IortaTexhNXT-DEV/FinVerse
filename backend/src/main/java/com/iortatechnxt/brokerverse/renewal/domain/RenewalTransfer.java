@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +16,7 @@ import java.util.Locale;
  * remarks, accepted or declined with remarks by a Team Leader of the receiving unit, or cancelled
  * by the sender. One open request per renewal.
  */
+@OwnedBy(value = RenewalCandidate.class, key = "candidateId")
 @Entity
 @Table(name = "rnw_transfer")
 public class RenewalTransfer extends BaseEntity {

@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.report.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportBatchRequest;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportBatchResponse;
 import com.iortatechnxt.brokerverse.report.core.ReportBatchService;
+import com.iortatechnxt.brokerverse.report.domain.ReportBatch;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Report batches (FRBS 2.4.5 / 2.4.7): select several reports, run them with shared parameters and
  * download one ZIP or one merged PDF. Per-report permissions are enforced by the report service.
  */
+@OwnedRecord(ReportBatch.class)
 @RestController
 @RequestMapping("/api/v1/reports/batches")
 @PreAuthorize(ReportController.REPORT_ACCESS)

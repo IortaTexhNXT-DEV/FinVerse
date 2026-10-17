@@ -6,10 +6,13 @@ import com.iortatechnxt.brokerverse.commission.api.dto.IncentiveDtos.RunResponse
 import com.iortatechnxt.brokerverse.commission.api.dto.IncentiveDtos.SchemeRequest;
 import com.iortatechnxt.brokerverse.commission.api.dto.IncentiveDtos.SchemeResponse;
 import com.iortatechnxt.brokerverse.commission.api.dto.IncentiveDtos.SchemeTerms;
+import com.iortatechnxt.brokerverse.commission.domain.IncentiveRun;
+import com.iortatechnxt.brokerverse.commission.domain.IncentiveScheme;
 import com.iortatechnxt.brokerverse.commission.service.IncentivePosting;
 import com.iortatechnxt.brokerverse.commission.service.IncentiveRunService;
 import com.iortatechnxt.brokerverse.commission.service.IncentiveSchemeService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -69,6 +72,7 @@ public class IncentiveController {
    */
   @GetMapping("/schemes/{id}")
   @PreAuthorize(CommissionAccess.INCENTIVE_READ)
+  @OwnedRecord(IncentiveScheme.class)
   public SchemeResponse scheme(@PathVariable Long id) {
     return SchemeResponse.from(schemes.require(id));
   }
@@ -95,6 +99,7 @@ public class IncentiveController {
    */
   @PutMapping("/schemes/{id}")
   @PreAuthorize(CommissionAccess.INCENTIVE)
+  @OwnedRecord(IncentiveScheme.class)
   public SchemeResponse update(@PathVariable Long id, @Valid @RequestBody SchemeTerms terms) {
     return SchemeResponse.from(schemes.update(id, terms.toTerms()));
   }
@@ -127,6 +132,7 @@ public class IncentiveController {
    */
   @GetMapping("/runs/{id}")
   @PreAuthorize(CommissionAccess.INCENTIVE_READ)
+  @OwnedRecord(IncentiveRun.class)
   public RunResponse run(@PathVariable Long id) {
     return RunResponse.from(runs.require(id));
   }
@@ -141,6 +147,7 @@ public class IncentiveController {
    */
   @GetMapping("/runs/{id}/lines")
   @PreAuthorize(CommissionAccess.INCENTIVE_READ)
+  @OwnedRecord(IncentiveRun.class)
   public PageResponse<RunLineResponse> lines(
       @PathVariable Long id,
       @RequestParam(defaultValue = "0") int page,
@@ -169,6 +176,7 @@ public class IncentiveController {
    */
   @PostMapping("/runs/{id}/post")
   @PreAuthorize(CommissionAccess.APPROVE)
+  @OwnedRecord(IncentiveRun.class)
   public RunResponse post(@PathVariable Long id) {
     return RunResponse.from(posting.post(id));
   }
@@ -181,6 +189,7 @@ public class IncentiveController {
    */
   @PostMapping("/runs/{id}/cancel")
   @PreAuthorize(CommissionAccess.INCENTIVE)
+  @OwnedRecord(IncentiveRun.class)
   public RunResponse cancel(@PathVariable Long id) {
     return RunResponse.from(runs.cancel(id));
   }

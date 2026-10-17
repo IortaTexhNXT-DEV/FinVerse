@@ -1,16 +1,19 @@
 package com.iortatechnxt.brokerverse.disbursement.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BankResponse;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BankStatusRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.BookRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.EodRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.EodRunResponse;
+import com.iortatechnxt.brokerverse.disbursement.domain.EodOutput;
 import com.iortatechnxt.brokerverse.disbursement.domain.EodRun;
 import com.iortatechnxt.brokerverse.disbursement.service.EodOutputFiles;
 import com.iortatechnxt.brokerverse.disbursement.service.EodService;
 import com.iortatechnxt.brokerverse.payables.domain.BankAccount;
+import com.iortatechnxt.brokerverse.payables.domain.ChequeBook;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountQueryService;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountService;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
@@ -37,6 +40,8 @@ import org.springframework.web.bind.annotation.RestController;
  * accounts with their check series: active / inactive tag with maker-checker, new and edited check
  * series. The bank account master itself stays in Payables.
  */
+@OwnedRecord(value = EodOutput.class, variable = "outputId")
+@OwnedRecord(value = ChequeBook.class, variable = "bookId")
 @RestController
 @RequestMapping("/api/v1/disbursement")
 public class OperationsController {
@@ -100,6 +105,7 @@ public class OperationsController {
    */
   @GetMapping("/eod/runs/{id}")
   @PreAuthorize(DisbursementAccess.EOD_READ)
+  @OwnedRecord(EodRun.class)
   public EodRunResponse run(@PathVariable Long id) {
     return EodRunResponse.from(eod.get(id), eod.outputs(id));
   }
@@ -126,6 +132,7 @@ public class OperationsController {
    */
   @PostMapping("/eod/runs/{id}/confirm")
   @PreAuthorize(DisbursementAccess.EOD)
+  @OwnedRecord(EodRun.class)
   public EodRunResponse confirm(@PathVariable Long id) {
     return EodRunResponse.from(eod.confirm(id), eod.outputs(id));
   }
@@ -169,6 +176,7 @@ public class OperationsController {
    */
   @PostMapping("/banks/{id}/status")
   @PreAuthorize(DisbursementAccess.REVIEW)
+  @OwnedRecord(BankAccount.class)
   public BankResponse requestStatus(
       @PathVariable Long id, @Valid @RequestBody BankStatusRequest body) {
     return bank(bankService.requestStatus(id, body.status()));
@@ -182,6 +190,7 @@ public class OperationsController {
    */
   @PostMapping("/banks/{id}/authorize")
   @PreAuthorize(DisbursementAccess.APPROVE)
+  @OwnedRecord(BankAccount.class)
   public BankResponse authorize(@PathVariable Long id) {
     return bank(bankService.authorize(id));
   }
@@ -195,6 +204,7 @@ public class OperationsController {
    */
   @PostMapping("/banks/{id}/cheque-books")
   @PreAuthorize(DisbursementAccess.REVIEW)
+  @OwnedRecord(BankAccount.class)
   public BankResponse addBook(@PathVariable Long id, @Valid @RequestBody BookRequest body) {
     bankService.addChequeBook(
         id,

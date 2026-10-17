@@ -1,11 +1,13 @@
 package com.iortatechnxt.brokerverse.fixedasset.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.AssetMovementResponse;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.DisposalRequest;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.FixedAssetRequest;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.FixedAssetResponse;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.TransferRequest;
 import com.iortatechnxt.brokerverse.fixedasset.domain.AssetStatus;
+import com.iortatechnxt.brokerverse.fixedasset.domain.FixedAsset;
 import com.iortatechnxt.brokerverse.fixedasset.service.AssetLifecycleService;
 import com.iortatechnxt.brokerverse.fixedasset.service.DisposalPreview;
 import com.iortatechnxt.brokerverse.fixedasset.service.FixedAssetService;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for the fixed asset register. */
+@OwnedRecord(FixedAsset.class)
 @RestController
 @RequestMapping("/api/v1/assets/register")
 public class FixedAssetController {

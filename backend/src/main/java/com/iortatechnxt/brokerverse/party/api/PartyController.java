@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.party.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.party.api.dto.PartyRequest;
 import com.iortatechnxt.brokerverse.party.api.dto.PartyResponse;
+import com.iortatechnxt.brokerverse.party.domain.Party;
 import com.iortatechnxt.brokerverse.party.domain.PartyType;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
 import jakarta.validation.Valid;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for business partners. */
+@OwnedRecord(Party.class)
 @RestController
 @RequestMapping("/api/v1/parties")
 public class PartyController {

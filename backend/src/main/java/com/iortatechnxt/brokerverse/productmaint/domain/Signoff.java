@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -10,6 +11,7 @@ import java.time.Instant;
  * A ManCom decision on the requirements of a package request (BRPM.015, PQ07): signed off (the
  * request goes to MBS) or returned to TSU; the signed sheet is an optional attachment.
  */
+@OwnedBy(value = PackageRequest.class, key = "requestId")
 @Entity
 @Table(name = "pm_signoff")
 public class Signoff extends BaseEntity {

@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.investment.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.investment.api.dto.PortfolioRequest;
 import com.iortatechnxt.brokerverse.investment.api.dto.PortfolioResponse;
+import com.iortatechnxt.brokerverse.investment.domain.InvestmentPortfolio;
 import com.iortatechnxt.brokerverse.investment.service.PortfolioService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for investment portfolios. */
+@OwnedRecord(InvestmentPortfolio.class)
 @RestController
 @RequestMapping("/api/v1/investments/portfolios")
 public class PortfolioController {

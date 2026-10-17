@@ -5,12 +5,14 @@ import com.iortatechnxt.brokerverse.collections.installment.api.dto.PlanDtos.Gen
 import com.iortatechnxt.brokerverse.collections.installment.api.dto.PlanDtos.ManualRequest;
 import com.iortatechnxt.brokerverse.collections.installment.api.dto.PlanDtos.PlanResponse;
 import com.iortatechnxt.brokerverse.collections.installment.api.dto.PlanDtos.PolicyYearsRequest;
+import com.iortatechnxt.brokerverse.collections.installment.domain.InstallmentPlan;
 import com.iortatechnxt.brokerverse.collections.installment.domain.InstallmentRepository;
 import com.iortatechnxt.brokerverse.collections.installment.domain.PlanEnums.InstallmentStatus;
 import com.iortatechnxt.brokerverse.collections.installment.domain.PlanEnums.PlanStatus;
 import com.iortatechnxt.brokerverse.collections.installment.service.InstallmentPlanService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  * and overdue, creation from the policy years of a multi-year account, generated or entered by the
  * collector ({@code CLX_BILLING}), allocation refresh and cancellation.
  */
+@OwnedRecord(InstallmentPlan.class)
 @RestController
 @RequestMapping("/api/v1/collections/plans")
 public class InstallmentPlanController {

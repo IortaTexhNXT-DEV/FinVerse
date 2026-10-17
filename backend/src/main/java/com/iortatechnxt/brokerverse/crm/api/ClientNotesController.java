@@ -1,11 +1,14 @@
 package com.iortatechnxt.brokerverse.crm.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientNotesDtos.BannerResponse;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientNotesDtos.HistoryResponse;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientNotesDtos.InstructionRequest;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientNotesDtos.InstructionResponse;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientNotesDtos.NotesResponse;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientNotesDtos.TagRequest;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
+import com.iortatechnxt.brokerverse.crm.domain.ClientInstruction;
 import com.iortatechnxt.brokerverse.crm.service.ClientNotesService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Client tags and special instructions (BRNB.091): the banner shown on quotation and account
  * screens, maintenance and change history.
  */
+@OwnedRecord(Client.class)
+@OwnedRecord(value = ClientInstruction.class, variable = "instructionId")
 @RestController
 @RequestMapping("/api/v1/crm/clients/{id}")
 public class ClientNotesController {

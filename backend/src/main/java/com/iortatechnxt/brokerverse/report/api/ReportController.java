@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.report.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportCatalogueEntry;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportRunResponse;
 import com.iortatechnxt.brokerverse.report.core.CodeSetSource.CodeOption;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Generic report API: catalogue, on-screen run and export (PDF / XLSX / CSV / ODS / XML / DOCX).
  * Per-report permissions are enforced by {@link ReportService}.
  */
+@GlobalRecord("a report run belongs to its requester, checked by the service")
 @RestController
 @RequestMapping("/api/v1/reports")
 @PreAuthorize(ReportController.REPORT_ACCESS)

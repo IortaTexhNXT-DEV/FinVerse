@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.renewal.placement.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.AdviceVersion;
+import com.iortatechnxt.brokerverse.renewal.domain.RenewalPlacement;
 import com.iortatechnxt.brokerverse.renewal.placement.service.InsuranceAdvices;
 import com.iortatechnxt.brokerverse.renewal.placement.service.PlacementGeneration;
 import com.iortatechnxt.brokerverse.renewal.placement.service.PlacementResponses;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * the With Issue tag, the insurer's response, the cancellation, the return to Marketing and the
  * Insurance Advice.
  */
+@OwnedRecord(RenewalPlacement.class)
 @RestController
 @RequestMapping("/api/v1/renewal")
 public class RenewalPlacementController {

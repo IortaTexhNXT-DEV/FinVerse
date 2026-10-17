@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.acsl.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
  * One control account in a GL-SL reconciliation (ACSL 2.13.2): the GL balance, the sub-ledger
  * balance and the difference, all debit positive in base currency.
  */
+@OwnedBy(value = GlSlRun.class, key = "runId")
 @Entity
 @Table(name = "acsl_glsl_recon")
 public class GlSlRecon {

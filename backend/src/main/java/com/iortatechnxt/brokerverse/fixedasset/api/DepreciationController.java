@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.fixedasset.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.DepreciationLineResponse;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.DepreciationPreviewResponse;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.DepreciationRunResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for the monthly depreciation run. */
+@OwnedRecord(DepreciationRun.class)
 @RestController
 @RequestMapping("/api/v1/assets/depreciation")
 public class DepreciationController {

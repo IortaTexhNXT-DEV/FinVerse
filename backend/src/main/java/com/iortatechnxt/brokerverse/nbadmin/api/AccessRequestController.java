@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestEventResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestQuery;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestRequest;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * decides a change ({@link AccessDecisionController}). Users and their group profiles come from
  * UIDM-ISC; the requests about users raised before remain readable here.
  */
+@GlobalRecord("users, roles and access requests are programme-wide")
 @RestController
 @RequestMapping("/api/v1/nbadmin")
 public class AccessRequestController {

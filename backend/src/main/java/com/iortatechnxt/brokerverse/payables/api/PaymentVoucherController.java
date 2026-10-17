@@ -2,10 +2,12 @@ package com.iortatechnxt.brokerverse.payables.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.payables.api.dto.DatedReasonRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.PayableItemResponse;
 import com.iortatechnxt.brokerverse.payables.api.dto.PaymentRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.VoucherResponse;
+import com.iortatechnxt.brokerverse.payables.domain.PaymentVoucher;
 import com.iortatechnxt.brokerverse.payables.domain.VoucherStatus;
 import com.iortatechnxt.brokerverse.payables.service.PaymentApprovalService;
 import com.iortatechnxt.brokerverse.payables.service.PaymentVoucherService;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Payment vouchers: pay open payables of any party by cheque, transfer or PDC. */
+@OwnedRecord(PaymentVoucher.class)
 @RestController
 @RequestMapping("/api/v1/payables/vouchers")
 public class PaymentVoucherController {

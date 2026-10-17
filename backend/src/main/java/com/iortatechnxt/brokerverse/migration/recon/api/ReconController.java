@@ -1,10 +1,12 @@
 package com.iortatechnxt.brokerverse.migration.recon.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.migration.load.service.BatchPlanService;
 import com.iortatechnxt.brokerverse.migration.recon.api.dto.ReconDtos.ExplainRequest;
 import com.iortatechnxt.brokerverse.migration.recon.api.dto.ReconDtos.LineResponse;
 import com.iortatechnxt.brokerverse.migration.recon.api.dto.ReconDtos.RunResponse;
 import com.iortatechnxt.brokerverse.migration.recon.domain.MigReconRun;
+import com.iortatechnxt.brokerverse.migration.recon.domain.ReconLine;
 import com.iortatechnxt.brokerverse.migration.recon.service.ReconciliationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Reconciliation (FR-DM-019 to FR-DM-021; screen Reconciliation): runs the reconciliation of a
  * loaded batch, shows its lines by level and records the explanation and approval of breaks.
  */
+@OwnedRecord(value = ReconLine.class, variable = "lineId")
 @RestController
 @RequestMapping("/api/v1/migration")
 public class ReconController {

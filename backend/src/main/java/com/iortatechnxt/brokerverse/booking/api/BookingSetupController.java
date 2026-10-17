@@ -3,8 +3,12 @@ package com.iortatechnxt.brokerverse.booking.api;
 import com.iortatechnxt.brokerverse.booking.api.dto.AutoBookRuleDto;
 import com.iortatechnxt.brokerverse.booking.api.dto.IncentiveRuleDto;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceTypeDto;
+import com.iortatechnxt.brokerverse.booking.domain.AutoBookRule;
+import com.iortatechnxt.brokerverse.booking.domain.IncentiveRule;
 import com.iortatechnxt.brokerverse.booking.service.BookingRuleService;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceTypeService;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -77,6 +81,7 @@ public class BookingSetupController {
    */
   @PutMapping("/auto-book-rules/{id}")
   @PreAuthorize(BookingAccess.SETUP_MAINTAIN)
+  @OwnedRecord(AutoBookRule.class)
   public AutoBookRuleDto updateAutoBookRule(
       @PathVariable Long id, @Valid @RequestBody AutoBookRuleDto request) {
     return AutoBookRuleDto.from(rules.updateAutoBookRule(id, request.toCriteria()));
@@ -118,6 +123,7 @@ public class BookingSetupController {
    */
   @PutMapping("/incentive-rules/{id}")
   @PreAuthorize(BookingAccess.SETUP_MAINTAIN)
+  @OwnedRecord(IncentiveRule.class)
   public IncentiveRuleDto updateIncentiveRule(
       @PathVariable Long id, @Valid @RequestBody IncentiveRuleDto request) {
     return IncentiveRuleDto.from(rules.updateIncentiveRule(id, request.toCriteria()));
@@ -157,6 +163,7 @@ public class BookingSetupController {
    */
   @PutMapping("/service-invoice-types/{id}")
   @PreAuthorize(BookingAccess.SETUP_MAINTAIN)
+  @GlobalRecord("service invoice types are programme-wide")
   public ServiceInvoiceTypeDto updateServiceInvoiceType(
       @PathVariable Long id, @Valid @RequestBody ServiceInvoiceTypeDto request) {
     return ServiceInvoiceTypeDto.from(types.update(id, request.toSettings()));

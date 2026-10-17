@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.submitted.proposal.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmNominatedRate;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
@@ -129,6 +130,7 @@ public class SbmProposalController {
   @PostMapping("/{id}/release")
   @PreAuthorize(PROPOSE)
   @Transactional
+  @OwnedRecord(SbmProposal.class)
   public ProposalView release(@PathVariable Long id) {
     return view(proposals.release(id));
   }
@@ -143,6 +145,7 @@ public class SbmProposalController {
   @PostMapping("/{id}/return")
   @PreAuthorize(PROPOSE)
   @Transactional
+  @OwnedRecord(SbmProposal.class)
   public ProposalView returnProposal(@PathVariable Long id, @RequestBody ReasonRequest request) {
     return view(proposals.returnProposal(id, request.reason()));
   }
@@ -156,6 +159,7 @@ public class SbmProposalController {
    */
   @GetMapping("/{id}/document")
   @PreAuthorize(MasterlistController.VIEW)
+  @OwnedRecord(SbmProposal.class)
   public ResponseEntity<byte[]> document(@PathVariable Long id, HttpServletRequest request) {
     return downloads.respond(documents.pdf(id), request);
   }
@@ -195,6 +199,7 @@ public class SbmProposalController {
    */
   @PutMapping("/rates/{id}")
   @PreAuthorize(PROPOSE)
+  @OwnedRecord(SbmNominatedRate.class)
   public RateView changeRate(
       @RequestParam Long companyId, @PathVariable Long id, @RequestBody SbmNominatedRate.Row row) {
     return RateView.of(rates.update(companyId, id, row));
@@ -210,6 +215,7 @@ public class SbmProposalController {
    */
   @PostMapping("/rates/{id}/{action}")
   @PreAuthorize(PROPOSE)
+  @OwnedRecord(SbmNominatedRate.class)
   public RateView rateAction(
       @RequestParam Long companyId, @PathVariable Long id, @PathVariable String action) {
     return RateView.of(

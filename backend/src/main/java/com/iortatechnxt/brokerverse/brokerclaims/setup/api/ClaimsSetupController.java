@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.setup.service.AttributeSetupSer
 import com.iortatechnxt.brokerverse.brokerclaims.setup.service.AttributeSetupService.ValueAttributes;
 import com.iortatechnxt.brokerverse.brokerclaims.setup.service.HandlerSetupService;
 import com.iortatechnxt.brokerverse.brokerclaims.setup.service.MatrixSetupService;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * (BCL_SETUP) under maker-checker; and the Claims lists maintained through the list-of-values API
  * with the owner permission BCL_SETUP.
  */
+@GlobalRecord("the claim status access matrix is programme-wide")
 @RestController
 @RequestMapping("/api/v1/broker-claims/setup")
 @PreAuthorize(ClaimsSetupController.SETUP)

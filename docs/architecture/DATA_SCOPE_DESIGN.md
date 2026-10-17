@@ -62,6 +62,25 @@ One mechanism per way a company reaches a controller, instead of 194 hand edits:
 | Request body with a `companyId` (and `branchId`) accessor, a list of such items, or a record body with a list component of such items (bulk requests) | `RequestBodyAdvice` after the body is read | `security.api.DataScopeBodyAdvice` (rules in `DataScopeTargets`) |
 | Anything else (a company under another name; a multipart part; a header; a parameter bound under another name) | explicit `dataScope.requireCompany(...)` in the method, marked `@CompanyScoped` | `common.security.CompanyScoped` |
 
+### 4.1 Records addressed by id (record scope check)
+
+An endpoint that reads or changes one stored record by its id (`GET /claims/{id}`, `PUT /insurers/contacts/{contactId}`) names no company in the request; the record carries it. These endpoints are checked by the **record scope check**:
+
+| Part | Class |
+|---|---|
+| Declaration: the record a path variable addresses, on the controller (all its endpoints with that variable) or on the method (replaces the class declaration of the same variable) | `common.security.OwnedRecord` (entity class, or `type` for a record kept outside the entity model) |
+| Allow list of programme-wide records (catalog masters, users and roles, lists of values, watch lists, platform administration), with the reason | `common.security.GlobalRecord` |
+| Child records without a company of their own (a contact of an insurer, a line of a batch) name their parent and the parent id property | `common.security.OwnedBy` on the entity |
+| Owner resolution: the record's `getCompanyId()` / `getBranchId()`, its company association, its `OwnedBy` parent, or the record it links to (`getEntityType()` / `getEntityId()`, attachments) | `audit.service.RecordOwnership` (shared with the change history of G05) |
+| Records kept with SQL (contact centre cases) | a `common.security.RecordOwnerLookup` bean per record type |
+| The check | `audit.service.RecordScope`, applied by `audit.api.RecordScopeAdvisor` |
+
+The advisor runs **after** the permission check of the endpoint (`@PreAuthorize`), so a caller without the permission is still answered 403, and **before** the endpoint body, so nothing is read or changed. A record of a company (or branch) outside the caller's scope is answered **404**, as if it did not exist (the answer of the change history, G05), so ids of other companies cannot be probed. A user with all companies is not checked (no database read); a record that does not exist is left to the endpoint (404). Polymorphic endpoints (`/product-maintenance/terms/{type}/{id}`, `/submitted/setup/{kind}/{id}`, `/catalog/records/{kind}/{id}`) call `RecordScope` explicitly with the record of the kind and are marked `@CompanyScoped`.
+
+**Enforcement.** `ArchitectureTest.idEndpointsNameTheirRecord` fails the build when an endpoint of the user APIs takes a numeric path variable (other than `companyId`) and names no record for any of them, is not `@GlobalRecord` and not `@CompanyScoped`; and when a named entity has no company (it must then be `@OwnedBy` its parent or listed as `@GlobalRecord`). `RecordScopeIT` proves in-scope, out-of-scope and all-companies callers on the insurer page, the service invoice batches, a write and a child record, and that every named record type has its lookup.
+
+Coverage at Sprint 4: 1,052 numeric path variables on 1,024 endpoints of 208 controllers; all are declared (`OwnedRecord` on the company records, `GlobalRecord` on the programme-wide ones, the polymorphic endpoints explicit).
+
 Path variables named `branchId` are not checked as company branches: the insurer branch maintenance (`/catalog/insurers/branches/{branchId}`) uses that name for the branches of an insurer.
 
 **List and search endpoints** that return several companies' data filter on `allowed()` in the service, never only on the screen:
@@ -96,7 +115,7 @@ A user who starts a job from a screen ("Run now") is still checked on the reques
 
 ## 7. Risks and limits
 
-- **Records addressed by id only.** An endpoint that loads a record by its id without a `companyId` (for example `GET /claims/{id}`) is not covered by this capability: the record carries its company but the request does not name it. Closing this needs a per-module check on load (follow-up per module, using `requireCompany(record.companyId())`).
+- **Records addressed by id only.** Covered by the record scope check (section 4.1) since Sprint 4. Text business keys in a path (`{invoiceNo}`, `{arn}`, `{batchNo}`, `{ref}`) are not resolved by it yet; they remain a follow-up recorded in the Conformance Register.
 - **Reports and exports** that take a company are covered by the interceptor; whether branch scope must also filter the lines of a company-wide report is a business decision (section 8).
 - **Home branch.** The user's home branch is not forced into the scope; an administrator who narrows the branches should keep it.
 - **Cache staleness.** A narrowed scope applies within one request on the instance that made the change and at once on the others (cache cleared through Valkey); a user's open screens show refusals on the next call.

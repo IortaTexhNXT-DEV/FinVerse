@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.eb.setup.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.eb.domain.EbRequiredDocument;
 import com.iortatechnxt.brokerverse.eb.domain.EbThresholdRule;
 import com.iortatechnxt.brokerverse.eb.setup.api.dto.SetupDtos.RequiredDocumentResponse;
@@ -75,6 +76,7 @@ public class EbSetupController {
    */
   @PutMapping("/threshold-rules/{id}")
   @PreAuthorize(SETUP)
+  @OwnedRecord(EbThresholdRule.class)
   public ThresholdRuleResponse updateRule(
       @PathVariable Long id, @RequestParam Long companyId, @RequestBody EbThresholdRule.Data data) {
     return ThresholdRuleResponse.from(setup.updateRule(companyId, id, data));
@@ -90,6 +92,7 @@ public class EbSetupController {
    */
   @PostMapping("/threshold-rules/" + ACTION)
   @PreAuthorize(SETUP)
+  @OwnedRecord(EbThresholdRule.class)
   public ThresholdRuleResponse ruleAction(
       @PathVariable Long id, @PathVariable String action, @RequestParam Long companyId) {
     return ThresholdRuleResponse.from(
@@ -135,6 +138,7 @@ public class EbSetupController {
    */
   @PutMapping("/required-documents/{id}")
   @PreAuthorize(SETUP)
+  @OwnedRecord(EbRequiredDocument.class)
   public RequiredDocumentResponse updateRequired(
       @PathVariable Long id,
       @RequestParam Long companyId,
@@ -152,6 +156,7 @@ public class EbSetupController {
    */
   @PostMapping("/required-documents/" + ACTION)
   @PreAuthorize(SETUP)
+  @OwnedRecord(EbRequiredDocument.class)
   public RequiredDocumentResponse requiredAction(
       @PathVariable Long id, @PathVariable String action, @RequestParam Long companyId) {
     return RequiredDocumentResponse.from(

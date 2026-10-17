@@ -12,6 +12,10 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerPageDtos.ContactRespo
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerPageDtos.RemittanceRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerResponse;
+import com.iortatechnxt.brokerverse.catalog.domain.CommissionRate;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerBankAccount;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerBranch;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerContact;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerLedgerService;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerLedgerService.InsurerAccounts;
@@ -19,8 +23,7 @@ import com.iortatechnxt.brokerverse.catalog.service.InsurerPageService;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.RateTableService;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
-import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
-import com.iortatechnxt.brokerverse.common.security.DataScope;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Insurer panel: profiles, branches with LGT and commission rates (Appendix A, Q06). */
+@OwnedRecord(InsurerProfile.class)
+@OwnedRecord(value = InsurerContact.class, variable = "contactId")
+@OwnedRecord(value = InsurerBankAccount.class, variable = "accountId")
+@OwnedRecord(value = InsurerBranch.class, variable = "branchId")
+@OwnedRecord(value = CommissionRate.class, variable = "rateId")
 @RestController
 @RequestMapping("/api/v1/catalog/insurers")
 public class InsurerController {
@@ -44,7 +52,6 @@ public class InsurerController {
   private final RateTableService rates;
   private final InsurerPageService page;
   private final InsurerLedgerService ledger;
-  private final DataScope dataScope;
 
   /**
    * Creates the controller.
@@ -53,19 +60,16 @@ public class InsurerController {
    * @param rates commission rates
    * @param page contacts, bank accounts, remittance details and linked products
    * @param ledger accounts of the insurer
-   * @param dataScope data scope of the reader
    */
   public InsurerController(
       InsurerService insurers,
       RateTableService rates,
       InsurerPageService page,
-      InsurerLedgerService ledger,
-      DataScope dataScope) {
+      InsurerLedgerService ledger) {
     this.insurers = insurers;
     this.rates = rates;
     this.page = page;
     this.ledger = ledger;
-    this.dataScope = dataScope;
   }
 
   /**
@@ -78,11 +82,8 @@ public class InsurerController {
    */
   @GetMapping("/{id}/accounts")
   @PreAuthorize(CatalogAccess.READ)
-  @CompanyScoped("the company of the insurer is checked with DataScope.requireCompany")
   public InsurerAccounts accounts(@PathVariable Long id) {
-    InsurerProfile insurer = ledger.insurer(id);
-    dataScope.requireCompany(insurer.getCompanyId());
-    return ledger.accounts(insurer);
+    return ledger.accounts(ledger.insurer(id));
   }
 
   /**

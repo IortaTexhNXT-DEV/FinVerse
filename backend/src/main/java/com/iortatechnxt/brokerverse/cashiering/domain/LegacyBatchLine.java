@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.cashiering.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
  * A line of a Cashiering legacy batch: an unapplied item taken to income, or a legacy invoice whose
  * PR 2307 is reversed against the insurer; posted in its own transaction.
  */
+@OwnedBy(value = LegacyBatch.class, key = "batchId")
 @Entity
 @Table(name = "csh_legacy_batch_line")
 public class LegacyBatchLine {

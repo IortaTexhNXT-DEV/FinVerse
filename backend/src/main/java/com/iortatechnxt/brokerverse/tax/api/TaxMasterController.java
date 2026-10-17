@@ -1,11 +1,15 @@
 package com.iortatechnxt.brokerverse.tax.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.tax.api.dto.PartyTaxProfileRequest;
 import com.iortatechnxt.brokerverse.tax.api.dto.PartyTaxProfileResponse;
 import com.iortatechnxt.brokerverse.tax.api.dto.TaxCodeRequest;
 import com.iortatechnxt.brokerverse.tax.api.dto.TaxCodeResponse;
 import com.iortatechnxt.brokerverse.tax.api.dto.TaxFormRequest;
 import com.iortatechnxt.brokerverse.tax.api.dto.TaxFormResponse;
+import com.iortatechnxt.brokerverse.tax.domain.PartyTaxProfile;
+import com.iortatechnxt.brokerverse.tax.domain.TaxCode;
+import com.iortatechnxt.brokerverse.tax.domain.TaxForm;
 import com.iortatechnxt.brokerverse.tax.service.PartyTaxProfileService;
 import com.iortatechnxt.brokerverse.tax.service.TaxCodeService;
 import com.iortatechnxt.brokerverse.tax.service.TaxFormService;
@@ -80,6 +84,7 @@ public class TaxMasterController {
    */
   @PutMapping("/codes/{id}")
   @PreAuthorize(TaxAccess.MANAGE)
+  @OwnedRecord(TaxCode.class)
   public TaxCodeResponse updateCode(
       @PathVariable Long id, @Valid @RequestBody TaxCodeRequest request) {
     return TaxCodeResponse.from(codes.update(id, request.toCommand()));
@@ -93,6 +98,7 @@ public class TaxMasterController {
    */
   @PostMapping("/codes/{id}/authorize")
   @PreAuthorize(TaxAccess.AUTHORIZE)
+  @OwnedRecord(TaxCode.class)
   public TaxCodeResponse authorizeCode(@PathVariable Long id) {
     return TaxCodeResponse.from(codes.authorize(id));
   }
@@ -131,6 +137,7 @@ public class TaxMasterController {
    */
   @PutMapping("/forms/{id}")
   @PreAuthorize(TaxAccess.MANAGE)
+  @OwnedRecord(TaxForm.class)
   public TaxFormResponse updateForm(
       @PathVariable Long id, @Valid @RequestBody TaxFormRequest request) {
     return TaxFormResponse.from(forms.update(id, request.toCommand()));
@@ -144,6 +151,7 @@ public class TaxMasterController {
    */
   @PostMapping("/forms/{id}/authorize")
   @PreAuthorize(TaxAccess.AUTHORIZE)
+  @OwnedRecord(TaxForm.class)
   public TaxFormResponse authorizeForm(@PathVariable Long id) {
     return TaxFormResponse.from(forms.authorize(id));
   }
@@ -182,6 +190,7 @@ public class TaxMasterController {
    */
   @PutMapping("/profiles/{id}")
   @PreAuthorize(TaxAccess.MANAGE)
+  @OwnedRecord(PartyTaxProfile.class)
   public PartyTaxProfileResponse updateProfile(
       @PathVariable Long id, @Valid @RequestBody PartyTaxProfileRequest request) {
     return PartyTaxProfileResponse.from(profiles.update(id, request.toCommand()));
@@ -195,6 +204,7 @@ public class TaxMasterController {
    */
   @PostMapping("/profiles/{id}/authorize")
   @PreAuthorize(TaxAccess.AUTHORIZE)
+  @OwnedRecord(PartyTaxProfile.class)
   public PartyTaxProfileResponse authorizeProfile(@PathVariable Long id) {
     return PartyTaxProfileResponse.from(profiles.authorize(id));
   }

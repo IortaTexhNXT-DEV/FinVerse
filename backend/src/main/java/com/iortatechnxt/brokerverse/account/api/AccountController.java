@@ -21,6 +21,7 @@ import com.iortatechnxt.brokerverse.account.service.NewAccount;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  * the business actions of the NB_ACCOUNT workflow. Generic actions (return, void) are run through
  * the workflow API by the workflow panel.
  */
+@OwnedRecord(Account.class)
 @RestController
 @RequestMapping("/api/v1/accounts")
 public class AccountController {

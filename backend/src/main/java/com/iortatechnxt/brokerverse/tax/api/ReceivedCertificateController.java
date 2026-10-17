@@ -2,8 +2,10 @@ package com.iortatechnxt.brokerverse.tax.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.tax.api.dto.ReceivedCertificateDtos.CertificateBody;
 import com.iortatechnxt.brokerverse.tax.api.dto.ReceivedCertificateDtos.CertificateResponse;
+import com.iortatechnxt.brokerverse.tax.domain.ReceivedCertificate;
 import com.iortatechnxt.brokerverse.tax.service.ReceivedCertificateService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * search, one certificate, record (posts {@code TAX_CWT_CERT_RECEIVED}) and cancel (reverses it).
  * Disbursement users (CWT tagging) and tax users record certificates.
  */
+@OwnedRecord(ReceivedCertificate.class)
 @RestController
 @RequestMapping("/api/v1/tax/received-certificates")
 public class ReceivedCertificateController {

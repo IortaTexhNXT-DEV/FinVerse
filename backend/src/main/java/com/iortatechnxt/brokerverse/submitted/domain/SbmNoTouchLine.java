@@ -1,12 +1,14 @@
 package com.iortatechnxt.brokerverse.submitted.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 
 /** A policy of a No Touch billing batch with the values returned by the insurer (RL #164). */
+@OwnedBy(value = SbmNoTouchBatch.class, key = "batchId")
 @Entity
 @Table(name = "sbm_no_touch_line")
 public class SbmNoTouchLine extends BaseEntity {

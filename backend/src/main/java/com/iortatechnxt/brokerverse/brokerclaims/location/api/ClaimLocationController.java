@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.location.api.dto.LocationDtos.L
 import com.iortatechnxt.brokerverse.brokerclaims.location.domain.LocationRef;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.ClaimLocationService;
 import com.iortatechnxt.brokerverse.brokerclaims.location.service.LocationRefService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The locations of a claim (BRCLM.037/042; FR-CM-020): list with the insurer references valid
  * today, link locations of the cover, describe and remove them ({@code BCL_RECORD}).
  */
+@OwnedRecord(value = Claim.class, variable = "claimId")
 @RestController
 @RequestMapping("/api/v1/broker-claims/{claimId}/locations")
 public class ClaimLocationController {

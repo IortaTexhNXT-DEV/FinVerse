@@ -3,10 +3,12 @@ package com.iortatechnxt.brokerverse.booking.api;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceCreditRequest;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceIssueRequest;
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceResponse;
+import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.SiKind;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceRegister;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Service invoice register (BRNB.100/100b): search, view, download, resend, manual issue and
  * credit.
  */
+@OwnedRecord(ServiceInvoice.class)
 @RestController
 @RequestMapping("/api/v1/booking/service-invoices")
 public class ServiceInvoiceController {

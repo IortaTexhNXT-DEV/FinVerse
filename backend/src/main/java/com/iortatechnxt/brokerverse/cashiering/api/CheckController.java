@@ -9,12 +9,16 @@ import com.iortatechnxt.brokerverse.cashiering.api.dto.PaymentDtos.Selection;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.SetupDtos.PrintBatchResponse;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.PdcStatus;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.PickupStatus;
+import com.iortatechnxt.brokerverse.cashiering.domain.PdcItem;
 import com.iortatechnxt.brokerverse.cashiering.domain.PdcItem.PdcCheck;
+import com.iortatechnxt.brokerverse.cashiering.domain.PickupRequest;
 import com.iortatechnxt.brokerverse.cashiering.domain.PickupRequest.PickupDetails;
+import com.iortatechnxt.brokerverse.cashiering.domain.PrintBatch;
 import com.iortatechnxt.brokerverse.cashiering.service.BatchPrintService;
 import com.iortatechnxt.brokerverse.cashiering.service.PdcWarehouseService;
 import com.iortatechnxt.brokerverse.cashiering.service.PickupService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import jakarta.servlet.http.HttpServletRequest;
@@ -134,6 +138,7 @@ public class CheckController {
    */
   @PostMapping("/pdc/{id}/release")
   @PreAuthorize(CashAccess.UPLOAD)
+  @OwnedRecord(PdcItem.class)
   public PdcResponse release(@PathVariable Long id, @Valid @RequestBody PdcReleaseRequest r) {
     return PdcResponse.from(pdcs.release(id, r.outcome(), r.reason()));
   }
@@ -235,6 +240,7 @@ public class CheckController {
    */
   @PostMapping("/pickups/{id}/cancel")
   @PreAuthorize(CashAccess.RECEIPT)
+  @OwnedRecord(PickupRequest.class)
   public PickupResponse cancelPickup(@PathVariable Long id) {
     return PickupResponse.from(pickups.cancel(id));
   }
@@ -285,6 +291,7 @@ public class CheckController {
    */
   @PostMapping("/print-batches/{id}/skip")
   @PreAuthorize(CashAccess.PRINT)
+  @OwnedRecord(PrintBatch.class)
   public PrintBatchResponse skip(
       @PathVariable Long id, @RequestBody(required = false) SkipBody body) {
     return PrintBatchResponse.from(
@@ -300,6 +307,7 @@ public class CheckController {
    */
   @GetMapping("/print-batches/{id}/zip")
   @PreAuthorize(CashAccess.PRINT)
+  @OwnedRecord(PrintBatch.class)
   public ResponseEntity<byte[]> zip(@PathVariable Long id, HttpServletRequest request) {
     return downloads.respond(printing.zipFile(id), request);
   }
@@ -333,6 +341,7 @@ public class CheckController {
    */
   @GetMapping("/print-batches/{id}")
   @PreAuthorize(CashAccess.PRINT)
+  @OwnedRecord(PrintBatch.class)
   public PrintBatchResponse batch(@PathVariable Long id) {
     return PrintBatchResponse.from(printing.get(id), true);
   }
@@ -345,6 +354,7 @@ public class CheckController {
    */
   @PostMapping("/print-batches/{id}/retry")
   @PreAuthorize(CashAccess.PRINT)
+  @OwnedRecord(PrintBatch.class)
   public PrintBatchResponse retry(@PathVariable Long id) {
     return PrintBatchResponse.from(printing.retry(id), true);
   }
@@ -359,6 +369,7 @@ public class CheckController {
    */
   @GetMapping("/print-batches/{id}/file")
   @PreAuthorize(CashAccess.PRINT)
+  @OwnedRecord(PrintBatch.class)
   public ResponseEntity<byte[]> file(@PathVariable Long id, HttpServletRequest request) {
     return downloads.respond(printing.file(id), request);
   }

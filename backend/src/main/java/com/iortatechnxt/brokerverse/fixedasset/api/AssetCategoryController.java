@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.fixedasset.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.AssetCategoryRequest;
 import com.iortatechnxt.brokerverse.fixedasset.api.dto.AssetCategoryResponse;
+import com.iortatechnxt.brokerverse.fixedasset.domain.AssetCategory;
 import com.iortatechnxt.brokerverse.fixedasset.service.AssetCategoryService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for fixed asset categories. */
+@OwnedRecord(AssetCategory.class)
 @RestController
 @RequestMapping("/api/v1/assets/categories")
 public class AssetCategoryController {

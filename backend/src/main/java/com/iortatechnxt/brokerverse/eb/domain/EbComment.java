@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.eb.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -9,6 +10,7 @@ import jakarta.persistence.Table;
  * A comment on a comparative (FR-EB-043): an internal note or reply, or the client's comment
  * received by e-mail and entered by the AO.
  */
+@OwnedBy(value = EbComparative.class, key = "comparativeId")
 @Entity
 @Table(name = "eb_comment")
 public class EbComment extends BaseEntity {

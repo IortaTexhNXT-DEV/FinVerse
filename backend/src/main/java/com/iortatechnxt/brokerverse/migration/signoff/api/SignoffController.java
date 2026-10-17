@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.migration.signoff.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.migration.load.api.dto.BatchDtos.SignRequest;
 import com.iortatechnxt.brokerverse.migration.load.api.dto.BatchDtos.SignoffResponse;
+import com.iortatechnxt.brokerverse.migration.signoff.domain.MigSignoff;
 import com.iortatechnxt.brokerverse.migration.signoff.service.EvidenceService;
 import com.iortatechnxt.brokerverse.migration.signoff.service.GateMatrix;
 import com.iortatechnxt.brokerverse.migration.signoff.service.SignoffService;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Sign-off (FR-DM-022, FR-DM-023; screen Sign-off): the gate matrix of every object, the mapping
  * sign-off (G2), the list of sign-offs and their evidence files.
  */
+@OwnedRecord(value = MigSignoff.class, variable = "signoffId")
 @RestController
 @RequestMapping("/api/v1/migration/signoffs")
 public class SignoffController {

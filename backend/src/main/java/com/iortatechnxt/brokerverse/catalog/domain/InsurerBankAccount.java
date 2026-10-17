@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +12,7 @@ import jakarta.persistence.Table;
  * Bank account of an insurer: where premiums are remitted, refunds or commissions come from;
  * maker-checker.
  */
+@OwnedBy(value = InsurerProfile.class, key = "insurerId")
 @Entity
 @Table(name = "cat_insurer_bank_account")
 public class InsurerBankAccount extends AuthorizableEntity implements CatalogRecord {

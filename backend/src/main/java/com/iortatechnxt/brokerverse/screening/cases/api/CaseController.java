@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.screening.cases.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.screening.cases.api.dto.CaseDetail;
 import com.iortatechnxt.brokerverse.screening.cases.api.dto.CaseDocumentDto;
 import com.iortatechnxt.brokerverse.screening.cases.api.dto.CaseEventDto;
@@ -48,6 +50,8 @@ import org.springframework.web.multipart.MultipartFile;
  * its timeline, matches, review, documents and committee votes, the client's cases, saving the
  * review draft and uploading documents.
  */
+@OwnedRecord(ScreeningCase.class)
+@OwnedRecord(value = Client.class, variable = "clientId")
 @RestController
 @RequestMapping("/api/v1/screening")
 public class CaseController {

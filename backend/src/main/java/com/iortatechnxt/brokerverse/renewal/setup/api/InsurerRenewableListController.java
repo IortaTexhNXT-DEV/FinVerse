@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.setup.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerRenewableRisk;
 import com.iortatechnxt.brokerverse.renewal.setup.api.RenewalSetupController.RecordAction;
 import com.iortatechnxt.brokerverse.renewal.setup.api.dto.SetupDtos.Approval;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The insurer renewable lists of Renewal Setup (Annex BRRN.020 SC-10; FR-RN-020, 112): the risk
  * codes each insurer renews, maker-checker.
  */
+@OwnedRecord(InsurerRenewableRisk.class)
 @RestController
 @RequestMapping("/api/v1/renewal/setup/insurer-renewable")
 public class InsurerRenewableListController {

@@ -1,12 +1,14 @@
 package com.iortatechnxt.brokerverse.disbursement.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.RequestDtos.EncodeRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.RequestDtos.ReasonComment;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.RequestDtos.RequestResponse;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.RequestDtos.SummaryResponse;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.RequestSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.RequestStatus;
+import com.iortatechnxt.brokerverse.disbursement.domain.IntakeRequest;
 import com.iortatechnxt.brokerverse.disbursement.domain.IntakeRequest.RequestFacts;
 import com.iortatechnxt.brokerverse.disbursement.service.DisbursementQueryService;
 import com.iortatechnxt.brokerverse.disbursement.service.DisbursementQueryService.RequestSearch;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * status and received date, one request, a request encoded from an e-mail, the voucher of a
  * received request, the return of a request to its source and the release of BIR 2307 certificates.
  */
+@OwnedRecord(IntakeRequest.class)
 @RestController
 @RequestMapping("/api/v1/disbursement")
 public class RequestController {

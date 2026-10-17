@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.eb.comparative.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.eb.comparative.api.dto.ComparativeDtos.CommentRequest;
 import com.iortatechnxt.brokerverse.eb.comparative.api.dto.ComparativeDtos.CommentView;
 import com.iortatechnxt.brokerverse.eb.comparative.api.dto.ComparativeDtos.ComparativeSummary;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The comparative of a cycle (FR-EB-041 to 043): build, recommend, submit, sign off, threshold
  * approval, return, present, comments and export.
  */
+@OwnedRecord(value = EbCycle.class, variable = "cycleId")
 @RestController
 @RequestMapping("/api/v1/eb")
 @Transactional
@@ -89,6 +91,7 @@ public class ComparativeController {
    */
   @GetMapping("/programmes/{id}/comparatives")
   @PreAuthorize(VIEW)
+  @OwnedRecord(EbProgramme.class)
   public List<ComparativeSummary> list(@PathVariable Long id, @RequestParam Long companyId) {
     return comparatives.ofProgramme(companyId, id).stream().map(ComparativeSummary::from).toList();
   }
@@ -116,6 +119,7 @@ public class ComparativeController {
    */
   @GetMapping("/comparatives/{id}")
   @PreAuthorize(VIEW)
+  @OwnedRecord(EbComparative.class)
   public ComparativeView get(@PathVariable Long id, @RequestParam Long companyId) {
     return view(comparatives.require(companyId, id));
   }
@@ -130,6 +134,7 @@ public class ComparativeController {
    */
   @PutMapping("/comparatives/{id}/recommendation")
   @PreAuthorize(MARKET)
+  @OwnedRecord(EbComparative.class)
   public ComparativeView recommend(
       @PathVariable Long id,
       @RequestParam Long companyId,
@@ -148,6 +153,7 @@ public class ComparativeController {
    */
   @PostMapping("/comparatives/{id}/submit")
   @PreAuthorize(MARKET)
+  @OwnedRecord(EbComparative.class)
   public ComparativeView submit(@PathVariable Long id, @RequestParam Long companyId) {
     return view(comparatives.submit(companyId, id));
   }
@@ -162,6 +168,7 @@ public class ComparativeController {
    */
   @PostMapping("/comparatives/{id}/sign-off")
   @PreAuthorize(SIGN)
+  @OwnedRecord(EbComparative.class)
   public ComparativeView signOff(
       @PathVariable Long id,
       @RequestParam Long companyId,
@@ -179,6 +186,7 @@ public class ComparativeController {
    */
   @PostMapping("/comparatives/{id}/threshold-approve")
   @PreAuthorize(VIEW)
+  @OwnedRecord(EbComparative.class)
   public ComparativeView approveThreshold(
       @PathVariable Long id,
       @RequestParam Long companyId,
@@ -196,6 +204,7 @@ public class ComparativeController {
    */
   @PostMapping("/comparatives/{id}/return")
   @PreAuthorize(APPROVERS)
+  @OwnedRecord(EbComparative.class)
   public ComparativeView returnToAo(
       @PathVariable Long id, @RequestParam Long companyId, @RequestBody RemarksRequest request) {
     return view(approval.returnToAo(companyId, id, request.remarks()));
@@ -210,6 +219,7 @@ public class ComparativeController {
    */
   @PostMapping("/comparatives/{id}/present")
   @PreAuthorize(MARKET)
+  @OwnedRecord(EbComparative.class)
   public ComparativeView present(@PathVariable Long id, @RequestParam Long companyId) {
     return view(presenter.present(companyId, id));
   }
@@ -225,6 +235,7 @@ public class ComparativeController {
   @PostMapping("/comparatives/{id}/comments")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(VIEW)
+  @OwnedRecord(EbComparative.class)
   public CommentView comment(
       @PathVariable Long id, @RequestParam Long companyId, @RequestBody CommentRequest request) {
     return CommentView.from(
@@ -241,6 +252,7 @@ public class ComparativeController {
    */
   @GetMapping("/comparatives/{id}/export")
   @PreAuthorize(VIEW)
+  @OwnedRecord(EbComparative.class)
   public ResponseEntity<byte[]> export(
       @PathVariable Long id,
       @RequestParam Long companyId,

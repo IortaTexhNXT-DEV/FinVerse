@@ -6,9 +6,11 @@ import com.iortatechnxt.brokerverse.coa.api.dto.GlAccountRequest;
 import com.iortatechnxt.brokerverse.coa.api.dto.GlAccountResponse;
 import com.iortatechnxt.brokerverse.coa.api.dto.GlCategoryRequest;
 import com.iortatechnxt.brokerverse.coa.api.dto.GlCategoryResponse;
+import com.iortatechnxt.brokerverse.coa.domain.GlAccount;
 import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
 import com.iortatechnxt.brokerverse.coa.service.CoaNumberingService;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for the chart of accounts and GL categories. */
+@OwnedRecord(GlAccount.class)
 @RestController
 @RequestMapping("/api/v1/coa")
 public class ChartOfAccountsController {

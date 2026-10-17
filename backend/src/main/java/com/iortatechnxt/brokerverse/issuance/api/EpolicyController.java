@@ -1,11 +1,14 @@
 package com.iortatechnxt.brokerverse.issuance.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.issuance.api.dto.ConfirmPolicyRequest;
 import com.iortatechnxt.brokerverse.issuance.api.dto.EpolicyResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.RejectRequest;
 import com.iortatechnxt.brokerverse.issuance.api.dto.ReviewResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.UploadBatchResponse;
 import com.iortatechnxt.brokerverse.issuance.api.dto.UploadChoiceRequest;
+import com.iortatechnxt.brokerverse.issuance.domain.Epolicy;
+import com.iortatechnxt.brokerverse.issuance.domain.UploadBatch;
 import com.iortatechnxt.brokerverse.issuance.service.EpolicyService;
 import com.iortatechnxt.brokerverse.issuance.service.EpolicyService.ReceivedFile;
 import com.iortatechnxt.brokerverse.issuance.service.EpolicyUploadConfirmation;
@@ -89,6 +92,7 @@ public class EpolicyController {
    */
   @GetMapping("/epolicies/{id}")
   @PreAuthorize(IssuanceController.VIEW)
+  @OwnedRecord(Epolicy.class)
   public ReviewResponse review(@PathVariable Long id) {
     return ReviewResponse.from(epolicies.review(id));
   }
@@ -101,6 +105,7 @@ public class EpolicyController {
    */
   @PostMapping("/epolicies/{id}/extract")
   @PreAuthorize(IssuanceController.MANAGE)
+  @OwnedRecord(Epolicy.class)
   public ReviewResponse extract(@PathVariable Long id) {
     epolicies.reextract(id);
     return ReviewResponse.from(epolicies.review(id));
@@ -115,6 +120,7 @@ public class EpolicyController {
    */
   @PostMapping("/epolicies/{id}/confirm")
   @PreAuthorize(IssuanceController.MANAGE)
+  @OwnedRecord(Epolicy.class)
   public ReviewResponse confirm(
       @PathVariable Long id, @Valid @RequestBody ConfirmPolicyRequest request) {
     epolicies.confirm(id, request.policyNumbers(), request.issueDate());
@@ -130,6 +136,7 @@ public class EpolicyController {
    */
   @PostMapping("/epolicies/{id}/reject")
   @PreAuthorize(IssuanceController.MANAGE)
+  @OwnedRecord(Epolicy.class)
   public EpolicyResponse reject(@PathVariable Long id, @Valid @RequestBody RejectRequest request) {
     return EpolicyResponse.from(epolicies.reject(id, request.reasonCode(), request.remarks()));
   }
@@ -163,6 +170,7 @@ public class EpolicyController {
    */
   @GetMapping("/epolicy-uploads/{id}")
   @PreAuthorize(IssuanceController.MANAGE)
+  @OwnedRecord(UploadBatch.class)
   public UploadBatchResponse bulk(@PathVariable Long id) {
     return UploadBatchResponse.from(uploads.get(id));
   }
@@ -177,6 +185,7 @@ public class EpolicyController {
    */
   @PostMapping("/epolicy-uploads/{id}/items/{itemId}")
   @PreAuthorize(IssuanceController.MANAGE)
+  @OwnedRecord(UploadBatch.class)
   public UploadBatchResponse choose(
       @PathVariable Long id,
       @PathVariable Long itemId,
@@ -192,6 +201,7 @@ public class EpolicyController {
    */
   @PostMapping("/epolicy-uploads/{id}/confirm")
   @PreAuthorize(IssuanceController.MANAGE)
+  @OwnedRecord(UploadBatch.class)
   public UploadBatchResponse confirmBulk(@PathVariable Long id) {
     return UploadBatchResponse.from(confirmation.confirm(id));
   }
@@ -204,6 +214,7 @@ public class EpolicyController {
    */
   @PostMapping("/epolicy-uploads/{id}/discard")
   @PreAuthorize(IssuanceController.MANAGE)
+  @OwnedRecord(UploadBatch.class)
   public UploadBatchResponse discard(@PathVariable Long id) {
     return UploadBatchResponse.from(uploads.discard(id));
   }

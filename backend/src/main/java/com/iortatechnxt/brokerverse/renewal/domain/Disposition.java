@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +14,7 @@ import jakarta.persistence.Table;
  * history with their source (BRRN.018, RQ14). A matrix decision stores the matrix version and the
  * rule id (BRRN.034 AC 3).
  */
+@OwnedBy(value = RenewalCandidate.class, key = "candidateId")
 @Entity(name = "RnwDisposition")
 @Table(name = "rnw_disposition")
 public class Disposition extends BaseEntity {

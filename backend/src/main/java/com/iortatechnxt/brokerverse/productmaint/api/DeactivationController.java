@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.productmaint.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.productmaint.domain.DeactivationRequest;
 import com.iortatechnxt.brokerverse.productmaint.domain.DeactivationRequest.Details;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  * reason, remarks and approver, the approval or rejection with remarks, the withdrawal and the
  * reassignment of the approver. Supporting documents are attachments of the request.
  */
+@OwnedRecord(DeactivationRequest.class)
 @RestController
 @RequestMapping("/api/v1/product-maintenance/deactivations")
 public class DeactivationController {

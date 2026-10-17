@@ -5,10 +5,12 @@ import com.iortatechnxt.brokerverse.accounting.api.dto.EventTypeResponse;
 import com.iortatechnxt.brokerverse.accounting.api.dto.RuleRequest;
 import com.iortatechnxt.brokerverse.accounting.api.dto.RuleResponse;
 import com.iortatechnxt.brokerverse.accounting.api.dto.SimulationRequest;
+import com.iortatechnxt.brokerverse.accounting.domain.AccountingRule;
 import com.iortatechnxt.brokerverse.accounting.domain.EventStatus;
 import com.iortatechnxt.brokerverse.accounting.service.AccountingRuleService;
 import com.iortatechnxt.brokerverse.accounting.service.AccountingRuleService.Simulation;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Accounting engine configuration: event types, rules, simulator and event register. */
+@OwnedRecord(AccountingRule.class)
 @RestController
 @RequestMapping("/api/v1/accounting")
 public class AccountingRuleController {

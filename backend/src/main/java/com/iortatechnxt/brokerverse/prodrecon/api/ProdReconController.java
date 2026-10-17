@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.prodrecon.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.BulkFeedbackRequest;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.CommentRequest;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.CycleResponse;
@@ -8,7 +9,9 @@ import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.FeedbackRequ
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.ItemQuery;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.ItemResponse;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.PairRequest;
+import com.iortatechnxt.brokerverse.prodrecon.domain.ReconCycle;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconEnums.UnbookedStatus;
+import com.iortatechnxt.brokerverse.prodrecon.domain.ReconItem;
 import com.iortatechnxt.brokerverse.prodrecon.service.EarlyIncentiveValidator;
 import com.iortatechnxt.brokerverse.prodrecon.service.EarlyIncentiveValidator.Line;
 import com.iortatechnxt.brokerverse.prodrecon.service.ReconCycleService;
@@ -102,6 +105,7 @@ public class ProdReconController {
    */
   @GetMapping("/cycles/{id}")
   @PreAuthorize(ReconAccess.READ)
+  @OwnedRecord(ReconCycle.class)
   public CycleResponse cycle(@PathVariable Long id) {
     return CycleResponse.from(cycles.view(id));
   }
@@ -115,6 +119,7 @@ public class ProdReconController {
    */
   @GetMapping("/cycles/{id}/items")
   @PreAuthorize(ReconAccess.READ)
+  @OwnedRecord(ReconCycle.class)
   public PageResponse<ItemResponse> items(@PathVariable Long id, ItemQuery query) {
     return PageResponse.of(
         items.items(
@@ -139,6 +144,7 @@ public class ProdReconController {
    */
   @PostMapping("/cycles/{id}/automatch")
   @PreAuthorize(ReconAccess.PROCESS)
+  @OwnedRecord(ReconCycle.class)
   public Map<String, Integer> automatch(@PathVariable Long id) {
     return Map.of("changed", matching.rematch(id));
   }
@@ -152,6 +158,7 @@ public class ProdReconController {
    */
   @PostMapping("/cycles/{id}/close")
   @PreAuthorize(ReconAccess.PROCESS)
+  @OwnedRecord(ReconCycle.class)
   public CycleResponse close(@PathVariable Long id, @Valid @RequestBody CommentRequest request) {
     cycles.close(id, request.comment());
     return CycleResponse.from(cycles.view(id));
@@ -165,6 +172,7 @@ public class ProdReconController {
    */
   @GetMapping("/cycles/{id}/early-incentive")
   @PreAuthorize(ReconAccess.READ)
+  @OwnedRecord(ReconCycle.class)
   public List<Line> earlyIncentive(@PathVariable Long id) {
     return incentives.validate(cycles.require(id).getCompanyId(), id);
   }
@@ -178,6 +186,7 @@ public class ProdReconController {
    */
   @PutMapping("/items/{id}/feedback")
   @PreAuthorize(ReconAccess.PROCESS)
+  @OwnedRecord(ReconItem.class)
   public ItemResponse feedback(@PathVariable Long id, @Valid @RequestBody FeedbackRequest request) {
     return ItemResponse.from(items.feedback(id, request.toFeedback()));
   }
@@ -212,6 +221,7 @@ public class ProdReconController {
    */
   @PostMapping("/items/{id}/pair")
   @PreAuthorize(ReconAccess.PROCESS)
+  @OwnedRecord(ReconItem.class)
   public ItemResponse pair(@PathVariable Long id, @Valid @RequestBody PairRequest request) {
     return ItemResponse.from(matching.pair(id, request.insurerItemId()));
   }
@@ -224,6 +234,7 @@ public class ProdReconController {
    */
   @PostMapping("/items/{id}/split")
   @PreAuthorize(ReconAccess.PROCESS)
+  @OwnedRecord(ReconItem.class)
   public ItemResponse split(@PathVariable Long id) {
     return ItemResponse.from(matching.split(id));
   }

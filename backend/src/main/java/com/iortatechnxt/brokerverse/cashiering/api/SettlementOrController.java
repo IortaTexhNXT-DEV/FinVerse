@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.cashiering.api;
 import com.iortatechnxt.brokerverse.cashiering.domain.SettlementOr;
 import com.iortatechnxt.brokerverse.cashiering.service.SettlementOrService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.math.BigDecimal;
 import java.time.Instant;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The commission and incentive ORs of insurer settlements waiting for the approval of Disbursement
  * (FRS.CSH.07.01.01; Appendix R, C12), and issuing again an OR that could not be issued.
  */
+@OwnedRecord(SettlementOr.class)
 @RestController
 @RequestMapping("/api/v1/cashiering/settlement-ors")
 public class SettlementOrController {

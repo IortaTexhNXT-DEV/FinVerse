@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.subledger.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
 import com.iortatechnxt.brokerverse.subledger.api.dto.AgeingResponse;
 import com.iortatechnxt.brokerverse.subledger.api.dto.MatchRequest;
 import com.iortatechnxt.brokerverse.subledger.api.dto.OpenItemResponse;
+import com.iortatechnxt.brokerverse.subledger.domain.OpenItem;
 import com.iortatechnxt.brokerverse.subledger.service.AgeingService;
 import com.iortatechnxt.brokerverse.subledger.service.OpenItemService;
 import jakarta.validation.Valid;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Party sub-ledger inquiry and matching (knock-off). */
+@OwnedRecord(OpenItem.class)
 @RestController
 @RequestMapping("/api/v1/subledger")
 public class SubLedgerController {

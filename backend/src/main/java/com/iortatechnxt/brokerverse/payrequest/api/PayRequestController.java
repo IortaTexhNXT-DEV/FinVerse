@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.payrequest.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.crm.api.dto.PayoutAccountResponse;
 import com.iortatechnxt.brokerverse.crm.service.ClientPayoutAccounts;
 import com.iortatechnxt.brokerverse.payrequest.api.dto.PayRequestInputs.CashAdvanceInput;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
  * with its validations, the forms (raise and change an RRF, an RFP or a check cancellation), the
  * printable request form and the client's known CA / SA information.
  */
+@OwnedRecord(PaymentRequest.class)
 @RestController
 @RequestMapping("/api/v1/payment-requests")
 public class PayRequestController {

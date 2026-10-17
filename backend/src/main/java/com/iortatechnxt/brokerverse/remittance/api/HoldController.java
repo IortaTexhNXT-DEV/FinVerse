@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInService;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.AssignRequest;
@@ -11,6 +12,7 @@ import com.iortatechnxt.brokerverse.remittance.api.dto.RequestDtos.ExtendRequest
 import com.iortatechnxt.brokerverse.remittance.api.dto.RequestDtos.HoldCreateRequest;
 import com.iortatechnxt.brokerverse.remittance.api.dto.RequestDtos.HoldResponse;
 import com.iortatechnxt.brokerverse.remittance.api.dto.RequestDtos.HoldTermsRequest;
+import com.iortatechnxt.brokerverse.remittance.domain.HoldRequest;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.HoldStage;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RequestSource;
 import com.iortatechnxt.brokerverse.remittance.service.HoldService;
@@ -37,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Marketing hold requests (MKTID.002-007, RMTID.021/031): list, create, submit, approve, reject,
  * extend, cancel, release, assign and the Collection hold file upload ({@code COLLECTION_HOLD}).
  */
+@OwnedRecord(HoldRequest.class)
 @RestController
 @RequestMapping("/api/v1/remittance/holds")
 public class HoldController {

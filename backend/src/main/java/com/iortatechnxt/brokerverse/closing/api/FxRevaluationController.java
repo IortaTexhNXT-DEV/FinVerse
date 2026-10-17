@@ -3,7 +3,9 @@ package com.iortatechnxt.brokerverse.closing.api;
 import com.iortatechnxt.brokerverse.closing.api.dto.FxPreviewResponse;
 import com.iortatechnxt.brokerverse.closing.api.dto.FxRevaluationRequest;
 import com.iortatechnxt.brokerverse.closing.api.dto.FxRevaluationResponse;
+import com.iortatechnxt.brokerverse.closing.domain.FxRevaluationRun;
 import com.iortatechnxt.brokerverse.closing.service.FxRevaluationService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Period-end FX revaluation: preview, post (idempotent per period) and run history. */
+@OwnedRecord(FxRevaluationRun.class)
 @RestController
 @RequestMapping("/api/v1/closing/fx-revaluations")
 @PreAuthorize("hasAuthority('PERIOD_END_RUN')")

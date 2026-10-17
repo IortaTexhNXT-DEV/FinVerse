@@ -2,8 +2,10 @@ package com.iortatechnxt.brokerverse.submitted.fee.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import com.iortatechnxt.brokerverse.storage.service.FileDownload;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmHandlingFee;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmNoTouchBatch;
 import com.iortatechnxt.brokerverse.submitted.fee.api.dto.FeeDtos.AmbiguousView;
 import com.iortatechnxt.brokerverse.submitted.fee.api.dto.FeeDtos.BatchView;
@@ -77,6 +79,7 @@ public class FeeController {
    * @return fee
    */
   @GetMapping("/handling-fees/{id}")
+  @OwnedRecord(SbmHandlingFee.class)
   public FeeView get(@PathVariable Long id) {
     return FeeView.from(fees.get(id));
   }
@@ -114,6 +117,7 @@ public class FeeController {
    * @return fee
    */
   @PostMapping("/handling-fees/{id}/tag")
+  @OwnedRecord(SbmHandlingFee.class)
   public FeeView tagByHand(@PathVariable Long id, @Valid @RequestBody TagRequest r) {
     return FeeView.from(fees.tagByHand(id, r.unappliedRef()));
   }
@@ -126,6 +130,7 @@ public class FeeController {
    * @return fee
    */
   @PostMapping("/handling-fees/{id}/cancel")
+  @OwnedRecord(SbmHandlingFee.class)
   public FeeView cancel(@PathVariable Long id, @Valid @RequestBody CancelRequest r) {
     return FeeView.from(fees.cancel(id, r.reason()));
   }
@@ -160,6 +165,7 @@ public class FeeController {
    * @return lines
    */
   @GetMapping("/no-touch/{id}/lines")
+  @OwnedRecord(SbmNoTouchBatch.class)
   public List<LineView> lines(@PathVariable Long id) {
     return noTouch.lines(id).stream().map(LineView::from).toList();
   }
@@ -171,6 +177,7 @@ public class FeeController {
    * @return batch
    */
   @PostMapping("/no-touch/{id}/bill")
+  @OwnedRecord(SbmNoTouchBatch.class)
   public BatchView bill(@PathVariable Long id) {
     return BatchView.from(noTouch.bill(id));
   }
@@ -184,6 +191,7 @@ public class FeeController {
    * @return the file
    */
   @GetMapping("/no-touch/{id}/{part}")
+  @OwnedRecord(SbmNoTouchBatch.class)
   public ResponseEntity<byte[]> file(
       @PathVariable Long id, @PathVariable String part, HttpServletRequest request) {
     SbmNoTouchBatch b = noTouch.get(id);

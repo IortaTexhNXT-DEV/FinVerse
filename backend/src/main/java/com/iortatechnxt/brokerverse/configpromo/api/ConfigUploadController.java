@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.bulk.domain.BulkJob;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowStatus;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.ConfigUploadJobResponse;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.ConfigUploadTypeResponse;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.DecisionRequest;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
  * and preview, and the approval by a second user before the rows are applied. Each upload type
  * checks its own maintenance and approval permissions.
  */
+@OwnedRecord(BulkJob.class)
 @RestController
 @RequestMapping("/api/v1/config-uploads")
 @PreAuthorize("isAuthenticated()")

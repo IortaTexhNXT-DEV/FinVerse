@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.audit.service;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
+import com.iortatechnxt.brokerverse.common.security.UserDataScope;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
@@ -16,11 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * The company and branch that own a logged master record (G05), read from the record itself: its
  * {@code getCompanyId()} / {@code getBranchId()} accessors, or its {@code getCompany()} association
- * (a branch), or the record id for a company. A record without any of these is programme-wide.
+ * (a branch), or the record id for a company, or, for a record marked {@link OwnedBy}, the owner of
+ * its parent record, or, for a record linked to another by {@code getEntityType()} / {@code
+ * getEntityId()} (an attachment), the owner of the linked record. A record without any of these is
+ * programme-wide.
  */
 @Service
 @Transactional(readOnly = true)
 public class RecordOwnership {
+
+  /** Parent records followed at most, against a loop in the declarations. */
+  private static final int MAX_PARENTS = 4;
 
   /** Record type of a company in the log. */
   static final String COMPANY_TYPE = "Company";
@@ -67,8 +75,86 @@ public class RecordOwnership {
     if (type == null || entityId == null) {
       return Optional.empty();
     }
-    return Optional.ofNullable(em.find(type, entityId))
-        .map(row -> owner(entityType, entityId, row));
+    return ownerOf(type, entityId);
+  }
+
+  /**
+   * Resolves the owner of a record of a known type.
+   *
+   * @param type entity class
+   * @param entityId record id
+   * @return owner, empty when the record does not exist
+   */
+  public Optional<Owner> ownerOf(Class<?> type, Long entityId) {
+    return resolve(type, entityId, 0);
+  }
+
+  /**
+   * Whether a reader of the given scope may see a record of the given owner: a programme-wide
+   * record is visible to everyone, a company or branch record to a reader whose scope holds it. An
+   * unknown record is not visible.
+   *
+   * @param scope data scope of the reader
+   * @param owner owner of the record, empty when unknown
+   * @return true when visible
+   */
+  public static boolean visible(UserDataScope scope, Optional<Owner> owner) {
+    if (scope.allCompanies()) {
+      return true;
+    }
+    if (owner.isEmpty()) {
+      return false;
+    }
+    Owner o = owner.get();
+    if (o.company() == null) {
+      return true;
+    }
+    return o.branch() == null
+        ? scope.allowsCompany(o.company())
+        : scope.allowsBranch(o.company(), o.branch());
+  }
+
+  private Optional<Owner> resolve(Class<?> type, Object entityId, int depth) {
+    if (entityId == null) {
+      return Optional.empty();
+    }
+    Object row = em.find(type, entityId);
+    if (row == null) {
+      return Optional.empty();
+    }
+    return Optional.of(ownerOfRow(type, entityId, row, depth));
+  }
+
+  private Owner ownerOfRow(Class<?> type, Object entityId, Object row, int depth) {
+    Owner own = owner(type.getSimpleName(), entityId instanceof Long l ? l : null, row);
+    if (own.company() != null || depth >= MAX_PARENTS) {
+      return own;
+    }
+    OwnedBy parent = type.getAnnotation(OwnedBy.class);
+    if (parent == null) {
+      return linkedOwner(row, depth).orElse(own);
+    }
+    String getter =
+        "get" + Character.toUpperCase(parent.key().charAt(0)) + parent.key().substring(1);
+    Object key = valueOf(row, getter);
+    if (key != null && parent.value().isInstance(key)) {
+      Object parentId = valueOf(key, "getId");
+      return ownerOfRow(parent.value(), parentId, key, depth + 1);
+    }
+    return resolve(parent.value(), key, depth + 1).orElse(Owner.NONE);
+  }
+
+  private Optional<Owner> linkedOwner(Object row, int depth) {
+    if (!(valueOf(row, "getEntityType") instanceof String linkedType)
+        || !(valueOf(row, "getEntityId") instanceof String linkedId)
+        || !types.containsKey(linkedType)) {
+      return Optional.empty();
+    }
+    try {
+      return resolve(types.get(linkedType), Long.valueOf(linkedId.trim()), depth + 1);
+    } catch (NumberFormatException ex) {
+      return Optional.empty();
+    }
   }
 
   private static Owner owner(String entityType, Long entityId, Object row) {

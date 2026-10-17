@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.submitted.processing.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLoanMatch;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLoanMatchRepository;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Loan file results of a processing run (FR-SP-035): per record, the loan file and key that
  * matched, or the reason it is unmatched, with the time stamp, within the user's scope.
  */
+@OwnedRecord(SbmRun.class)
 @RestController
 @RequestMapping("/api/v1/submitted/runs")
 public class LoanMatchController {

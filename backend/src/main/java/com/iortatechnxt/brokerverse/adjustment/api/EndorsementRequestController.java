@@ -18,6 +18,7 @@ import com.iortatechnxt.brokerverse.adjustment.service.PolicyLinks.PolicyLink;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.util.List;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * preview and recompute, raise and change, the requests of an invoice, the endorsement slip and the
  * validation slip.
  */
+@OwnedRecord(EndorsementRequest.class)
 @RestController
 @RequestMapping("/api/v1/adjustment")
 public class EndorsementRequestController {

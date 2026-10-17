@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.CoverageDtos.ClauseResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.CoverageDtos.CoverageRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.CoverageDtos.CoverageResponse;
 import com.iortatechnxt.brokerverse.catalog.service.CoverageService;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Coverage / peril master and clause library (PMADD01/02). Authorisation and deactivation run
  * through {@code /api/v1/catalog/records/{COVERAGE|CLAUSE}/{id}}.
  */
+@GlobalRecord("programme-wide product catalog master")
 @RestController
 @RequestMapping("/api/v1/catalog")
 public class CoverageController {

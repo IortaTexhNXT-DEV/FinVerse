@@ -3,9 +3,12 @@ package com.iortatechnxt.brokerverse.brokerclaims.diary.api;
 import com.iortatechnxt.brokerverse.brokerclaims.diary.api.dto.DiaryDtos.DiaryEntryResponse;
 import com.iortatechnxt.brokerverse.brokerclaims.diary.api.dto.DiaryDtos.DiaryRequest;
 import com.iortatechnxt.brokerverse.brokerclaims.diary.api.dto.DiaryDtos.DoneRequest;
+import com.iortatechnxt.brokerverse.brokerclaims.diary.domain.DiaryEntry;
 import com.iortatechnxt.brokerverse.brokerclaims.diary.service.DiaryQuery;
 import com.iortatechnxt.brokerverse.brokerclaims.diary.service.DiaryService;
+import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** The claims diary: the Diary tab of a claim and My Diary (BRCLM.022/034; FR-CM-052). */
+@OwnedRecord(Claim.class)
+@OwnedRecord(value = DiaryEntry.class, variable = "entryId")
 @RestController
 @RequestMapping("/api/v1/broker-claims")
 public class DiaryController {

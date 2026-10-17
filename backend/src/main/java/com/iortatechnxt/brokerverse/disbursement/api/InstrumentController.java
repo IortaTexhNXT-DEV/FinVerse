@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.disbursement.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.InstrumentDtos.EmailRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.InstrumentDtos.ReferenceRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.InstrumentDtos.ReleaseRequest;
@@ -9,6 +10,8 @@ import com.iortatechnxt.brokerverse.disbursement.api.dto.InstrumentDtos.StatusEd
 import com.iortatechnxt.brokerverse.disbursement.api.dto.InstrumentDtos.StatusEditResponse;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.RequestDtos.RequestResponse;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.VoucherDtos.VoucherResponse;
+import com.iortatechnxt.brokerverse.disbursement.domain.StatusEdit;
+import com.iortatechnxt.brokerverse.disbursement.domain.Voucher;
 import com.iortatechnxt.brokerverse.disbursement.service.InstrumentActions;
 import com.iortatechnxt.brokerverse.disbursement.service.InstrumentService.Change;
 import com.iortatechnxt.brokerverse.disbursement.service.StatusEditService;
@@ -32,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
  * branch or BOB debit, receive an MC / DD, re-issue a stale check, and the status edits submitted
  * for the team leader's approval.
  */
+@OwnedRecord(Voucher.class)
+@OwnedRecord(value = StatusEdit.class, variable = "editId")
 @RestController
 @RequestMapping("/api/v1/disbursement")
 public class InstrumentController {

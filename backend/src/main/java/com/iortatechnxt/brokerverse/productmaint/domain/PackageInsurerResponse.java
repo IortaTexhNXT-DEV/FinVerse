@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
  * (JSON), conditions, validity and the response document. Every change raises the revision and is
  * kept in {@link PackageResponseHistory}; the last quotation slip e-mail is kept for the resend.
  */
+@OwnedBy(value = NegotiationRound.class, key = "roundId")
 @Entity
 @Table(name = "pm_insurer_response")
 public class PackageInsurerResponse extends BaseEntity {

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.productmaint.domain.MasterChange;
 import com.iortatechnxt.brokerverse.productmaint.domain.MasterChangeRepository;
 import com.iortatechnxt.brokerverse.productmaint.domain.MasterInboxFile;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * the changes with their status, file and error, the target, Send Now, reprocessing of a failed
  * change and, in SIT and UAT, the files received by the simulated receiving system.
  */
+@GlobalRecord("product master changes are programme-wide")
 @RestController
 @RequestMapping("/api/v1/product-maintenance/master-changes")
 public class MasterChangeController {

@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.migration.intake.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
+import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +15,7 @@ import java.time.Instant;
  * severity, the field and value and the message, and how the issue was resolved (fixed at source,
  * mapped, waived by the data owner with a reason, or the row excluded with a manual-entry plan).
  */
+@OwnedBy(value = MigBatch.class, key = "batchId")
 @Entity
 @Table(name = "mig_issue")
 public class MigIssue extends BaseEntity {

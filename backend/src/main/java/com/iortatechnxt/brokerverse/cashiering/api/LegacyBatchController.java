@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.LegacyBatch;
 import com.iortatechnxt.brokerverse.cashiering.domain.LegacyBatchLine;
 import com.iortatechnxt.brokerverse.cashiering.service.LegacyBatchService;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * reclassification of old unapplied payments to other income and reversal of legacy PR 2307
  * balances, each prepared, submitted, approved and posted line by line.
  */
+@OwnedRecord(value = LegacyBatchLine.class, variable = "lineId")
 @RestController
 @RequestMapping("/api/v1/cashiering/legacy-batches")
 public class LegacyBatchController {

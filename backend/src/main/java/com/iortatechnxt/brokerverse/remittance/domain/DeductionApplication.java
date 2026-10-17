@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -12,6 +13,7 @@ import java.time.Instant;
  * journal of its {@code OPS_REMIT_DEDUCTION} posting; reversed when the batch's DV is cancelled
  * (DIS 2.20.0).
  */
+@OwnedBy(value = RemittanceDeduction.class, key = "deductionId")
 @Entity
 @Table(name = "rem_deduction_application")
 public class DeductionApplication extends BaseEntity {

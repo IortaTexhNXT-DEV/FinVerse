@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.MftIntakeService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
  * again, the profiles of the file types, the MFT intake on demand and, in the SIT and UAT
  * environments, the channel simulator.
  */
+@OwnedRecord(ChannelFile.class)
 @RestController
 @RequestMapping("/api/v1/cashiering/payment-files")
 public class ChannelFileController {

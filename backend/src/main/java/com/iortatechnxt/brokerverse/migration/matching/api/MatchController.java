@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.matching.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatchRepository;
 import com.iortatechnxt.brokerverse.migration.load.service.BatchPlanService;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Client matching review (FR-DM-031; screen Matching): the queue of doubtful pairs, the two records
  * side by side and the Data Steward's merge or keep-separate decision.
  */
+@OwnedRecord(value = ClientMatch.class, variable = "pairId")
 @RestController
 @RequestMapping("/api/v1/migration/matches")
 @Transactional

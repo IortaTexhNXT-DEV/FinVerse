@@ -6,8 +6,10 @@ import com.iortatechnxt.brokerverse.collections.worklist.api.dto.AssignmentDtos.
 import com.iortatechnxt.brokerverse.collections.worklist.api.dto.AssignmentDtos.RuleRequest;
 import com.iortatechnxt.brokerverse.collections.worklist.api.dto.AssignmentDtos.RuleResponse;
 import com.iortatechnxt.brokerverse.collections.worklist.api.dto.AssignmentDtos.SelectionResponse;
+import com.iortatechnxt.brokerverse.collections.worklist.domain.AssignmentRule;
 import com.iortatechnxt.brokerverse.collections.worklist.service.AssignmentRuleService;
 import com.iortatechnxt.brokerverse.collections.worklist.service.AssignmentService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * selected accounts or of the accounts matching criteria (client, unit, aging, amount) with a
  * preview, permanent or temporary.
  */
+@OwnedRecord(AssignmentRule.class)
 @RestController
 @RequestMapping("/api/v1/collections")
 public class AssignmentController {

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.payables.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,6 +10,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 
 /** Status history (confirmation audit trail) of a post-dated cheque issued. Insert only. */
+@OwnedBy(value = IssuedPdc.class, key = "pdcId")
 @Entity
 @Table(name = "pay_pdc_event")
 public class IssuedPdcEvent extends BaseEntity {

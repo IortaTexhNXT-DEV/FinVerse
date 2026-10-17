@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.report.api;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportSubscriptionDtos;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportSubscriptionDtos.RunResponse;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportSubscriptionDtos.SubscriptionRequest;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * frequency, format and recipients, change or stop it, and follow its runs. The report's export
  * permission and the data scope are checked on subscribing and again at every run.
  */
+@GlobalRecord("a report subscription belongs to its owner, checked by the service")
 @RestController
 @RequestMapping("/api/v1/report-subscriptions")
 @PreAuthorize("hasAuthority('REPORT_VIEW')")

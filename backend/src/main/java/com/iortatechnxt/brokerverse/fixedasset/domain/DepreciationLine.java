@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.fixedasset.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -9,6 +10,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 
 /** Depreciation charged to one asset in a run, with its position after the charge. */
+@OwnedBy(value = DepreciationRun.class, key = "run")
 @Entity
 @Table(name = "fa_depreciation_line")
 public class DepreciationLine extends BaseEntity {

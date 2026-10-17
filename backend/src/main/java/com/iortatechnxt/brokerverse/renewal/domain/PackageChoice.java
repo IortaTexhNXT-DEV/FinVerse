@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +16,7 @@ import java.util.Objects;
  * resolve (DMQ36; FR-RN-028): chosen with a reason by a member of the Renewal processing team
  * (maker, created by) and approved or rejected by a second member.
  */
+@OwnedBy(value = RenewalCandidate.class, key = "candidateId")
 @Entity
 @Table(name = "rnw_package_choice")
 public class PackageChoice extends BaseEntity {

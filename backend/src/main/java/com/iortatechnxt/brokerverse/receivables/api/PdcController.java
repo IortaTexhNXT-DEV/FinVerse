@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.receivables.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.receivables.api.dto.DateRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.PdcReplaceRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.PdcRequest;
@@ -7,6 +8,7 @@ import com.iortatechnxt.brokerverse.receivables.api.dto.PdcResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReversalRequest;
 import com.iortatechnxt.brokerverse.receivables.domain.PdcStatus;
+import com.iortatechnxt.brokerverse.receivables.domain.PostDatedCheque;
 import com.iortatechnxt.brokerverse.receivables.service.PdcService;
 import com.iortatechnxt.brokerverse.receivables.service.ReceiptService;
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Register of post-dated cheques received. */
+@OwnedRecord(PostDatedCheque.class)
 @RestController
 @RequestMapping("/api/v1/receivables/pdcs")
 public class PdcController {

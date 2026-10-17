@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.acsl.api.dto.SoaViews.LayoutView;
 import com.iortatechnxt.brokerverse.acsl.api.dto.SoaViews.LogView;
 import com.iortatechnxt.brokerverse.acsl.api.dto.SoaViews.ResultView;
 import com.iortatechnxt.brokerverse.acsl.api.dto.SoaViews.UploadView;
+import com.iortatechnxt.brokerverse.acsl.domain.GlSlRun;
 import com.iortatechnxt.brokerverse.acsl.domain.ReconBucket;
 import com.iortatechnxt.brokerverse.acsl.domain.SoaUpload;
 import com.iortatechnxt.brokerverse.acsl.report.SoaReconReport;
@@ -17,6 +18,7 @@ import com.iortatechnxt.brokerverse.acsl.service.SoaUploadService;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.core.ReportService.RenderedReport;
@@ -110,6 +112,7 @@ public class AcslReconController {
    */
   @GetMapping(UPLOAD)
   @PreAuthorize(AcslAccess.VIEW)
+  @OwnedRecord(SoaUpload.class)
   public UploadView upload(@PathVariable Long id) {
     return view(queries.upload(id));
   }
@@ -122,6 +125,7 @@ public class AcslReconController {
    */
   @GetMapping(UPLOAD + "/log")
   @PreAuthorize(AcslAccess.VIEW)
+  @OwnedRecord(SoaUpload.class)
   public List<LogView> log(@PathVariable Long id) {
     return queries.uploadLog(id).stream().map(LogView::from).toList();
   }
@@ -135,6 +139,7 @@ public class AcslReconController {
    */
   @GetMapping(UPLOAD + "/results")
   @PreAuthorize(AcslAccess.VIEW)
+  @OwnedRecord(SoaUpload.class)
   public List<ResultView> results(
       @PathVariable Long id, @RequestParam(required = false) ReconBucket bucket) {
     return queries.results(queries.upload(id), bucket).stream().map(ResultView::from).toList();
@@ -148,6 +153,7 @@ public class AcslReconController {
    */
   @GetMapping(UPLOAD + "/report")
   @PreAuthorize(AcslAccess.EXPORT)
+  @OwnedRecord(SoaUpload.class)
   public ResponseEntity<byte[]> report(@PathVariable Long id) {
     SoaUpload upload = queries.upload(id);
     RenderedReport file =
@@ -238,6 +244,7 @@ public class AcslReconController {
    */
   @PostMapping(UPLOAD + "/reconcile")
   @PreAuthorize(AcslAccess.UPLOAD)
+  @OwnedRecord(SoaUpload.class)
   public UploadView reconcile(@PathVariable Long id) {
     return view(soa.reconcile(id));
   }
@@ -262,6 +269,7 @@ public class AcslReconController {
    */
   @GetMapping("/gl-sl/runs/{id}/rows")
   @PreAuthorize(AcslAccess.VIEW)
+  @OwnedRecord(GlSlRun.class)
   public List<GlSlRowView> rows(@PathVariable Long id) {
     return glsl.rows(id).stream().map(GlSlRowView::from).toList();
   }

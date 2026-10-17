@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.productmaint.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
  * Insert-only snapshot of a package insurer response after each change (PMADD04: every revision and
  * outcome change is logged).
  */
+@OwnedBy(value = PackageInsurerResponse.class, key = "responseId")
 @Entity
 @Table(name = "pm_insurer_response_history")
 public class PackageResponseHistory {

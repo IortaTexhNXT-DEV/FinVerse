@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.receivables.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.receivables.api.dto.AutoMatchRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.BankStatementLineResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.BrsResponse;
@@ -10,6 +11,9 @@ import com.iortatechnxt.brokerverse.receivables.api.dto.ReconciliationRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReconciliationResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.StatementImportRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.StatementResponse;
+import com.iortatechnxt.brokerverse.receivables.domain.BankMatch;
+import com.iortatechnxt.brokerverse.receivables.domain.BankReconciliation;
+import com.iortatechnxt.brokerverse.receivables.domain.BankStatement;
 import com.iortatechnxt.brokerverse.receivables.service.BankMatchingService;
 import com.iortatechnxt.brokerverse.receivables.service.BankReconciliationService;
 import com.iortatechnxt.brokerverse.receivables.service.BankStatementService;
@@ -93,6 +97,7 @@ public class BankReconciliationController {
    */
   @GetMapping("/statements/{id}/lines")
   @PreAuthorize("hasAuthority('RECONCILIATION_MANAGE')")
+  @OwnedRecord(BankStatement.class)
   public List<BankStatementLineResponse> lines(@PathVariable Long id) {
     return statements.lines(id).stream().map(BankStatementLineResponse::from).toList();
   }
@@ -161,6 +166,7 @@ public class BankReconciliationController {
    */
   @PostMapping("/matches/{id}/unmatch")
   @PreAuthorize("hasAuthority('RECONCILIATION_MANAGE')")
+  @OwnedRecord(BankMatch.class)
   public MatchResponse unmatch(@PathVariable Long id) {
     return MatchResponse.from(matching.unmatch(id));
   }
@@ -214,6 +220,7 @@ public class BankReconciliationController {
    */
   @PostMapping("/reconciliations/{id}/finalize")
   @PreAuthorize("hasAuthority('RECONCILIATION_MANAGE')")
+  @OwnedRecord(BankReconciliation.class)
   public ReconciliationResponse finalizeReconciliation(@PathVariable Long id) {
     return ReconciliationResponse.from(reconciliation.finalizeReconciliation(id));
   }

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.api;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.ClientViewBody;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.OutputView;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.RequirementsBody;
@@ -10,6 +11,8 @@ import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.SignoffView;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.CommentBody;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.ReasonBody;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.RequestResponse;
+import com.iortatechnxt.brokerverse.productmaint.domain.ComparativeOutput;
+import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.service.ComparativeService;
 import com.iortatechnxt.brokerverse.productmaint.service.ComparativeTable.Selection;
 import com.iortatechnxt.brokerverse.productmaint.service.ManComRouting;
@@ -36,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
  * client views with their PDF / Excel files, the requirements pack, the package slip, the ManCom
  * sign-off, and the MBS set-up, return and retirement.
  */
+@OwnedRecord(PackageRequest.class)
+@OwnedRecord(value = ComparativeOutput.class, variable = "outputId")
 @RestController
 @RequestMapping("/api/v1/product-maintenance/requests/{id}")
 public class PackageOutputsController {

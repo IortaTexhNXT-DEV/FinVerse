@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.RateResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.ShortPeriodRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.ShortPeriodResponse;
 import com.iortatechnxt.brokerverse.catalog.service.RateTableService;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Effective-dated taxes, rating factors, short-period table and motor limits (Appendix A). */
+@GlobalRecord("programme-wide product catalog master")
 @RestController
 @RequestMapping("/api/v1/catalog/rates")
 public class RateTableController {

@@ -1,9 +1,12 @@
 package com.iortatechnxt.brokerverse.period.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.period.api.dto.CreateFiscalYearRequest;
 import com.iortatechnxt.brokerverse.period.api.dto.FiscalYearResponse;
 import com.iortatechnxt.brokerverse.period.api.dto.PeriodResponse;
+import com.iortatechnxt.brokerverse.period.domain.AccountingPeriod;
+import com.iortatechnxt.brokerverse.period.domain.FiscalYear;
 import com.iortatechnxt.brokerverse.period.service.PeriodService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for the financial calendar and period status console. */
+@OwnedRecord(value = FiscalYear.class, variable = "yearId")
+@OwnedRecord(AccountingPeriod.class)
 @RestController
 @RequestMapping("/api/v1/periods")
 public class PeriodController {

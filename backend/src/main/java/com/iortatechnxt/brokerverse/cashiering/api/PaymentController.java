@@ -21,6 +21,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.PaymentPreviewService;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentPreviewService.Preview;
 import com.iortatechnxt.brokerverse.cashiering.service.PrebookedService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Payment intake (CSHID.008/020): the over-the-counter screen with its live application preview,
  * the payments received with their matching result, the pre-booked queue and the automatch run.
  */
+@OwnedRecord(Prebooked.class)
 @RestController
 @RequestMapping("/api/v1/cashiering")
 public class PaymentController {

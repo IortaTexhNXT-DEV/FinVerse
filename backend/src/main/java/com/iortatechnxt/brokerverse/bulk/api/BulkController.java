@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.bulk.api.dto.BulkHandlerResponse;
 import com.iortatechnxt.brokerverse.bulk.api.dto.BulkJobResponse;
 import com.iortatechnxt.brokerverse.bulk.api.dto.BulkRowResponse;
+import com.iortatechnxt.brokerverse.bulk.domain.BulkJob;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowStatus;
 import com.iortatechnxt.brokerverse.bulk.service.BulkHandlerRegistry;
 import com.iortatechnxt.brokerverse.bulk.service.BulkService;
@@ -13,6 +14,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkUpload;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /** Bulk uploads: types, templates, upload and validation, review, commit, reports. */
+@OwnedRecord(BulkJob.class)
 @RestController
 @RequestMapping("/api/v1/bulk")
 @PreAuthorize("hasAuthority('BULK_PROCESS')")

@@ -5,11 +5,14 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.SalesOfficerResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.SalesOrganisationResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.SalesUnitRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.SalesUnitResponse;
+import com.iortatechnxt.brokerverse.catalog.domain.SalesOfficer;
+import com.iortatechnxt.brokerverse.catalog.domain.SalesUnit;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationExport;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService.SalesAssignment;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -75,6 +78,7 @@ public class SalesOrganisationController {
    */
   @PostMapping("/units/{id}/deactivate")
   @PreAuthorize(CatalogAccess.MAINTAIN)
+  @OwnedRecord(SalesUnit.class)
   public SalesUnitResponse deactivateUnit(
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return SalesUnitResponse.from(sales.deactivateUnit(id, request.reason()));
@@ -89,6 +93,7 @@ public class SalesOrganisationController {
    */
   @PostMapping("/units/{id}/reactivate")
   @PreAuthorize(CatalogAccess.MAINTAIN)
+  @OwnedRecord(SalesUnit.class)
   public SalesUnitResponse reactivateUnit(
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return SalesUnitResponse.from(sales.reactivateUnit(id, request.reason()));
@@ -103,6 +108,7 @@ public class SalesOrganisationController {
    */
   @PostMapping("/officers/{id}/remove")
   @PreAuthorize(CatalogAccess.MAINTAIN)
+  @OwnedRecord(SalesOfficer.class)
   public SalesOfficerResponse removeOfficer(
       @PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
     return SalesOfficerResponse.from(sales.removeOfficer(id, request.reason()));
@@ -162,6 +168,7 @@ public class SalesOrganisationController {
    */
   @PutMapping("/units/{id}")
   @PreAuthorize(CatalogAccess.MAINTAIN)
+  @OwnedRecord(SalesUnit.class)
   public SalesUnitResponse updateUnit(
       @PathVariable Long id, @Valid @RequestBody SalesUnitRequest request) {
     return SalesUnitResponse.from(sales.updateUnit(id, request.details()));

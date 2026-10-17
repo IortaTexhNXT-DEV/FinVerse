@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.configpromo.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.BaselineRequest;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.BaselineResponse;
 import com.iortatechnxt.brokerverse.configpromo.api.dto.CatalogueResponse;
@@ -56,6 +57,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Configuration Promotion (System Administration): the catalogue, this environment and its
  * overrides, the exports and the packages kept here, the baselines and the drift report.
  */
+@GlobalRecord("configuration promotion is programme-wide")
 @RestController
 @RequestMapping("/api/v1/config-promotion")
 @PreAuthorize(PromotionController.ANY_PERMISSION)

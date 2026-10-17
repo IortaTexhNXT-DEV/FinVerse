@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.csf.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.csf.domain.ChangeStatus;
 import com.iortatechnxt.brokerverse.csf.service.ChangeQueryService;
 import com.iortatechnxt.brokerverse.csf.service.ChangeQueryService.ChangeFilter;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 030 to 033; CUSTOMER_SERVICING_DESIGN section 10): the search by key type and the tabs of a
  * client, each loaded on its own. Every read is under {@code CSF_VIEW}.
  */
+@OwnedRecord(value = Client.class, variable = "clientId")
 @RestController
 @RequestMapping("/api/v1/csf")
 @PreAuthorize("hasAuthority('CSF_VIEW')")

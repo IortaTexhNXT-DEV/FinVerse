@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.marketing.api;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.ReferralStatus;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Transfer requests for a New Business opportunity and the Transfer Request Monitoring screen (BDOI
  * Renewal FRS FRRN.011.01 to FRRN.011.05).
  */
+@OwnedRecord(RenewalReferral.class)
 @RestController
 @RequestMapping("/api/v1/renewal/referrals")
 @PreAuthorize("hasAnyAuthority('RNW_ASSIGN','RNW_DISPOSE')")

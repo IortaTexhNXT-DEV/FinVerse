@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.screening.config.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.screening.common.api.DecisionRequest;
 import com.iortatechnxt.brokerverse.screening.common.service.ScreeningPermissions;
 import com.iortatechnxt.brokerverse.screening.config.api.dto.ConfigVersionDetail;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * changes, draft, save, submit, approve, reject and discard. Makers need SCR_CONFIG_MAINTAIN,
  * checkers SCR_CONFIG_APPROVE.
  */
+@OwnedRecord(ConfigVersion.class)
 @RestController
 @RequestMapping("/api/v1/screening/config")
 public class ConfigVersionController {

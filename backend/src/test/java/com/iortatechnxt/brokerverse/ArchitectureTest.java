@@ -7,6 +7,11 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noFields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
+import com.iortatechnxt.brokerverse.audit.api.RecordScopeAdvisor;
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.security.DataScopeMappings;
 import com.tngtech.archunit.base.DescribedPredicate;
@@ -21,6 +26,8 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import jakarta.persistence.Entity;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -31,6 +38,9 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,6 +53,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,6 +81,11 @@ import org.springframework.web.bind.annotation.RestController;
  *       (DATA_SCOPE_DESIGN.md): by the interceptor ({@code companyId} query parameter or path
  *       variable), by the body advice (a body with {@code companyId}), or explicitly ({@code
  *       CompanyScoped}).
+ *   <li>Every endpoint that addresses a stored record by a numeric id in its path names the record
+ *       ({@code OwnedRecord}, checked against the data scope before the endpoint runs, HTTP 404
+ *       outside it), checks it explicitly ({@code CompanyScoped}), or is on the explicit allow list
+ *       of programme-wide records ({@code GlobalRecord}); every named record belongs to a company
+ *       (its own company, a parent record of {@code OwnedBy}, or a linked record).
  * </ul>
  *
  * <p>A plain JUnit Jupiter test (not the ArchUnit engine), so it runs in the alphabetical class
@@ -256,6 +272,143 @@ final class ArchitectureTest {
         }
       };
 
+  private static final ArchCondition<JavaMethod> NAME_THE_RECORD_OF_ITS_ID =
+      new ArchCondition<>("name the record a numeric id in its path addresses") {
+        @Override
+        public void check(JavaMethod item, ConditionEvents events) {
+          boolean endpoint =
+              item.getAnnotations().stream()
+                  .anyMatch(a -> MAPPINGS.contains(a.getRawType().getName()));
+          if (!endpoint
+              || item.isAnnotatedWith(GlobalRecord.class)
+              || item.getOwner().isAnnotatedWith(GlobalRecord.class)
+              || item.isAnnotatedWith(CompanyScoped.class)) {
+            return;
+          }
+          Method method = item.reflect();
+          List<String> ids = recordIds(method);
+          Map<String, OwnedRecord> declared =
+              RecordScopeAdvisor.declarations(method.getDeclaringClass(), method);
+          if (!ids.isEmpty() && ids.stream().noneMatch(declared::containsKey)) {
+            events.add(
+                SimpleConditionEvent.violated(
+                    item,
+                    item.getFullName()
+                        + " addresses a record by "
+                        + ids
+                        + " without naming it: declare @OwnedRecord(<entity>.class, variable ="
+                        + " ...) on the method or its controller, or @GlobalRecord(<reason>) for a"
+                        + " programme-wide record"));
+          }
+        }
+      };
+
+  /**
+   * The numeric path variables of an endpoint that address a record (the company itself is checked
+   * by the data scope interceptor).
+   *
+   * @param method endpoint
+   * @return path variable names
+   */
+  static List<String> recordIds(Method method) {
+    List<String> ids = new ArrayList<>();
+    for (Parameter p : method.getParameters()) {
+      PathVariable variable = p.getAnnotation(PathVariable.class);
+      if (variable == null || p.getType() != Long.class && p.getType() != long.class) {
+        continue;
+      }
+      String name =
+          !variable.value().isEmpty()
+              ? variable.value()
+              : !variable.name().isEmpty() ? variable.name() : p.getName();
+      if (!"companyId".equals(name)) {
+        ids.add(name);
+      }
+    }
+    return ids;
+  }
+
+  /**
+   * Every endpoint of the user APIs that addresses a record by a numeric id names it, so the record
+   * scope check refuses a record of a company outside the data scope of the caller (OWASP API1,
+   * IDOR); programme-wide records are on the explicit {@code GlobalRecord} allow list.
+   */
+  private static final ArchRule ID_ENDPOINTS_NAME_THEIR_RECORD =
+      methods()
+          .that()
+          .areDeclaredInClassesThat()
+          .areAnnotatedWith(RestController.class)
+          .and()
+          .areDeclaredInClassesThat()
+          .resideOutsideOfPackage("..integration..")
+          .and()
+          .arePublic()
+          .should(NAME_THE_RECORD_OF_ITS_ID)
+          .because("a user may read or change only the records of his data scope");
+
+  private static final ArchCondition<JavaClass> NAME_COMPANY_RECORDS =
+      new ArchCondition<>("name only records that belong to a company") {
+        @Override
+        public void check(JavaClass item, ConditionEvents events) {
+          Class<?> type = item.reflect();
+          List<OwnedRecord> named = new ArrayList<>();
+          for (Method m : type.getDeclaredMethods()) {
+            named.addAll(List.of(m.getAnnotationsByType(OwnedRecord.class)));
+          }
+          named.addAll(List.of(type.getAnnotationsByType(OwnedRecord.class)));
+          for (OwnedRecord r : named) {
+            if (r.type().isEmpty() == (r.value() == void.class)) {
+              events.add(
+                  SimpleConditionEvent.violated(
+                      item, item.getName() + " names a record by neither or both entity and type"));
+            } else if (r.type().isEmpty() && !ownedByACompany(r.value())) {
+              events.add(
+                  SimpleConditionEvent.violated(
+                      item,
+                      item.getName()
+                          + " names "
+                          + r.value().getName()
+                          + ", which belongs to no company: mark it @OwnedBy its parent, or use"
+                          + " @GlobalRecord"));
+            }
+          }
+        }
+      };
+
+  /**
+   * Whether a stored record belongs to a company: it carries the company, it is a company, it names
+   * its parent ({@code OwnedBy}), or it links to another record (an attachment).
+   *
+   * @param type entity class
+   * @return true when the record scope check can resolve its company
+   */
+  static boolean ownedByACompany(Class<?> type) {
+    if (!type.isAnnotationPresent(Entity.class)) {
+      return false;
+    }
+    boolean ownCompany =
+        "Company".equals(type.getSimpleName())
+            || hasAccessor(type, "getCompanyId")
+            || hasAccessor(type, "getCompany");
+    boolean linked = hasAccessor(type, "getEntityType") && hasAccessor(type, "getEntityId");
+    return ownCompany || linked || type.isAnnotationPresent(OwnedBy.class);
+  }
+
+  private static boolean hasAccessor(Class<?> type, String name) {
+    try {
+      return type.getMethod(name).getParameterCount() == 0;
+    } catch (NoSuchMethodException ex) {
+      return false;
+    }
+  }
+
+  private static final ArchRule NAMED_RECORDS_BELONG_TO_A_COMPANY =
+      classes()
+          .that()
+          .areAnnotatedWith(RestController.class)
+          .should(NAME_COMPANY_RECORDS)
+          .because("a record without a company has nothing to check; list it as @GlobalRecord");
+
   private static final ArchRule COMPANY_ENDPOINTS_ARE_DATA_SCOPED =
       methods()
           .that()
@@ -360,6 +513,12 @@ final class ArchitectureTest {
   @Test
   void companyEndpointsAreDataScoped() {
     COMPANY_ENDPOINTS_ARE_DATA_SCOPED.check(classes);
+  }
+
+  @Test
+  void idEndpointsNameTheirRecord() {
+    ID_ENDPOINTS_NAME_THEIR_RECORD.check(classes);
+    NAMED_RECORDS_BELONG_TO_A_COMPANY.check(classes);
   }
 
   @Test

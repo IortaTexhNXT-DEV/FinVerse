@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.quotation.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -12,6 +13,7 @@ import java.time.Instant;
  * One version of a quotation's content (BRNB.020), stored as JSON. A version is frozen when the
  * quotation is submitted and never changes afterwards; the next change opens a new version.
  */
+@OwnedBy(value = Quotation.class, key = "quotationId")
 @Entity
 @Table(name = "quo_version")
 public class QuotationVersion extends BaseEntity {

@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.api;
 
+import com.iortatechnxt.brokerverse.audit.service.RecordScope;
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.productmaint.domain.ClientResponse;
 import com.iortatechnxt.brokerverse.productmaint.domain.FinalTermChange;
@@ -57,6 +59,7 @@ public class TermsController {
   private final ClientResponseService clientResponses;
   private final UserDirectory users;
   private final CurrentUser currentUser;
+  private final RecordScope recordScope;
 
   /**
    * Creates the controller.
@@ -66,13 +69,16 @@ public class TermsController {
    * @param clientResponses client responses
    * @param users user names
    * @param currentUser current user (permission of the record type)
+   * @param recordScope data scope check of the request
    */
   public TermsController(
       TermsTableService tables,
       TermsProposalService proposals,
       ClientResponseService clientResponses,
       UserDirectory users,
-      CurrentUser currentUser) {
+      CurrentUser currentUser,
+      RecordScope recordScope) {
+    this.recordScope = recordScope;
     this.tables = tables;
     this.proposals = proposals;
     this.clientResponses = clientResponses;
@@ -89,6 +95,7 @@ public class TermsController {
    */
   @GetMapping
   @PreAuthorize(VIEW)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public TermsView table(@PathVariable String type, @PathVariable Long id) {
     return view(tables.table(record(type, id)));
   }
@@ -103,6 +110,7 @@ public class TermsController {
    */
   @PutMapping("/fields")
   @PreAuthorize(KEY_IN)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public TermsView fields(
       @PathVariable String type, @PathVariable Long id, @RequestBody FieldsBody body) {
     TermsRecord record = keyIn(type, id);
@@ -120,6 +128,7 @@ public class TermsController {
    */
   @PutMapping("/options/{insurer}")
   @PreAuthorize(KEY_IN)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public TermsView saveOption(
       @PathVariable String type,
       @PathVariable Long id,
@@ -145,6 +154,7 @@ public class TermsController {
    */
   @DeleteMapping("/options/{insurer}/{optionNo}")
   @PreAuthorize(KEY_IN)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public TermsView removeOption(
       @PathVariable String type,
       @PathVariable Long id,
@@ -163,6 +173,7 @@ public class TermsController {
    */
   @PutMapping("/final-terms")
   @PreAuthorize(SELECT)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public TermsView saveFinalTerms(
       @PathVariable String type, @PathVariable Long id, @RequestBody Map<String, String> values) {
     return view(tables.saveFinalTerms(select(type, id), values));
@@ -177,6 +188,7 @@ public class TermsController {
    */
   @GetMapping("/final-terms/history")
   @PreAuthorize(VIEW)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public List<ChangeView> history(@PathVariable String type, @PathVariable Long id) {
     return tables.history(record(type, id)).stream().map(this::change).toList();
   }
@@ -191,6 +203,7 @@ public class TermsController {
    */
   @PostMapping("/proceed")
   @PreAuthorize(SELECT)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public TermsView proceed(
       @PathVariable String type, @PathVariable Long id, @RequestBody ProceedBody body) {
     return view(proposals.proceed(select(type, id), body.insurers(), body.comment()));
@@ -206,6 +219,7 @@ public class TermsController {
    */
   @PostMapping("/proposals")
   @PreAuthorize(KEY_IN)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public List<FileView> generate(
       @PathVariable String type, @PathVariable Long id, @RequestBody CommentOnly body) {
     return proposals.generate(keyIn(type, id), body.comment()).stream().map(this::file).toList();
@@ -220,6 +234,7 @@ public class TermsController {
    */
   @GetMapping("/proposals")
   @PreAuthorize(VIEW)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public List<FileView> files(@PathVariable String type, @PathVariable Long id) {
     return proposals.files(record(type, id)).stream().map(this::file).toList();
   }
@@ -234,6 +249,7 @@ public class TermsController {
    */
   @GetMapping("/export")
   @PreAuthorize(VIEW)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public ResponseEntity<byte[]> export(
       @PathVariable String type,
       @PathVariable Long id,
@@ -251,6 +267,7 @@ public class TermsController {
    */
   @GetMapping("/client-responses")
   @PreAuthorize(VIEW)
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public List<ResponseView> clientResponses(@PathVariable String type, @PathVariable Long id) {
     return clientResponses.responses(quotation(type, id).id()).stream()
         .map(this::response)
@@ -267,6 +284,7 @@ public class TermsController {
    */
   @PostMapping("/client-responses")
   @PreAuthorize("hasAuthority('PROPOSAL_REQUEST')")
+  @CompanyScoped("the request is checked with RecordScope when the record is read")
   public ResponseView recordResponse(
       @PathVariable String type, @PathVariable Long id, @Valid @RequestBody ResponseBody body) {
     return response(
@@ -276,12 +294,14 @@ public class TermsController {
             new ClientResponse.Details(body.responseDate(), body.remarks(), body.insurers())));
   }
 
-  private static TermsRecord record(String type, Long id) {
-    return new TermsRecord(
-        "package".equals(type) ? TermsRecord.PACKAGE : TermsRecord.QUOTATION, id);
+  private TermsRecord record(String type, Long id) {
+    TermsRecord record =
+        new TermsRecord("package".equals(type) ? TermsRecord.PACKAGE : TermsRecord.QUOTATION, id);
+    recordScope.require(record.type(), id);
+    return record;
   }
 
-  private static TermsRecord quotation(String type, Long id) {
+  private TermsRecord quotation(String type, Long id) {
     TermsRecord record = record(type, id);
     if (!record.quotation()) {
       throw new AccessDeniedException("The client response belongs to quotation requests");

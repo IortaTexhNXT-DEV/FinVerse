@@ -6,12 +6,14 @@ import com.iortatechnxt.brokerverse.budget.api.dto.BudgetResponse;
 import com.iortatechnxt.brokerverse.budget.api.dto.CopyActualsRequest;
 import com.iortatechnxt.brokerverse.budget.api.dto.CreateBudgetRequest;
 import com.iortatechnxt.brokerverse.budget.api.dto.VarianceLineResponse;
+import com.iortatechnxt.brokerverse.budget.domain.Budget;
 import com.iortatechnxt.brokerverse.budget.service.BudgetLineService;
 import com.iortatechnxt.brokerverse.budget.service.BudgetMonitoringService;
 import com.iortatechnxt.brokerverse.budget.service.BudgetService;
 import com.iortatechnxt.brokerverse.budget.service.BudgetTemplate;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /** Budget versions (grid, import, copy, approval) and budget monitoring. */
+@OwnedRecord(Budget.class)
 @RestController
 @RequestMapping("/api/v1/budgets")
 public class BudgetController {

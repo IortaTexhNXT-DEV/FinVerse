@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.frbs.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
  * A fully paid invoice counted in a service-fee line (FRBS 2.10.0). An invoice is in one live run
  * only; cancelling or recomputing the run frees it.
  */
+@OwnedBy(value = ServiceFeeRun.class, key = "runId")
 @Entity
 @Table(name = "frbs_service_fee_item")
 public class ServiceFeeItem {

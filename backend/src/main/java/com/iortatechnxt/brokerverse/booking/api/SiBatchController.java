@@ -2,12 +2,12 @@ package com.iortatechnxt.brokerverse.booking.api;
 
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceResponse;
 import com.iortatechnxt.brokerverse.booking.api.dto.SiBatchResponse;
+import com.iortatechnxt.brokerverse.booking.domain.SiBatch;
 import com.iortatechnxt.brokerverse.booking.service.SiBatchFiles;
 import com.iortatechnxt.brokerverse.booking.service.SiBatchService;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
-import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
-import com.iortatechnxt.brokerverse.common.security.DataScope;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Daily service-invoice batches per insurer (G09): the batches of a period with their delivery
  * status, the service invoices of a batch, and sending a failed batch again.
  */
+@OwnedRecord(SiBatch.class)
 @RestController
 @RequestMapping("/api/v1/booking/si-batches")
 public class SiBatchController {
@@ -35,17 +36,13 @@ public class SiBatchController {
 
   private final SiBatchService batches;
 
-  private final DataScope dataScope;
-
   /**
    * Creates the controller.
    *
    * @param batches batches
-   * @param dataScope data scope of the user
    */
-  public SiBatchController(SiBatchService batches, DataScope dataScope) {
+  public SiBatchController(SiBatchService batches) {
     this.batches = batches;
-    this.dataScope = dataScope;
   }
 
   /**
@@ -72,9 +69,7 @@ public class SiBatchController {
    */
   @GetMapping("/{id}/pdf")
   @PreAuthorize(BookingAccess.VIEW)
-  @CompanyScoped("the company of the batch is checked with DataScope.requireCompany")
   public ResponseEntity<byte[]> pdf(@PathVariable Long id) {
-    dataScope.requireCompany(batches.get(id).getCompanyId());
     SiBatchFiles.Files files = batches.files(id);
     return ResponseEntity.ok()
         .contentType(MediaType.APPLICATION_PDF)
@@ -90,9 +85,7 @@ public class SiBatchController {
    */
   @GetMapping("/{id}/manifest")
   @PreAuthorize(BookingAccess.VIEW)
-  @CompanyScoped("the company of the batch is checked with DataScope.requireCompany")
   public ResponseEntity<byte[]> manifest(@PathVariable Long id) {
-    dataScope.requireCompany(batches.get(id).getCompanyId());
     SiBatchFiles.Files files = batches.files(id);
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(SiBatchFiles.CSV))

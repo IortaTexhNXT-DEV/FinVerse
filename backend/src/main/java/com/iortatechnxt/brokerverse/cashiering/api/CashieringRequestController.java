@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.CashieringPaymentReversal
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringRefundValidationSource;
 import com.iortatechnxt.brokerverse.cashiering.service.CollectorRequestService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +118,7 @@ public class CashieringRequestController {
    */
   @GetMapping("/unapplied/{id}/collector-requests")
   @PreAuthorize(CashAccess.VIEW)
+  @OwnedRecord(Unapplied.class)
   public List<CollectorRequestResponse> ofItem(@PathVariable Long id) {
     List<CollectorRequest> found = collectorRequests.forItem(id);
     Map<Long, Unapplied> items = collectorRequests.itemsOf(found);
@@ -134,6 +136,7 @@ public class CashieringRequestController {
    */
   @PostMapping("/collector-requests/{id}/accept")
   @PreAuthorize(CashAccess.DISPOSITION)
+  @OwnedRecord(CollectorRequest.class)
   public DispositionResponse accept(@PathVariable Long id, @Valid @RequestBody AcceptBody body) {
     return DispositionResponse.from(collectorRequests.accept(id, body.toAcceptance()));
   }
@@ -147,6 +150,7 @@ public class CashieringRequestController {
    */
   @PostMapping("/collector-requests/{id}/reject")
   @PreAuthorize(CashAccess.DISPOSITION)
+  @OwnedRecord(CollectorRequest.class)
   public CollectorRequestResponse rejectRequest(
       @PathVariable Long id, @Valid @RequestBody RejectBody body) {
     CollectorRequest r = collectorRequests.reject(id, body.reason());
@@ -186,6 +190,7 @@ public class CashieringRequestController {
    */
   @GetMapping("/refund-validations/{id}/candidates")
   @PreAuthorize(VIEW)
+  @OwnedRecord(RefundCheck.class)
   public List<UnappliedResponse> candidates(@PathVariable Long id) {
     return validations.candidates(id).stream().map(u -> UnappliedResponse.from(u, null)).toList();
   }
@@ -199,6 +204,7 @@ public class CashieringRequestController {
    */
   @PostMapping("/refund-validations/{id}/confirm")
   @PreAuthorize(CashAccess.DISPOSITION)
+  @OwnedRecord(RefundCheck.class)
   public RefundValidationResponse confirm(
       @PathVariable Long id, @Valid @RequestBody ConfirmBody body) {
     return RefundValidationResponse.from(
@@ -214,6 +220,7 @@ public class CashieringRequestController {
    */
   @PostMapping("/refund-validations/{id}/reject")
   @PreAuthorize(CashAccess.DISPOSITION)
+  @OwnedRecord(RefundCheck.class)
   public RefundValidationResponse rejectValidation(
       @PathVariable Long id, @Valid @RequestBody RejectBody body) {
     return RefundValidationResponse.from(validations.reject(id, body.reason()));
@@ -251,6 +258,7 @@ public class CashieringRequestController {
    */
   @PostMapping("/payment-reversals/{id}/approve")
   @PreAuthorize(CashAccess.APPROVE)
+  @OwnedRecord(PaymentReversal.class)
   public PaymentReversalResponse approveReversal(@PathVariable Long id) {
     return PaymentReversalResponse.from(reversals.approve(id));
   }
@@ -264,6 +272,7 @@ public class CashieringRequestController {
    */
   @PostMapping("/payment-reversals/{id}/reject")
   @PreAuthorize(CashAccess.APPROVE)
+  @OwnedRecord(PaymentReversal.class)
   public PaymentReversalResponse rejectReversal(
       @PathVariable Long id, @Valid @RequestBody RejectBody body) {
     return PaymentReversalResponse.from(reversals.reject(id, body.reason()));

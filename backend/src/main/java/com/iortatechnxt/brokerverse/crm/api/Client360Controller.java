@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.crm.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.crm.api.dto.Client360Response;
 import com.iortatechnxt.brokerverse.crm.api.dto.Client360Response.HistoryEntry;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientListItem;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.Client360Service;
 import com.iortatechnxt.brokerverse.crm.service.KycDueQuery;
 import com.iortatechnxt.brokerverse.crm.service.KycReviewService;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Client 360 (BRNB.099: linked records, missing linkages, history) and the KYC reviews due list
  * (BRNB.110).
  */
+@OwnedRecord(Client.class)
 @RestController
 @RequestMapping("/api/v1/crm")
 @PreAuthorize("hasAuthority('CLIENT_VIEW')")

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.frbs.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import com.iortatechnxt.brokerverse.frbs.domain.FrbsEnums.LineStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +18,7 @@ import java.util.Set;
  * and currency, its accrual journal, its payout request to Disbursement and the RELEASED and
  * LIQUIDATED tags with their dates and the unit's liquidation report.
  */
+@OwnedBy(value = ServiceFeeRun.class, key = "runId")
 @Entity
 @Table(name = "frbs_service_fee_line")
 public class ServiceFeeLine extends BaseEntity {

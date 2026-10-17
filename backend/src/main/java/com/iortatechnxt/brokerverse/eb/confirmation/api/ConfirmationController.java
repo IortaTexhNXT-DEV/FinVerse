@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.eb.confirmation.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.eb.confirmation.api.dto.ConfirmationDtos.ConfirmationRequest;
 import com.iortatechnxt.brokerverse.eb.confirmation.api.dto.ConfirmationDtos.ConfirmationResponse;
 import com.iortatechnxt.brokerverse.eb.confirmation.api.dto.ConfirmationDtos.VoidRequest;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /** The client's confirmation of a cycle and Trigger Placement (FR-EB-046). */
+@OwnedRecord(value = EbCycle.class, variable = "cycleId")
 @RestController
 @RequestMapping("/api/v1/eb")
 @Transactional

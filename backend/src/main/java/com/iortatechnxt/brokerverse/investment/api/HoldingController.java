@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.investment.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.investment.api.dto.CouponReceiptRequest;
 import com.iortatechnxt.brokerverse.investment.api.dto.FairValueRequest;
 import com.iortatechnxt.brokerverse.investment.api.dto.HoldingRequest;
@@ -7,6 +8,7 @@ import com.iortatechnxt.brokerverse.investment.api.dto.HoldingResponse;
 import com.iortatechnxt.brokerverse.investment.api.dto.RedemptionRequest;
 import com.iortatechnxt.brokerverse.investment.api.dto.TransactionResponse;
 import com.iortatechnxt.brokerverse.investment.domain.HoldingStatus;
+import com.iortatechnxt.brokerverse.investment.domain.InvestmentHolding;
 import com.iortatechnxt.brokerverse.investment.service.HoldingEventService;
 import com.iortatechnxt.brokerverse.investment.service.InvestmentService;
 import jakarta.validation.Valid;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for investment holdings. */
+@OwnedRecord(InvestmentHolding.class)
 @RestController
 @RequestMapping("/api/v1/investments/holdings")
 public class HoldingController {

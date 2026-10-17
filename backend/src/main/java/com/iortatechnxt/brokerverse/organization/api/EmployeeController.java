@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.organization.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.organization.api.dto.EmployeeRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.EmployeeResponse;
+import com.iortatechnxt.brokerverse.organization.domain.Employee;
 import com.iortatechnxt.brokerverse.organization.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Employee master with cost centres (DIS 3.30.1). */
+@OwnedRecord(Employee.class)
 @RestController
 @RequestMapping("/api/v1/organization/employees")
 public class EmployeeController {

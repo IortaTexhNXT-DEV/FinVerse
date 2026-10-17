@@ -18,6 +18,7 @@ import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedRules
 import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedWorklistService;
 import com.iortatechnxt.brokerverse.collections.worklist.api.ClxAccess;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDirectory.UnappliedView;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * (with the Cashiering request it implies), the status view of the requests, the disposition rules
  * of the form and a manual run of the "For Application To Invoice" file.
  */
+@OwnedRecord(ApplicationRequest.class)
 @RestController
 @RequestMapping("/api/v1/collections/unapplied")
 public class UnappliedCollectorController {

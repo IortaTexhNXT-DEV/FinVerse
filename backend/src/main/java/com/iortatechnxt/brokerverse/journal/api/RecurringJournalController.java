@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.journal.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.api.dto.RecurringTemplateRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.RecurringTemplateResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Recurring / accrual journal templates: maintenance, "run now" and generation history. */
+@OwnedRecord(RecurringJournalTemplate.class)
 @RestController
 @RequestMapping("/api/v1/journals/recurring")
 public class RecurringJournalController {

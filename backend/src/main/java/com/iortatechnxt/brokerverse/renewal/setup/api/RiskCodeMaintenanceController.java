@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.setup.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.NonRenewableRiskCode;
 import com.iortatechnxt.brokerverse.renewal.setup.service.RiskCodeMaintenance;
 import java.time.Instant;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Risk Code Maintenance (FRRN.038): read by every Renewal user, maintained by the users of the
  * Renewal setup; authorization by another user goes through the Renewal setup.
  */
+@OwnedRecord(NonRenewableRiskCode.class)
 @RestController
 @RequestMapping("/api/v1/renewal/setup/risk-code-maintenance")
 public class RiskCodeMaintenanceController {

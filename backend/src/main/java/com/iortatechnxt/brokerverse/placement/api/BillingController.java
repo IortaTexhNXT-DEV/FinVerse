@@ -2,11 +2,14 @@ package com.iortatechnxt.brokerverse.placement.api;
 
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.placement.api.dto.ArnRequest;
 import com.iortatechnxt.brokerverse.placement.api.dto.BillingBatchRequest;
 import com.iortatechnxt.brokerverse.placement.api.dto.BillingBatchResponse;
 import com.iortatechnxt.brokerverse.placement.api.dto.BillingCandidateResponse;
 import com.iortatechnxt.brokerverse.placement.api.dto.PaymentReportResponse;
+import com.iortatechnxt.brokerverse.placement.domain.BillingBatch;
+import com.iortatechnxt.brokerverse.placement.domain.PaymentReport;
 import com.iortatechnxt.brokerverse.placement.domain.PaymentReportKind;
 import com.iortatechnxt.brokerverse.placement.service.BillingService;
 import com.iortatechnxt.brokerverse.placement.service.BillingService.BillingFile;
@@ -111,6 +114,7 @@ public class BillingController {
    * @return batch
    */
   @GetMapping("/batches/{id}")
+  @OwnedRecord(BillingBatch.class)
   public BillingBatchResponse batch(@PathVariable Long id) {
     return BillingBatchResponse.detail(billing.get(id));
   }
@@ -123,6 +127,7 @@ public class BillingController {
    * @return file
    */
   @GetMapping("/batches/{id}/file")
+  @OwnedRecord(BillingBatch.class)
   public ResponseEntity<byte[]> file(
       @PathVariable Long id, @RequestParam(defaultValue = "XLSX") String format) {
     BillingFile file = billing.file(id, format);
@@ -185,6 +190,7 @@ public class BillingController {
    * @return report
    */
   @GetMapping("/reports/{id}")
+  @OwnedRecord(PaymentReport.class)
   public PaymentReportResponse report(@PathVariable Long id) {
     return PaymentReportResponse.detail(reports.get(id));
   }
@@ -198,6 +204,7 @@ public class BillingController {
    * @return report
    */
   @PostMapping("/reports/{id}/lines/{lineId}/match")
+  @OwnedRecord(PaymentReport.class)
   public PaymentReportResponse match(
       @PathVariable Long id, @PathVariable Long lineId, @Valid @RequestBody ArnRequest request) {
     return PaymentReportResponse.detail(reports.resolveLine(id, lineId, request.arn()));
@@ -210,6 +217,7 @@ public class BillingController {
    * @return report with the outcome per line
    */
   @PostMapping("/reports/{id}/confirm")
+  @OwnedRecord(PaymentReport.class)
   public PaymentReportResponse confirm(@PathVariable Long id) {
     return PaymentReportResponse.detail(confirmation.confirm(id));
   }
@@ -221,6 +229,7 @@ public class BillingController {
    * @return report
    */
   @PostMapping("/reports/{id}/discard")
+  @OwnedRecord(PaymentReport.class)
   public PaymentReportResponse discard(@PathVariable Long id) {
     return PaymentReportResponse.detail(reports.discard(id));
   }

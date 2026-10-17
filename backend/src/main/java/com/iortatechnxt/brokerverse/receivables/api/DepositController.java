@@ -1,9 +1,11 @@
 package com.iortatechnxt.brokerverse.receivables.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.receivables.api.dto.DateRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.DepositSlipRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.DepositSlipResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptSummaryResponse;
+import com.iortatechnxt.brokerverse.receivables.domain.DepositSlip;
 import com.iortatechnxt.brokerverse.receivables.service.DepositService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Cheques and cash not yet banked, and bank deposit slips. */
+@OwnedRecord(DepositSlip.class)
 @RestController
 @RequestMapping("/api/v1/receivables/deposits")
 public class DepositController {

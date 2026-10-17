@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.payables.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.payables.api.dto.DatedReasonRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.DisbursementRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.DisbursementResponse;
@@ -8,6 +9,9 @@ import com.iortatechnxt.brokerverse.payables.api.dto.FundRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.FundResponse;
 import com.iortatechnxt.brokerverse.payables.api.dto.ReimbursementRequest;
 import com.iortatechnxt.brokerverse.payables.api.dto.ReimbursementResponse;
+import com.iortatechnxt.brokerverse.payables.domain.PettyCashDisbursement;
+import com.iortatechnxt.brokerverse.payables.domain.PettyCashFund;
+import com.iortatechnxt.brokerverse.payables.domain.PettyCashReimbursement;
 import com.iortatechnxt.brokerverse.payables.service.PettyCashFundService;
 import com.iortatechnxt.brokerverse.payables.service.PettyCashService;
 import jakarta.validation.Valid;
@@ -27,6 +31,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Petty cash funds, disbursement vouchers and reimbursement claims (imprest system). */
+@OwnedRecord(PettyCashFund.class)
+@OwnedRecord(value = PettyCashDisbursement.class, variable = "voucherId")
+@OwnedRecord(value = PettyCashReimbursement.class, variable = "claimId")
 @RestController
 @RequestMapping("/api/v1/payables/petty-cash")
 public class PettyCashController {

@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.insurer.api.dto.InsurerDtos.Ins
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.api.dto.InsurerDtos.UpdateRequest;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerUpdateService;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.LossAdviceService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Insurer communication of a claim (BRCLM.041; FR-CM-022/024): the insurer updates (timeline,
  * insert-only) and the loss advice e-mailed to the insurers with its drafts for review.
  */
+@OwnedRecord(value = Claim.class, variable = "claimId")
 @RestController
 @RequestMapping("/api/v1/broker-claims/{claimId}")
 public class InsurerUpdateController {

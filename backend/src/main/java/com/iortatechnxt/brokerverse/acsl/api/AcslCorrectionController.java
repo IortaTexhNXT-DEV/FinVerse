@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.acsl.service.CorrectionJournals.OriginalLine
 import com.iortatechnxt.brokerverse.acsl.service.CorrectionPosting;
 import com.iortatechnxt.brokerverse.acsl.service.CorrectionService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  * wrong-account correction, save the lines, submit, endorse and approve (post). Returns and
  * cancellations are generic workflow actions.
  */
+@OwnedRecord(Correction.class)
 @RestController
 @RequestMapping("/api/v1/acsl/corrections")
 public class AcslCorrectionController {

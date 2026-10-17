@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.prodrecon.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconEnums.MatchMethod;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconEnums.ReconStatus;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconEnums.UnbookedStatus;
@@ -22,6 +23,7 @@ import java.util.List;
  * differ beyond the tolerance, the pre-booked account found for insurer production, and the
  * feedback and disposition recorded by the reconciliation handler.
  */
+@OwnedBy(value = ReconCycle.class, key = "cycleId")
 @Entity
 @Table(name = "prc_item")
 public class ReconItem extends BaseEntity {

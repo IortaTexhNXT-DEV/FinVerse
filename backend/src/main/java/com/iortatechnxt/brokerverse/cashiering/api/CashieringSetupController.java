@@ -7,12 +7,14 @@ import com.iortatechnxt.brokerverse.cashiering.api.dto.SetupDtos.RuleResponse;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.SetupDtos.SeriesRequest;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.SetupDtos.SeriesResponse;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.SetupDtos.SeriesUpdate;
+import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptSeries;
 import com.iortatechnxt.brokerverse.cashiering.service.CommissionOrService;
 import com.iortatechnxt.brokerverse.cashiering.service.MinimalBalanceService;
 import com.iortatechnxt.brokerverse.cashiering.service.MinimalBalanceService.Sweep;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentFileLayouts;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSeriesService;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * maker-checker, the payment file layouts, the minimal balance rules and sweep, and the commission
  * payment details with their OR issuance.
  */
+@OwnedRecord(ReceiptSeries.class)
 @RestController
 @RequestMapping("/api/v1/cashiering")
 public class CashieringSetupController {

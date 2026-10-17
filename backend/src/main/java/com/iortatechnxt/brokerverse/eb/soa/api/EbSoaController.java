@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.eb.soa.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.eb.document.api.EbUploads;
+import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.domain.EbProgrammeRepository;
 import com.iortatechnxt.brokerverse.eb.domain.EbSoa;
 import com.iortatechnxt.brokerverse.eb.service.EbParties;
@@ -125,6 +127,7 @@ public class EbSoaController {
    */
   @GetMapping("/soa/{id}")
   @PreAuthorize(SOA_VIEW)
+  @OwnedRecord(EbSoa.class)
   public SoaResponse get(@PathVariable Long id, @RequestParam Long companyId) {
     return map(soas.require(companyId, id));
   }
@@ -138,6 +141,7 @@ public class EbSoaController {
    */
   @GetMapping("/programmes/{id}/invoices")
   @PreAuthorize(VIEW)
+  @OwnedRecord(EbProgramme.class)
   public List<ProgrammeInvoice> programmeInvoices(
       @PathVariable Long id, @RequestParam Long companyId) {
     return invoices.ofProgramme(records.programme(companyId, id)).stream()
@@ -158,6 +162,7 @@ public class EbSoaController {
   @PostMapping(value = "/programmes/{id}/soa", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(INTAKE)
+  @OwnedRecord(EbProgramme.class)
   public SoaResponse receive(
       @PathVariable Long id,
       @RequestParam Long companyId,
@@ -191,6 +196,7 @@ public class EbSoaController {
    */
   @PostMapping("/soa/{id}/validate")
   @PreAuthorize(PROCESS)
+  @OwnedRecord(EbSoa.class)
   public SoaResponse validate(
       @PathVariable Long id,
       @RequestParam Long companyId,
@@ -208,6 +214,7 @@ public class EbSoaController {
    */
   @PostMapping("/soa/{id}/reject")
   @PreAuthorize(PROCESS)
+  @OwnedRecord(EbSoa.class)
   public SoaResponse reject(
       @PathVariable Long id, @RequestParam Long companyId, @RequestBody RejectRequest request) {
     return map(soas.reject(companyId, id, request.reasonCode(), request.remarks()));
@@ -222,6 +229,7 @@ public class EbSoaController {
    */
   @PostMapping("/soa/{id}/release")
   @PreAuthorize(PROCESS)
+  @OwnedRecord(EbSoa.class)
   public SoaResponse release(@PathVariable Long id, @RequestParam Long companyId) {
     return map(release.release(companyId, id));
   }

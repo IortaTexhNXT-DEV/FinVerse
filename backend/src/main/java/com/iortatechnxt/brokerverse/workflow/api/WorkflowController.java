@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.workflow.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.workflow.api.dto.ActionRequest;
 import com.iortatechnxt.brokerverse.workflow.api.dto.AssignRequest;
 import com.iortatechnxt.brokerverse.workflow.api.dto.CaseResponse;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * My Work queues, a record's workflow panel (stage, actions, history), generic actions (return,
  * void...), claim and assignment.
  */
+@OwnedRecord(WorkCase.class)
 @RestController
 @RequestMapping("/api/v1/workflow")
 public class WorkflowController {

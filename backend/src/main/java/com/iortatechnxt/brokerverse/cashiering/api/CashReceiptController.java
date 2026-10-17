@@ -28,6 +28,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService.PrintFilter;
 import com.iortatechnxt.brokerverse.cashiering.service.ReceiptSearchService.ReceiptCriteria;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
@@ -117,6 +118,7 @@ public class CashReceiptController {
    */
   @GetMapping("/receipts/{id}")
   @PreAuthorize(CashAccess.VIEW)
+  @OwnedRecord(Receipt.class)
   public ReceiptResponse get(@PathVariable Long id) {
     CashReceiptService.ReceiptDetail d = receipts.detail(id);
     return ReceiptResponse.from(d.receipt(), d.applications(), d.actions());
@@ -210,6 +212,7 @@ public class CashReceiptController {
    */
   @PostMapping("/receipts/{id}/cancel")
   @PreAuthorize(CashAccess.CANCEL)
+  @OwnedRecord(Receipt.class)
   public ActionResponse cancel(@PathVariable Long id, @Valid @RequestBody CancelRequest request) {
     return ActionResponse.from(
         actions.requestCancel(id, new Reason(request.reasonCode(), request.reasonText())));
@@ -224,6 +227,7 @@ public class CashReceiptController {
    */
   @PostMapping("/receipts/{id}/reinstate")
   @PreAuthorize(CashAccess.REINSTATE)
+  @OwnedRecord(Receipt.class)
   public ActionResponse reinstate(
       @PathVariable Long id, @Valid @RequestBody ReinstateRequest request) {
     return ActionResponse.from(
@@ -271,6 +275,7 @@ public class CashReceiptController {
    */
   @PostMapping("/receipt-actions/{id}/approve")
   @PreAuthorize(CashAccess.APPROVE)
+  @OwnedRecord(ReceiptAction.class)
   public ActionResponse approve(@PathVariable Long id) {
     return ActionResponse.from(actions.approve(id));
   }
@@ -283,6 +288,7 @@ public class CashReceiptController {
    */
   @PostMapping("/receipt-actions/{id}/resubmit")
   @PreAuthorize("hasAnyAuthority('CASH_CANCEL', 'CASH_REINSTATE')")
+  @OwnedRecord(ReceiptAction.class)
   public ActionResponse resubmit(@PathVariable Long id) {
     ReceiptAction a = actions.resubmit(id);
     return ActionResponse.from(a);
@@ -296,6 +302,7 @@ public class CashReceiptController {
    */
   @GetMapping("/receipts/{id}/pdf")
   @PreAuthorize(CashAccess.VIEW)
+  @OwnedRecord(Receipt.class)
   public ResponseEntity<byte[]> pdf(@PathVariable Long id) {
     Receipt r = receipts.get(id);
     return CashAccess.pdf(
@@ -321,6 +328,7 @@ public class CashReceiptController {
    */
   @PostMapping("/receipts/{id}/certificate-of-payment")
   @PreAuthorize(CashAccess.RECEIPT)
+  @OwnedRecord(Receipt.class)
   public ResponseEntity<byte[]> certificateOfPayment(
       @PathVariable Long id,
       @RequestParam(required = false) String policyNo,

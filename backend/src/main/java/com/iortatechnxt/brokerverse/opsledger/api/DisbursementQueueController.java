@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.opsledger.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.QueueDtos.DisbursementResponse;
 import com.iortatechnxt.brokerverse.opsledger.api.dto.QueueDtos.DvRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * requests with acknowledge, DV number, paid and return. Disbursement users only ({@code
  * DISB_PROCESS}).
  */
+@OwnedRecord(DisbursementRequest.class)
 @RestController
 @RequestMapping("/api/v1/ops/disbursements")
 @PreAuthorize(OpsAccess.DISBURSEMENT)

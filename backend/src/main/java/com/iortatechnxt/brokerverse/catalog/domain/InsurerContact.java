@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 /** Contact person of an insurer (placement, claims, accounting, remittance), maker-checker. */
+@OwnedBy(value = InsurerProfile.class, key = "insurerId")
 @Entity
 @Table(name = "cat_insurer_contact")
 public class InsurerContact extends AuthorizableEntity implements CatalogRecord {

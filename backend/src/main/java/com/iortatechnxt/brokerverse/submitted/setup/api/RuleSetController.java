@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.submitted.setup.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmRuleSet;
 import com.iortatechnxt.brokerverse.submitted.processing.service.RuleSetService;
 import com.iortatechnxt.brokerverse.submitted.processing.service.SbmFacts;
@@ -33,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
  * their rules (maker, {@code SBM_RULE_MAINTAIN}), approval and rejection (checker, {@code
  * SBM_RULE_APPROVE}), and the facts and operators a rule may use.
  */
+@OwnedRecord(SbmRuleSet.class)
+@OwnedRecord(value = SbmRule.class, variable = "ruleId")
 @RestController
 @RequestMapping("/api/v1/submitted/setup/rule-sets")
 public class RuleSetController {

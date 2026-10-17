@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.disbursement.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.InstrumentStatus;
 import jakarta.persistence.Column;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
  * online banking, with its number, status and the time of each step. Status changes follow {@link
  * InstrumentLifecycle}; a status edit approved by the team leader (DIS 2.8.5) sets it directly.
  */
+@OwnedBy(value = Voucher.class, key = "voucherId")
 @Entity
 @Table(name = "dsb_instrument")
 public class Instrument extends BaseEntity {

@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.coa.service.CoaUploadHandler;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.io.IOException;
 import java.util.Map;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
  * shared bulk framework (handler {@link CoaUploadHandler#CODE}): template, validation of every row,
  * review, commit and result report.
  */
+@OwnedRecord(BulkJob.class)
 @RestController
 @RequestMapping("/api/v1/coa/uploads")
 @PreAuthorize("hasAuthority('COA_UPLOAD')")

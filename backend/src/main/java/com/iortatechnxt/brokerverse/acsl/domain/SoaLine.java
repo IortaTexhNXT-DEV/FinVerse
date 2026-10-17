@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.acsl.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
  * policy, assured, dates, gross premium, balance and payments, or failed with the reason (the
  * upload log).
  */
+@OwnedBy(value = SoaUpload.class, key = "uploadId")
 @Entity
 @Table(name = "acsl_soa_line")
 public class SoaLine {

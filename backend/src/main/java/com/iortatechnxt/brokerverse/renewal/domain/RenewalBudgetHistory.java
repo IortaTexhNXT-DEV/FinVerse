@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import java.time.Instant;
  * One change of a budget amount (FRRN.042.06): the field, the previous and the updated value, the
  * user and the time. Insert-only.
  */
+@OwnedBy(value = RenewalBudget.class, key = "budgetId")
 @Entity
 @Table(name = "rnw_budget_history")
 public class RenewalBudgetHistory {

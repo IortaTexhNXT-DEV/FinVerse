@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.messaging.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.messaging.api.dto.NotificationResponse;
 import com.iortatechnxt.brokerverse.messaging.api.dto.PreferenceRequest;
 import com.iortatechnxt.brokerverse.messaging.domain.NotificationPreference.Channels;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** The signed-in user's notifications (header bell). */
+@GlobalRecord("a notification belongs to its recipient, checked by the service")
 @RestController
 @RequestMapping("/api/v1/notifications")
 @PreAuthorize("isAuthenticated()")

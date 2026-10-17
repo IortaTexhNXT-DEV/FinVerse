@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.renewal.processing.api;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.domain.UploadScope;
 import com.iortatechnxt.brokerverse.renewal.processing.service.CompleteFileService;
 import com.iortatechnxt.brokerverse.renewal.processing.service.ProcessingService;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Processing (FR-RN-060, 061, 063-065): Processing Officer assignment, return to Marketing, the
  * renewal account, the Computations tab and the complete-file scope of a dispositioned upload.
  */
+@OwnedRecord(value = UploadScope.class, variable = "jobId")
 @RestController
 @RequestMapping("/api/v1/renewal")
 public class ProcessingController {

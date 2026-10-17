@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.mapping.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.migration.mapping.api.dto.MapDtos.ColumnResponse;
 import com.iortatechnxt.brokerverse.migration.mapping.api.dto.MapDtos.LayoutResponse;
 import com.iortatechnxt.brokerverse.migration.mapping.api.dto.MapDtos.MaskingRequest;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Layouts, load templates, data-quality rules and masking rules (screen Layouts and Rules): the
  * templates BDOI fills are generated from the layout versions in force.
  */
+@GlobalRecord("migration layouts and masking rules are programme-wide")
 @RestController
 @RequestMapping("/api/v1/migration")
 public class LayoutController {

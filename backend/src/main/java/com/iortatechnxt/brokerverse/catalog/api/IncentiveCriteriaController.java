@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.IncentiveDtos.DeactivateRequ
 import com.iortatechnxt.brokerverse.catalog.domain.IncentiveCriteria;
 import com.iortatechnxt.brokerverse.catalog.service.IncentiveCriteriaService;
 import com.iortatechnxt.brokerverse.catalog.service.IncentiveRuleParameters;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * pending row is changed; an active row is amended by a successor), deactivate. Authorisation runs
  * through {@code /api/v1/catalog/records/INCENTIVE_CRITERIA/{id}/authorize} (PRODUCT_AUTHORIZE).
  */
+@OwnedRecord(IncentiveCriteria.class)
 @RestController
 @RequestMapping("/api/v1/catalog/incentive-criteria")
 public class IncentiveCriteriaController {

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.productmaint.domain.PlacementReport;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The repository of the Consolidated Placement Update Report (BDOI FRS FRPM.007.01): the reports
  * generated weekly or on request, their preview, the Excel file and the schedule in force.
  */
+@OwnedRecord(PlacementReport.class)
 @RestController
 @RequestMapping("/api/v1/product-maintenance/placement-reports")
 @PreAuthorize("hasAuthority('PKG_REPORT_VIEW')")

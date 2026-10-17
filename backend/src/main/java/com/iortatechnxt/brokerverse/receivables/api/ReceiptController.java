@@ -1,12 +1,14 @@
 package com.iortatechnxt.brokerverse.receivables.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ApplyRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptRequest;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptSearchParams;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReceiptSummaryResponse;
 import com.iortatechnxt.brokerverse.receivables.api.dto.ReversalRequest;
+import com.iortatechnxt.brokerverse.receivables.domain.Receipt;
 import com.iortatechnxt.brokerverse.receivables.service.ReceiptPostingService;
 import com.iortatechnxt.brokerverse.receivables.service.ReceiptService;
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Official receipts: entry, inquiry, approval, application of money on account, reversal. */
+@OwnedRecord(Receipt.class)
 @RestController
 @RequestMapping("/api/v1/receivables/receipts")
 public class ReceiptController {

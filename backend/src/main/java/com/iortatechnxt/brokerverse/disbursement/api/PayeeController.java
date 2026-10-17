@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.PayeeDtos.AccountRequest;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.PayeeDtos.PayeeRequestBody;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.PayeeDtos.PayeeRequestResponse;
@@ -13,6 +14,7 @@ import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeR
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeStage;
 import com.iortatechnxt.brokerverse.disbursement.domain.Payee;
+import com.iortatechnxt.brokerverse.disbursement.domain.PayeeRequest;
 import com.iortatechnxt.brokerverse.disbursement.service.PayeeQueryService;
 import com.iortatechnxt.brokerverse.disbursement.service.PayeeQueryService.PayeeSearch;
 import com.iortatechnxt.brokerverse.disbursement.service.PayeeService;
@@ -37,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
  * maker-checker (draft, submit, authorise, deactivate, reactivate, delete an unused draft) and the
  * payee maintenance requests (DIS 2.2.1). Returns run through the workflow panel.
  */
+@OwnedRecord(Payee.class)
+@OwnedRecord(value = PayeeRequest.class, variable = "requestId")
 @RestController
 @RequestMapping("/api/v1/disbursement")
 public class PayeeController {

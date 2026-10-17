@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.crm.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientActionRequest;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientResponse;
 import com.iortatechnxt.brokerverse.crm.api.dto.KycChecklistResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Client onboarding (BRNB.090/101): KYC documents and checklist, submission, verification by a
  * checker, confirmation and deactivation.
  */
+@OwnedRecord(Client.class)
 @RestController
 @RequestMapping("/api/v1/crm/clients/{id}")
 public class ClientOnboardingController {

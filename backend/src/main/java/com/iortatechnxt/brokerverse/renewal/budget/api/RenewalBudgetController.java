@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.budget.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.renewal.budget.service.RenewalBudgetService;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalBudget;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalBudgetHistory;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * year, the creation and update of a record and its history. The upload runs through the bulk
  * upload of handler {@code RNW_BUDGET}.
  */
+@OwnedRecord(RenewalBudget.class)
 @RestController
 @RequestMapping("/api/v1/renewal/budgets")
 @PreAuthorize("hasAuthority('RNW_BUDGET')")

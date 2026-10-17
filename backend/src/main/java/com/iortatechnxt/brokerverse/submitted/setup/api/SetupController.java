@@ -1,6 +1,10 @@
 package com.iortatechnxt.brokerverse.submitted.setup.api;
 
+import com.iortatechnxt.brokerverse.audit.service.RecordScope;
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmApprovalMatrix;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmInsurerRule;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLetterRule;
@@ -24,6 +28,7 @@ import com.iortatechnxt.brokerverse.submitted.setup.service.SetupService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,18 +52,31 @@ public class SetupController {
   private static final String MAINTAIN = "hasAuthority('SBM_RULE_MAINTAIN')";
   private static final String APPROVE = "hasAuthority('SBM_RULE_APPROVE')";
 
+  /** The stored record of each setup kind, for the record scope check. */
+  private static final Map<String, Class<?>> RECORDS =
+      Map.of(
+          "LIMIT", SbmLimitRule.class,
+          "INSURER", SbmInsurerRule.class,
+          "LETTER", SbmLetterRule.class,
+          "MATRIX", SbmApprovalMatrix.class,
+          "RECIPIENT", SbmNotificationRecipient.class);
+
   private final SetupService setup;
   private final NotificationRecipientService recipients;
+  private final RecordScope recordScope;
 
   /**
    * Creates the controller.
    *
    * @param setup setup
    * @param recipients notification recipients
+   * @param recordScope data scope check of a record addressed by id
    */
-  public SetupController(SetupService setup, NotificationRecipientService recipients) {
+  public SetupController(
+      SetupService setup, NotificationRecipientService recipients, RecordScope recordScope) {
     this.setup = setup;
     this.recipients = recipients;
+    this.recordScope = recordScope;
   }
 
   /**
@@ -96,6 +114,7 @@ public class SetupController {
    */
   @PutMapping("/limits/{id}")
   @PreAuthorize(MAINTAIN)
+  @OwnedRecord(SbmLimitRule.class)
   public LimitView changeLimit(
       @RequestParam Long companyId, @PathVariable Long id, @RequestBody SbmLimitRule.Limits l) {
     return LimitView.from(setup.saveLimitRule(companyId, id, l));
@@ -226,7 +245,9 @@ public class SetupController {
    */
   @PostMapping("/{kind}/{id}/authorize")
   @PreAuthorize(APPROVE)
+  @CompanyScoped("the record of the kind is checked with RecordScope")
   public ControlView authorize(@PathVariable String kind, @PathVariable Long id) {
+    requireInScope(kind, id);
     return view(id, setup.authorize(kind(kind), id));
   }
 
@@ -239,7 +260,9 @@ public class SetupController {
    */
   @PostMapping("/{kind}/{id}/deactivate")
   @PreAuthorize(MAINTAIN)
+  @CompanyScoped("the record of the kind is checked with RecordScope")
   public ControlView deactivate(@PathVariable String kind, @PathVariable Long id) {
+    requireInScope(kind, id);
     return view(id, setup.deactivate(kind(kind), id));
   }
 
@@ -263,6 +286,7 @@ public class SetupController {
    */
   @PutMapping("/sources/{id}")
   @PreAuthorize(MAINTAIN)
+  @GlobalRecord("submitted policy sources are programme-wide")
   public SourceView saveSource(@PathVariable Long id, @Valid @RequestBody SourceRequest r) {
     return SourceView.from(setup.saveSource(id, r.name(), r.mandatoryFields(), r.active()));
   }
@@ -318,6 +342,13 @@ public class SetupController {
             r.username(),
             r.segments() == null ? List.of() : r.segments(),
             r.ownRecordsOnly()));
+  }
+
+  private void requireInScope(String kind, Long id) {
+    Class<?> record = RECORDS.get(kind(kind));
+    if (record != null) {
+      recordScope.require(record, id);
+    }
   }
 
   private static String kind(String path) {

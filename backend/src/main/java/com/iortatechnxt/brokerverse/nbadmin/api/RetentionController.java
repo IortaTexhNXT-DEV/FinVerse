@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.RetentionEligibleResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.RetentionRuleRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Data retention (BRNB.106): rules, eligible counts and drill-down, manual review run. */
+@GlobalRecord("retention rules are programme-wide")
 @RestController
 @RequestMapping("/api/v1/nbadmin/retention")
 public class RetentionController {

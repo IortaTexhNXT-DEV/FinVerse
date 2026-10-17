@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.commission.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +10,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 
 /** A legacy invoice of a direct payment PR reversal batch, posted in its own transaction. */
+@OwnedBy(value = DpprBatch.class, key = "batchId")
 @Entity
 @Table(name = "cmr_dppr_batch_line")
 public class DpprBatchLine {

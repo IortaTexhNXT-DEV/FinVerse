@@ -1,12 +1,14 @@
 package com.iortatechnxt.brokerverse.crm.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
 /** A controlled tag on a client (list of values CLIENT_TAG), e.g. VIP or DO_NOT_CALL (BRNB.091). */
+@OwnedBy(value = Client.class, key = "clientId")
 @Entity
 @Table(name = "crm_client_tag")
 public class ClientTag extends BaseEntity {

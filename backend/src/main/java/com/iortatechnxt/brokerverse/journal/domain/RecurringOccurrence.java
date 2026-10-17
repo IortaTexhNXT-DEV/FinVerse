@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.journal.domain;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
  * A generated occurrence of a recurring template. The unique (template, date) key makes generation
  * idempotent: an occurrence is never generated twice, whoever runs it and however often.
  */
+@OwnedBy(value = RecurringJournalTemplate.class, key = "templateId")
 @Entity
 @Table(name = "jnl_recurring_occurrence")
 public class RecurringOccurrence {

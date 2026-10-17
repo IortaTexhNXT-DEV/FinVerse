@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.migration.mapping.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.migration.mapping.api.dto.MapDtos.ApprovalResponse;
 import com.iortatechnxt.brokerverse.migration.mapping.api.dto.MapDtos.DiffResponse;
 import com.iortatechnxt.brokerverse.migration.mapping.api.dto.MapDtos.DraftRequest;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /** Versioned code maps (FR-DM-011, FR-DM-012; screen Code Maps). */
+@GlobalRecord("migration code maps are programme-wide")
 @RestController
 @RequestMapping("/api/v1/migration/maps")
 public class MapController {

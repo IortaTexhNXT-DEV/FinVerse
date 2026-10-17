@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.brokerclaims.status.api;
 
+import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.status.api.dto.StatusDtos.ActionPlanRequest;
 import com.iortatechnxt.brokerverse.brokerclaims.status.api.dto.StatusDtos.AdjusterRequest;
 import com.iortatechnxt.brokerverse.brokerclaims.status.api.dto.StatusDtos.ClaimProgressResponse;
@@ -12,6 +13,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimFollowUpSer
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimProgressQuery;
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimStatusService;
 import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimStatusService.StatusOption;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Status actions and History of a claim (BRCLM.005/010-021/027/035; FR-CM-041-045/050/051/053):
  * every call names the company of the claim, so a claim of another company is "not found".
  */
+@OwnedRecord(Claim.class)
 @RestController
 @RequestMapping("/api/v1/broker-claims/{id}")
 public class ClaimStatusController {

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.disbursement.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.OutputKind;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -16,6 +17,7 @@ import java.util.Objects;
  * A file produced by an end-of-day run (DIS 2.16.1-2.16.6, 3.28.2): the DCTF, the check print
  * batch, the ATD / MC-DD / credit ticket / TT forms, the day's vouchers and the EOD reports.
  */
+@OwnedBy(value = EodRun.class, key = "eodRunId")
 @Entity
 @Table(name = "dsb_eod_output")
 public class EodOutput extends BaseEntity {

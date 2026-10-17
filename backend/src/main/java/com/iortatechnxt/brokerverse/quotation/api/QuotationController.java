@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.account.api.dto.CommentRequest;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.quotation.api.dto.QuotationActionDtos.AcceptRequest;
 import com.iortatechnxt.brokerverse.quotation.api.dto.QuotationActionDtos.BatchSendRequest;
@@ -50,6 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
  * diff, documents, create and update, live premium, and the business actions of the NB_QUOTATION
  * workflow. Generic actions (return, void, decline) are run by the workflow panel.
  */
+@OwnedRecord(Quotation.class)
 @RestController("brokingQuotationController")
 @RequestMapping("/api/v1/quotations")
 public class QuotationController {

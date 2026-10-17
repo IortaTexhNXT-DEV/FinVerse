@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.brokerclaims.diary.domain;
 
+import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -13,6 +15,7 @@ import java.time.LocalDate;
  * completed. Entries are never deleted: a wrong entry is marked done with a remark. Closed claims
  * accept diary entries.
  */
+@OwnedBy(value = Claim.class, key = "claimId")
 @Entity
 @Table(name = "bcl_diary_entry")
 public class DiaryEntry extends BaseEntity {

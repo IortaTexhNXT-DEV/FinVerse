@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.productmaint.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.CommentBody;
 import com.iortatechnxt.brokerverse.productmaint.domain.ManComApproval;
 import com.iortatechnxt.brokerverse.productmaint.domain.MarketingApproval;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * approval history (FRPM.011.02), the ManCom approver selection, decisions and progress
  * (FRPM.014.01) and the Request for Deployment (FRPM.015.01).
  */
+@OwnedRecord(PackageRequest.class)
 @RestController
 @RequestMapping("/api/v1/product-maintenance/requests/{id}")
 public class PackageRoutingController {

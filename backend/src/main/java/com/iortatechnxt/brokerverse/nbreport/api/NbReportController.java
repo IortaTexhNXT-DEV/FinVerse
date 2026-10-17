@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbreport.api;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.api.dto.NbDashboardResponse;
 import com.iortatechnxt.brokerverse.nbreport.api.dto.ReportVariantDto;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * (BRNB.075). The NB reports themselves run through the generic report API ({@code
  * /api/v1/reports}, category New Business).
  */
+@GlobalRecord("report variants are programme-wide")
 @RestController
 @RequestMapping("/api/v1/nb")
 public class NbReportController {

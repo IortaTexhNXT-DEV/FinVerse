@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nonpackage.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
  * the comparative table (BRNB.010). Every change raises the revision and is kept in {@link
  * InsurerResponseHistory}.
  */
+@OwnedBy(value = ProposalRequest.class, key = "proposalId")
 @Entity
 @Table(name = "npk_insurer_response")
 public class InsurerResponse extends BaseEntity {

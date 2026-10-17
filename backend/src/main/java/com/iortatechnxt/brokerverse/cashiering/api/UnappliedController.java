@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.UnappliedService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * For Reversal (and Done), the item with its disposition history, assign / update / submit /
  * approve / withdraw a disposition, mark and approve a reversal, and bulk submit / approve.
  */
+@OwnedRecord(Unapplied.class)
 @RestController
 @RequestMapping("/api/v1/cashiering")
 public class UnappliedController {

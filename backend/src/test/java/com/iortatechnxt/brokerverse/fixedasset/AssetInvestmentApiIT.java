@@ -26,12 +26,16 @@ class AssetInvestmentApiIT {
   @Autowired private Api api;
   @Autowired private TestData data;
 
+  /** A code of its own per run: the categories of earlier runs stay in the shared database. */
+  private final String categoryCode =
+      "API-" + java.util.concurrent.ThreadLocalRandom.current().nextInt(10_000, 99_999);
+
   private Map<String, Object> category(String name) {
     return Json.of(
         "companyId",
         data.company().getId(),
         "code",
-        "API-CAT",
+        categoryCode,
         "name",
         name,
         "assetAccount",

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.lamd.api;
 
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
 import com.iortatechnxt.brokerverse.renewal.lamd.service.RmuOfficerService;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,6 +67,7 @@ public class RmuOfficerController {
    */
   @PutMapping("/{id}")
   @PreAuthorize(MAINTAIN)
+  @CompanyScoped("the officer is looked up among the officers of the checked company")
   public RmuOfficerService.Officer update(
       @RequestParam Long companyId,
       @PathVariable Long id,

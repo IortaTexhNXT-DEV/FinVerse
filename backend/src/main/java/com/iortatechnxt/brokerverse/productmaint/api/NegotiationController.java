@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.productmaint.api;
 
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.NegotiationDtos.ComparativeView;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.NegotiationDtos.HistoryView;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.NegotiationDtos.PrepareBody;
@@ -13,6 +14,7 @@ import com.iortatechnxt.brokerverse.productmaint.api.dto.NegotiationDtos.TermsFi
 import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.CommentBody;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.RequestResponse;
 import com.iortatechnxt.brokerverse.productmaint.domain.NegotiationRound;
+import com.iortatechnxt.brokerverse.productmaint.domain.PackageInsurerResponse;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.service.NegotiationService;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageDocuments;
@@ -41,6 +43,8 @@ import org.springframework.web.multipart.MultipartFile;
  * responses with their documents and history, the live comparative table of a round, terms final,
  * the TSU Head's release of the terms and Marketing's acceptance.
  */
+@OwnedRecord(PackageRequest.class)
+@OwnedRecord(value = PackageInsurerResponse.class, variable = "responseId")
 @RestController
 @RequestMapping("/api/v1/product-maintenance/requests/{id}")
 public class NegotiationController {

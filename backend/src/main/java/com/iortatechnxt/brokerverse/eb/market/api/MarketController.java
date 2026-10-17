@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.eb.market.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.eb.document.api.EbUploads;
+import com.iortatechnxt.brokerverse.eb.domain.EbCycle;
 import com.iortatechnxt.brokerverse.eb.domain.EbInsurerRequest;
 import com.iortatechnxt.brokerverse.eb.domain.EbProposal;
 import com.iortatechnxt.brokerverse.eb.market.api.dto.MarketDtos.CloseRequest;
@@ -40,6 +42,9 @@ import org.springframework.web.multipart.MultipartFile;
  * The market steps of a cycle (FR-EB-035, 040, 044, 045): the TOR, the insurer requests, the
  * proposals and the revision requests.
  */
+@OwnedRecord(value = EbCycle.class, variable = "cycleId")
+@OwnedRecord(value = EbInsurerRequest.class, variable = "requestId")
+@OwnedRecord(value = EbProposal.class, variable = "proposalId")
 @RestController
 @RequestMapping("/api/v1/eb")
 @Transactional

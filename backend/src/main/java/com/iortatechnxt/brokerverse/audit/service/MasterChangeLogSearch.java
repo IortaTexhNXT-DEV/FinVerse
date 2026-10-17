@@ -117,7 +117,7 @@ public class MasterChangeLogSearch {
                 visible.computeIfAbsent(
                     e.entityType() + "#" + e.entityId(),
                     k ->
-                        MasterChangeLog.visible(
+                        RecordOwnership.visible(
                             scope, ownership.ownerOf(e.entityType(), e.entityId()))))
         .toList();
   }

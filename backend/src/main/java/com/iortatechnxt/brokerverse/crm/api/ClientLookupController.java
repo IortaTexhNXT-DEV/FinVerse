@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.crm.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientSummaryResponse;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Client pickers and summaries used by quotation, proposal and account screens. */
+@OwnedRecord(Client.class)
 @RestController
 @RequestMapping("/api/v1/crm/clients")
 @PreAuthorize("hasAuthority('CLIENT_VIEW')")

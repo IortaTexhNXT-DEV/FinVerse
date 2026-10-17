@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.insurer.domain.InsurerClaim;
 import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.InsurerClaimService;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -37,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
  * reserve ({@code BCL_RESERVE_AMEND}), assign the adjuster of a line ({@code BCL_ADJUSTER_ASSIGN})
  * and the reserve history. Every answer is the claim's lines after the change.
  */
+@OwnedRecord(value = Claim.class, variable = "claimId")
+@OwnedRecord(value = InsurerClaim.class, variable = "lineId")
 @RestController
 @RequestMapping("/api/v1/broker-claims/{claimId}/insurers")
 public class InsurerClaimController {

@@ -6,9 +6,11 @@ import com.iortatechnxt.brokerverse.booking.api.dto.InvoiceSearchParams;
 import com.iortatechnxt.brokerverse.booking.api.dto.InvoiceSummaryResponse;
 import com.iortatechnxt.brokerverse.booking.api.dto.OpenItemLineResponse;
 import com.iortatechnxt.brokerverse.booking.api.dto.PostedLineResponse;
+import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.service.BookingQueryService;
 import com.iortatechnxt.brokerverse.booking.service.InvoiceBooked;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Booked invoices (BRNB.027): search, detail with open items, the schedule and endorsements of an
  * account, and the published event of an invoice (replay for the Operations feed).
  */
+@OwnedRecord(BookedInvoice.class)
 @RestController
 @RequestMapping("/api/v1/booking")
 public class BookedInvoiceController {

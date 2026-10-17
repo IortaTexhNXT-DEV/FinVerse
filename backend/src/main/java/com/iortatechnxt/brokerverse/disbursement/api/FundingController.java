@@ -2,11 +2,13 @@ package com.iortatechnxt.brokerverse.disbursement.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.FundingApproval;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.FundingRequestBody;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.OperationDtos.FundingResponse;
 import com.iortatechnxt.brokerverse.disbursement.api.dto.VoucherDtos.CommentRequest;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.FundingStage;
+import com.iortatechnxt.brokerverse.disbursement.domain.FundingRequest;
 import com.iortatechnxt.brokerverse.disbursement.service.FundingService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * maker, submit, verify (a team leader other than the maker) and the two approvals, the second of
  * which posts the transfer. Return, decline and cancel run through the workflow panel.
  */
+@OwnedRecord(FundingRequest.class)
 @RestController
 @RequestMapping("/api/v1/disbursement/funding")
 public class FundingController {

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.submitted.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** A policy review (BRIDSP-06): number, date, reviewer, adequacy, findings and remarks. */
+@OwnedBy(value = SbmPolicy.class, key = "policyId")
 @Entity
 @Table(name = "sbm_iaaf_review")
 public class SbmIaafReview extends BaseEntity {

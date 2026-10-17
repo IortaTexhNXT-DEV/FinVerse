@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.identity.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.identity.api.dto.DirectoryProfileResponse;
 import com.iortatechnxt.brokerverse.identity.api.dto.IdentityEventResponse;
 import com.iortatechnxt.brokerverse.identity.domain.IdentityEventStatus;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * and Synchronise Now, the on-demand synchronisation of a user, the directory details of a user,
  * and the creation of a user from an existing and active Enterprise SSO account.
  */
+@GlobalRecord("directory identity events are programme-wide")
 @RestController
 @RequestMapping("/api/v1/admin/identity")
 @PreAuthorize("hasAuthority('USER_MANAGE')")

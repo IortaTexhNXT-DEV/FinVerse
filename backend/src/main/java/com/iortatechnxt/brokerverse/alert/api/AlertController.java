@@ -5,12 +5,14 @@ import com.iortatechnxt.brokerverse.alert.api.dto.AlertResponse;
 import com.iortatechnxt.brokerverse.alert.api.dto.AlertSearchParams;
 import com.iortatechnxt.brokerverse.alert.api.dto.ExceptionCodeRequest;
 import com.iortatechnxt.brokerverse.alert.api.dto.ExceptionCodeResponse;
+import com.iortatechnxt.brokerverse.alert.domain.Alert;
 import com.iortatechnxt.brokerverse.alert.domain.AlertSeverity;
 import com.iortatechnxt.brokerverse.alert.service.AlertDailyJob;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.alert.service.AlertService.CodeSettings;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.system.api.dto.JobRunResponse;
 import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
 import com.iortatechnxt.brokerverse.system.service.JobRegistry;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Alerts inbox, acknowledgement, Exception Codes Master and on-demand checks. */
+@OwnedRecord(Alert.class)
 @RestController
 @RequestMapping("/api/v1/alerts")
 public class AlertController {

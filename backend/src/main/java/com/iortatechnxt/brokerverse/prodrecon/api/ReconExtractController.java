@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.prodrecon.api;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.service.ExtractRepositoryService;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.UploadResponse;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ProdReconDtos.UploadResultResponse;
@@ -13,8 +14,10 @@ import com.iortatechnxt.brokerverse.prodrecon.api.dto.ReconExtractDtos.ScheduleR
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ReconExtractDtos.ScheduleResponse;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ReconExtractDtos.SendRequest;
 import com.iortatechnxt.brokerverse.prodrecon.api.dto.ReconExtractDtos.SettingsResponse;
+import com.iortatechnxt.brokerverse.prodrecon.domain.ReconCycle;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconEnums.ExtractTrigger;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconExtract;
+import com.iortatechnxt.brokerverse.prodrecon.domain.ReconSchedule;
 import com.iortatechnxt.brokerverse.prodrecon.service.ProductionExtractService;
 import com.iortatechnxt.brokerverse.prodrecon.service.ReconScheduleService;
 import com.iortatechnxt.brokerverse.prodrecon.service.ReconSendService;
@@ -131,6 +134,7 @@ public class ReconExtractController {
    */
   @GetMapping("/cycles/{id}/extracts")
   @PreAuthorize(ReconAccess.READ)
+  @OwnedRecord(ReconCycle.class)
   public List<ExtractResponse> ofCycle(@PathVariable Long id) {
     return extracts.ofCycle(id).stream().map(ExtractResponse::from).toList();
   }
@@ -145,6 +149,7 @@ public class ReconExtractController {
    */
   @GetMapping("/extracts/{id}/lines")
   @PreAuthorize(ReconAccess.READ)
+  @OwnedRecord(ReconExtract.class)
   public PageResponse<ExtractLineResponse> lines(
       @PathVariable Long id,
       @RequestParam(defaultValue = "0") int page,
@@ -163,6 +168,7 @@ public class ReconExtractController {
    */
   @GetMapping("/extracts/{id}/file")
   @PreAuthorize(ReconAccess.READ)
+  @OwnedRecord(ReconExtract.class)
   public ResponseEntity<byte[]> file(@PathVariable Long id, HttpServletRequest request) {
     ReconExtract extract = extracts.require(id);
     if (extract.getFileId() == null) {
@@ -180,6 +186,7 @@ public class ReconExtractController {
    */
   @PostMapping("/extracts/{id}/send")
   @PreAuthorize(ReconAccess.SEND)
+  @OwnedRecord(ReconExtract.class)
   public ExtractResponse send(@PathVariable Long id, @Valid @RequestBody SendRequest request) {
     return ExtractResponse.from(sender.send(id, request.to(), request.cc()));
   }
@@ -264,6 +271,7 @@ public class ReconExtractController {
    */
   @PutMapping("/schedules/{id}")
   @PreAuthorize(ReconAccess.PROCESS)
+  @OwnedRecord(ReconSchedule.class)
   public ScheduleResponse updateSchedule(
       @PathVariable Long id, @Valid @RequestBody ScheduleRequest request) {
     return ScheduleResponse.from(schedules.update(id, request.terms()));

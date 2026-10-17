@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.RecordFormService.Account
 import com.iortatechnxt.brokerverse.cashiering.service.RecordFormService.FormSettings;
 import com.iortatechnxt.brokerverse.cashiering.service.ReversalRecordService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  * FRS.CSH.02.01, 02.02, 02.05, 03.01, 04.01): save, edit, cancel and submit by the cashier; the
  * lists For Posting and Returned; posting and return by the Approver/Poster.
  */
+@OwnedRecord(ReceiptRecord.class)
 @RestController
 @RequestMapping("/api/v1/cashiering/records")
 public class ReceiptRecordController {

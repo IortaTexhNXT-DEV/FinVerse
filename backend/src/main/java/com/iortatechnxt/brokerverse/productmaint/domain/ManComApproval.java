@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -12,6 +13,7 @@ import java.time.Instant;
  * approved, then APPROVED, RETURNED or REJECTED with the remarks; CLOSED when the round ended
  * without the approver's decision.
  */
+@OwnedBy(value = PackageRequest.class, key = "requestId")
 @Entity
 @Table(name = "pm_mancom_approval")
 public class ManComApproval extends BaseEntity {

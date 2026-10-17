@@ -2,12 +2,14 @@ package com.iortatechnxt.brokerverse.journal.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalAssignRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalIdsRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalRequest;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalResponse;
 import com.iortatechnxt.brokerverse.journal.api.dto.JournalSearchParams;
 import com.iortatechnxt.brokerverse.journal.api.dto.ReverseJournalRequest;
+import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.journal.service.JournalAuthorizationService;
 import com.iortatechnxt.brokerverse.journal.service.JournalBulkApprovals;
 import com.iortatechnxt.brokerverse.journal.service.JournalEntryService;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST API for journal entry, authorization, reversal and inquiry. */
+@OwnedRecord(JournalBatch.class)
 @RestController
 @RequestMapping("/api/v1/journals")
 public class JournalController {

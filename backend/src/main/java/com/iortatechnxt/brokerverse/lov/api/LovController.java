@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.lov.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.api.dto.LovOption;
 import com.iortatechnxt.brokerverse.lov.api.dto.LovTypeResponse;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * LOV_MANAGE}, authorized with {@code MASTER_AUTHORIZE}) and, for a list with an owner permission,
  * for the holders of that permission ({@code LovAccess}).
  */
+@GlobalRecord("lists of values are programme-wide")
 @RestController
 @RequestMapping("/api/v1/lov")
 public class LovController {

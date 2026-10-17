@@ -5,11 +5,14 @@ import com.iortatechnxt.brokerverse.collections.billing.api.dto.BillingDtos.Gene
 import com.iortatechnxt.brokerverse.collections.billing.api.dto.BillingDtos.RecipientResponse;
 import com.iortatechnxt.brokerverse.collections.billing.api.dto.BillingDtos.SendRequest;
 import com.iortatechnxt.brokerverse.collections.billing.api.dto.BillingDtos.StatementResponse;
+import com.iortatechnxt.brokerverse.collections.billing.domain.BillingStatement;
 import com.iortatechnxt.brokerverse.collections.billing.domain.BillingStatement.StatementStatus;
 import com.iortatechnxt.brokerverse.collections.billing.service.BillingStatementService;
 import com.iortatechnxt.brokerverse.collections.billing.service.SoaDispatch;
+import com.iortatechnxt.brokerverse.collections.installment.domain.InstallmentPlan;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -35,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
  * generation for one cycle or for the cycles due in a period ({@code CLX_SOA_ISSUE}), the PDF,
  * sending by e-mail and cancellation.
  */
+@OwnedRecord(BillingStatement.class)
+@OwnedRecord(value = InstallmentPlan.class, variable = "planId")
 @RestController
 @RequestMapping("/api/v1/collections/billing/statements")
 public class BillingStatementController {

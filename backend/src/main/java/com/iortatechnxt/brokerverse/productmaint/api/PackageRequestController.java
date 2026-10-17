@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.CountsView;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.RequestDtos.CommentBody;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  * package version and the Product Maintenance home counts. Generic actions (return, void, not
  * proceeded) run through the workflow API.
  */
+@OwnedRecord(PackageRequest.class)
 @RestController
 @RequestMapping("/api/v1/product-maintenance")
 public class PackageRequestController {

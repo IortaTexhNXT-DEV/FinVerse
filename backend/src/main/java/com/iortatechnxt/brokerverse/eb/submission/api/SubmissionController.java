@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.eb.submission.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.domain.EbSubmission;
 import com.iortatechnxt.brokerverse.eb.service.EbParties;
 import com.iortatechnxt.brokerverse.eb.submission.api.dto.SubmissionDtos.AcknowledgeRequest;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Submissions of documents to insurers (FR-EB-034). */
+@OwnedRecord(EbProgramme.class)
+@OwnedRecord(value = EbSubmission.class, variable = "submissionId")
 @RestController
 @RequestMapping("/api/v1/eb")
 @Transactional

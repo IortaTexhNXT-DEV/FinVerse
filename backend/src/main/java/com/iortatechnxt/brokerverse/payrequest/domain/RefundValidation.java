@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.payrequest.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +15,7 @@ import java.time.Instant;
  * unapplied list with a new AR number. One task per validator and refund line and per round; the
  * source reference {@code <request>#<round>:<line>} is the idempotency key of the port.
  */
+@OwnedBy(value = PaymentRequest.class, key = "requestId")
 @Entity
 @Table(name = "prq_validation")
 public class RefundValidation extends BaseEntity {

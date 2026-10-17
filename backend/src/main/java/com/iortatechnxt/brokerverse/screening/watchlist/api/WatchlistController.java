@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.screening.watchlist.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.screening.common.api.DecisionRequest;
 import com.iortatechnxt.brokerverse.screening.common.service.ScreeningPermissions;
 import com.iortatechnxt.brokerverse.screening.watchlist.api.dto.ChangeDto;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  * history, add / change / deactivate (maker, SCR_LIST_MAINTAIN) and approve / reject (checker,
  * SCR_LIST_APPROVE).
  */
+@GlobalRecord("watch lists are programme-wide")
 @RestController
 @RequestMapping("/api/v1/screening/watchlist")
 public class WatchlistController {

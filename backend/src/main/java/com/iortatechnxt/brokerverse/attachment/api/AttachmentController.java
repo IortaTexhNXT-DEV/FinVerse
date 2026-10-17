@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.attachment.api;
 import com.iortatechnxt.brokerverse.attachment.api.dto.AttachmentResponse;
 import com.iortatechnxt.brokerverse.attachment.api.dto.LinkRequest;
 import com.iortatechnxt.brokerverse.attachment.domain.AllowedFileType;
+import com.iortatechnxt.brokerverse.attachment.domain.Attachment;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
 import com.iortatechnxt.brokerverse.attachment.service.AttachmentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentNamingService;
@@ -10,6 +11,7 @@ import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOptions;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.storage.api.FileDownloads;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -38,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
  * and remove (BRNB.026/055/056). Lists and downloads apply the document access classes and uploads
  * and links take a process tag (BRID-025).
  */
+@OwnedRecord(Attachment.class)
 @RestController
 @RequestMapping("/api/v1/attachments")
 public class AttachmentController {

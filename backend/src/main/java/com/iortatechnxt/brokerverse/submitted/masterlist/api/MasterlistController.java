@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.submitted.masterlist.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmTracking;
 import com.iortatechnxt.brokerverse.submitted.masterlist.api.dto.PolicyDtos.ActionRequest;
 import com.iortatechnxt.brokerverse.submitted.masterlist.api.dto.PolicyDtos.AssignRequest;
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
  * counters, the record, manual entry and edit, the renewal tag, the tracking fields, the Assign
  * Handler bulk action, the handlers' actions and the field history.
  */
+@OwnedRecord(SbmPolicy.class)
 @RestController
 @RequestMapping("/api/v1/submitted/policies")
 public class MasterlistController {

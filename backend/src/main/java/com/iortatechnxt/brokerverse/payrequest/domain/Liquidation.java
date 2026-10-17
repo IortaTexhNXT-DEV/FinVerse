@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.payrequest.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +22,7 @@ import java.util.function.Function;
  * confirmed, AQ18): fieldwork days with their expenses, the over / (short) against the cash
  * advanced, and the journal of event {@code PRQ_CA_LIQUIDATION} once posted.
  */
+@OwnedBy(value = PaymentRequest.class, key = "requestId")
 @Entity
 @Table(name = "prq_liquidation")
 public class Liquidation extends BaseEntity {

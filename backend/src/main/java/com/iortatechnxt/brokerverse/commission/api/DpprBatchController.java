@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.commission.api;
 import com.iortatechnxt.brokerverse.commission.domain.DpprBatch;
 import com.iortatechnxt.brokerverse.commission.domain.DpprBatchLine;
 import com.iortatechnxt.brokerverse.commission.service.DpprBatchService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * directly to the insurer, prepared by the Commission user, approved by the team lead and posted
  * line by line.
  */
+@OwnedRecord(value = DpprBatchLine.class, variable = "lineId")
 @RestController
 @RequestMapping("/api/v1/commission/dppr-batches")
 public class DpprBatchController {

@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.booking.api.dto.WorkbenchCountsResponse;
 import com.iortatechnxt.brokerverse.booking.api.dto.WorkbenchRowResponse;
 import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.BookingSource;
+import com.iortatechnxt.brokerverse.booking.domain.QueueEntry;
 import com.iortatechnxt.brokerverse.booking.domain.QueueSource;
 import com.iortatechnxt.brokerverse.booking.service.BookingPreviewService;
 import com.iortatechnxt.brokerverse.booking.service.BookingQueryService;
@@ -21,6 +22,7 @@ import com.iortatechnxt.brokerverse.booking.service.BookingWorkbenchService;
 import com.iortatechnxt.brokerverse.booking.service.BookingWorkbenchService.Filter;
 import com.iortatechnxt.brokerverse.booking.service.BookingWorkbenchService.Tab;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * confirmation, individual booking, queue (add, edit, remove), batch confirm / cancel, "Book now"
  * and batch runs.
  */
+@OwnedRecord(QueueEntry.class)
 @RestController
 @RequestMapping("/api/v1/booking")
 public class BookingController {

@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.screening.matching.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.FalsePositiveRequest;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.MatchDetail;
@@ -8,6 +10,7 @@ import com.iortatechnxt.brokerverse.screening.matching.api.dto.MatchQuery;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.MatchRow;
 import com.iortatechnxt.brokerverse.screening.matching.api.dto.RunDto;
 import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningMatch;
+import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningRun;
 import com.iortatechnxt.brokerverse.screening.matching.domain.ScreeningTrigger;
 import com.iortatechnxt.brokerverse.screening.matching.service.MatchCaseOpener;
 import com.iortatechnxt.brokerverse.screening.matching.service.MatchDecisionService;
@@ -34,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  * side-by-side comparison, "Open Case", "Mark False Positive"), the run log and "Screen Now" for a
  * client.
  */
+@OwnedRecord(value = Client.class, variable = "clientId")
 @RestController
 @RequestMapping("/api/v1/screening")
 public class ScreeningMatchController {
@@ -102,6 +106,7 @@ public class ScreeningMatchController {
    */
   @GetMapping("/matches/{id}")
   @PreAuthorize(HAS_VIEW)
+  @OwnedRecord(ScreeningMatch.class)
   public MatchDetail match(@PathVariable Long id) {
     ScreeningMatch m = decisions.get(id);
     return MatchDetail.from(
@@ -119,6 +124,7 @@ public class ScreeningMatchController {
    */
   @PostMapping("/matches/{id}/false-positive")
   @PreAuthorize(HAS_INVESTIGATE)
+  @OwnedRecord(ScreeningMatch.class)
   public MatchRow falsePositive(
       @PathVariable Long id, @Valid @RequestBody FalsePositiveRequest request) {
     decisions.markFalsePositive(id, request.toRequest());
@@ -133,6 +139,7 @@ public class ScreeningMatchController {
    */
   @PostMapping("/matches/{id}/open-case")
   @PreAuthorize(HAS_INVESTIGATE)
+  @OwnedRecord(ScreeningMatch.class)
   public MatchCaseOpener.OpenedCase openCase(@PathVariable Long id) {
     return decisions.openCase(id);
   }
@@ -196,6 +203,7 @@ public class ScreeningMatchController {
    */
   @GetMapping("/runs/{id}")
   @PreAuthorize(HAS_VIEW)
+  @OwnedRecord(ScreeningRun.class)
   public RunDto run(@PathVariable Long id) {
     return RunDto.from(queries.run(id));
   }
@@ -208,6 +216,7 @@ public class ScreeningMatchController {
    */
   @GetMapping("/runs/{id}/matches")
   @PreAuthorize(HAS_VIEW)
+  @OwnedRecord(ScreeningRun.class)
   public List<MatchRow> runMatches(@PathVariable Long id) {
     return queries.runMatches(id).stream().map(MatchRow::from).toList();
   }

@@ -1,12 +1,14 @@
 package com.iortatechnxt.brokerverse.productmaint.api;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.AdvisoryBody;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.AdvisoryView;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.ExpiryRow;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.RenewalBody;
 import com.iortatechnxt.brokerverse.productmaint.api.dto.OutputDtos.RenewalView;
 import com.iortatechnxt.brokerverse.productmaint.domain.Advisory;
+import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequest;
 import com.iortatechnxt.brokerverse.productmaint.service.AdvisoryService;
 import com.iortatechnxt.brokerverse.productmaint.service.PackageExpiryService;
 import jakarta.validation.Valid;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
  * the drafts pending for a company, editing and sending (blocked without the supporting documents);
  * the packages by end date with their renewal status and the bulk "Generate Renewal Request".
  */
+@OwnedRecord(PackageRequest.class)
+@OwnedRecord(value = Advisory.class, variable = "advisoryId")
 @RestController
 @RequestMapping("/api/v1/product-maintenance")
 public class AdvisoryExpiryController {

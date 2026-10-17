@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.ledger.api;
 
 import com.iortatechnxt.brokerverse.coa.domain.GlAccount;
 import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.ledger.api.dto.AccountStatementResponse;
 import com.iortatechnxt.brokerverse.ledger.api.dto.StatementLineResponse;
 import com.iortatechnxt.brokerverse.ledger.domain.LedgerEntry;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** GL inquiry: account statements with running balance and drill-down to journals. */
+@OwnedRecord(value = GlAccount.class, variable = "accountId")
 @RestController
 @RequestMapping("/api/v1/ledger")
 public class LedgerController {

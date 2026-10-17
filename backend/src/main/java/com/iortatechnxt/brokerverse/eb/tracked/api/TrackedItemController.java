@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.eb.tracked.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.eb.domain.EbTrackedItem;
 import com.iortatechnxt.brokerverse.eb.tracked.api.dto.ItemRequests.ItemFilter;
 import com.iortatechnxt.brokerverse.eb.tracked.api.dto.ItemRequests.ItemRequest;
 import com.iortatechnxt.brokerverse.eb.tracked.api.dto.ItemRequests.StatusRequest;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * and billings of the EB programmes, filtered by programme, member, type, party, status and
  * overdue; opened, changed and moved on by Marketing and Processing.
  */
+@OwnedRecord(EbTrackedItem.class)
 @RestController
 @RequestMapping("/api/v1/eb/pending-items")
 public class TrackedItemController {

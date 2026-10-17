@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.remittance.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInService;
 import com.iortatechnxt.brokerverse.remittance.api.dto.BatchDtos.CommentRequest;
@@ -10,6 +11,7 @@ import com.iortatechnxt.brokerverse.remittance.api.dto.RequestDtos.SpecialCreate
 import com.iortatechnxt.brokerverse.remittance.api.dto.RequestDtos.SpecialResponse;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RequestSource;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.SpecialStage;
+import com.iortatechnxt.brokerverse.remittance.domain.SpecialRemittance;
 import com.iortatechnxt.brokerverse.remittance.service.RemittanceQueryService;
 import com.iortatechnxt.brokerverse.remittance.service.SpecialRemittanceService;
 import com.iortatechnxt.brokerverse.remittance.service.SpecialRemittanceService.NewRequest;
@@ -34,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
  * approve into a special batch, reject, and the Collection file upload ({@code
  * COLLECTION_SPECIAL_REMIT}).
  */
+@OwnedRecord(SpecialRemittance.class)
 @RestController
 @RequestMapping("/api/v1/remittance/special")
 public class SpecialRemittanceController {

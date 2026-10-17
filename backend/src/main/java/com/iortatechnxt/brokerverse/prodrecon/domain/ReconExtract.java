@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.prodrecon.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconEnums.ExtractTrigger;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
  * file name (PRODRECON_FILE_PATTERN), repository file and checksum, number of lines, and when and
  * to whom it was sent.
  */
+@OwnedBy(value = ReconCycle.class, key = "cycleId")
 @Entity
 @Table(name = "prc_extract")
 public class ReconExtract extends BaseEntity {

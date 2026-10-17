@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.submitted.processing.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLimitCheckRepository;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyRepository;
@@ -38,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Processing Runs (FRS FR-SP-021, 022, 050): start a run on demand (Run Processing), the list of
  * runs, a run with its results and fallout, and the rule results and limit checks of a record.
  */
+@OwnedRecord(SbmRun.class)
+@OwnedRecord(value = SbmPolicy.class, variable = "policyId")
 @RestController
 @RequestMapping("/api/v1/submitted/runs")
 public class RunController {

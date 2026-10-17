@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.eb.programme.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
+import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.home.service.EbHomeService;
 import com.iortatechnxt.brokerverse.eb.programme.api.dto.ProgrammeRequests.ContactRequest;
 import com.iortatechnxt.brokerverse.eb.programme.api.dto.ProgrammeRequests.LineRequest;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * list with Send RA, the New Programme screen, the programme page (profile, lines, contacts,
  * cycles, activity) and the EB Home counts.
  */
+@OwnedRecord(EbProgramme.class)
 @RestController
 @RequestMapping("/api/v1/eb")
 public class ProgrammeController {

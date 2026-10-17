@@ -2,8 +2,10 @@ package com.iortatechnxt.brokerverse.submitted.masterlist.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmBusinessType;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmExtraction;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicyData;
 import com.iortatechnxt.brokerverse.submitted.masterlist.api.dto.ExtractionDtos.ExtractionView;
 import com.iortatechnxt.brokerverse.submitted.masterlist.api.dto.PolicyDtos.PolicyDetail;
@@ -31,6 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
  * Extraction Review (FRS FR-SP-002): upload of a policy document for a record or a new record, the
  * proposals waiting for confirmation, and confirm or reject.
  */
+@OwnedRecord(SbmExtraction.class)
+@OwnedRecord(value = SbmPolicy.class, variable = "policyId")
 @RestController("sbmExtractionController")
 @RequestMapping("/api/v1/submitted/extractions")
 public class ExtractionController {

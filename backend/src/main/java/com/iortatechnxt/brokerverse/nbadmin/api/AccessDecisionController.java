@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.api;
 
+import com.iortatechnxt.brokerverse.common.security.GlobalRecord;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessDecisionResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.DecisionRequest;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  * approval, reject, return, resubmit, cancel, and the implementation of approved group-profile
  * requests by the System Administrator (BRD-11 p.6).
  */
+@GlobalRecord("users, roles and access requests are programme-wide")
 @RestController
 @RequestMapping("/api/v1/nbadmin/access-requests")
 public class AccessDecisionController {

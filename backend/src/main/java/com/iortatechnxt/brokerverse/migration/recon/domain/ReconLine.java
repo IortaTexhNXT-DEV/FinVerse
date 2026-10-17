@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.migration.recon.domain;
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +18,7 @@ import java.time.Instant;
  * explanation with a reason, approved by a reconciliation approver other than the user who
  * explained it.
  */
+@OwnedBy(value = MigReconRun.class, key = "runId")
 @Entity
 @Table(name = "mig_recon_line")
 public class ReconLine extends BaseEntity {

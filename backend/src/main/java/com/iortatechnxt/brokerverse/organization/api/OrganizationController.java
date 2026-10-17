@@ -1,11 +1,14 @@
 package com.iortatechnxt.brokerverse.organization.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.organization.api.dto.BranchRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.BranchResponse;
 import com.iortatechnxt.brokerverse.organization.api.dto.CompanyRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.CompanyResponse;
 import com.iortatechnxt.brokerverse.organization.api.dto.HolidayRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.HolidayResponse;
+import com.iortatechnxt.brokerverse.organization.domain.Branch;
+import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -82,6 +85,7 @@ public class OrganizationController {
    */
   @PutMapping("/companies/{id}")
   @PreAuthorize(MAINTAIN)
+  @OwnedRecord(Company.class)
   public CompanyResponse updateCompany(
       @PathVariable Long id, @Valid @RequestBody CompanyRequest request) {
     return CompanyResponse.from(service.updateCompany(id, request));
@@ -95,6 +99,7 @@ public class OrganizationController {
    */
   @PostMapping("/companies/{id}/authorize")
   @PreAuthorize(AUTHORIZE)
+  @OwnedRecord(Company.class)
   public CompanyResponse authorizeCompany(@PathVariable Long id) {
     return CompanyResponse.from(service.authorizeCompany(id));
   }
@@ -133,6 +138,7 @@ public class OrganizationController {
    */
   @PutMapping("/branches/{id}")
   @PreAuthorize(MAINTAIN)
+  @OwnedRecord(Branch.class)
   public BranchResponse updateBranch(
       @PathVariable Long id, @Valid @RequestBody BranchRequest request) {
     return BranchResponse.from(service.updateBranch(id, request));
@@ -146,6 +152,7 @@ public class OrganizationController {
    */
   @PostMapping("/branches/{id}/authorize")
   @PreAuthorize(AUTHORIZE)
+  @OwnedRecord(Branch.class)
   public BranchResponse authorizeBranch(@PathVariable Long id) {
     return BranchResponse.from(service.authorizeBranch(id));
   }
@@ -158,6 +165,7 @@ public class OrganizationController {
    */
   @PostMapping("/branches/{id}/deactivate")
   @PreAuthorize(AUTHORIZE)
+  @OwnedRecord(Branch.class)
   public BranchResponse deactivateBranch(@PathVariable Long id) {
     return BranchResponse.from(service.deactivateBranch(id));
   }

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.issuance.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.issuance.domain.AdviceRecipient;
 import com.iortatechnxt.brokerverse.issuance.service.AdviceRecipientService;
 import java.time.Instant;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The Insurance Advice recipient set-up (FR-NB-107): recipients and automatic sending per mortgagee
  * bank, maker-checker. Maintained by the Business Administrator, authorized by a second user.
  */
+@OwnedRecord(AdviceRecipient.class)
 @RestController
 @RequestMapping("/api/v1/issuance/advice-recipients")
 public class AdviceRecipientController {

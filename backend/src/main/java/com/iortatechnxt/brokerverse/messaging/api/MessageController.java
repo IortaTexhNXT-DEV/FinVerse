@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.messaging.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.messaging.api.dto.MessageResponse;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageStatus;
+import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage;
 import com.iortatechnxt.brokerverse.messaging.service.MessageSearch;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Outbound message log (Administration) and the e-mails sent for one record (record pages).
  * Attachments are not downloadable here: the business record keeps the original document.
  */
+@OwnedRecord(OutboundMessage.class)
 @RestController
 @RequestMapping("/api/v1/messages")
 public class MessageController {

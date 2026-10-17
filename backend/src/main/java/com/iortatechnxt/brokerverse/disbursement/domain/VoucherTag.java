@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.disbursement.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.security.OwnedBy;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.CwtDirection;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.TagKind;
 import jakarta.persistence.Column;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
  * insurer or released to a supplier (period covered, date received / released, amount, certificate
  * reference).
  */
+@OwnedBy(value = Voucher.class, key = "voucherId")
 @Entity
 @Table(name = "dsb_voucher_tag")
 public class VoucherTag extends BaseEntity {

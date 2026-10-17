@@ -1,7 +1,10 @@
 package com.iortatechnxt.brokerverse.eb.franchise.api;
 
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.eb.document.api.EbUploads;
+import com.iortatechnxt.brokerverse.eb.domain.EbCycle;
 import com.iortatechnxt.brokerverse.eb.domain.EbFranchiseRequest;
+import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.franchise.api.dto.FranchiseDtos.FranchiseResponse;
 import com.iortatechnxt.brokerverse.eb.franchise.api.dto.FranchiseDtos.InsurersRequest;
 import com.iortatechnxt.brokerverse.eb.franchise.service.FranchiseService;
@@ -24,6 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /** Franchise requests of a cycle (FR-EB-032, 033): request, record the decision, advise. */
+@OwnedRecord(EbProgramme.class)
+@OwnedRecord(value = EbCycle.class, variable = "cycleId")
+@OwnedRecord(value = EbFranchiseRequest.class, variable = "requestId")
 @RestController
 @RequestMapping("/api/v1/eb")
 @Transactional

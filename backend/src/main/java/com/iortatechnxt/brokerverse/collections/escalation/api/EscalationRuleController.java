@@ -3,9 +3,11 @@ package com.iortatechnxt.brokerverse.collections.escalation.api;
 import com.iortatechnxt.brokerverse.collections.escalation.api.dto.EscalationDtos.MatchResponse;
 import com.iortatechnxt.brokerverse.collections.escalation.api.dto.EscalationDtos.RuleRequest;
 import com.iortatechnxt.brokerverse.collections.escalation.api.dto.EscalationDtos.RuleResponse;
+import com.iortatechnxt.brokerverse.collections.escalation.domain.EscalationRule;
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationEngine;
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationRuleService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import jakarta.validation.Valid;
 import java.time.Clock;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * authorization by another user ({@code MASTER_AUTHORIZE}), deactivation, and the preview of the
  * accounts a rule escalates on a date.
  */
+@OwnedRecord(EscalationRule.class)
 @RestController
 @RequestMapping("/api/v1/collections/escalation-rules")
 public class EscalationRuleController {

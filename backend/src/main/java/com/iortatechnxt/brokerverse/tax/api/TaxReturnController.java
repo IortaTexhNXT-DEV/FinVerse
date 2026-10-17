@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.tax.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.tax.api.dto.FileReturnRequest;
 import com.iortatechnxt.brokerverse.tax.api.dto.PayReturnRequest;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Tax returns register and lifecycle: prepare, refresh, file, pay, cancel. */
+@OwnedRecord(TaxReturn.class)
 @RestController
 @RequestMapping("/api/v1/tax/returns")
 public class TaxReturnController {

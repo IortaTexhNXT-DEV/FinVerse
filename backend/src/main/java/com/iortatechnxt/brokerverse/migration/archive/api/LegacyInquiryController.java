@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.migration.archive.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.migration.archive.api.dto.InquiryDtos.AccessLogResponse;
 import com.iortatechnxt.brokerverse.migration.archive.api.dto.InquiryDtos.RecordDetail;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * detail, documents and Excel export of the legacy archive, every access logged with its reason;
  * and the access log for Compliance.
  */
+@OwnedRecord(ArchiveRecord.class)
 @RestController
 @RequestMapping("/api/v1/legacy-inquiry")
 public class LegacyInquiryController {

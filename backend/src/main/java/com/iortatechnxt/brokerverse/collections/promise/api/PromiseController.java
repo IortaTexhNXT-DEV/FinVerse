@@ -2,10 +2,12 @@ package com.iortatechnxt.brokerverse.collections.promise.api;
 
 import com.iortatechnxt.brokerverse.collections.promise.api.dto.PromiseDtos.PromiseRequest;
 import com.iortatechnxt.brokerverse.collections.promise.api.dto.PromiseDtos.PromiseResponse;
+import com.iortatechnxt.brokerverse.collections.promise.domain.PaymentPromise;
 import com.iortatechnxt.brokerverse.collections.promise.domain.PromiseStatus;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * account, recording ({@code CLX_WORK}) and withdrawal. Evaluation is done by the job {@code
  * CLX_PROMISE_CHECK}.
  */
+@OwnedRecord(PaymentPromise.class)
 @RestController
 @RequestMapping("/api/v1/collections/promises")
 public class PromiseController {

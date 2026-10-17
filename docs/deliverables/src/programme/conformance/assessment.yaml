@@ -1,7 +1,7 @@
 # Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
 # evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
 # fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
-version: "1.4"
+version: "1.5"
 date: 17 October 2026
 scope: >-
   Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
@@ -22,7 +22,12 @@ scope: >-
   a fresh SIT/UAT environment (P2.1 to P2.12 now pass); the remaining parts of G04, G05, G08 and G09 delivered (run
   time of day, last working day and relative periods of the report subscriptions; programme-wide Master Data Change
   Log with export and the data scope of the change history; the insurer's ledger accounts; supplementary batches,
-  merged PDF and manifest of the service invoices); the other results are carried over from version 1.3.
+  merged PDF and manifest of the service invoices); the other results are carried over from version 1.3. Version 1.5
+  (17-Oct-2026): the walkthrough-script steps of BRD-00, BRD-08, BRD-12 and BRD-13 run again on a fresh SIT/UAT
+  environment after the fixes of 17-Oct-2026: gap G11 closed (New Policy and Edit of Submitted Policies), gap G06 closed
+  (Layout panel of the report runner and the MIS fields catalogue), recipes of BRD-00 J1.3, BRD-08 P1.3, P3.1, P3.3
+  and BRD-13 FR-DM-125.1 and .2 corrected; the data scope of records addressed by id checked on every screen action; the
+  case routing notice copied to the account officer (BRD-9 FRS v1.2); the other results are carried over from v1.4.
 
 # The FRS whose requirements are counted, per BRD (Summary); BIBS FRS when not listed.
 baselines:
@@ -32,7 +37,7 @@ baselines:
   BRD-11: BDOI FRS v1.6
 
 # Results of the previous version (Summary, Change since v<previous_version>).
-previous_version: "1.3"
+previous_version: "1.4"
 previous:
   BRD-00: {frs: 25, ok: 19, partly: 1, nok: 2, nt: 3}
   BRD-01: {frs: 95, ok: 69, partly: 24, nok: 0, nt: 2}
@@ -43,23 +48,23 @@ previous:
   BRD-06: {frs: 49, ok: 27, partly: 22, nok: 0, nt: 0}
   BRD-07: {frs: 39, ok: 27, partly: 10, nok: 0, nt: 2}
   BRD-08: {frs: 39, ok: 15, partly: 12, nok: 0, nt: 12}
-  BRD-09: {frs: 29, ok: 6, partly: 7, nok: 12, nt: 4}
+  BRD-09: {frs: 29, ok: 18, partly: 7, nok: 0, nt: 4}
   BRD-10: {frs: 44, ok: 33, partly: 10, nok: 0, nt: 1}
   BRD-11: {frs: 12, ok: 4, partly: 8, nok: 0, nt: 0}
   BRD-12: {frs: 35, ok: 13, partly: 20, nok: 0, nt: 2}
   BRD-13: {frs: 48, ok: 18, partly: 19, nok: 0, nt: 11}
-  Total: {frs: 644, ok: 368, partly: 220, nok: 14, nt: 42}
+  Total: {frs: 644, ok: 380, partly: 220, nok: 2, nt: 42}
 
 # What changed since the previous version, per BRD (Summary).
 changes:
-  BRD-00: Remaining parts of the gaps of version 1.3 delivered - report subscriptions at a time of day, on the last
-    working day and with relative periods (G04), the Master Data Change Log screen with export and the data scope of
-    the change history (G05), the insurer's ledger accounts (G08), supplementary service-invoice batches with the
-    merged PDF and manifest (G09).
-  BRD-03: Ledger Accounts tab of the insurer page and the Master Data Change Log (FRS BRD-03 v1.6, FRPM.023.02 and
-    FRPM.021.03).
-  BRD-09: Case management delivered (gap G01, FR-CSF-050 to FR-CSF-061); walkthrough steps P2.1 to P2.12 run again
-    and pass (FRS BRD-9 v1.2).
+  BRD-00: Layout panel of the report runner (grouping, subtotals and counts, bar or line chart) and the MIS fields
+    catalogue (gap G06, FR-CR-042, FR-CR-062); data scope of every record addressed by id; recipe of J1.3 corrected.
+  BRD-08: Steps P1.3, P3.1 and P3.3 follow the Drop 2 process of assumption A-EB-06 (the AO records what is received
+    by e-mail); P1.2 and P1.4 stay blocked by the partner portal (G02).
+  BRD-09: The case routing notice is copied to the account officer of the account (FRS BRD-9 v1.2).
+  BRD-12: New Policy on the Masterlist and Edit on the policy record (gap G11, FR-SP-003); step P1.2 passes.
+  BRD-13: Steps FR-DM-125.1 and .2 checked on the load template of layout P03 (compiled and checked outside BIBS by
+    design).
 
 # Decisions on requirement items of the BDOI-template FRS (by item or group id): result, reason, evidence.
 bdoi_decisions:
@@ -133,6 +138,9 @@ extra_checks:
   FR-CR-060: [LovServiceIT]
   FR-CR-031: [MasterChangeLogIT, MasterChangesTest]
   FR-CR-043: [ReportSubscriptionIT, ReportSubscriptionScheduleTest]
+  FR-CR-042: [ReportLayoutOptionsTest, ReportLayoutIT]
+  FR-CR-062: [ReportLayoutIT]
+  FR-SP-003: [ManualPolicyIT]
   FR-CR-061: [CatalogIT, InsurerPageIT]
   FR-CR-070: [UserAdminApiIT, LoginProtectionTest, SignInTokensIT]
   FR-CR-071: [DocumentProtectorTest]
@@ -341,6 +349,10 @@ gaps:
       Deliver the portal in the drop agreed with BDOI: external users provisioned through User Access requests,
       the task inbox and structured proposal form for insurers, the client HR pages, and the staging and review of
       portal uploads; until then the officer keys in what is received by e-mail.
+      Depends on BDOI input: the portal is outside Drop 2 by BDOI's scope decision, and its hosting, sign-in,
+      one-time code and user administration wait for EBQ13 (BDO Information Security) and the UIDM-ISC provisioning
+      of external users (BRD-11 FRS v1.6). No part of the portal is delivered before these decisions; the Drop 2 process
+      of assumption A-EB-06 is walked in steps P1.3, P3.1 and P3.3, and P1.2 and P1.4 stay blocked.
     size: Large
   - id: G03
     brd: BRD-00
@@ -425,6 +437,15 @@ gaps:
       grouping fields, subtotals and counts, one bar or line chart) saved with the variant and applied to the screen,
       Excel and PDF.
     size: Large
+    status: Closed
+    closed: >-
+      Delivered in the release of 17-Oct-2026: the report runner has a Layout panel after a run (one or two grouping fields, MIS fields
+      first with their catalogue label, subtotals and the number of records per group, one bar or line chart of a
+      totalled amount or the count drawn in the PDF and on a Chart sheet of the Excel file), saved with the variant
+      and applied to the exports and subscriptions; reports with a prescribed layout offer none. MIS Fields under
+      Broking Setup (maker-checker, one field per data element, delivered with the fields of BR-173 and the MIS
+      columns of the Report List, changes in the Master Data Change Log). The automated checks of the report
+      layout, the MIS fields and their screens pass.
   - id: G07
     brd: BRD-00
     frs: [FR-CR-010]
@@ -508,6 +529,11 @@ gaps:
     proposal: Add New Policy on the Masterlist and Edit on the policy record (segment, business type, loan, assured,
       terms, risk, marks and tracking), with the validations of the upload and the history of the changed fields.
     size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 17-Oct-2026: New Policy on the Masterlist and Edit on the policy record (segment, business type,
+      loan, assured, terms, risk and marks), saved VALIDATED with the checks of the MANUAL source and the history of
+      the changed fields (automated check of the manual policy); step P1.2 of the walkthrough script passes on a fresh SIT/UAT environment.
   - id: G12
     brd: BRD-12
     frs: [FR-SP-082]

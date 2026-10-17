@@ -294,6 +294,17 @@ LOG = [
      "Register v1.4 issued; v1.3 superseded. Product Maintenance FRS, UX Design, Process and Storyboards and Reports "
      "v1.6, Developer Specification v1.3, User Stories v1.2 and review workbooks v1.3 issued; Customer Servicing "
      "Facility FRS and test plan v1.2 issued.", "Closed", "Conformance Register v1.4"),
+    ("O-016", "17 Oct 2026", "Decision", "BRD-00", "End-to-End Conformance Register v1.5: data scope of records "
+     "addressed by id, G06 and G11 closed, walkthrough recipes corrected", "Every screen action that opens or changes "
+     "one record checks that the record belongs to a company and branch of the user's data access, otherwise it is "
+     "answered as not found. Delivered and closed: the Layout panel of the reports with the MIS fields catalogue "
+     "(G06) and New Policy and Edit of Submitted Policies (G11); the case routing notice is copied to the account "
+     "officer. Walkthrough recipes corrected where they did not follow the screens or the release: BRD-00 J1.3, "
+     "BRD-08 P1.3, P3.1 and P3.3 (Drop 2 process, assumption A-EB-06), BRD-13 FR-DM-125.1 and .2 (compiled and "
+     "checked outside BIBS by design). Run again on a fresh SIT/UAT environment: 351 steps pass, none fail, 2 "
+     "blocked. Open and waiting for BDOI: the partner portal (G02: Drop 2 scope, EBQ13, UIDM-ISC provisioning).",
+     "iorta TechNXT", "Register v1.5 issued; v1.4 superseded. Product Maintenance UX Design v1.7 issued; v1.6 "
+     "superseded.", "Closed", "Conformance Register v1.5"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

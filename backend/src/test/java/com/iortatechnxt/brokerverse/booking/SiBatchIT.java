@@ -130,7 +130,14 @@ class SiBatchIT {
     SiBatchFiles.Files files = batches.files(batch.getId());
     assertThat(new String(files.pdf(), 0, 5, StandardCharsets.US_ASCII)).isEqualTo("%PDF-");
     String manifest = new String(files.manifest(), StandardCharsets.UTF_8);
-    assertThat(manifest).contains(a.getSiNo(), b.getSiNo(), "PDF Pages").contains("Total,,,,2,");
+    assertThat(manifest)
+        .contains(a.getSiNo(), b.getSiNo(), "PDF Pages")
+        .contains("Total,,,," + batch.getItemCount() + ",");
+    // The run also takes earlier service invoices of the insurer still in no batch (lookback).
+    assertThat(batches.items(batch.getId()))
+        .extracting(ServiceInvoice::getId)
+        .contains(a.getId(), b.getId())
+        .hasSize(batch.getItemCount());
     assertThat(files.pdfName()).isEqualTo("SI_BATCH_INS-MGIC_" + date + ".pdf");
     assertThat(
             jdbc.queryForObject(

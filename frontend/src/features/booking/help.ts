@@ -59,11 +59,12 @@ export const BOOKING_HELP: HelpSection = {
       summary:
         'The service invoices issued to each insurer on a business day, e-mailed to the insurer in one batch with their delivery status.',
       workflow: [
-        'The daily job generates one batch per insurer and day from the service invoices of the day and e-mails it with every service invoice attached.',
-        'Open a batch to see its service invoices; send a failed batch again with Re-send.',
+        'The daily job generates one batch per insurer and day and e-mails it as one PDF of all its service invoices with a manifest listing each service invoice, its amounts and its pages.',
+        "A service invoice issued after the day's batch of its insurer goes into the next daily batch, or into a supplementary batch made with Run Supplementary Batch.",
+        'Open a batch to see its service invoices; download its PDF or manifest; send a failed batch again with Re-send.',
       ],
       controls: [
-        'One batch per insurer and day: running the job again for a day leaves the existing batches unchanged.',
+        'One daily batch per insurer and day: running the job again for a day leaves the existing batches unchanged; supplementary batches are numbered 2, 3 and so on.',
         'Delivery status: generated, sent, failed (with the reason) or retried.',
       ],
     },

@@ -47,17 +47,24 @@ public class SiBatchService {
 
   private static final int BODY_CAPACITY = 256;
 
-  /** Service invoices to insurers of a date that are in no batch yet. */
+  /**
+   * Days back a batch run looks for service invoices still in no batch: one issued after the day's
+   * batch of its insurer goes into the next run, or into a supplementary batch.
+   */
+  public static final int LOOKBACK_DAYS = 31;
+
+  /** Service invoices to insurers issued up to a date that are in no batch yet. */
   static final String BILLABLE =
       "select si.id from bkg_service_invoice si"
           + " join bkg_si_type t on t.code = si.type_code"
-          + " where t.recipient = 'INSURER' and si.issue_date = ?"
+          + " where t.recipient = 'INSURER' and si.issue_date between ? and ?"
+          + " and (cast(? as bigint) is null or si.company_id = ?)"
           + " and not exists (select 1 from bkg_si_batch_item i where i.service_invoice_id = si.id)"
-          + " order by si.company_id, si.recipient_code, si.id";
+          + " order by si.company_id, si.recipient_code, si.issue_date, si.id";
 
   private final SiBatchRepository batches;
   private final ServiceInvoiceRepository serviceInvoices;
-  private final ServiceInvoiceDocument documents;
+  private final SiBatchFiles files;
   private final PartyService parties;
   private final MessageService messages;
   private final ApplicationEventPublisher events;
@@ -70,7 +77,7 @@ public class SiBatchService {
    *
    * @param batches batches
    * @param serviceInvoices service invoices
-   * @param documents service invoice PDFs
+   * @param files merged PDF and manifest
    * @param parties insurer parties (billing address)
    * @param messages outbox
    * @param events event publisher
@@ -81,7 +88,7 @@ public class SiBatchService {
   public SiBatchService(
       SiBatchRepository batches,
       ServiceInvoiceRepository serviceInvoices,
-      ServiceInvoiceDocument documents,
+      SiBatchFiles files,
       PartyService parties,
       MessageService messages,
       ApplicationEventPublisher events,
@@ -90,7 +97,7 @@ public class SiBatchService {
       Clock clock) {
     this.batches = batches;
     this.serviceInvoices = serviceInvoices;
-    this.documents = documents;
+    this.files = files;
     this.parties = parties;
     this.messages = messages;
     this.events = events;
@@ -116,7 +123,26 @@ public class SiBatchService {
    * @return batches generated
    */
   public List<SiBatch> generate(LocalDate date) {
-    List<Long> ids = jdbc.queryForList(BILLABLE, Long.class, date);
+    return generate(null, date, false);
+  }
+
+  /**
+   * Runs a supplementary batch for a company and date: the service invoices issued up to the date
+   * and in no batch yet (issued after the day's batch of their insurer) form one more batch per
+   * insurer, numbered after the batches of the date.
+   *
+   * @param companyId company
+   * @param date business date of the batch
+   * @return batches generated
+   */
+  public List<SiBatch> supplementary(Long companyId, LocalDate date) {
+    return generate(companyId, date, true);
+  }
+
+  private List<SiBatch> generate(Long companyId, LocalDate date, boolean supplementary) {
+    List<Long> ids =
+        jdbc.queryForList(
+            BILLABLE, Long.class, date.minusDays(LOOKBACK_DAYS), date, companyId, companyId);
     Map<String, List<ServiceInvoice>> byInsurer = new LinkedHashMap<>();
     for (ServiceInvoice si : serviceInvoices.findAllById(ids)) {
       byInsurer
@@ -126,12 +152,13 @@ public class SiBatchService {
     List<SiBatch> generated = new ArrayList<>();
     for (List<ServiceInvoice> items : byInsurer.values()) {
       ServiceInvoice first = items.get(0);
-      if (batches
-          .findByCompanyIdAndInsurerCodeAndBatchDate(
-              first.getCompanyId(), first.getRecipientCode(), date)
-          .isPresent()) {
+      List<SiBatch> existing =
+          batches.findByCompanyIdAndInsurerCodeAndBatchDateOrderBySequenceNoDesc(
+              first.getCompanyId(), first.getRecipientCode(), date);
+      if (!existing.isEmpty() && !supplementary) {
         continue;
       }
+      int sequence = existing.isEmpty() ? 1 : existing.get(0).getSequenceNo() + 1;
       SiBatch batch =
           batches.save(
               new SiBatch(
@@ -139,16 +166,30 @@ public class SiBatchService {
                   first.getRecipientCode(),
                   first.getRecipientName(),
                   date,
+                  sequence,
                   items));
       audit.record(
           ENTITY,
           reference(batch),
           AuditAction.CREATE,
-          "Generated with " + batch.getItemCount() + " service invoices");
+          (sequence > 1 ? "Supplementary batch generated with " : "Generated with ")
+              + batch.getItemCount()
+              + " service invoices");
       send(batch, items);
       generated.add(batch);
     }
     return generated;
+  }
+
+  /**
+   * The merged PDF and the manifest of a batch.
+   *
+   * @param id batch
+   * @return files
+   */
+  public SiBatchFiles.Files files(Long id) {
+    SiBatch batch = get(id);
+    return files.of(batch, serviceInvoices.findAllById(batch.getServiceInvoiceIds()));
   }
 
   /**
@@ -230,10 +271,11 @@ public class SiBatchService {
       batch.failed("No billing e-mail address for " + batch.getInsurerCode());
       return;
     }
-    List<MessageFile> files =
-        items.stream()
-            .map(si -> new MessageFile(si.getSiNo() + ".pdf", PDF, documents.content(si)))
-            .toList();
+    SiBatchFiles.Files built = files.of(batch, items);
+    List<MessageFile> attachments =
+        List.of(
+            new MessageFile(built.pdfName(), PDF, built.pdf()),
+            new MessageFile(built.manifestName(), SiBatchFiles.CSV, built.manifest()));
     Long messageId =
         messages
             .queueEmail(
@@ -244,7 +286,7 @@ public class SiBatchService {
                     null,
                     "Service invoices of " + batch.getBatchDate(),
                     body(batch, items),
-                    files,
+                    attachments,
                     null,
                     new RecordLink(ENTITY, String.valueOf(batch.getId()), reference(batch))))
             .messageId();
@@ -264,9 +306,9 @@ public class SiBatchService {
         new StringBuilder(BODY_CAPACITY)
             .append("Dear ")
             .append(batch.getInsurerName())
-            .append(",\n\nPlease find attached our ")
+            .append(",\n\nPlease find attached, in one PDF with its manifest, our ")
             .append(items.size())
-            .append(" service invoices issued on ")
+            .append(" service invoices of the batch of ")
             .append(batch.getBatchDate())
             .append(":\n\n");
     for (ServiceInvoice si : items) {

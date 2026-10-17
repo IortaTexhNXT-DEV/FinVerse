@@ -14,6 +14,7 @@ import java.time.LocalDate;
  * @param insurerCode insurer
  * @param insurerName insurer name
  * @param batchDate business date of the service invoices
+ * @param sequenceNo 1 for the daily batch, 2 and up for a supplementary batch
  * @param itemCount number of service invoices
  * @param currency currency, null when the invoices are in several currencies
  * @param commissionTotal total commission
@@ -31,6 +32,7 @@ public record SiBatchResponse(
     String insurerCode,
     String insurerName,
     LocalDate batchDate,
+    int sequenceNo,
     int itemCount,
     String currency,
     BigDecimal commissionTotal,
@@ -55,6 +57,7 @@ public record SiBatchResponse(
         b.getInsurerCode(),
         b.getInsurerName(),
         b.getBatchDate(),
+        b.getSequenceNo(),
         b.getItemCount(),
         b.getCurrency(),
         b.getCommissionTotal(),

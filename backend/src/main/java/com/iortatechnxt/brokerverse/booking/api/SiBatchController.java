@@ -2,12 +2,19 @@ package com.iortatechnxt.brokerverse.booking.api;
 
 import com.iortatechnxt.brokerverse.booking.api.dto.ServiceInvoiceResponse;
 import com.iortatechnxt.brokerverse.booking.api.dto.SiBatchResponse;
+import com.iortatechnxt.brokerverse.booking.service.SiBatchFiles;
 import com.iortatechnxt.brokerverse.booking.service.SiBatchService;
+import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
+import com.iortatechnxt.brokerverse.common.security.DataScope;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,13 +35,70 @@ public class SiBatchController {
 
   private final SiBatchService batches;
 
+  private final DataScope dataScope;
+
   /**
    * Creates the controller.
    *
    * @param batches batches
+   * @param dataScope data scope of the user
    */
-  public SiBatchController(SiBatchService batches) {
+  public SiBatchController(SiBatchService batches, DataScope dataScope) {
     this.batches = batches;
+    this.dataScope = dataScope;
+  }
+
+  /**
+   * Runs a supplementary batch for a date: the service invoices issued after the day's batch of
+   * their insurer, still in no batch, form one more batch per insurer.
+   *
+   * @param companyId company
+   * @param date business date of the batch
+   * @return batches generated
+   */
+  @PostMapping("/supplementary")
+  @PreAuthorize(BookingAccess.PROCESS)
+  public List<SiBatchResponse> supplementary(
+      @RequestParam Long companyId,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    return batches.supplementary(companyId, date).stream().map(SiBatchResponse::from).toList();
+  }
+
+  /**
+   * The service invoices of a batch in one PDF.
+   *
+   * @param id batch
+   * @return PDF
+   */
+  @GetMapping("/{id}/pdf")
+  @PreAuthorize(BookingAccess.VIEW)
+  @CompanyScoped("the company of the batch is checked with DataScope.requireCompany")
+  public ResponseEntity<byte[]> pdf(@PathVariable Long id) {
+    dataScope.requireCompany(batches.get(id).getCompanyId());
+    SiBatchFiles.Files files = batches.files(id);
+    return ResponseEntity.ok()
+        .contentType(MediaType.APPLICATION_PDF)
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(files.pdfName()))
+        .body(files.pdf());
+  }
+
+  /**
+   * The manifest of a batch (CSV).
+   *
+   * @param id batch
+   * @return manifest
+   */
+  @GetMapping("/{id}/manifest")
+  @PreAuthorize(BookingAccess.VIEW)
+  @CompanyScoped("the company of the batch is checked with DataScope.requireCompany")
+  public ResponseEntity<byte[]> manifest(@PathVariable Long id) {
+    dataScope.requireCompany(batches.get(id).getCompanyId());
+    SiBatchFiles.Files files = batches.files(id);
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(SiBatchFiles.CSV))
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(files.manifestName()))
+        .body(files.manifest());
   }
 
   /**

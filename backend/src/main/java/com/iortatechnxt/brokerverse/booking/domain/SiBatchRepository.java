@@ -2,21 +2,20 @@ package com.iortatechnxt.brokerverse.booking.domain;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /** Daily service-invoice batches (G09). */
 public interface SiBatchRepository extends JpaRepository<SiBatch, Long> {
 
   /**
-   * The batch of an insurer and date.
+   * The batches of an insurer and date, the last one first.
    *
    * @param companyId company
    * @param insurerCode insurer
    * @param batchDate date
-   * @return batch
+   * @return batches
    */
-  Optional<SiBatch> findByCompanyIdAndInsurerCodeAndBatchDate(
+  List<SiBatch> findByCompanyIdAndInsurerCodeAndBatchDateOrderBySequenceNoDesc(
       Long companyId, String insurerCode, LocalDate batchDate);
 
   /**

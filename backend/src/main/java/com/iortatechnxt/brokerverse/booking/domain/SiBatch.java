@@ -39,6 +39,9 @@ public class SiBatch extends BaseEntity {
   @Column(name = "batch_date", nullable = false, updatable = false)
   private LocalDate batchDate;
 
+  @Column(name = "sequence_no", nullable = false, updatable = false)
+  private int sequenceNo = 1;
+
   @Column(name = "item_count", nullable = false, updatable = false)
   private int itemCount;
 
@@ -84,6 +87,7 @@ public class SiBatch extends BaseEntity {
    * @param insurerCode insurer party
    * @param insurerName insurer name
    * @param batchDate business date of the service invoices
+   * @param sequenceNo 1 for the daily batch, 2 and up for a supplementary batch
    * @param items the service invoices, at least one
    */
   public SiBatch(
@@ -91,6 +95,7 @@ public class SiBatch extends BaseEntity {
       String insurerCode,
       String insurerName,
       LocalDate batchDate,
+      int sequenceNo,
       List<ServiceInvoice> items) {
     if (items.isEmpty()) {
       throw new BusinessRuleException("SI_BATCH_EMPTY", "A batch needs at least one invoice");
@@ -99,6 +104,7 @@ public class SiBatch extends BaseEntity {
     this.insurerCode = insurerCode;
     this.insurerName = insurerName;
     this.batchDate = batchDate;
+    this.sequenceNo = sequenceNo;
     this.itemCount = items.size();
     List<String> currencies = items.stream().map(ServiceInvoice::getCurrency).distinct().toList();
     this.currency = currencies.size() == 1 ? currencies.get(0) : null;
@@ -219,5 +225,15 @@ public class SiBatch extends BaseEntity {
 
   public List<Long> getServiceInvoiceIds() {
     return List.copyOf(serviceInvoiceIds);
+  }
+
+  /**
+   * Number of the batch of its insurer and date: 1 for the daily batch, 2 and up for a
+   * supplementary batch.
+   *
+   * @return sequence
+   */
+  public int getSequenceNo() {
+    return sequenceNo;
   }
 }

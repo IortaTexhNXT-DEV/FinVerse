@@ -11,11 +11,13 @@ import com.iortatechnxt.brokerverse.booking.domain.SiBatch;
 import com.iortatechnxt.brokerverse.booking.domain.SiBatchStatus;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceService;
 import com.iortatechnxt.brokerverse.booking.service.ServiceInvoiceService.IssueRequest;
+import com.iortatechnxt.brokerverse.booking.service.SiBatchFiles;
 import com.iortatechnxt.brokerverse.booking.service.SiBatchJob;
 import com.iortatechnxt.brokerverse.booking.service.SiBatchService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -89,6 +91,54 @@ class SiBatchIT {
     assertThatThrownBy(() -> as.run("proc", () -> batches.resend(batch.getId())))
         .extracting("code")
         .isEqualTo("SI_BATCH_NOT_RESENDABLE");
+  }
+
+  @Test
+  void aLateInvoiceGoesIntoASupplementaryBatchOrTheNextRun() {
+    LocalDate date = uniqueDate();
+    issue("INS-MGIC", date, "100.00");
+    as.run("proc", () -> batches.generate(date));
+    ServiceInvoice late = issue("INS-MGIC", date, "40.00");
+
+    List<SiBatch> extra = as.run("proc", () -> batches.supplementary(fx.company(), date));
+    SiBatch supplementary =
+        extra.stream().filter(x -> "INS-MGIC".equals(x.getInsurerCode())).findFirst().orElseThrow();
+    assertThat(supplementary.getSequenceNo()).isEqualTo(2);
+    assertThat(supplementary.getServiceInvoiceIds()).containsExactly(late.getId());
+
+    ServiceInvoice later = issue("INS-MGIC", date, "30.00");
+    LocalDate next = date.plusDays(1);
+    SiBatch nextRun =
+        as.run("proc", () -> batches.generate(next)).stream()
+            .filter(x -> "INS-MGIC".equals(x.getInsurerCode()))
+            .findFirst()
+            .orElseThrow();
+    assertThat(nextRun.getServiceInvoiceIds()).contains(later.getId());
+    assertThat(nextRun.getSequenceNo()).isEqualTo(1);
+  }
+
+  @Test
+  void aBatchHasOneMergedPdfAndAManifest() {
+    LocalDate date = uniqueDate();
+    ServiceInvoice a = issue("INS-MGIC", date, "100.00");
+    ServiceInvoice b = issue("INS-MGIC", date, "200.00");
+    SiBatch batch =
+        as.run("proc", () -> batches.generate(date)).stream()
+            .filter(x -> "INS-MGIC".equals(x.getInsurerCode()))
+            .findFirst()
+            .orElseThrow();
+    SiBatchFiles.Files files = batches.files(batch.getId());
+    assertThat(new String(files.pdf(), 0, 5, StandardCharsets.US_ASCII)).isEqualTo("%PDF-");
+    String manifest = new String(files.manifest(), StandardCharsets.UTF_8);
+    assertThat(manifest).contains(a.getSiNo(), b.getSiNo(), "PDF Pages").contains("Total,,,,2,");
+    assertThat(files.pdfName()).isEqualTo("SI_BATCH_INS-MGIC_" + date + ".pdf");
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from msg_outbound_attachment a join msg_outbound m"
+                    + " on m.id = a.message_id where m.id = ?",
+                Integer.class,
+                batch.getMessageId()))
+        .isEqualTo(2);
   }
 
   @Test

@@ -1,0 +1,12 @@
+# Defaults and ceilings for any container of the namespace that does not declare its own resources
+# (e.g. a one-off job or debug pod), so nothing runs unbounded. The four deployments declare theirs.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: bibs-container-defaults
+spec:
+  limits:
+    - type: Container
+      defaultRequest: { cpu: "100m", memory: "128Mi", ephemeral-storage: "64Mi" }
+      default: { cpu: "500m", memory: "512Mi", ephemeral-storage: "512Mi" }
+      max: { cpu: "4", memory: "8Gi", ephemeral-storage: "8Gi" }

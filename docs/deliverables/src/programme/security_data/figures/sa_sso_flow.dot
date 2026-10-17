@@ -1,0 +1,15 @@
+// Security Architecture: single sign-on with EIAM (OpenID Connect, authorisation code with PKCE) and the BIBS session.
+digraph sa_sso_flow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.35, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fillcolor="@WHITE", margin="0.12,0.05", width=6.2];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.1];
+  a [label=<<b>1.</b> User opens BIBS and chooses "Sign in with BDO" (sign-in options from the server)>];
+  b [label=<<b>2.</b> BIBS creates a sign-in request (state, nonce, PKCE S256 verifier) and redirects to EIAM>];
+  c [label=<<b>3.</b> EIAM authenticates the user: password, MFA and conditional access of BDO>, fillcolor="@AMBER_BG"];
+  d [label=<<b>4.</b> EIAM returns the authorisation code; BIBS exchanges it as a confidential client>];
+  e [label=<<b>5.</b> BIBS checks the ID token: signature (provider key set, RS256 only), issuer, audience, expiry, nonce>];
+  f [label=<<b>6.</b> The identity is linked to an existing active BIBS user only (never created); optional group gate>];
+  g [label=<<b>7.</b> One-time ticket (2 minutes) redeemed by the web client>];
+  h [label=<<b>8.</b> BIBS session: access token 15 min, rotating refresh cookie, idle 30 min, absolute 8 h>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  a -> b -> c -> d -> e -> f -> g -> h;
+}

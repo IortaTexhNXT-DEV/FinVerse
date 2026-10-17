@@ -1,0 +1,66 @@
+# How migrated data is told apart from new data on the business screens (Handbook Part B).
+area: Migrated data on the business screens
+screens:
+  - id: SCR-DM-16
+    title: LEGACY badge and Origin filter on the lists
+    route: /crm/clients
+    also: [/accounts, /operations/invoices, /cashiering/unapplied, /collections/worklist, /catalog/products,
+           /catalog/insurers, /disbursement/payees]
+    purpose: >-
+      Records migrated from a legacy system are used with the normal BIBS screens. They are told apart from records
+      created in BIBS by a LEGACY badge next to their number on the lists and records (Clients, Accounts, Invoice
+      Search, Unapplied Payments, the PR Worklist and its accounts, Products, Insurers, Payees), with the source
+      system, the legacy reference and the migration batch in its tooltip, and by the Origin filter of the lists that
+      hold migrated records.
+    entry: ["Client & Policy › Clients › Clients", "Client & Policy › Accounts & Placement › Accounts",
+            "Operations › Operations › Invoice Search", "Finance › Cashiering › Unapplied Payments",
+            "Finance › Collections › PR Worklist"]
+    shots:
+      - {state: clients, user: ao, caption: Clients list with a migrated client marked LEGACY}
+      - {state: unapplied, user: cashier, path: /cashiering/unapplied, caption: Unapplied Payments with the Origin filter set to Migrated}
+    fields:
+      - "Every list with migrated records | LEGACY | Badge | Next to the number; tooltip: Migrated from <system>, legacy reference <ref>, batch <batch> | - | Origin of the record | - | - | - | -"
+      - "Lists with the Origin filter | Origin | Drop-down | All origins, BIBS, Migrated | N | - | All origins | - | - | -"
+      - "Client search | [Legacy client number] | Text | A legacy client number finds the BIBS client it was merged into | N | Key cross-reference | - | - | - | -"
+      - "Account search | [Legacy policy reference] | Text | A legacy policy number finds the migrated policy header | N | Key cross-reference | - | - | - | -"
+    actions:
+      - "[Search and filters] | Users of each list | Always | Find migrated records by their BIBS or legacy number, or only the migrated or BIBS records | - | -"
+    rules:
+      - "Every migrated record keeps the origin Migrated, its source system, legacy reference and migration batch (FR-DM-032)."
+      - "Migrated records raise no notification to clients or insurers and no outbound integration message (FR-DM-014)."
+      - "A migrated client is found by any of its legacy client numbers (FR-DM-033)."
+    outcome: Users work migrated and new records on the same screens and always know which is which.
+    frs: [FR-DM-032, FR-DM-033, FR-DM-040]
+    tests: [CLIENTS, ACCOUNTS]
+
+  - id: SCR-DM-17
+    title: Legacy invoice on Invoice 360
+    route: /operations/invoices/:no
+    parent: /operations/invoices
+    purpose: >-
+      An open legacy invoice is carried into the BIBS Operations ledger with its open balances and processed like a
+      BIBS invoice. Invoice 360 shows its LEGACY badge and legacy invoice number, and a Legacy Invoice card with the
+      source system, the legacy reference, the migration batch and the values at cut-over, kept as loaded: the
+      original gross premium, commission and VAT, and per component what was booked, adjusted, paid and remitted in
+      legacy, written off and open at cut-over.
+    entry: ["Operations › Operations › Invoice Search › a legacy invoice", "PR Worklist › a legacy item"]
+    shots:
+      - {state: legacy, user: cashier, open: invoice_legacy, caption: Invoice 360 of a legacy invoice with the Legacy Invoice card}
+    fields:
+      - "Header | LEGACY | Badge | Next to the invoice number | - | Origin | - | - | - | -"
+      - "Header | Legacy Invoice | Chip | Legacy invoice number when it differs from the BIBS number | - | Legacy invoice | - | - | - | -"
+      - "Legacy Invoice | Source System, Legacy Invoice No., Legacy Reference, Legacy Service Invoice | Text | - | - | Values at cut-over | - | - | - | -"
+      - "Legacy Invoice | Invoice Date, Due Date | Date | dd-MMM-yyyy | - | Values at cut-over | - | - | - | -"
+      - "Legacy Invoice | Original Gross Premium, Original Commission / VAT | Amount | Two decimals | - | Values at cut-over | - | - | - | -"
+      - "Legacy Invoice | Commission Realised in Legacy, Deferred VAT Open | Amount | Two decimals | - | Values at cut-over | - | - | - | -"
+      - "Legacy Invoice | Insurer Shares, Migration Batch | Text | - | - | Values at cut-over | - | - | - | -"
+      - "Legacy positions at cut-over | Component, Booked, Adjusted, Paid in Legacy, Remitted in Legacy, Written Off, Open at Cut-over | Columns | One row per component | - | Values at cut-over | - | - | - | -"
+    actions:
+      - "[The actions of Invoice 360] | Users of Invoice 360 | As for a BIBS invoice | Payments, automatch, refunds, reclassifications, remittance and endorsements work on the legacy invoice; its postings go to the legacy accounts | - | -"
+    rules:
+      - "A legacy invoice is not re-booked; it keeps its legacy number and its postings go to the legacy control accounts (FR-DM-050)."
+      - "The values at cut-over are never changed; the report Changes to Legacy Invoices compares every later change with them (FR-DM-100)."
+      - "When legacy could give only the open balances, the card says so and the original amounts are blank (FR-DM-050)."
+    outcome: The user sees what was open at cut-over and what has happened in BIBS since, on one screen.
+    frs: [FR-DM-050, FR-DM-051, FR-DM-060, FR-DM-100]
+    tests: [INV360]

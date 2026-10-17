@@ -1,0 +1,32 @@
+digraph contract {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.12, ranksep=0.9, bgcolor="white"];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@FIELD_BLUE", fontname="Arial", fontsize=9, fontcolor="@NEAR_BLACK", margin="0.1,0.05"];
+  edge [color="@CTA_BLUE", arrowsize=0.6];
+  core [label="User Access Maintenance", fillcolor="@HEADER_BLUE", fontcolor="white", fontsize=16, color="@HEADER_BLUE", margin="0.3,0.25"];
+  in0 [label="BRD-1 New Business\n- Out: the approval right of access requests kept "];
+  in0 -> core;
+  in1 [label="BRD-13 Data Migration\n- The users and group profiles of go-live. Users a"];
+  in1 -> core;
+  in2 [label="EIAM (BDO Enterprise Identity Access Management on Microsoft Entra ID), owned by BDOI IT\n- The sign-in of BDO users through single sign-on "];
+  in2 -> core;
+  in3 [label="UIDM-ISC (BDO identity governance), owned by BDOI IT\n- Joiner"];
+  in3 -> core;
+  out0 [label="Audit trail and reports (platform)\n- Sign-ins"];
+  core -> out0;
+  out1 [label="BRD-1 New Business\n- Out: the approval right of access requests kept "];
+  core -> out1;
+  out2 [label="BRD-10 Sanction Screening\n- The Compliance roles (Compliance Officer"];
+  core -> out2;
+  out3 [label="BRD-2 Operations, BRD-4 Collections, BRD-5 Accounting, BRD-6 Renewal, BRD-7 Claims, BRD-8 Employee Benefits, BRD-12 Submitted Policies\n- The group profiles of their personas and the men"];
+  core -> out3;
+  out4 [label="BRD-3 Product Maintenance\n- The role-permission change requests of Product M"];
+  core -> out4;
+  out5 [label="BRD-8 Employee Benefits (partner portal)\n- External (portal) users of insurers and client H"];
+  core -> out5;
+  out6 [label="Every BIBS module (BRD-1 to BRD-13 and the platform)\n- The signed-in user"];
+  core -> out6;
+  out7 [label="Messaging (e-mail relay of the BIBS environment)\n- The access-changed e-mails"];
+  core -> out7;
+  out8 [label="UIDM-ISC (BDO identity governance), owned by BDOI IT\n- Joiner"];
+  core -> out8;
+}

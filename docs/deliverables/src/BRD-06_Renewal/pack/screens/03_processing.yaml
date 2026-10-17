@@ -1,0 +1,104 @@
+# Screen specifications of BRD-6 Renewal: the Processing Worklist with the dispositioned file, the insurer batches and
+# the insurer response of a renewal.
+area: Processing and the insurer
+screens:
+  - id: SCR-RN-10
+    title: Processing Worklist
+    route: /renewal/processing
+    purpose: >-
+      The renewals posted For Renewal, by tab: for processing, in processing, with the insurer, insurer responded and
+      returned. The Processing Team Leader assigns a Processing Officer (or takes them); the officer creates the
+      renewal account and works the renewal; a renewal that cannot proceed is returned to Marketing with a reason.
+      The dispositioned file of Marketing is uploaded here.
+    entry:
+      - Client & Policy › Renewal › Processing Worklist
+      - Renewal Home › Insurer reply overdue
+      - Notification Renewal posted
+    shots:
+      - {state: list, user: proctl, caption: "Processing Worklist of the Processing Team Leader with the actions of the tab"}
+      - {state: assign, user: proctl, fill: assign_po, caption: "Assign Processing Officer dialog"}
+      - {state: return, user: proc, fill: return_marketing, caption: "Return to Marketing dialog: to the officer or the Team Leader, with the reason"}
+    fields:
+      - "Tabs | For Processing / In Processing / With Insurer / Insurer Responded / Returned | Tab | - | - | Processing stage | For Processing | - | - | -"
+      - "Quick filters | Assigned to me / Due in 30 days | Toggle button | One at a time | - | - | None | - | - | -"
+      - "List | [Columns of the renewal lists] | Column | As on the Expiry List (SCR-RN-02) | - | Renewals | - | Read only | - | No renewals to display"
+      - "Assign Processing Officer dialog | Processing Officer | Drop-down | Name of the officer | Y | Processing Officers | Blank | For Processing, In Processing | Active Processing Officer | <officer> is not a Processing Officer"
+      - "Return to Marketing dialog | Return to | Drop-down | Account Officer or Team Leader | Y | Fixed list | Account Officer | For Processing, In Processing | - | -"
+      - "Return to Marketing dialog | Reason / Remarks | Drop-down, text area | Renewal return reason list; up to 200 characters | Y / Y | Renewal return reason | Blank | For Processing, In Processing | - | Select a reason for 'Return to Marketing'"
+      - "Upload Dispositions | [Upload wizard: Renewal Reference, Disposition, Reason, New Invoice No, Remarks] | Upload | Template of the dispositioned file | - | Renewals | - | For Disposition | Every row checked before anything is saved | Disposition <disposition> is not valid"
+      - "Complete file | Expiry From / Expiry To / Unit | Date, date, text | The expiry range and the unit the file covers | Y | - | Blank | After the upload | - | Enter the expiry range and the unit of the complete file"
+    actions:
+      - "Assign PO | Processing Team Leader | Renewals ticked | Opens the dialog; Assign gives the renewals to the officer | In Processing | Renewal assigned (NT-01)"
+      - "Assign to Me | Processing Team Leader | Renewals ticked | Assigns the renewals to the user | In Processing | -"
+      - "Return to Marketing | Processing Team Leader and Officers | Renewals ticked | Opens the dialog; the renewal goes back to the officer or the Team Leader | For Disposition or Review in Progress | Renewal returned (NT-04)"
+      - "Upload Dispositions | Processing Team Leader and Officers (upload permission) | Always | Opens the upload of the dispositioned file; Declare Complete File tags the renewals of the range and unit missing from it | For Disposition with the dispositions of the file | -"
+      - "Create Renewal Account (renewal) | Processing Officers | For Processing or In Processing without a renewal account | Creates the renewal account (business type Renewal) from the expiring account | - | -"
+    rules:
+      - "A renewal is assigned to one Processing Officer at a time; the Team Leader may re-assign it (FR-RN-061)."
+      - "The renewal account is created once, from the expiring account, and books as business type Renewal (FR-RN-063)."
+      - "A return to Marketing needs a reason and remarks; the renewal goes back to the officer or to the Team Leader (FR-RN-065)."
+      - "A file declared complete tags the renewals of the range and unit missing from it as not in the file (FR-RN-060)."
+    outcome: The posted renewals are processed by their officers.
+    frs: [FR-RN-060, FR-RN-061, FR-RN-062, FR-RN-063, FR-RN-065]
+    tests: [PROCWL]
+
+  - id: SCR-RN-11
+    title: Insurer Batches
+    route: /renewal/insurer
+    purpose: >-
+      The renewals sent to each insurer for its renewal terms: New Batch takes the renewals of an insurer in
+      processing for an expiry range with the 28 columns of the insurer extract; the batch is downloaded or sent to
+      the insurer, protected; Upload Insurer Responses records the replies of the insurer's file.
+    entry:
+      - Client & Policy › Renewal › Insurer Batches
+    shots:
+      - {state: list, user: proc, caption: "Insurer Batches with the batch opened: the renewals and the columns of the extract"}
+      - {state: new, user: proc, fill: new_batch, caption: "New insurer batch dialog: the insurer and the expiry range"}
+    fields:
+      - "List | Batch / Insurance Company / Expiry range | Column | Batch number; name of the insurer; the range as a period | - | Insurer batches | - | Read only | - | No insurer batches"
+      - "List | Renewals / Sent / Reply due / Status | Column | Number of renewals; time and the sender's name; dd-MMM-yyyy; Draft, Sent, Partially Responded or Closed | - | Insurer batches | - | Read only | - | -"
+      - "Batch | Responded / [the 28 columns of the insurer extract] | Table | Yes or No for each renewal; Insurance Company, Invoice No, Assured Name, Risk Code, Inception Date, Expiry Date, Sum Insured, Premium Amount and the other columns of FRS section 6.4 | - | Renewals of the batch | - | Read only | - | -"
+      - "New insurer batch dialog | Insurance Company | Drop-down | Name of the insurer | Y | Insurers of the renewals | Blank | New | - | Select the insurer"
+      - "New insurer batch dialog | Expiry From / Expiry To | Date | dd-MMM-yyyy; the end on or after the start | Y | - | Blank | New | Valid range | Enter a valid start and end date"
+      - "Upload Insurer Responses | [Upload wizard: Renewal Reference, Policy No, Response, Insurer Reference, Revised Premium, Revised Sum Insured, Revised Rate, Terms, Received On, Reject Action, Remarks] | Upload | Template of the insurer responses | - | Renewals with the insurer | - | With Insurer | Every row checked before anything is saved | Response <response> is not valid"
+    actions:
+      - "New Batch | Processing (insurer permission) | Always | Opens the dialog; Create Batch takes the renewals of the insurer in the range | Draft | -"
+      - "Download | Every user of the screen | A batch is open | Downloads the insurer extract | - | -"
+      - "Send to Insurer | Processing (insurer permission) | Draft | Asks for confirmation; the extract is e-mailed protected to the insurer's renewal contacts | Sent; the renewals With Insurer | Insurer extract e-mail (NT-18)"
+      - "Upload Insurer Responses | Processing (insurer permission) | Always | Opens the upload of the insurer's file; each response is matched to its renewal | Insurer Responded | Insurer renewal response (NT-06)"
+      - "Close | Every user of the screen | A batch is open | Closes the batch | - | -"
+    rules:
+      - "A batch takes the For Renewal renewals of one insurer in processing for the expiry range; a batch is sent once (FR-RN-070)."
+      - "The insurer has the reply days (10 by default) to answer; a batch past its reply date raises the insurer overdue alert (FR-RN-070)."
+      - "Responses are captured once and kept; Renew As Is with a match moves the renewal to the Renewal Advice without re-keying; a revision raises the financial impact; a rejection re-markets or closes the renewal (FR-RN-071)."
+    outcome: The insurers receive the renewals and their decisions are recorded.
+    frs: [FR-RN-070, FR-RN-071]
+    tests: [BATCHES]
+
+  - id: SCR-RN-12
+    title: Record Insurer Response
+    route: /renewal/candidates/:ref
+    parent: /renewal/processing
+    purpose: >-
+      The insurer's answer for one renewal, recorded by hand when it does not come in the insurer's file: renew as
+      is, renew with revised terms (the revised premium and sum insured) or declined, with the insurer reference and
+      the date received; a declined renewal is re-marketed to another insurer or goes to the No Advice Letter.
+    entry:
+      - Renewal (With Insurer) › Record Insurer Response
+    shots:
+      - {state: response, user: proc, open_renewal: with_insurer, fill: response_revise, caption: "Record Insurer Response dialog: renew with revised terms"}
+    fields:
+      - "Record Insurer Response dialog | Response | Drop-down | Renew as is, Renew with revised terms, Declined | Y | Insurer renewal response | Renew as is | With Insurer | - | -"
+      - "Record Insurer Response dialog | Insurer Reference | Text | Reference of the insurer | N | - | Blank | With Insurer | - | -"
+      - "Record Insurer Response dialog | Revised Premium / Revised Sum Insured | Amount | Two decimals | Cond.: revised terms (premium) / N | - | Blank | With Insurer | Above zero | Enter the revised premium"
+      - "Record Insurer Response dialog | Received On | Date | dd-MMM-yyyy | N | - | Today | With Insurer | - | -"
+      - "Record Insurer Response dialog | Re-market to another insurer | Check box | Declined only | N | - | Unticked | With Insurer | - | -"
+      - "Record Insurer Response dialog | Remarks | Text area | Up to 200 characters | N | - | Blank | With Insurer | At most 200 characters | Remarks may have at most 200 characters"
+    actions:
+      - "Record Insurer Response | Processing (insurer permission) | With Insurer | Opens the dialog; Record keeps the response, which drives the renewal when it is the latest valid one | RA Ready, In Processing (revised terms), For Disposition (re-market) or Letter Pending (declined) | Insurer renewal response (NT-06)"
+    rules:
+      - "A late, conflicting or mismatched response does not move the renewal; the mismatch is overridden by the Team Leader with remarks (FR-RN-071, FR-RN-051)."
+      - "Revised terms are a financial impact: the client accepts them explicitly (FR-RN-064, FR-RN-084)."
+    outcome: The insurer's decision drives the renewal without re-keying.
+    frs: [FR-RN-071]
+    tests: [INSTAB]

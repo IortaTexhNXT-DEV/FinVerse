@@ -1,0 +1,162 @@
+# Messages catalogue of BRD-3 Product Maintenance: sources, places and the fix the user makes.
+# The message texts are read from the code by tools/deliverables/code_facts.py at every build (never typed here).
+# This file says where each message appears (by the class or file that raises it) and what the user does.
+sources:
+  backend_packages: [productmaint, catalog]
+  exclude_classes: []
+  bulk_handlers: []
+  frontend_dirs: [features/productmaint, features/catalog]
+
+# Where a message appears: the first rule whose pattern matches the class (backend) or file (frontend) wins.
+places:
+  - [ "^(ProductMaintenanceHomePage)$", "Product Maintenance Home (SCR-PM-01)" ]
+  - [ "^(PackageRequestsPage|BulkAssignDialog|requestColumns|StageAge)$", "Package Requests (SCR-PM-02)" ]
+  - [ "^(PackageRequestRules|RequestDraft|PackageRequestFormPage|RequestHeaderCard|TermsEditor|packageRequest|TermsChecks|PackageRequestController)$", "New Package Request and Edit Package Request (SCR-PM-03)" ]
+  - [ "^(PackageRequestService|PackageRequests|PackageRequestPage|PackageActions|RequestTabs|TermsView|ActionDialogs)$", "Package Request record: stage actions (SCR-PM-04)" ]
+  - [ "^(NegotiationService|PackageResponseService|NegotiationController|NegotiationTab|ResponseDialog|TermsService)$", "Package Request record: Negotiation tab (SCR-PM-05)" ]
+  - [ "^(ComparativeService|ComparativeTable|ComparativeTab|PackageOutputsController)$", "Package Request record: Comparative tab (SCR-PM-06)" ]
+  - [ "^(RequirementsService|RequirementsTab)$", "Package Request record: Requirements & Sign-off tab (SCR-PM-07)" ]
+  - [ "^(PackageSetupHandoff|AdvisoryService|AdvisoriesTab|CatalogPackageSetupService)$", "Package Request record: Set-up and Advisories tabs (SCR-PM-08)" ]
+  - [ "^(PackageTsuWorkbenchPage)$", "TSU Workbench (SCR-PM-09)" ]
+  - [ "^(PackageExpiryService|AdvisoryExpiryController|PackageExpiryPage)$", "Package Expiry (SCR-PM-10)" ]
+  - [ "^(RiskProduct|ProductLine|CoverType|ProductCatalogService|ProductEditorModal|productForm|ProductsPage)$", "Products and the product dialog (SCR-PM-11)" ]
+  - [ "^(FieldRule|FieldValueRules|ProductRuleService|RuleEditorModal|CatalogRulesPanel|ProductDetailPage|ProductVersionsTab|DetailList)$", "Product record: versions and rules (SCR-PM-12)" ]
+  - [ "^(ProductVersion|ProductVersionService|PackageCompleteness|PackageChecks|ProductVersionQueries|VersionEditorPage|VersionSchemeSection|VersionPanelSections|VersionTermsSection|VersionCheckpoint|ValidationResultCard|validationOutcome|PackageRequestLink|versionForm)$", "Package Version (SCR-PM-13)" ]
+  - [ "^(ValidationQueuePage)$", "Validation Queue (SCR-PM-14)" ]
+  - [ "^(CoverageService|CoveragesPage|CoverageModals|coverageForm)$", "Coverages & Clauses (SCR-PM-15)" ]
+  - [ "^(IncentiveCriteria|IncentiveCriteriaService|IncentiveRuleParameters|IncentivesPage|IncentiveEditorModal|IncentiveParamsTable|incentiveForm)$", "Incentive Criteria (SCR-PM-16)" ]
+  - [ "^(InsurerProfile|InsurerBranch|InsurerService|InsurersPage|InsurerEditorModal|insurerForm)$", "Insurers (SCR-PM-17)" ]
+  - [ "^(InsurerDetailPage|InsurerRatesModals)$", "Insurer record (SCR-PM-18)" ]
+  - [ "^(EffectiveDatedRecord|MotorLimit|ShortPeriodRate|RateTableService|RatesPage|RateModals)$", "Rates & Taxes (SCR-PM-19)" ]
+  - [ "^(SalesOrganisationService|SalesOrganisationExport|SalesOrganisationPage|SalesOrgDialogs|SalesOrgReasonDialog|SalesOrgCells|salesOrgColumns|salesTree)$", "Sales Organisation (SCR-PM-20)" ]
+  - [ "^(PremiumCalculator|RatingService|SchemeResolver|PremiumCalculatorPage|CalculatorResult|calculatorForm)$", "Premium Calculator (SCR-PM-21); pricing of quotations and accounts" ]
+  - [ "^(RateSchemeExceptionService|RateOverride|RateExceptionDialog|RateExceptionPage|rateException)$", "Quotation: package rate scheme and rate exception (SCR-PM-22)" ]
+  - [ "^(CatalogRecords|RecordActions)$", "Authorize and Deactivate on every product master (Common screen elements)" ]
+
+# The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
+# not repeated here. Keys are message codes; frontend messages without a code use their text.
+fixes:
+  # Package requests
+  PKG_AMOUNT_NEGATIVE: Correct the rate or amount; rates, limits, premiums and shares are zero or more.
+  PKG_COVER_TYPE_INVALID: Choose a cover type of the selected product line.
+  PKG_DATES_INVALID: Correct the dates so that the package end date is after the start or effective date.
+  PKG_LINE_MISMATCH: Choose the product line of the package, or another package of the chosen line.
+  PKG_PRODUCT_NOT_PACKAGED: Choose a product flagged Package; a non-package product has no package request.
+  PKG_FOUR_EYES: Ask another user with the approval permission to take the action; the maker, submitter or recommender cannot.
+  PKG_REQUEST_NOT_EDITABLE: No change is possible in this stage; ask the owner of the stage to return the request if it must change.
+  PKG_TYPE_FIXED: Void the request and create a new one of the right type.
+  PKG_REQUEST_TYPE_MISMATCH: Use Retire package for a retirement request and Set up package version for every other type.
+  PKG_SCOPE_CLIENT: Use Release terms to Marketing; the terms of a client-specific package go to Marketing first.
+  PKG_SCOPE_GENERIC: Use Proceed to requirements (generic package).
+  # Negotiation
+  INSURER_NO_EMAIL: Ask the Business Administrator to add the insurer's placement e-mail on Insurers, then approve or resend the slip.
+  NEGOTIATION_INCOMPLETE: Key in the outcome of every insurer of the latest round (No response when the insurer did not reply) and choose the insurers the package takes.
+  PKG_INSURER_NOT_OFFERED: Choose only insurers whose outcome is an offer in the latest round.
+  PKG_INSURER_ROLE_INVALID: Choose Panel, Lead or Participant.
+  PKG_ROUND_CLOSED: Open the latest round and key in the terms there.
+  PKG_SHARES_INVALID: Give a share to every lead and participant insurer so that the shares total 100.
+  QS_ALREADY_SENT: Use Revise quotation slip (new round) to change the slip.
+  QS_FOUR_EYES: Ask the TSU Team Lead or another TSU officer to approve the slip.
+  QS_LOCKED: No action; the slips of a signed-off request cannot change.
+  QS_NOT_IN_PREPARATION: Refresh the request; the slip was already submitted or sent.
+  QS_NOT_PREPARED: Submit the slip for approval first; it is numbered then.
+  QS_NOT_RESENDABLE: Resend only from the latest sent round, before the ManCom sign-off.
+  QS_NOT_SENT: Approve and send the slip of the round first.
+  QS_NOT_SUBMITTED: Submit the slip for approval first.
+  UPLOAD_FAILED: Check that the file opens and upload it again.
+  # Comparative
+  COMPARATIVE_FIELD_UNKNOWN: Choose the fields from the list shown.
+  COMPARATIVE_NO_MASTER: Click Compile Master first, then generate the client view.
+  COMPARATIVE_NO_TERMS: Approve and send the quotation slip of the round first.
+  # Set-up and advisories
+  ADVISORY_ALREADY_SENT: No action; refresh the Advisories tab.
+  PACKAGE_TERM_INSURER_UNKNOWN: Add the insurer to the Insurers tab, or remove its terms.
+  PRODUCT_NOT_ACTIVE: Choose an active, authorised product, or ask for its authorisation.
+  PRODUCT_NOT_PACKAGED: Choose a package product; non-package products are not versioned and need no exception.
+  PRODUCT_NOT_VERSIONED: Ask MBS to set up the first version of the package through a package request.
+  VERSION_IN_PROGRESS: Complete, submit or return the version being set up before starting another.
+  VERSION_PRODUCT_MISMATCH: Refresh the version and save it again.
+  # Products and versions
+  CODE_PATTERN_INVALID: Correct the risk-code pattern of the line (a regular expression without look-around or back-references).
+  COVER_TYPE_DEPTH: Attach the subtype to a cover type, not to another subtype.
+  COVER_TYPE_INVALID: Choose a cover type of the product's line.
+  PACKAGE_HIERARCHY_INCOMPLETE: Choose the cover type of the product and include at least one basic coverage in the version.
+  PRODUCT_CODE_PATTERN: Enter a risk code that follows the naming convention of the line.
+  PRODUCT_FIELD_VERSIONED: Change the rate, minimum premium, commission or TSI limit in a new version (Versions tab › New Version).
+  PRODUCT_MINIMUM_INVALID: Enter a minimum premium of zero or more.
+  PRODUCT_NOT_SELLABLE: Choose a product in force; an expired package is sold again only after a Reactivate request, a retired package not at all.
+  PRODUCT_TERM_INVALID: Enter a maximum term between 1 and 10 years.
+  LOV_TYPE_UNKNOWN: Enter the code of an existing list of values (Lists of Values screen).
+  RULE_SCOPE_INVALID: Choose Applies to All for a rule of every product; the scope code is set by the system.
+  MAKER_CHECKER_VIOLATION: Ask another user with the permission to decide it; another validator (TSU Head or Business Administrator) validates a version, another approver decides a rate exception.
+  VERSION_NOT_FOR_VALIDATION: Refresh the version; only a version submitted for validation is validated.
+  PACKAGE_INSURER_TERMS_MISSING: Open the Insurer Terms tab and complete the terms of the insurer for that coverage.
+  PACKAGE_SHARES_INVALID: Correct the shares of the lead and participant insurers so that they total 100%.
+  PACKAGE_DATES_INVALID: Correct the dates on the Rate Scheme & Dates tab.
+  REASON_REQUIRED: Give the reason (the return reason of a package version, or why a sales unit is deactivated or reactivated or an officer removed from a team).
+  # Incentive criteria
+  INCENTIVE_ACTIVE_LOCKED: Open the active criterion and save the change as an amendment from a later date.
+  INCENTIVE_NOT_ACTIVE: Change the pending row itself; only an active criterion is amended.
+  INCENTIVE_PERIOD_INVALID: Enter an effective-from date after the start of the active criterion.
+  INCENTIVE_PERIOD_OVERLAP: Choose dates that do not overlap another row of the same code, or end the other row first.
+  INCENTIVE_PRODUCT_NOT_ACTIVE: Remove the product from the matrix, or choose an active product.
+  INCENTIVE_RULE_PARAMS_INVALID: Choose each parameter from the list of the incentive type and enter its value as the parameter asks (an amount or a number for the minimum gross premium).
+  INCENTIVE_VALUE_REQUIRED: Enter the value of the criterion.
+  # Insurers, rates and sales organisation
+  CREDIT_DAYS_INVALID: Enter credit days between 0 and 365.
+  INSURER_BRANCH_NOT_ACTIVE: Choose an authorised, active branch, or ask for the branch's authorisation.
+  INSURER_BRANCH_UNKNOWN: Choose a branch of the insurer.
+  INSURER_NOT_ACTIVE: Choose an authorised, active insurer, or ask for the insurer's authorisation.
+  PARTY_NOT_INSURER: Use another partner code; the code belongs to another kind of business partner.
+  PLACEMENT_CHANNEL_PARKED: Choose E-mail as the placement channel.
+  RATE_INVALID: Enter a percentage between 0 and 100.
+  EFFECTIVITY_INVALID: Correct the effective-to date so that it is on or after the effective-from date.
+  EFFECTIVE_FROM_REQUIRED: Enter the effective-from date.
+  LIMIT_INVALID: Enter a limit greater than zero.
+  LIMIT_PREMIUM_INVALID: Enter a premium of zero or more.
+  SHORT_PERIOD_MONTHS_INVALID: Enter the months covered between 1 and 12.
+  SALES_PARENT_INVALID: Choose a parent unit of the level above (region for a department, department for a team).
+  SALES_TEAM_UNKNOWN: Choose an existing, active team; reactivate the team first if it was deactivated.
+  SALES_UNIT_IN_USE: Deactivate the sub-units of the unit and remove or reassign its account officers first (Show Inactive lists what is already inactive).
+  SALES_UNIT_INACTIVE: No action; the unit is already inactive.
+  SALES_UNIT_NOT_INACTIVE: No action; only an inactive unit is reactivated.
+  SALES_OFFICER_INACTIVE: No action; the officer is already removed from the team. Use Assign to a Team to place the officer again.
+  USER_UNKNOWN: Enter the user name of an existing BIBS user.
+  # Pricing and rate exceptions
+  INSURER_NOT_ON_PACKAGE: Choose an insurer of the package's panel.
+  MOTOR_LIMIT_UNKNOWN: Choose a limit of the BI / PD limit table, or ask the Business Administrator to add it.
+  RATING_OD_FACTOR_MISSING: Ask the Business Administrator to set up the motor own-damage factor on Rates & Taxes.
+  RATING_PERIOD_INVALID: Correct the period so that the end is after the start.
+  RATING_SHORT_PERIOD_INVALID: Use the pro-rata basis, or ask for the short-period row of this period.
+  SHORT_PERIOD_RATE_MISSING: Ask the Business Administrator to add the short-period row for this number of months.
+  RATE_EXCEPTION_VALIDITY_PAST: Enter a validity date of today or later.
+  RATE_EXCEPTION_INCOMPLETE: Enter the item rate the exception is for.
+  RATE_SCHEME_NOT_CURRENT: Use the scheme rate of the current version, or request a rate exception and submit once it is approved.
+  RATE_EXCEPTION_REASON_REQUIRED: Write why the exception is rejected; the requester receives it with the notice.
+  RECORD_NOT_PENDING: Refresh the record; it has already been decided by another user.
+  # Common
+  COMPANY_REQUIRED: Select the company in the page header.
+  DUPLICATE: Use another code; the code already exists.
+  NOT_FOUND: Refresh the screen; the record was changed or removed. Report the message with its reference if it persists.
+  VALIDATION_FAILED: Correct the fields listed under the message.
+  CONCURRENT_MODIFICATION: Reload the record; another user changed it. Enter the change again.
+  ACCESS_DENIED: Ask for the permission; the menu shows only the screens of your role.
+  INTERNAL_ERROR: Report the message with its reference to the System Administrator.
+  MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the System Administrator.
+  UPLOAD_TOO_LARGE: Reduce the file (split it or scan at a lower resolution) and upload it again.
+  "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>": Correct the value in the file in the format of the column and upload the file again.
+  "<Column> is mandatory": Fill in the column in the file and upload the file again.
+  # Screen checks without a code (by text)
+  "Include at least one coverage": Tick Included on at least one coverage, or add one.
+  "Returned by the validator: <returned reason>": Correct the draft as the reason says and submit it for validation again.
+  "The effective date cannot be before today": Enter an effective date of today or later.
+  "The package end date must be after the effective date": Enter a package end date after the effective date.
+  "The package end date must be after its start date": Enter a package end date after the package start.
+  "The end is before the start": Correct the end date so that it is on or after the start date.
+  "The change must start after <active from>": Enter an effective-from date after the start of the active criterion.
+  "Select requests of one stage": Select requests of one stage only.
+  "Correct the highlighted fields": Correct the fields marked in red on each tab.
+  "<problems>": Correct the points listed in the warning.
+  "The quotation slip is approved and sent to the insurers.": Confirm to approve and send the quotation slip, or cancel to review it first.
+  "The package version is validated and released for use.": Confirm to validate and release the version, or cancel to review it first.
+  PRODUCT_NOT_MIGRATED: No action on this screen; only products created by the data migration can be withdrawn by it. Report it to the data migration team if the product should be withdrawn.

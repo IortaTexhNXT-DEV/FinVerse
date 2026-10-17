@@ -1,0 +1,22 @@
+// BRD-5 Volume 1: statuses of a manual journal (journal JournalStatus). FRS section 5.1.
+digraph acc_journal {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.6, ranksep=0.5, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DRAFT            [label="DRAFT\nmaker"];
+  PENDING_APPROVAL [label="PENDING_APPROVAL\nassigned poster"];
+  REJECTED         [label="REJECTED\nreturned to maker", fillcolor="@AMBER_BG"];
+  POSTED           [label="POSTED\nin the ledger", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  REVERSED         [label="REVERSED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  CANCELLED        [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> PENDING_APPROVAL [label=" submit (validate,\n confirm)"];
+  PENDING_APPROVAL -> POSTED [label=" post (not the submitter,\n within limit)"];
+  PENDING_APPROVAL -> REJECTED [label=" return to maker\n (remarks)", style=dashed];
+  REJECTED -> PENDING_APPROVAL [label=" resubmit", style=dashed, constraint=false];
+  POSTED -> REVERSED [label=" reverse / reverse-on date\n (JOURNAL_AUTO_REVERSAL)", style=dotted];
+  DRAFT -> CANCELLED [label=" cancel", style=dotted];
+  { rank=same; POSTED; REJECTED; }
+}

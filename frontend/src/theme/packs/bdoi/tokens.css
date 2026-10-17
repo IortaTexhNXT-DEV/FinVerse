@@ -1,0 +1,26 @@
+/*
+ * Theme pack "bdoi": the BDO Insure look of BIBS for BDOI (docs/design/BDO_UX_GUIDELINES.md,
+ * BDO Style Guide of ITG User Experience Design). Colours, fonts and the print title of the
+ * client; the platform tokens (spacing, sizes, neutrals) stay in src/styles/tokens.css.
+ */
+:root {
+  /* Brand digital colours */
+  --brand-navy: #004ea8; /* Header Blue: headers, table heads, section bars */
+  --brand-blue: #0072d8; /* CTA Blue: primary buttons, links, active items */
+  --brand-blue-600: #005fb4; /* CTA hover / pressed */
+  --brand-blue-050: #e5f5ff; /* Background Blue: highlights, alternate rows */
+  --brand-field-blue: #99c1e7; /* Text Field Blue: input borders */
+  --brand-gold: #fdb913; /* Yellow: accents and breakers, used sparingly */
+  --brand-gold-600: #e0a100;
+  --brand-gold-050: #fff4d6;
+  --color-info: #0072d8;
+  --color-info-bg: #e5f5ff;
+  --focus-ring: 0 0 0 3px rgba(0, 114, 216, 0.35);
+
+  /* Typography: Nunito, Arial as the approved fallback */
+  --font-heading: 'Nunito', Arial, sans-serif;
+  --font-body: 'Nunito', Arial, sans-serif;
+
+  /* Title printed above every page */
+  --print-title: 'BIBS – BDOI Broker System';
+}

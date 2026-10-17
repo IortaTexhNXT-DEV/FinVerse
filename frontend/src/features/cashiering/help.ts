@@ -1,0 +1,270 @@
+import type { HelpSection } from '@/features/help/helpContent';
+import { BRAND } from '@/branding';
+
+/** In-app help of the Cashiering screens (CSHID.001-027, MKTID.010/013, DBMID.001). */
+export const CASHIERING_HELP: HelpSection = {
+  id: 'cashiering',
+  module: 'Cashiering',
+  intro:
+    'Cashiering receives premium and non-premium payments, issues acknowledgement receipts (AR) and Head Office official receipts (OR), applies payments to booked invoices component by component and manages unapplied payments and BIR 2307 reversals.',
+  screens: [
+    {
+      name: 'Cashiering Workbench',
+      path: '/cashiering',
+      summary:
+        'Work queues of Cashiering (invoices with outstanding premium, partially paid invoices, hand-offs to complete) and the way into the Cashiering screens.',
+      controls: [
+        'Receipts, cancellations, reinstatements and dispositions follow maker-checker approval.',
+      ],
+    },
+    {
+      name: 'Create AR/OR',
+      path: '/cashiering/records/new',
+      summary:
+        'Creation record of an acknowledgement receipt (premium or non-premium payment) or of a Head Office official receipt: receipt type, entry type with the client or insurer, payor, payment type, currency, Post to Bank Account, paid amount, check details, receipt issuance date, receipting branch, remarks and the accounts paid with the amount of each.',
+      workflow: [
+        'Save checks the required fields, the currency booked on each account and the holding period of a check, then gives the record its number (CR-AR-… or CR-OR-…) with the status Created.',
+        'A record in status Created or Returned can be edited; a record in status Created can be cancelled and keeps its number.',
+        'Submit for Posting sends the record to the Approver/Poster; the AR or OR number is issued only when the record is posted.',
+      ],
+      controls: [
+        'Whether ARs and ORs wait for the posting step is a setting of the System Administrator.',
+      ],
+    },
+    {
+      name: 'Posting',
+      path: '/cashiering/posting',
+      summary:
+        'The creation, cancellation and reinstatement records of ARs and ORs For Posting or Returned, filtered by status, receipt type, dates, record number and name, with the export to Excel.',
+      workflow: [
+        'Select one or several records and post them: each is posted on its own, so a record in a depleted series stays For Posting with its reason while the others are posted.',
+        'Return sends a record back to its creator with a reason; the creator is notified.',
+      ],
+      controls: ['The creator of a record can neither post nor return it.'],
+    },
+    {
+      name: 'Day-End List',
+      path: '/cashiering/day-end',
+      summary:
+        'The creation records of a day with their status, and the totals per payment type and per bank account for the reconciliation of the day.',
+    },
+    {
+      name: 'Search Log',
+      path: '/cashiering/search-log',
+      summary:
+        'Every receipt search with the user, the criteria in words, the date and time and the number of results.',
+      controls: ['Viewed by the Auditor and the Cashiering Team Leader.'],
+    },
+    {
+      name: 'Unapplied Payment List',
+      path: '/cashiering/unapplied-inquiry',
+      summary:
+        'Every unapplied payment with an outstanding amount: excess, unapplied, AR insurer refund, unbooked/unmatched, pre-booked and AP unapplied commission.',
+      workflow: [
+        'Filter by type, payment date, insurer, client, assured, account reference, or part of the number, reference or payor.',
+        'A payment fully applied leaves the list; open a row to work its disposition.',
+      ],
+      controls: ['A Marketing user sees the payments of his or her marketing unit only.'],
+    },
+    {
+      name: 'Settlement ORs',
+      path: '/cashiering/settlement-ors',
+      summary:
+        'The commission and incentive ORs of the insurer settlements: one OR per insurer and settlement batch, issued once Disbursement approves the payment request of the batch.',
+      workflow: [
+        'The approval of a remittance batch asks for its ORs; they wait for the approval of the payment request by Disbursement.',
+        'When Disbursement approves the voucher or releases the payment, the OR is issued and its number is shown on the remittance batch.',
+        'An OR that could not be issued is issued again from the row action menu.',
+      ],
+      controls: [
+        'A payment request cancelled by Disbursement cancels the OR waiting for it; the batch asks again when it is approved again.',
+        'The point the OR is issued (Disbursement approval or remittance approval) is a setting of Cashiering.',
+      ],
+    },
+    {
+      name: 'Payment Files',
+      path: '/cashiering/payment-files',
+      summary:
+        'Upload of the Bills Payment, CLPC, Trade, Direct Credit, post-dated check and Commission Schedule files in their bank and channel layouts, several files of several types at once, and the list of the files received by upload or via MFT.',
+      workflow: [
+        'Each file is checked: name convention of its type, size limit, a file already uploaded, the record count and total of the header, the TOTAL row.',
+        'A file that passes the checks is processed row by row; a failed row never stops the others and is listed with its reason in the run report.',
+        'The run report gives the count and amount per category and every payment record; the validation report, the failed rows and the raw file are downloadable.',
+      ],
+      controls: [
+        'A file received via MFT and refused is alerted to the Cashiering Team Leader.',
+        'The name convention, the layout, the size limit and the MFT folder of each type are kept in Cashiering Setup.',
+      ],
+    },
+    {
+      name: 'Receive Payment',
+      path: '/cashiering/receive',
+      summary:
+        'Over-the-counter payment: enter the ARN, invoice, policy or PN numbers, the payor and the amount. The preview shows the invoices matched and how the payment is applied (DST, VAT, LGT, other charges, then basic premium), the BOOK rate and any excess.',
+      workflow: [
+        'Several references are applied oldest invoice first.',
+        'A 2% CWT client is applied up to 98% of the premium; the 2% waits for the BIR 2307.',
+        'An account not booked yet goes to the pre-booked queue; an unknown reference goes to unapplied payments.',
+        'Issue AR and Apply saves the payment, issues the AR and posts the application.',
+      ],
+      controls: ['The AR number comes from the active AR series of the branch.'],
+    },
+    {
+      name: 'Receipts',
+      path: '/cashiering/receipts',
+      summary:
+        'Search ARs and ORs by receipt number, client, invoice, policy, payor, assured, insurer, amount, date and status. Open a receipt to print it, cancel it or reinstate it, and see its applications, lines, journals and history. Issue Official Receipt creates a Head Office OR for service fees, profit share, commissions, incentives or other income.',
+      workflow: [
+        'Cancel Receipt asks for a reason; the cancellation is posted when the checker approves it and reverses the applications.',
+        'Reinstate (full or partial) needs the reason and the encoded fields of the reason group.',
+        'The Cancellations and Reinstatements tab lists the requests waiting for approval.',
+      ],
+      controls: ['The requester cannot approve their own request.'],
+    },
+    {
+      name: 'Unapplied Payments',
+      path: '/cashiering/unapplied',
+      summary:
+        'Payments not applied to an invoice, in the tabs Unapplied, Monitoring, For Approval, For Reversal and Done. Open an item to assign its disposition: apply to an invoice or its DST, refund, reclass to a client or transfer to a unit.',
+      workflow: [
+        'Assign a disposition (Monitoring), submit it, and the approver processes it.',
+        'A refund goes to the Disbursement queue; a reclass or transfer moves the whole balance.',
+        'Submit Selected and Approve Selected act on the checked items.',
+        'A completed disposition can be marked for reversal and reversed on approval.',
+      ],
+      controls: ['Dispositions that need approval are processed by a second user.'],
+    },
+    {
+      name: 'Unapplied to Income',
+      path: '/cashiering/unapplied-income',
+      summary: `Batches of old unapplied payments, created in ${BRAND.product} or carried over from the legacy systems, reclassified to other income - unclaimed collections. Legacy items post on the legacy unapplied collections account.`,
+      workflow: [
+        `New Batch: give the reason and the currency, then add unapplied payments received at least the number of days you choose; the Origin filter shows the migrated or ${BRAND.product} items.`,
+        'Submit the batch; the Cashiering team lead approves it, then top management.',
+        'After the second approval each item posts on its own and is closed; an item whose balance changed is refused.',
+      ],
+      controls: [
+        'The requester never approves, and the two approvals are given by two people.',
+        'An item can be on one batch at a time.',
+      ],
+    },
+    {
+      name: 'Legacy PR 2307 Reversal',
+      path: '/cashiering/legacy-pr2307',
+      summary:
+        'Batches settling the PR 2307 of legacy invoices against the amount due to the insurer, on the legacy control accounts.',
+      workflow: [
+        'New Batch: give the reason and the currency, then add each legacy invoice with the amount to reverse.',
+        'When the PR 2307 balance is short, the difference is first moved from the premium receivable.',
+        'Submit the batch; the Cashiering team lead approves or returns it, and each invoice then posts on its own.',
+      ],
+      controls: [
+        'The amount must be within the open PR 2307 and premium receivable and within the due to insurer.',
+        'The requester never approves their own batch.',
+      ],
+    },
+    {
+      name: 'Incoming Requests',
+      path: '/cashiering/requests',
+      summary:
+        'What other modules ask of Cashiering: collector requests on unapplied payments from Collections (apply to an invoice, refund, reclass, transfer), refund validations from Payment Requests (is the premium of a cancelled account back in the unapplied list with a new AR?) and payment reversals from ACSL.',
+      workflow: [
+        'Collector Requests: select one and Accept Request to assign its disposition (the invoice, amount and remarks come from the collector; add the client for a reclass or the unit for a transfer), or Reject Request with a reason.',
+        'Tick "Submit the disposition now" to process an application at once; a refund, reclass or transfer goes for approval as usual.',
+        'Refund Validations: Confirm Validation with the unapplied item holding the returned premium (its AR is the new AR unless another is entered), or reject it.',
+        "Payment Reversals: an approver reverses the receipt's application on the invoice; the money goes back to the unapplied list.",
+      ],
+      controls: [
+        'Collections, Payment Requests and ACSL receive each decision at once.',
+        'Accepting and validating need CASH_DISPOSITION; a reversal is approved by a second user with CASH_APPROVE.',
+      ],
+    },
+    {
+      name: 'Pre-booked Payments',
+      path: '/cashiering/prebooked',
+      summary:
+        'Payments received for accounts that are not booked yet, with their age. They are applied automatically once the account is booked; Re-match Now tries at once and Release moves an item to unapplied payments.',
+      controls: ['Items waiting too long raise an alert.'],
+    },
+    {
+      name: 'Payment Uploads',
+      path: '/cashiering/uploads',
+      summary:
+        'Upload a Bills Payment, Trade, CLPC, Direct Credit or PDC file. Each accepted row becomes a payment with its AR and is matched at once; the run summary counts the applied, unapplied, pre-booked, excess and failed rows.',
+      controls: [
+        'The same file cannot be uploaded twice.',
+        'The bank file layouts are configured in Cashiering Setup.',
+      ],
+    },
+    {
+      name: 'PDC Warehouse',
+      path: '/cashiering/pdc',
+      summary:
+        'Post-dated checks by maturity month with their PDCW- number. On maturity the check becomes a payment with an AR; before that it can be returned, replaced or pulled out.',
+    },
+    {
+      name: 'Check Pick-up',
+      path: '/cashiering/pickups',
+      summary:
+        'Checks to collect from clients, filtered by pick-up date. Select the checks picked up and Print ARs to issue and print their receipts in one batch.',
+    },
+    {
+      name: 'Batch Print',
+      path: '/cashiering/print',
+      summary:
+        'Print ARs by receipting branch and issue date and ORs by insurer and issue date, print the receipts the system generated from the print queue, and re-print by full or partial number.',
+      workflow: [
+        "Choose the Client's Copy, the company copy or both; at most 500 receipts are printed in one batch.",
+        'The first print gives the receipt its certificate number; a later print carries the REPRINT mark and adds to the print count.',
+        'The batch opens in Print Preview to print or download; the ZIP holds one PDF per receipt named after its type and number.',
+        'A receipt that could not be printed is listed with the reason in the print log, to retry or skip.',
+      ],
+      controls: ['The company copy is kept with the receipt on its Documents tab.'],
+    },
+    {
+      name: 'BIR 2307',
+      path: '/cashiering/cwt',
+      summary:
+        'Marketing tags the BIR 2307 certificates (or cash) of 2% CWT clients; Cashiering receives them, ticks the CWT-copy checklist and validates them into a report per insurer that is routed to Disbursement and released to the insurer.',
+      workflow: [
+        'Validation reclassifies the 2% to PR2307.',
+        'Release to the insurer offsets the PR2307 against the premium due to the insurer.',
+        'A cash 2307 is settled with an AR instead.',
+      ],
+      controls: ['Marketing tags, Cashiering validates, Disbursement releases.'],
+    },
+    {
+      name: 'Commission ORs',
+      path: '/cashiering/commission-ors',
+      summary:
+        'Upload the commission payments of the insurers and issue one Head Office official receipt per payment with its VAT and withholding tax.',
+    },
+    {
+      name: 'Receipt Series',
+      path: '/cashiering/series',
+      summary:
+        'AR and OR number ranges per branch with their BIR ATP number, year and number format (prefix, year, branch indicator and sequence) and the numbers left. A new series is usable once authorized; an alert warns before a series runs out.',
+      controls: [
+        'A series is created by one user and authorized by another (maker-checker).',
+        'A series of a year gives numbers in that year only; OR series are kept for Head Office only.',
+      ],
+    },
+    {
+      name: 'AR and OR Forms',
+      path: '/cashiering/receipt-forms',
+      summary:
+        'The header, note and footer lines of the printed AR and OR, with their versions and effective dates.',
+      workflow: [
+        'Change Form proposes a new version with its effective date.',
+        'Another authorised user approves or rejects it; an approved version is printed from its effective date.',
+      ],
+      controls: ['The user who changed a form cannot approve it; earlier versions are kept.'],
+    },
+    {
+      name: 'Cashiering Setup',
+      path: '/cashiering/setup',
+      summary:
+        'The payment file layouts (automatic, delimited or fixed width) and the minimal balance rules, with Run Sweep Now to clear small premium balances and small excess payments at once.',
+    },
+  ],
+};

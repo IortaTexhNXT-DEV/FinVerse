@@ -1,0 +1,156 @@
+# Notifications catalogue of BRD-6 Renewal: in-app notices (bell in the page header), alerts (Alert inbox of the
+# administrators and team leaders) and e-mails. Texts are those of the platform; <name> is filled in by BIBS.
+# Each user chooses the in-app and e-mail channels of the Renewal events on Notification Settings.
+notifications:
+  - id: NT-01
+    channel: In-app
+    trigger: "Renewals are assigned (event Renewal assigned): to an Account Officer by the Team Leader, to a Processing Officer; a renewal turns Exception on a new check; a LAMD line routes a renewal"
+    recipient: The officer assigned; on an Exception the Account Officer and the Processing Officer; on a LAMD line the Team Leaders of the unit
+    template: "Title: <renewal ref> assigned to you, <renewal ref> assigned to you for processing, <renewal ref>: Exception or <renewal ref>: LAMD <loan status>. Text: Give the disposition of the renewal of <client>, expiring <expiry date>; <client>; A check failed on the renewal of <client>; or the routing"
+    content: The renewal; the notice opens the renewal
+    screen: My Dispositions, Processing Worklist, Renewal
+    frs: [FR-RN-030, FR-RN-061, FR-RN-020, FR-RN-025]
+  - id: NT-02
+    channel: In-app, e-mail
+    trigger: A renewal is transferred to another Marketing unit (event Renewal transfer requested)
+    recipient: The Team Leaders of the receiving unit
+    template: "Title: <renewal ref> transferred to your unit. Text: Accept or decline the renewal of <client>: <remarks>"
+    content: The request; the notice opens the renewal
+    screen: Transfers
+    frs: [FR-RN-031]
+  - id: NT-03
+    channel: In-app
+    trigger: The receiving unit accepts or declines a transfer (event Renewal transfer decided)
+    recipient: The user who requested the transfer
+    template: "Title: <renewal ref>: transfer accepted or declined. Text: The transfer to <unit> was accepted, or was declined: <remarks>"
+    content: The decision and the remarks of a decline
+    screen: Transfers, Renewal
+    frs: [FR-RN-032]
+  - id: NT-04
+    channel: In-app, e-mail
+    trigger: "A renewal is returned (event Renewal returned): by the Team Leader to the officer, by Processing to Marketing, or re-opened"
+    recipient: The Account Officer (or the Team Leaders of the unit for a return to the Team Leader and a re-open)
+    template: "Title: <renewal ref> returned to you, <renewal ref> returned by Processing or <renewal ref> re-opened. Text: <reason>: <remarks>, or Give a new disposition: <reason>"
+    content: The reason and the remarks; the notice opens the renewal
+    screen: My Dispositions, TL Review, Renewal
+    frs: [FR-RN-046, FR-RN-047, FR-RN-050, FR-RN-065]
+  - id: NT-05
+    channel: In-app
+    trigger: The Team Leader posts a renewal For Renewal (event Renewal posted)
+    recipient: The users who assign the Processing Officers (Processing Team Leaders)
+    template: "Title: <renewal ref> posted for processing. Text: <client>"
+    content: The renewal; the notice opens the renewal
+    screen: Processing Worklist
+    frs: [FR-RN-050]
+  - id: NT-06
+    channel: In-app
+    trigger: An insurer response is recorded, by hand or from the insurer's file (event Insurer renewal response)
+    recipient: The Processing Officer of the renewal
+    template: "Title: <renewal ref>: insurer response <response>. Text: Applied to the renewal, or Not applied: check the Insurer tab"
+    content: Whether the response drives the renewal; the notice opens the renewal
+    screen: Insurer Batches, Renewal (Insurer tab)
+    frs: [FR-RN-071]
+  - id: NT-07
+    channel: In-app
+    trigger: The client accepts the renewal, and the accepted renewal account is ready for placement (event Renewal accepted)
+    recipient: The Account Officer and the Processing Officer of the renewal
+    template: "Title: <renewal ref> accepted by the client, or <renewal ref>: ready for placement. Text: <client> accepted the renewal by <method>, or the progress of the renewal account"
+    content: The acceptance; the notice opens the renewal
+    screen: Renewal (Letters tab)
+    frs: [FR-RN-084]
+  - id: NT-08
+    channel: In-app
+    trigger: The renewal is booked, or the policy expired without renewal (event Renewal booked)
+    recipient: The Account Officer and the Processing Officer of the renewal
+    template: "Title: <renewal ref> renewed, or <renewal ref> closed: expired without renewal. Text: Booked with invoice <invoice>, or The policy of <client> expired on <expiry date>"
+    content: The outcome of the renewal
+    screen: Renewal
+    frs: [FR-RN-084, FR-RN-083]
+  - id: NT-09
+    channel: In-app, e-mail
+    trigger: The go-live take-over of the migrated policies is completed (event Go-live renewal extraction completed)
+    recipient: The users who extract renewals (Team Leaders)
+    template: "Title: Go-live renewals taken over (<n>). Text: <n> renewals, <n> urgent; by expiry month <month: count>"
+    content: The counts of the take-over; the notice opens the urgent renewals of the Expiry List
+    screen: Expiry List
+    frs: [FR-RN-016]
+  - id: NT-10
+    channel: In-app
+    trigger: A package choice of a migrated policy is approved or rejected (event Renewal package choice decided)
+    recipient: The user who proposed the package
+    template: "Title: <renewal ref>: package choice approved or rejected. Text: <product version> applies to the renewal, or was rejected: <remarks>"
+    content: The decision; the notice opens the renewal
+    screen: Renewal Setup (Package Choices), Renewal
+    frs: [FR-RN-028]
+  - id: NT-11
+    channel: Alert
+    trigger: An expiring account is not disposed or not accepted within the escalation days of its segment before expiry (Renewal at risk)
+    recipient: The administrators and Team Leaders who receive the alerts of Renewal
+    template: "Renewal at risk: <renewal ref> of <client> expires on <expiry date> without a disposition or an acceptance"
+    content: The renewal; it is counted in the At risk tile of the Renewal Home
+    screen: Alerts, Renewal Home
+    frs: [FR-RN-102]
+  - id: NT-12
+    channel: Alert
+    trigger: The daily extraction of expiring accounts fails (Renewal extraction failed)
+    recipient: The administrators who receive the alerts of Renewal
+    template: "Renewal extraction failed: <reason>; the next run takes the missed dates"
+    content: The run and the reason
+    screen: Alerts, Expiry List (Recent extractions)
+    frs: [FR-RN-010]
+  - id: NT-13
+    channel: Alert
+    trigger: An insurer has not answered a renewal batch by its reply date (Insurer renewal batch overdue)
+    recipient: The administrators and the Processing Team Leaders who receive the alerts of Renewal
+    template: "Insurer renewal batch overdue: <batch no> of <insurer>, reply due <date>"
+    content: The batch; it is counted in the Insurer reply overdue tile
+    screen: Alerts, Insurer Batches
+    frs: [FR-RN-070]
+  - id: NT-14
+    channel: Alert
+    trigger: A Renewal Advice or renewal letter could not be sent to the client (Renewal letter not delivered)
+    recipient: The administrators who receive the alerts of Renewal
+    template: "Renewal letter not delivered: <letter no> of <renewal ref> to <recipient>: <reason>"
+    content: The letter; it is counted in the Letters failed tile
+    screen: Alerts, Letters
+    frs: [FR-RN-081]
+  - id: NT-15
+    channel: Alert
+    trigger: A renewal stays in the Exception classification longer than the allowed days, 7 by default (Renewal exception ageing)
+    recipient: The administrators and Team Leaders who receive the alerts of Renewal
+    template: "Renewal exception ageing: <renewal ref> has been an Exception for <days> days"
+    content: The renewal and its failed checks
+    screen: Alerts, TL Review (Exceptions)
+    frs: [FR-RN-022]
+  - id: NT-16
+    channel: E-mail
+    trigger: Send on the Letters screen (Renewal Advice, first or second notice)
+    recipient: The client's e-mail address
+    template: "Subject: Renewal Advice <letter no> - <client>. Body: the renewal of policy <policy no> expiring on <expiry date>, the renewal terms and premium, the payment instructions and the BDOI contacts; the attachment is protected and the password follows in a separate e-mail"
+    content: "<letter no>.pdf, password protected; the e-mail and its delivery are kept on the Letters tab of the renewal"
+    screen: Letters, Renewal (Letters tab)
+    frs: [FR-RN-080, FR-RN-081]
+  - id: NT-17
+    channel: E-mail
+    trigger: Follows every protected Renewal Advice, letter and insurer extract e-mail
+    recipient: The same recipients
+    template: "The password of the attachment of the e-mail <subject>, with the password hint for the recipient"
+    content: The password only
+    screen: Letters, Insurer Batches
+    frs: [FR-RN-081, FR-RN-070]
+  - id: NT-18
+    channel: E-mail
+    trigger: Send to Insurer on an insurer batch
+    recipient: The renewal e-mail addresses of the insurer
+    template: "Subject: Renewal extract <batch no> - <insurer>. Body: the renewals expiring in <period> for the insurer's renewal terms, the reply date; the attachment is protected and the password follows in a separate e-mail"
+    content: "The insurer extract with its 28 columns, password protected; the batch keeps the time sent and the sender"
+    screen: Insurer Batches
+    frs: [FR-RN-070]
+  - id: NT-19
+    channel: E-mail
+    trigger: "Send Letters on the NAL / NFR tab; the NRNS reminder and the non-acceptance letter sent by the nightly letter run"
+    recipient: The client's e-mail address
+    template: "Subject: <letter type> <letter no> - <client>. Body: the letter (No Advice Letter, Not for Renewal Letter with its reason, NRNS reminder or non-acceptance notice); the attachment is protected and the password follows in a separate e-mail"
+    content: "<letter no>.pdf, password protected; kept on the Letters tab of the renewal"
+    screen: Letters, Renewal (Letters tab)
+    frs: [FR-RN-082, FR-RN-083, FR-RN-024]

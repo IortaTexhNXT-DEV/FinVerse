@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bibs
+  labels:
+    # Pod Security Admission "restricted" for every pod: non-root users, no privilege escalation,
+    # no Linux capabilities, RuntimeDefault seccomp (the frontend runs an unprivileged nginx).
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted

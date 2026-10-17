@@ -1,0 +1,145 @@
+# Messages catalogue of BRD-6 Renewal: sources, places and the fix the user makes.
+# The message texts are read from the platform at every build (never typed here). This file says where each message
+# appears (by the class or file that raises it) and what the user does. Records looked up by a reference the user
+# never types (an internal key of a correction, a transfer or a package choice) are left out.
+sources:
+  backend_packages: [renewal]
+  exclude_codes: [NOT_FOUND]
+  exclude_texts: ["^<0>$", "^<problems>$", "^<missing>$"]
+  bulk_handlers: [DispositionUploadHandler, InsurerResponseBulkHandler, AcceptanceBulkHandler, LamdReportHandler,
+                  PackageMapBulkHandler, LegacyPoliciesBulkHandler, RaAlreadySentBulkHandler]
+  bulk_screen: "Upload panel of the Renewal screen"
+  frontend_dirs: [features/renewal/common/ActionDialogs.tsx, features/renewal/common/CandidateList.tsx,
+                  features/renewal/common/CompleteFileForm.tsx, features/renewal/common/MoreDialogs.tsx,
+                  features/renewal/common/RenewalBits.tsx, features/renewal/common/UploadPanel.tsx,
+                  features/renewal/expiry/ExpiryListPage.tsx, features/renewal/followups/FollowupsPage.tsx,
+                  features/renewal/home/RenewalHomePage.tsx, features/renewal/insurer/InsurerBatchesPage.tsx,
+                  features/renewal/lamd/LamdPage.tsx, features/renewal/letters/LettersPage.tsx,
+                  features/renewal/mine/MyDispositionsPage.tsx, features/renewal/processing/ProcessingPage.tsx,
+                  features/renewal/record/CandidatePage.tsx, features/renewal/record/ClientDialogs.tsx,
+                  features/renewal/record/DetailsTab.tsx, features/renewal/record/HistoryTabs.tsx,
+                  features/renewal/record/RecordActions.tsx, features/renewal/record/RecordDialogs.tsx,
+                  features/renewal/record/RecordTabs.tsx, features/renewal/review/ReviewPage.tsx,
+                  features/renewal/setup/ChecksTab.tsx, features/renewal/setup/GoLiveTab.tsx,
+                  features/renewal/setup/PackageChoicesTab.tsx, features/renewal/setup/PackageMapTab.tsx,
+                  features/renewal/setup/RenewalSetupPage.tsx, features/renewal/setup/RiskCodesTab.tsx,
+                  features/renewal/setup/RuleVersionsTab.tsx, features/renewal/transfers/TransfersPage.tsx]
+
+# Where a message appears: the first rule whose pattern matches the class (backend) or file (frontend) wins.
+places:
+  - [ "^(RenewalHomePage|RenewalHomeService)$", "Renewal Home (SCR-RN-01)" ]
+  - [ "^(ExpiryListPage|ExtractionService|InitiationService|CandidateList|MoreDialogs)$", "Expiry List: Generate Expiry List, Initiate and the Filters panel (SCR-RN-02)" ]
+  - [ "^(RenewalAssignmentService|ActionDialogs)$", "Assign Disposition and Re-assign dialogs (SCR-RN-02, SCR-RN-08)" ]
+  - [ "^(CandidatePage|DetailsTab|RenewalRecords|RenewalScope|RecordActions|BlockingChecks)$", "Renewal record (SCR-RN-03)" ]
+  - [ "^(RecordTabs|HistoryTabs)$", "Renewal record tabs (SCR-RN-04, SCR-RN-05)" ]
+  - [ "^(MyDispositionsPage)$", "My Dispositions (SCR-RN-06)" ]
+  - [ "^(RecordDialogs|RenewalDispositionService|RemarkService|NbPathService)$", "Set Disposition, Add Remark and Re-open (SCR-RN-07)" ]
+  - [ "^(ReviewPage|ReviewService|OverrideService)$", "TL Review: Post, Return and Override (SCR-RN-08)" ]
+  - [ "^(TransfersPage|TransferService|RenewalTransfer)$", "Transfers and the Transfer dialog (SCR-RN-09)" ]
+  - [ "^(ProcessingPage|ProcessingService|CompleteFileService|CompleteFileForm|RenewalBatch|RenewalAccountService)$", "Processing Worklist, the dispositioned file and the renewal account (SCR-RN-10)" ]
+  - [ "^(InsurerBatchesPage|InsurerBatchService)$", "Insurer Batches (SCR-RN-11)" ]
+  - [ "^(RenewalInsurerResponseService)$", "Record Insurer Response (SCR-RN-12)" ]
+  - [ "^(LettersPage|LetterService|RenewalLetter)$", "Letters: Generate RA, Send and Send Letters (SCR-RN-13)" ]
+  - [ "^(ClientDialogs|AcceptanceService)$", "Record Acceptance (SCR-RN-14)" ]
+  - [ "^(FollowupsPage|FollowupService)$", "Follow-ups and Add Follow-up (SCR-RN-15)" ]
+  - [ "^(LamdPage|LamdService)$", "LAMD Reports (SCR-RN-16)" ]
+  - [ "^(RiskCodesTab|ChecksTab|RenewalSetupService|NonRenewableRiskCode|RenewalSetupPage)$", "Renewal Setup: Non-renewable Risk Codes and Checks (SCR-RN-17)" ]
+  - [ "^(RuleVersionsTab|RuleVersionService|VersionedRules|BucketRuleSet)$", "Renewal Setup: Classification Rules and Decision Matrix (SCR-RN-18)" ]
+  - [ "^(PackageMapTab|PackageChoicesTab|PackageMapService|PackageChoiceService|PackageChoice)$", "Renewal Setup: Package Map, Package Choices and Propose Package (SCR-RN-19)" ]
+  - [ "^(GoLiveTab|GoLiveService|RaAlreadySentService|RaSentRequest)$", "Renewal Setup: Go-live (SCR-RN-20)" ]
+
+# The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
+# not repeated here. Keys are message codes; frontend messages without a code use their text.
+fixes:
+  RNW_ACCEPTANCE_DATE: Enter the date the client accepted, today or earlier.
+  RNW_ACCEPTANCE_EVIDENCE: Upload the e-mail or the signed Renewal Advice in the Documents tab of the renewal and choose it as the evidence.
+  RNW_CHECK_BLOCKING: Have the failed checks named in the message passed or overridden by the Team Leader, then try again.
+  RNW_ACCEPTANCE_IMPACT: Tick that the client acknowledged the change of premium, after checking the evidence.
+  RNW_FOLLOWUP_DATE: Enter a next action date from today on, or leave it empty.
+  RNW_BUCKET_RULE_FAIL_CLEAN: Give a failed check the Review or Exception classification.
+  LOV_EFFECTIVITY_INVALID: Correct the dates so that the risk code does not end before it starts.
+  RNW_PACKAGE_CHOICE_DECIDED: No action; the package choice is already decided. Refresh the list.
+  RNW_PACKAGE_CHOICE_MAKER: Ask another member of the Renewal processing team to approve the choice.
+  RNW_RA_SENT_DECIDED: No action; the correction is already decided. Refresh the list.
+  RNW_RA_SENT_MAKER: Ask another member of the Renewal processing team to approve the correction.
+  RNW_LETTER_STATUS: Refresh the list; generate the letter again if it was cancelled.
+  RNW_TRANSFER_DECIDED: No action; the transfer is already decided. Refresh the list.
+  RNW_RULES_MAKER_CHECKER: Ask another user to activate the version.
+  RNW_RULES_NOT_DRAFT: Create a new version from the active one to change the rules.
+  RNW_RULES_NOT_SUBMITTED: Submit the draft version first, or refresh the list.
+  RNW_RANGE_INVALID: Correct the dates so that the range does not end before it starts.
+  RNW_GOLIVE_FAILED: Report the message to the System Administrator; correct the migrated policies named and run the take-over again.
+  RNW_RA_SENT_INVALID: Correct the rows of the file listed under the message and upload it again.
+  RNW_BATCH_EMPTY: Choose another expiry range or insurer; only renewals For Renewal in processing are sent to the insurer.
+  RNW_BATCH_SENT: No action; the batch is already sent. Upload the insurer's responses when they arrive.
+  RNW_BATCH_MAILBOX: Ask the Business Administrator to give the insurer its renewal e-mail address, then send the batch again.
+  RNW_RESPONSE_INVALID: Correct the response named in the message (for a revision, enter the revised premium).
+  RNW_RA_LATE: Tick the confirmation of a late Renewal Advice in the Generate dialog when the client must still receive it.
+  RNW_RA_SECOND: Send the first notice first, or wait for the days given before the second notice.
+  RNW_LETTER_NONE: Remove the renewal from the selection; it has no letter to send.
+  RNW_NB_PATH_EXISTS: Open the quotation or proposal request already linked to the renewal.
+  RNW_OVERRIDE_NOT_FAILING: Remove the renewal from the selection; the check passes and needs no override.
+  RNW_OVERRIDE_SAME: Choose another classification, or remove the renewal from the selection.
+  RNW_OVERRIDE_CLEAN: Override the failed check first, or choose the Review classification.
+  RNW_OVERRIDE_NFR: Return the renewal to the Account Officer to give Not for Renewal with its reason.
+  RNW_OVERRIDE_TARGET: Choose the check or the new value of the override.
+  RNW_REMARKS_REQUIRED: Enter the remarks.
+  RNW_REMARKS_TOO_LONG: Shorten the remarks to 200 characters.
+  RNW_ASSIGN_SAME: Remove the renewal from the selection, or choose another officer.
+  RNW_ASSIGN_STP: No action; the renewal follows the loan-driven straight-through path and needs no officer.
+  RNW_ASSIGN_UNIT: Choose an officer of the unit of the renewal, or transfer the renewal to the officer's unit.
+  RNW_ASSIGN_AO: Choose an active officer who gives renewal dispositions.
+  HISTORY_NOT_VIEWED: Open the Account History tab and click View Account History, then give the disposition.
+  RNW_DISPOSITION_INCOMPLETE: Complete the disposition named in the message, then push it again.
+  RNW_REOPEN_STAGE: No action; only a renewal tagged Not for Renewal can be re-opened.
+  RNW_REOPEN_LATE: No action; the policy expired more than the re-open days ago. Start a new business quotation if the client still wants the cover.
+  RNW_NOT_ASSIGNED: Ask the Team Leader to assign the renewal to you, or to give the disposition.
+  RNW_NEW_INVOICE: Enter the invoice number the policy was booked under, as shown in Booking.
+  WORKFLOW_REASON_REQUIRED: Choose the reason.
+  RNW_BLOCKING_CHECK: Have the failed checks named in the message passed or overridden, then post the renewal again.
+  RNW_DISPOSITION_REQUIRED: Return the renewal to the Account Officer to give the disposition.
+  RNW_TRANSFER_OPEN: Wait for the receiving unit to decide the open request, or cancel it on Transfers.
+  RNW_TRANSFER_NOT_REQUESTER: Ask the user who requested the transfer to cancel it.
+  RNW_TRANSFER_SAME_UNIT: Choose another unit than the unit of the renewal.
+  RNW_TRANSFER_NOT_RECEIVER: Ask a Team Leader of the receiving unit to decide the transfer.
+  RNW_TRANSFER_UNIT: Choose an active Marketing unit.
+  RNW_SCOPE_JOB: Upload and process the dispositioned file first, then declare it complete.
+  RNW_SCOPE_APPLIED: No action; the file is already declared complete.
+  RNW_SCOPE_RANGE: Enter the expiry range and the unit of the complete file.
+  RNW_PO_INVALID: Choose a Processing Officer from the list.
+  RNW_ACCOUNT_MISSING: Report the renewal to the System Administrator; the renewal account linked to it is missing.
+  RNW_ACCOUNT_DATA: Propose the BIBS package of the migrated policy (Propose Package) and make sure the client is in BIBS, then create the renewal account.
+  RNW_SELECTION_EMPTY: Tick at least one renewal in the list.
+  RNW_STAGE_INVALID: Refresh the renewal; the action is not possible in its current stage.
+  RENEWAL_LOCKED: Ask the Team Leader to unlock the Renewal Advice (override) before the renewal is changed.
+  RNW_PACKAGE_REASON: Enter the reason of the package choice.
+  RNW_PACKAGE_TARGET: Choose a product and version that can be sold for renewal.
+  RNW_PACKAGE_NOT_MIGRATED: No action; the renewal is not a migrated packaged policy.
+  RNW_PACKAGE_CLOSED: No action; the renewal is closed.
+  RNW_PACKAGE_PENDING: Wait for the package choice already waiting for approval to be decided.
+  RNW_PACKAGE_REJECT_REMARKS: Enter the reason of the rejection.
+  RNW_PACKAGE_MAP_INVALID: Correct the mapping as listed under the message.
+  RNW_CHECK_SEVERITY: Choose the severity of the check.
+  RNW_RISK_CODE_REQUIRED: Enter the risk code.
+  RNW_RISK_CODE_INCOMPLETE: Enter the reason and the effective date.
+  RNW_RULES_REJECT_REMARKS: Enter the reason of the rejection.
+  RNW_RULE_PRIORITY_DUPLICATE: Give each rule of the version its own priority.
+  VALIDATION_FAILED: Correct the fields listed under the message.
+  CONCURRENT_MODIFICATION: Reload the record; another user changed it. Enter the change again.
+  ACCESS_DENIED: Ask for the permission; the menu shows only the screens of your role.
+  INTERNAL_ERROR: Report the message with its reference to the System Administrator.
+  MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the System Administrator.
+  UPLOAD_TOO_LARGE: Reduce the file (split it) and upload it again.
+  "Renewal <reference> does not exist": Correct the renewal reference of the row.
+  "Renewal <renewal ref> is not awaiting a response": Remove the row; the renewal is not waiting for the client's reply.
+  "Method <method> is not valid (E-mail or Payment)": Enter E-mail or Payment in the Method column.
+  "Legacy policy <legacy ref> is already a renewal": Remove the row; the policy is already taken over.
+  "Response <response> is not valid": Enter Renew As Is, Revise or Reject in the Response column.
+  "Choose the report type (Paid-off or RMU)": Choose the report type before the upload.
+  "Choose the period of the report": Choose the month of the report before the upload.
+  "The row has no PN number": Enter the PN number of the loan in the row.
+  "Renewal <renewal ref> cannot be updated in stage <label>": Remove the row; the renewal is past the disposition.
+  "Disposition <disposition> is not valid": Enter For Renewal, Not for Renewal, For Quotation, For Proposal or Lost Business.
+  "Remarks may have at most 200 characters": Shorten the remarks of the row to 200 characters.
+  "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>": Correct the value in the file in the format of the column and upload the file again.
+  "<Column> is mandatory": Fill in the column in the file and upload the file again.

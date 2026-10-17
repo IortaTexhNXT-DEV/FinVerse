@@ -1,0 +1,33 @@
+# Who signs what in the BRD-3 Product Maintenance sign-off set: one definition, read by 00 Start Here, the 01 guide
+# deck, the sign-off certificate of the 03 workbook, the Drop 0 closure summary and the drop index (signoff_pack.py,
+# "ownership"). The roles and units are those of the BRD-3 approval sheets; a role the set adds is marked "Added for
+# this set". The set holds business content only; the technical content is in the Technical Specification, reviewed
+# by BDOI IT.
+source: "BRD-3 approval sheets: main BRD p.34-35; Workshop Addendum p.8-9"
+
+roles:
+  - {id: ITN, short: iorta TechNXT, role: "iorta TechNXT project team: Project Manager, Business Analysis, test lead", org: iorta TechNXT, capacity: Prepared by, confirms: "The set is complete and consistent as issued, traced to the BRD and to the screens; every comment is answered in the comments log", sheet: Added for this set (author of the FRS set)}
+  - {id: BA, short: BA (BPS), role: "Business Analyst, Enterprise Services Group - Business Project Services (BPS)", org: BDO Unibank ESG, capacity: Prepared by, confirms: "The set states the BRD requirements as written; every departure is listed in the proposed rules and clarifications", sheet: "Prepared by (p.34, p.8)"}
+  - {id: TSU, short: TSU, role: "Technical Support Unit (TSU), BU representatives", org: BDOI, capacity: Input provided by, confirms: "The package request, negotiation, requirements, advisory and expiry screens match the business input", sheet: "Input provided by (p.34, p.8)"}
+  - {id: MBS, short: MBS, role: "Marketing Business System (MBS), BU representatives", org: BDOI, capacity: Input provided by, confirms: "The set-up, version, master and incentive screens and the configuration inputs match the business input", sheet: "Input provided by and Reviewed by (p.34, p.8)"}
+  - {id: PGM, short: Program Manager (BPS), role: "Program Manager, Enterprise Services Group - Business Project Services (BPS)", org: BDO Unibank ESG, capacity: Reviewed by, confirms: "Traceability of every BRD requirement to the set and completeness of the set", sheet: "Reviewed by (p.34, p.9)"}
+  - {id: IT, short: BDOI IT, role: "BDOI Information Technology Group (BDOI IT)", org: BDOI, capacity: Reviewed by, confirms: "Interfaces, user access and menus, and the Technical Specification (a separate document); not the business screens", sheet: Added for this set}
+  - {id: PO, short: Product Owner, role: "Product Owner, Marketing Business System", org: BDOI, capacity: Approved by, confirms: "Owns the set and approves all of its contents", sheet: "Approved by (p.34, p.9)"}
+  - {id: CRT, short: UH Claims and TU, role: "Unit Head - Claims, Analytics, Risk Management, Reinsurance and Technical Underwriting", org: BDOI, capacity: Approved by, confirms: "The TSU part: package requests, negotiation, requirements, advisories and expiry", sheet: "Approved by (p.35, p.9)"}
+  - {id: CC, short: UH Combank and Corbank, role: "Unit Head - Combank and Corbank", org: BDOI, capacity: Approved by, confirms: "Package requests, approvals and pricing for Combank and Corbank", sheet: "Approved by (p.35, p.9)"}
+  - {id: RM, short: Head Retail Marketing, role: "Head - Retail Marketing", org: BDOI, capacity: Approved by, confirms: "Package requests, approvals and pricing for Retail Marketing", sheet: "Approved by (p.35, p.9)"}
+  - {id: CRM, short: Head Corporate and Retail Marketing, role: "Head - Corporate and Retail Marketing", org: BDOI, capacity: Approved by, confirms: "Package requests, approvals and pricing for Corporate Marketing", sheet: "Approved by (p.35)"}
+  - {id: COMP, short: Head Comptrollership, role: "Head - Comptrollership", org: BDOI, capacity: Approved by, confirms: "Rates and taxes, commission rates and incentive criteria", sheet: "Approved by (p.35; marked not required on the addendum, p.9)"}
+
+parts:
+  - {part: "Screens and fields (FRS screen specifications; workbook Screen catalogue, Field register)", prepares: [ITN], input: [TSU, MBS], reviews: [MBS, PGM], approves: [PO, CRT, CC, RM, CRM]}
+  - {part: "Business rules and validations", prepares: [ITN], input: [TSU, MBS, BA], reviews: [MBS, PGM], approves: [PO, CRT, COMP]}
+  - {part: "Messages and notifications", prepares: [ITN], input: [TSU, MBS], reviews: [PGM], approves: [PO]}
+  - {part: "Documents and reports (quotation slip, comparative, advisories, catalogue reports)", prepares: [ITN], input: [TSU, MBS], reviews: [PGM], approves: [PO, CRT]}
+  - {part: "Walkthroughs (end-to-end, screen by screen)", prepares: [ITN], input: [TSU, MBS], reviews: [PGM], approves: [PO]}
+  - {part: "UX screen deck, UX screen register and image package (07 to 09, for the BDOI UX Design team; the screens as specified in this set)", prepares: [ITN], input: [TSU, MBS], reviews: [PGM], approves: [PO]}
+  - {part: "Proposed business rules and clarifications for confirmation", prepares: [ITN], input: [BA, MBS, TSU], reviews: [PGM], approves: [PO]}
+  - {part: "Interfaces, user access and menus by persona", prepares: [ITN], input: [MBS], reviews: [IT], approves: [PO]}
+  - {part: "Test plan (04 workbook, 05 summary)", prepares: [ITN], input: [TSU, MBS], reviews: [PGM, IT], approves: [PO]}
+  - {part: "Configuration inputs (06 templates, Drop 0)", prepares: [ITN], input: [MBS, TSU], reviews: [MBS, PGM], approves: [PO, COMP]}
+  - {part: "Technical Specification (separate document, not part of the business sign-off)", prepares: [ITN], input: [IT], reviews: [IT], approves: [IT]}

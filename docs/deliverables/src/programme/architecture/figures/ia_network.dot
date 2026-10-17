@@ -1,0 +1,28 @@
+// Network zones and trust boundaries (Infrastructure Architecture, chapter 4).
+digraph ia_network {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.55, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="16" color="@HEADER_BLUE"><b>Network zones and trust boundaries</b></font><br/><font point-size="10" color="@MUTED">TB1 to TB6 mark the trust boundaries. No zone has a route from the internet; every hop is TLS.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.14,0.08", fillcolor="@WHITE", width=2.8];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.0, fontname="Arial", fontsize=10, fontcolor="@DANGER"];
+
+  z1 [label=<<b>Z1 BDO corporate network</b><br/><font point-size="10">user workstations, VDI;<br/>on-premises systems: bank channels,<br/>LMS, PMS, CCM, file server</font>>, fillcolor="@BG_BLUE"];
+  z2 [label=<<b>Z2 Apigee X</b><br/><font point-size="10">BDO API proxies (Google Cloud):<br/>OAuth 2.0, quotas, spike arrest</font>>, fillcolor="@BG_BLUE"];
+  z7 [label=<<b>Z7 Management</b><br/><font point-size="10">bastion through SSM, pipeline runner;<br/>no inbound ports, session logging</font>>, fillcolor="@DIRTY_WHITE"];
+  z3 [label=<<b>Z3 Edge subnets</b><br/><font point-size="10">Route 53 private zone, AWS WAF,<br/>internal load balancer (Gateway bibs), HTTPS 443</font>>, fillcolor="@DIRTY_WHITE", width=4.2];
+  z4 [label=<<b>Z4 Application subnets - EKS namespace bibs</b><br/><font point-size="10">four workloads; network policies deny by default;<br/>restricted Pod Security; IAM role per workload (IRSA)</font>>, fillcolor="@BG_BLUE", width=4.2];
+  z5 [label=<<b>Z5 Data subnets</b><br/><font point-size="10">RDS PostgreSQL, ElastiCache Valkey, MSK;<br/>admit Z4 only; no route out</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  z6 [label=<<b>Z6 Private access to AWS services</b><br/><font point-size="10">S3 gateway; PrivateLink for KMS, STS,<br/>Secrets Manager, ECR, CloudWatch Logs</font>>, fillcolor="@AMBER_BG"];
+
+  {rank=same; z1; z2; z7}
+  {rank=same; z5; z6}
+  z1 -> z3 [label=" TB1 Direct Connect / VPN"];
+  z2 -> z3 [label=" TB2 private interconnect"];
+  z3 -> z4 [label=" TB3 HTTPS to the pods"];
+  z4 -> z5 [label=" TB4 TLS, credentials"];
+  z4 -> z6 [label=" TB5 IAM (IRSA)"];
+  z4 -> z2 [label=" TB2 outbound APIs", constraint=false, style=dashed];
+  z4 -> z1 [label=" TB6 SMTP 587, files", constraint=false, style=dashed];
+  z7 -> z4 [label=" kubectl via SSM", fontcolor="@MUTED", color="@MUTED", style=dashed];
+}

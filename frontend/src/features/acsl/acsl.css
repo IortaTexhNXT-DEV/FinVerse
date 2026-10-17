@@ -1,0 +1,56 @@
+/* ACSL screens (BRD-5 ACSL). Colours and spacing come from the tokens. */
+
+.acsl-lines .input,
+.acsl-lines .select {
+  min-width: 96px;
+}
+
+.acsl-lines td {
+  vertical-align: top;
+}
+
+.acsl-lines .field-error {
+  display: block;
+  margin-top: var(--space-1);
+}
+
+.acsl-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.acsl-variance {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.acsl-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-3);
+}
+
+.acsl-count {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.acsl-count strong {
+  color: var(--color-heading);
+  font-size: 1.25rem;
+}
+
+.acsl-count span {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}

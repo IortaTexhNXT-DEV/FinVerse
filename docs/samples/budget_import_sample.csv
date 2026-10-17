@@ -1,0 +1,11 @@
+# iNXT BrokerVerse budget import (POST /api/v1/budgets/{id}/import, Content-Type text/plain).
+# Lines starting with # and blank lines are ignored. Header names are lower case.
+# Layout 1: account_code,cost_centre,m01..m12 (twelve monthly amounts of the fiscal year).
+# Layout 2: account_code,cost_centre,annual (annual amount spread evenly, remainder in month 12).
+# Amounts are in natural sign: income and expense budgets are both positive. Values must not
+# contain commas or quotes. cost_centre is optional (blank = whole account).
+account_code,cost_centre,m01,m02,m03,m04,m05,m06,m07,m08,m09,m10,m11,m12
+4100,,21000000,21000000,27000000,24000000,24000000,27000000,24000000,24000000,27000000,24000000,27000000,30000000
+5601,FIN,800000,800000,800000,800000,800000,800000,800000,800000,800000,800000,800000,800000
+5601,UW,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000,1000000
+5603,FIN,500000,500000,500000,500000,500000,500000,500000,500000,500000,500000,500000,500000

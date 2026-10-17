@@ -1,0 +1,57 @@
+# Edge routing with the Kubernetes Gateway API (gateway.networking.k8s.io/v1, standard channel). One
+# Gateway with an HTTPS listener on 443 and two HTTPRoutes (ARCHITECTURE_OPTION_DECISION.md 5.1):
+#   users:   client network -> private DNS -> WAF -> Gateway -> /api bibs-web, / bibs-frontend
+#   systems: client systems -> Apigee X -> private route -> Gateway -> /integration bibs-integration
+# The longest matching path prefix wins, so /api and /integration never reach the frontend route.
+# The controller is chosen per environment by a gateway component of the overlay, which sets the
+# GatewayClass, the TLS certificate of the listener and the controller's own settings:
+#   components/gateway-alb    (default) AWS Load Balancer Controller: internal ALB, ACM certificate,
+#                             AWS WAF web ACL, HTTPS to the pods
+#   components/gateway-envoy  Envoy Gateway: listener certificate from a TLS secret, internal NLB
+# HTTPS to the pods on 8443 in both cases. Security headers come from nginx (SPA) and the backend
+# (APIs); the upload size limit from the application and the WAF (DEPLOYMENT.md section 3).
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: bibs
+spec:
+  gatewayClassName: bibs-alb
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "<BIBS_HOST>"
+      allowedRoutes:
+        namespaces: { from: Same }
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bibs-users
+spec:
+  parentRefs:
+    - { name: bibs, sectionName: https }
+  hostnames: ["<BIBS_HOST>"]
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: /api }
+      backendRefs:
+        - { name: bibs-web, port: 8443 }
+    - matches:
+        - path: { type: PathPrefix, value: / }
+      backendRefs:
+        - { name: bibs-frontend, port: 8443 }
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: bibs-integration
+spec:
+  parentRefs:
+    - { name: bibs, sectionName: https }
+  hostnames: ["<BIBS_HOST>"]
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: /integration }
+      backendRefs:
+        - { name: bibs-integration, port: 8443 }

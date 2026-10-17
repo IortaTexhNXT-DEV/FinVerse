@@ -1,0 +1,20 @@
+// BRD-5 Volume 2: workflows PRQ_CASH_ADVANCE and PRQ_CHECK_CANCEL (V890). FRS section 5.6.
+digraph v2_ca {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.55, ranksep=0.5, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  subgraph cluster_ca { label="Cash advance (RFP)"; fontname="Arial"; fontsize=11; color="@HEADER_BLUE";
+    A1 [label="DRAFT\nemployee"]; A2 [label="FOR_REVIEW"]; A3 [label="FOR_APPROVAL\nMarketing"];
+    A4 [label="HR_APPROVAL\nHR", fillcolor="@AMBER_BG"]; A5 [label="SENT_TO_DISBURSEMENT"];
+    A6 [label="DISBURSED\nliquidation", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    A1 -> A2 [label=" submit"]; A2 -> A3 [label=" endorse"]; A3 -> A4 [label=" approve"];
+    A4 -> A5 [label=" approve"]; A5 -> A6 [label=" paid", style=dotted];
+    A2 -> A1 [label=" return", style=dashed]; A4 -> A3 [label=" return", style=dashed]; }
+  subgraph cluster_cc { label="Check cancellation (CCR)"; fontname="Arial"; fontsize=11; color="@HEADER_BLUE";
+    C1 [label="REQUESTED"]; C2 [label="FOR_REVIEW"]; C3 [label="FOR_APPROVAL"];
+    C4 [label="SENT\nhand-off DV_CANCELLATION", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    C1 -> C2 [label=" submit"]; C2 -> C3 [label=" endorse"]; C3 -> C4 [label=" approve"];
+    C2 -> C1 [label=" return", style=dashed]; }
+}

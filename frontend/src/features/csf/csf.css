@@ -1,0 +1,23 @@
+/* Customer Service Facility screens: the e-mail text of the resend preview, the checklist rows. */
+.csf-message {
+  white-space: pre-line;
+}
+
+.csf-checklist {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.csf-check-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.csf-check-row > :first-child {
+  flex: 1 1 200px;
+}

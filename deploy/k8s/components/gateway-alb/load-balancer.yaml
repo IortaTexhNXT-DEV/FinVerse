@@ -1,0 +1,61 @@
+# Internal ALB of the Gateway "bibs" (Gateway spec.infrastructure.parametersRef). No public exposure,
+# HTTPS 443 only. The WAF web ACL carries the AWS managed rule groups, the rate-based rule on
+# /api/v1/auth/* and the rule admitting /integration/* only from the Apigee source ranges. The
+# certificate, the web ACL and the source ranges come from the overlay's environment.yaml; the
+# 192.0.2.x values are documentation addresses that match nothing.
+apiVersion: gateway.k8s.aws/v1
+kind: LoadBalancerConfiguration
+metadata:
+  name: bibs-alb
+  namespace: bibs
+spec:
+  scheme: internal
+  listenerConfigurations:
+    - protocolPort: "HTTPS:443"
+      defaultCertificate: "arn:aws:acm:<AWS_REGION>:<AWS_ACCOUNT_ID>:certificate/<ALB_CERTIFICATE_ID>"
+      sslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+  # Client networks (Direct Connect / VPN, VDI) and the Apigee X private route.
+  sourceRanges: ["192.0.2.10/32", "192.0.2.11/32"]
+  wafV2:
+    webACL: "arn:aws:wafv2:<AWS_REGION>:<AWS_ACCOUNT_ID>:regional/webacl/<WAF_ACL_NAME>/<WAF_ACL_ID>"
+  loadBalancerAttributes:
+    - { key: routing.http.drop_invalid_header_fields.enabled, value: "true" }
+    # Long report downloads and uploads (the former ingress setting).
+    - { key: idle_timeout.timeout_seconds, value: "300" }
+---
+# Target groups: pod IPs (target type ip), HTTPS to the pods (certificates bibs-*-tls).
+apiVersion: gateway.k8s.aws/v1
+kind: TargetGroupConfiguration
+metadata:
+  name: bibs-web
+  namespace: bibs
+spec:
+  targetReference: { kind: Service, name: bibs-web }
+  defaultConfiguration:
+    targetType: ip
+    protocol: HTTPS
+    healthCheckConfig: { healthCheckProtocol: HTTPS, healthCheckPath: /readyz }
+---
+apiVersion: gateway.k8s.aws/v1
+kind: TargetGroupConfiguration
+metadata:
+  name: bibs-frontend
+  namespace: bibs
+spec:
+  targetReference: { kind: Service, name: bibs-frontend }
+  defaultConfiguration:
+    targetType: ip
+    protocol: HTTPS
+    healthCheckConfig: { healthCheckProtocol: HTTPS, healthCheckPath: /healthz }
+---
+apiVersion: gateway.k8s.aws/v1
+kind: TargetGroupConfiguration
+metadata:
+  name: bibs-integration
+  namespace: bibs
+spec:
+  targetReference: { kind: Service, name: bibs-integration }
+  defaultConfiguration:
+    targetType: ip
+    protocol: HTTPS
+    healthCheckConfig: { healthCheckProtocol: HTTPS, healthCheckPath: /readyz }

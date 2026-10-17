@@ -1,0 +1,102 @@
+package com.iortatechnxt.brokerverse.report.core;
+
+import java.util.List;
+
+/**
+ * Declares one report parameter.
+ *
+ * @param name key used in requests
+ * @param label UI label
+ * @param type input type
+ * @param required mandatory flag
+ * @param options allowed values for SELECT
+ * @param defaultValue default value (ISO date keywords TODAY, MONTH_START, YEAR_START allowed)
+ */
+public record ParameterSpec(
+    String name,
+    String label,
+    ParameterType type,
+    boolean required,
+    List<String> options,
+    String defaultValue) {
+
+  /** Canonical constructor normalising options. */
+  public ParameterSpec {
+    options = options == null ? List.of() : List.copyOf(options);
+  }
+
+  /**
+   * Mandatory parameter.
+   *
+   * @param name name
+   * @param label label
+   * @param type type
+   * @return spec
+   */
+  public static ParameterSpec required(String name, String label, ParameterType type) {
+    return new ParameterSpec(name, label, type, true, List.of(), null);
+  }
+
+  /**
+   * Optional parameter.
+   *
+   * @param name name
+   * @param label label
+   * @param type type
+   * @return spec
+   */
+  public static ParameterSpec optional(String name, String label, ParameterType type) {
+    return new ParameterSpec(name, label, type, false, List.of(), null);
+  }
+
+  /**
+   * Mandatory SELECT parameter with a default.
+   *
+   * @param name name
+   * @param label label
+   * @param options options
+   * @param defaultValue default
+   * @return spec
+   */
+  public static ParameterSpec select(
+      String name, String label, List<String> options, String defaultValue) {
+    return new ParameterSpec(name, label, ParameterType.SELECT, true, options, defaultValue);
+  }
+
+  /**
+   * Optional include / exclude list of codes (Renewal filter criteria, BRD x.009.2): single,
+   * multiple, "all except" and all selections. The options are served by the {@link CodeSetSource}
+   * of the given source key.
+   *
+   * @param name name
+   * @param label label
+   * @param source key of the {@link CodeSetSource} that lists the codes
+   * @return spec
+   */
+  public static ParameterSpec codeSet(String name, String label, String source) {
+    return new ParameterSpec(name, label, ParameterType.CODE_SET, false, List.of(source), null);
+  }
+
+  /**
+   * A choice of one value from a list by name; the value is the code.
+   *
+   * @param name parameter name
+   * @param label business label
+   * @param source key of the {@link CodeSetSource} offering the values
+   * @param required whether a value must be chosen
+   * @return spec
+   */
+  public static ParameterSpec lookup(String name, String label, String source, boolean required) {
+    return new ParameterSpec(name, label, ParameterType.LOOKUP, required, List.of(source), null);
+  }
+
+  /**
+   * Returns a copy with a default value.
+   *
+   * @param value default
+   * @return spec
+   */
+  public ParameterSpec withDefault(String value) {
+    return new ParameterSpec(name, label, type, required, options, value);
+  }
+}

@@ -1,0 +1,2 @@
+legacy_invoice_no,invoice_kind,legacy_policy_ref,policy_no,legacy_client_no,assured_name,currency,booking_date,invoice_date,due_date,inception_date,expiry_date,risk_code,line_code,market_segment,ao_user_id,sales_unit_code,branch_code,cost_center,gross_premium,commission,vat_on_commission,wtax_rate_pct,commission_realised,deferred_vat_open,dp_flag,cwt_flag
+I97000011,BOOKING,EP970001,MC-970001,E970001,Carmela Villanueva,PHP,2027-11-02,2027-11-02,2027-12-02,2027-11-01,2028-11-01,CAR-A,ENG,CBG,AO01,U01,MKT,OPS,11200.00,1500.00,180.00,10,500.00,120.00,N,N

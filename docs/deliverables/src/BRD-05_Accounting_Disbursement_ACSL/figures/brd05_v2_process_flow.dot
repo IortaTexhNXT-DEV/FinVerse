@@ -1,0 +1,41 @@
+// BRD-5 Volume 2: payment request to payment, with Payment Requests and ACSL (FRS section 2.2).
+digraph v2_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.5, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=2.3, height=0.85, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  s1 [label=<<b>1. Request</b><br/><font point-size="9">Modules, Marketing, upload,<br/>encoding - DIS 2.4-2.6, 3.25</font>>, fillcolor="@DIRTY_WHITE"];
+  s2 [label=<<b>2. DV</b><br/><font point-size="9">Processor<br/>DIS 2.7.x</font>>, fillcolor="@BG_BLUE"];
+  s3 [label=<<b>3. Review</b><br/><font point-size="9">Team Leader<br/>DIS 2.13-2.15</font>>, fillcolor="@BG_BLUE"];
+  s4 [label=<<b>4. Approval, posting</b><br/><font point-size="9">Approver<br/>DIS 2.19.0</font>>, fillcolor="@AMBER_BG"];
+  s5 [label=<<b>5. End of day</b><br/><font point-size="9">DCTF, checks, forms,<br/>reports - DIS 2.16.x</font>>, fillcolor="@AMBER_BG"];
+  s6 [label=<<b>6. Instrument follow-up</b><br/><font point-size="9">Processor, uploads, jobs<br/>DIS 2.8.x, 3.26.x</font>>, fillcolor="@BG_BLUE"];
+  s7 [label=<<b>7. Tagging</b><br/><font point-size="9">OR / AR, CWT, 2307<br/>DIS 2.10-2.12</font>>, fillcolor="@BG_BLUE"];
+  s8 [label=<<b>8. Status to source</b><br/><font point-size="9">System<br/>MKT 1.20.0</font>>, fillcolor="@DIRTY_WHITE"];
+  s9 [label=<<b>9. ACSL control</b><br/><font point-size="9">SOA, GL-SL, cases,<br/>corrections - ACSL 2.x</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  { rank=same; s1; s2; s3; }
+  { rank=same; s4; s5; s6; }
+  { rank=same; s7; s8; s9; }
+  s1 -> s2 -> s3;
+  s1 -> s4 -> s7 [style=invis, weight=10];
+  s2 -> s5 -> s8 [style=invis, weight=10];
+  s3 -> s6 -> s9 [style=invis, weight=10];
+  s3 -> s4 [constraint=false];
+  s4 -> s5 -> s6;
+  s6 -> s7 [constraint=false];
+  s7 -> s8 -> s9;
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">System / source</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">Processor / TL</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="9">Approver / EOD</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="9">ACSL</font></td>
+      </tr>
+    </table>>];
+  s8 -> legend [style=invis];
+}

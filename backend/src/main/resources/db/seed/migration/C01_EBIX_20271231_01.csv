@@ -1,0 +1,2 @@
+legacy_client_no,client_type,last_name,first_name,birth_date,market_segment,email,kyc_status,kyc_verified_date,kyc_review_due,client_status,created_date,last_updated
+E970001,I,Villanueva,Carmela,1979-06-14,CBG,carmela.villanueva@brokerverse-seed.ph,COMPLETE,2026-05-02,2029-05-02,A,2019-03-01,2027-10-01 09:00:00

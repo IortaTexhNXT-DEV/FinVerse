@@ -1,0 +1,1324 @@
+"""Final-document steps shared by the BDOI-format FRS builders (Cashiering, User Access Maintenance, Product
+Maintenance, Renewal): the BDOI-format FRS is the final document and stands alone.
+
+- ``reference_findings``: references to another FRS left in a .docx or .xlsx (FR numbers of the earlier FRS, "BIBS
+  reference", "reference FRS", "BIBS FRS", "our FRS", "BIBS test plan"); the builders stop when one is found.
+- ``populate_toc``: the table of contents written into the .docx itself from the headings and the page numbers
+  LibreOffice lays out, so that Word does not have to update the fields on opening (the TOC field is kept, so Word can
+  still refresh it).
+- ``render_pages``: every page of a PDF as PNG, for the page-by-page review.
+
+Command line:
+  python3 brd_common_final.py scan FILE...           counts of the references found in each file
+  python3 brd_common_final.py toc FILE.docx...       populates the table of contents of each document
+  python3 brd_common_final.py render FILE.pdf DIR    writes DIR/page-NNN.png
+"""
+from __future__ import annotations
+
+import copy
+import math
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import zipfile
+from pathlib import Path
+
+# References to another FRS that the final document does not contain
+REFERENCE_PATTERNS = {
+    "FR number of another FRS": r"\bFR-(?:OP|PM|UA|RN|NB)-\d{3}\b",
+    "BIBS reference": r"\bBIBS reference\b",
+    "reference FRS / requirement": r"\breference (?:FRS|FR|requirements?)\b",
+    "BIBS FRS / our FRS": r"\b(?:BIBS FRS|our FRS|FRS v2\.\d)\b",
+    "BIBS test plan": r"\bBIBS test plan\b",
+    "incorporated from": r"\bincorporated from the BIBS\b",
+}
+
+
+def _texts(path: Path) -> list[str]:
+    """The text of every part of a .docx or .xlsx, one string per XML part (tags removed)."""
+    out = []
+    with zipfile.ZipFile(path) as z:
+        for name in z.namelist():
+            if name.endswith(".xml") and (name.startswith("word/") or name.startswith("xl/")):
+                xml = z.read(name).decode("utf-8", "ignore")
+                xml = re.sub(r"</w:p>|</si>|</c>|<w:tab/>", "\n", xml)
+                out.append(re.sub(r"<[^>]+>", "", xml))
+    return out
+
+
+def reference_findings(path: Path, context: int = 70) -> dict[str, list[str]]:
+    """Each kind of reference to another FRS found in a document, with a short context per occurrence."""
+    found: dict[str, list[str]] = {}
+    for text in _texts(Path(path)):
+        for kind, pat in REFERENCE_PATTERNS.items():
+            for m in re.finditer(pat, text):
+                snippet = text[max(0, m.start() - context):m.end() + context].replace("\n", " / ")
+                found.setdefault(kind, []).append(snippet)
+    return found
+
+
+def reference_count(path: Path) -> int:
+    return sum(len(v) for v in reference_findings(path).values())
+
+
+def check_no_references(paths) -> None:
+    """Stops the build when a document still refers to another FRS."""
+    problems = []
+    for p in paths:
+        for kind, hits in reference_findings(Path(p)).items():
+            problems.append(f"{Path(p).name}: {len(hits)} x {kind}, e.g. ...{hits[0]}...")
+    if problems:
+        raise SystemExit("references to another FRS left in the final documents:\n  " + "\n  ".join(problems))
+
+
+# --------------------------------------------------------------------------------------------- LibreOffice
+class _Office:
+    """A private headless LibreOffice reached through UNO."""
+
+    def __enter__(self):
+        import uno  # noqa: PLC0415
+
+        self.uno = uno
+        self.profile = Path(tempfile.mkdtemp(prefix="frs_lo_"))
+        self.pipe = f"frsfinal{int(time.time() * 1000)}"
+        self.proc = subprocess.Popen(
+            ["soffice", f"-env:UserInstallation=file://{self.profile}", "--headless", "--norestore", "--invisible",
+             f"--accept=pipe,name={self.pipe};urp;"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        local = uno.getComponentContext()
+        resolver = local.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", local)
+        ctx = None
+        for _ in range(120):
+            try:
+                ctx = resolver.resolve(f"uno:pipe,name={self.pipe};urp;StarOffice.ComponentContext")
+                break
+            except Exception:  # noqa: BLE001
+                time.sleep(1)
+        if ctx is None:
+            raise RuntimeError("LibreOffice did not start")
+        self.desktop = ctx.ServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", ctx)
+        return self
+
+    def prop(self, name, value):
+        from com.sun.star.beans import PropertyValue  # noqa: PLC0415
+
+        p = PropertyValue()
+        p.Name, p.Value = name, value
+        return p
+
+    def open(self, path: Path):
+        return self.desktop.loadComponentFromURL(self.uno.systemPathToFileUrl(str(path)), "_blank", 0,
+                                                 (self.prop("Hidden", True),))
+
+    def __exit__(self, *exc):
+        try:
+            self.desktop.terminate()
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            self.proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            self.proc.kill()
+        shutil.rmtree(self.profile, ignore_errors=True)
+
+
+def toc_entries(path: Path) -> list[tuple[int, str, str]]:
+    """(level, heading text, page) of every line of the first table of contents, as LibreOffice lays it out."""
+    with _Office() as lo:
+        model = lo.open(path)
+        idx = model.getDocumentIndexes()
+        entries = []
+        for _ in range(2):
+            for i in range(idx.getCount()):
+                idx.getByIndex(i).update()
+            model.refresh()
+        for i in range(idx.getCount()):
+            ix = idx.getByIndex(i)
+            if not ix.supportsService("com.sun.star.text.ContentIndex"):
+                continue
+            en = ix.getAnchor().createEnumeration()
+            while en.hasMoreElements():
+                par = en.nextElement()
+                text = par.getString()
+                style = par.ParaStyleName or ""
+                m = re.search(r"(\d+)\s*$", style)
+                if not text.strip() or "\t" not in text:
+                    continue
+                head, page = text.rsplit("\t", 1)
+                entries.append((int(m.group(1)) if m else 1, head.replace("\t", " ").strip(), page.strip()))
+            break
+        model.close(True)
+    return entries
+
+
+def populate_toc(path: Path) -> int:
+    """Writes the table of contents of a .docx from LibreOffice's layout and clears the update-on-open flag.
+    Returns the number of entries."""
+    from docx import Document  # noqa: PLC0415
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    path = Path(path)
+    entries = toc_entries(path)
+    if not entries:
+        raise SystemExit(f"{path.name}: no table of contents laid out")
+    doc = Document(str(path))
+    body = doc.element.body
+    first = next((p for p in body.iter(qn("w:p"))
+                  if any(re.match(r"\s*TOC\b", t.text or "") for t in p.iter(qn("w:instrText")))), None)
+    if first is None:
+        raise SystemExit(f"{path.name}: no TOC field")
+    # the paragraphs of the field: from its begin to the end that closes it
+    paras, depth, started = [], 0, False
+    p = first
+    while p is not None:
+        if p.tag == qn("w:p"):
+            paras.append(p)
+            for fc in p.iter(qn("w:fldChar")):
+                kind = fc.get(qn("w:fldCharType"))
+                if kind == "begin":
+                    depth += 1
+                    started = True
+                elif kind == "end":
+                    depth -= 1
+            if started and depth == 0:
+                break
+        p = p.getnext()
+    content = first.getparent()
+    instr = next(t.text for t in first.iter(qn("w:instrText")) if "TOC" in (t.text or ""))
+    styles = {}
+    for p in paras:
+        ps = p.find(f"{qn('w:pPr')}/{qn('w:pStyle')}")
+        if ps is not None and re.fullmatch(r"TOC\d", ps.get(qn("w:val")) or ""):
+            styles.setdefault(int(ps.get(qn("w:val"))[3:]), p.find(qn("w:pPr")))
+    base_ppr = styles.get(1) if styles else first.find(qn("w:pPr"))
+    anchor = first.getprevious()
+    for p in paras:
+        content.remove(p)
+
+    def el(tag, **attrs):
+        e = content.makeelement(qn(tag), {qn(k): v for k, v in attrs.items()})
+        return e
+
+    def run_fld(kind):
+        r = el("w:r")
+        r.append(el("w:fldChar", **{"w:fldCharType": kind}))
+        return r
+
+    def run_text(text):
+        r = el("w:r")
+        t = el("w:t")
+        t.text = text
+        t.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
+        r.append(t)
+        return r
+
+    new = []
+    for i, (level, head, page) in enumerate(entries):
+        p = el("w:p")
+        ppr = copy.deepcopy(styles.get(level, base_ppr))
+        ps = ppr.find(qn("w:pStyle"))
+        if ps is None:
+            ps = el("w:pStyle")
+            ppr.insert(0, ps)
+        ps.set(qn("w:val"), f"TOC{min(level, 9)}")
+        tabs = ppr.find(qn("w:tabs"))
+        if tabs is not None:
+            ppr.remove(tabs)
+        tabs = el("w:tabs")
+        tabs.append(el("w:tab", **{"w:val": "right", "w:leader": "dot", "w:pos": "9630"}))
+        ppr.append(tabs) if ppr.find(qn("w:rPr")) is None else ppr.find(qn("w:rPr")).addprevious(tabs)
+        p.append(ppr)
+        if i == 0:
+            p.append(run_fld("begin"))
+            r = el("w:r")
+            it = el("w:instrText")
+            it.text = instr
+            it.set("{http://www.w3.org/XML/1998/namespace}space", "preserve")
+            r.append(it)
+            p.append(r)
+            p.append(run_fld("separate"))
+        p.append(run_text(head))
+        r = el("w:r")
+        r.append(el("w:tab"))
+        p.append(r)
+        p.append(run_text(page))
+        if i == len(entries) - 1:
+            p.append(run_fld("end"))
+        new.append(p)
+    if anchor is not None:
+        for p in reversed(new):
+            anchor.addnext(p)
+    else:
+        for k, p in enumerate(new):
+            content.insert(k, p)
+    settings = doc.settings.element
+    for old in settings.findall(qn("w:updateFields")):
+        settings.remove(old)
+    doc.save(str(path))
+    return len(entries)
+
+
+def toc_levels_from_lo(path: Path) -> None:  # pragma: no cover - diagnostic
+    for e in toc_entries(path):
+        print(e)
+
+
+# Guidance sentences of BDOI's FRS template (D051) that are instructions to the author, not content
+TEMPLATE_GUIDANCE = re.compile(
+    r"^\(?(?:State the major benefits that the implementation|List Stakeholders|Describe the dependencies between this "
+    r"Application|List the use cases/business functions that are out of scope|List the system/organizational interfaces "
+    r"that are out of scope|List the filenames of the Business Request)")
+
+
+def retext(p_element, text: str):
+    """A paragraph element given another text in the format of its first run (the other runs dropped)."""
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    runs = p_element.findall(qn("w:r"))
+    if not runs:
+        r = p_element.makeelement(qn("w:r"), {})
+        p_element.append(r)
+        runs = [r]
+    for r in runs[1:]:
+        p_element.remove(r)
+    r = runs[0]
+    for child in list(r):
+        if child.tag != qn("w:rPr"):
+            r.remove(child)
+    t = r.makeelement(qn("w:t"), {"{http://www.w3.org/XML/1998/namespace}space": "preserve"})
+    t.text = text
+    r.append(t)
+    return p_element
+
+
+MIN_COL = 920   # twips (about 0.64 inch): narrowest column after a refit, so short headers ("Priority") do not break
+
+
+def fit_widths(widths: list[int], room: int, min_col: int = MIN_COL) -> list[int]:
+    """Column widths scaled to fit `room` (twips), no column below min_col (or its own width when it was already
+    narrower); the other columns share what is left in proportion."""
+    total = sum(widths)
+    if total <= 0:
+        return widths
+    floor = [min(w, min_col) for w in widths]
+    fixed: set[int] = set()
+    while True:
+        free = room - sum(floor[i] for i in fixed)
+        rest = sum(widths[i] for i in range(len(widths)) if i not in fixed)
+        if rest <= 0:
+            break
+        f = free / rest
+        low = {i for i in range(len(widths)) if i not in fixed and widths[i] * f < floor[i]}
+        if not low:
+            break
+        fixed |= low
+    return [floor[i] if i in fixed else max(int(widths[i] * f), 1) for i in range(len(widths))]
+
+
+def finalise_docx(path: Path) -> dict:
+    """The clean-up of a built .docx: the template's guidance sentences removed and every table fitted to the text
+    width of its section. Returns what was changed."""
+    from docx import Document  # noqa: PLC0415
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    path = Path(path)
+    doc = Document(str(path))
+    body = doc.element.body
+    removed = 0
+    for p in list(body.iter(qn("w:p"))):
+        text = "".join(x.text or "" for x in p.iter(qn("w:t"))).strip()
+        if text and TEMPLATE_GUIDANCE.match(text) and p.find(f".//{qn('w:drawing')}") is None:
+            p.getparent().remove(p)
+            removed += 1
+
+    def width_of(sect):
+        sz, mar = sect.find(qn("w:pgSz")), sect.find(qn("w:pgMar"))
+        if sz is None or mar is None:
+            return None
+        return int(sz.get(qn("w:w"))) - int(mar.get(qn("w:left"))) - int(mar.get(qn("w:right")))
+
+    fitted = 0
+    pending = []
+    for el in body.iterchildren():
+        if el.tag == qn("w:tbl"):
+            pending.append(el)
+        sect = el.find(f"{qn('w:pPr')}/{qn('w:sectPr')}") if el.tag == qn("w:p") else (
+            el if el.tag == qn("w:sectPr") else None)
+        if sect is None:
+            continue
+        limit = width_of(sect)
+        for tbl in pending:
+            grid = tbl.find(qn("w:tblGrid"))
+            cols = grid.findall(qn("w:gridCol")) if grid is not None else []
+            total = sum(int(c.get(qn("w:w")) or 0) for c in cols)
+            ind = tbl.find(f"{qn('w:tblPr')}/{qn('w:tblInd')}")
+            indent = int(ind.get(qn("w:w")) or 0) if ind is not None and ind.get(qn("w:type")) in (None, "dxa") else 0
+            room = (limit or 0) - max(indent, 0)
+            if not limit or total <= room + 15:
+                continue
+            old = [int(c.get(qn("w:w")) or 0) for c in cols]
+            new = fit_widths(old, room)
+            for c, w in zip(cols, new):
+                c.set(qn("w:w"), str(w))
+            for tr in tbl.findall(qn("w:tr")):        # cell widths follow the grid (gridSpan summed)
+                gi = 0
+                for tc in tr.findall(qn("w:tc")):
+                    tcpr = tc.find(qn("w:tcPr"))
+                    span_el = tcpr.find(qn("w:gridSpan")) if tcpr is not None else None
+                    span = int(span_el.get(qn("w:val"))) if span_el is not None else 1
+                    tcw = tcpr.find(qn("w:tcW")) if tcpr is not None else None
+                    if tcw is not None and tcw.get(qn("w:type")) in (None, "dxa") and tcw.get(qn("w:w")):
+                        tcw.set(qn("w:w"), str(sum(new[gi:gi + span]) or int(int(tcw.get(qn("w:w"))) * room / total)))
+                    gi += span
+            tblw = tbl.find(f"{qn('w:tblPr')}/{qn('w:tblW')}")
+            if tblw is not None and tblw.get(qn("w:type")) == "dxa":
+                tblw.set(qn("w:w"), str(room))
+            fitted += 1
+        pending = []
+    # no blank page: a heading that starts a page right after a section break (next page) needs no page break
+    # of its own; empty paragraphs right before such a heading, and at the end of the document, are dropped
+    def empty(el):
+        return (el.tag == qn("w:p") and not "".join(x.text or "" for x in el.iter(qn("w:t"))).strip()
+                and el.find(f".//{qn('w:drawing')}") is None and el.find(f".//{qn('w:sectPr')}") is None
+                and el.find(f".//{qn('w:br')}") is None)
+
+    def break_only(el):
+        # a paragraph holding nothing but a page break: redundant before a heading that starts a page itself
+        return (el.tag == qn("w:p") and not "".join(x.text or "" for x in el.iter(qn("w:t"))).strip()
+                and el.find(f".//{qn('w:drawing')}") is None and el.find(f".//{qn('w:sectPr')}") is None
+                and any(b.get(qn("w:type")) == "page" for b in el.iter(qn("w:br"))))
+
+    blanks = 0
+    for p in list(body.iterchildren()):
+        if p.tag != qn("w:p"):
+            continue
+        ppr = p.find(qn("w:pPr"))
+        pbb = ppr.find(qn("w:pageBreakBefore")) if ppr is not None else None
+        if pbb is None:
+            continue
+        prev = p.getprevious()
+        while prev is not None and (empty(prev) or break_only(prev)):
+            gone = prev
+            prev = prev.getprevious()
+            if prev is not None and prev.tag == qn("w:tbl"):
+                break  # a table keeps the paragraph that follows it
+            body.remove(gone)
+            blanks += 1
+        if prev is not None and prev.tag == qn("w:p") and prev.find(f"{qn('w:pPr')}/{qn('w:sectPr')}") is not None:
+            ppr.remove(pbb)
+            blanks += 1
+    last = body.find(qn("w:sectPr"))
+    prev = last.getprevious() if last is not None else None
+    while prev is not None and empty(prev) and prev.getprevious() is not None and prev.getprevious().tag != qn("w:tbl"):
+        gone = prev
+        prev = prev.getprevious()
+        body.remove(gone)
+        blanks += 1
+    # a column headed "Revision" or "Version" wide enough for its heading on one line (BDOI's revision log)
+    widened = 0
+    for tbl in body.iter(qn("w:tbl")):
+        rows = tbl.findall(qn("w:tr"))
+        grid = tbl.find(qn("w:tblGrid"))
+        if not rows or grid is None:
+            continue
+        cells = rows[0].findall(qn("w:tc"))
+        cols = grid.findall(qn("w:gridCol"))
+        if len(cells) != len(cols):
+            continue
+        for k, cell in enumerate(cells):
+            head = "".join(x.text or "" for x in cell.iter(qn("w:t"))).strip()
+            width = int(cols[k].get(qn("w:w")) or 0)
+            if head in ("Revision", "Version") and 0 < width < 1150:
+                widest = max(range(len(cols)), key=lambda i: int(cols[i].get(qn("w:w")) or 0))
+                delta = 1150 - width
+                cols[k].set(qn("w:w"), "1150")
+                cols[widest].set(qn("w:w"), str(int(cols[widest].get(qn("w:w"))) - delta))
+                for row in rows:
+                    tcs = row.findall(qn("w:tc"))
+                    if len(tcs) == len(cols):
+                        for i, tc in enumerate(tcs):
+                            tcw = tc.find(f"{qn('w:tcPr')}/{qn('w:tcW')}")
+                            if tcw is not None and tcw.get(qn("w:type")) in (None, "dxa"):
+                                tcw.set(qn("w:w"), cols[i].get(qn("w:w")))
+                widened += 1
+    # a picture never taller than the page leaves room for its caption: scaled down to MAX_PICTURE_H at most
+    ns_wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+    ns_a = "http://schemas.openxmlformats.org/drawingml/2006/main"
+    shrunk = 0
+    limit_emu = int(MAX_PICTURE_H * 914400)
+    for ext in body.iter(f"{{{ns_wp}}}extent"):
+        cy = int(ext.get("cy") or 0)
+        if cy > limit_emu:
+            f = limit_emu / cy
+            cx = int(int(ext.get("cx")) * f)
+            ext.set("cx", str(cx))
+            ext.set("cy", str(limit_emu))
+            inline = ext.getparent()
+            for xe in inline.iter(f"{{{ns_a}}}ext"):
+                xe.set("cx", str(cx))
+                xe.set("cy", str(limit_emu))
+            shrunk += 1
+    # a heading right before a picture stays with it (empty paragraphs between them dropped)
+    for p in list(body.iter(qn("w:p"))):
+        ppr = p.find(qn("w:pPr"))
+        ps = ppr.find(qn("w:pStyle")) if ppr is not None else None
+        style = (ps.get(qn("w:val")) or "") if ps is not None else ""
+        if not style.lower().startswith("heading"):
+            continue
+        nxt = p.getnext()
+        while nxt is not None and empty(nxt):
+            gone = nxt
+            nxt = nxt.getnext()
+            body.remove(gone)
+        if nxt is not None and nxt.tag == qn("w:p") and nxt.find(f".//{qn('w:drawing')}") is not None:
+            if ppr.find(qn("w:keepNext")) is None:
+                kn = ppr.makeelement(qn("w:keepNext"), {})
+                ps.addnext(kn)
+    # a picture stays on the page of its caption (the paragraph after it)
+    kept = 0
+    for p in body.iter(qn("w:p")):
+        if p.find(f".//{qn('w:drawing')}") is None:
+            continue
+        nxt = p.getnext()
+        text = "".join(x.text or "" for x in nxt.iter(qn("w:t"))) if nxt is not None and nxt.tag == qn("w:p") else ""
+        if not re.match(r"\s*(Figure|Screenshot|Image)\b", text):
+            continue
+        ppr = p.find(qn("w:pPr"))
+        if ppr is None:
+            ppr = p.makeelement(qn("w:pPr"), {})
+            p.insert(0, ppr)
+        if ppr.find(qn("w:keepNext")) is None:
+            ps = ppr.find(qn("w:pStyle"))
+            kn = ppr.makeelement(qn("w:keepNext"), {})
+            if ps is not None:
+                ps.addnext(kn)
+            else:
+                ppr.insert(0, kn)
+            kept += 1
+    # the header row of every table repeated on each page the table runs to; the last three rows kept together,
+    # so that a table never leaves one row alone on the next page
+    headers = 0
+    for tbl in body.iter(qn("w:tbl")):
+        rows = tbl.findall(qn("w:tr"))
+        if len(rows) < 3:
+            continue
+        # a short row (a few lines) is never split across two pages; a long one (an observation of half a page)
+        # may still break, so that no page is left half empty
+        for tr in rows:
+            text = "".join(x.text or "" for x in tr.iter(qn("w:t")))
+            if len(text) > 600:
+                continue
+            trpr = tr.find(qn("w:trPr"))
+            if trpr is None:
+                trpr = tr.makeelement(qn("w:trPr"), {})
+                tr.insert(1 if tr.find(qn("w:tblPrEx")) is not None else 0, trpr)
+            if trpr.find(qn("w:cantSplit")) is None:
+                trpr.insert(0, trpr.makeelement(qn("w:cantSplit"), {}))
+        for tr in rows[-3:-1]:
+            # only a short row is kept with the next one: a long row kept with its successor would leave a page
+            # half empty
+            if len("".join(x.text or "" for x in tr.iter(qn("w:t")))) > 600:
+                continue
+            for p in tr.iter(qn("w:p")):
+                ppr = p.find(qn("w:pPr"))
+                if ppr is None:
+                    ppr = p.makeelement(qn("w:pPr"), {})
+                    p.insert(0, ppr)
+                if ppr.find(qn("w:keepNext")) is None:
+                    ps = ppr.find(qn("w:pStyle"))
+                    kn = ppr.makeelement(qn("w:keepNext"), {})
+                    if ps is not None:
+                        ps.addnext(kn)
+                    else:
+                        ppr.insert(0, kn)
+        trpr = rows[0].find(qn("w:trPr"))
+        if trpr is None:
+            trpr = rows[0].makeelement(qn("w:trPr"), {})
+            rows[0].insert(1 if rows[0].find(qn("w:tblPrEx")) is not None else 0, trpr)
+        if trpr.find(qn("w:tblHeader")) is None:
+            trpr.append(trpr.makeelement(qn("w:tblHeader"), {}))
+            headers += 1
+    # a line break at the end of a paragraph stretches the last line of a justified paragraph: dropped
+    breaks = 0
+    for p in body.iter(qn("w:p")):
+        runs = [r for r in p.findall(qn("w:r")) if len(r) and any(c.tag != qn("w:rPr") for c in r)]
+        while runs:
+            last = runs[-1]
+            kids = [c for c in last if c.tag != qn("w:rPr")]
+            if kids and kids[-1].tag == qn("w:br") and kids[-1].get(qn("w:type")) in (None, "textWrapping"):
+                last.remove(kids[-1])
+                breaks += 1
+                if not [c for c in last if c.tag != qn("w:rPr")]:
+                    runs.pop()
+                continue
+            break
+    # an empty row left at the end of a table (a template row to fill in) is dropped
+    trailing = 0
+    for tbl in body.iter(qn("w:tbl")):
+        rows = tbl.findall(qn("w:tr"))
+        while len(rows) > 2:
+            last = rows[-1]
+            text = "".join(x.text or "" for x in last.iter(qn("w:t"))).strip()
+            if text or last.find(f".//{qn('w:drawing')}") is not None:
+                break
+            tbl.remove(last)
+            rows = rows[:-1]
+            trailing += 1
+    # the line that introduces a table stays with it: a short paragraph right before a table is kept with the next
+    intros = 0
+    for tbl in body.findall(qn("w:tbl")):
+        prev = tbl.getprevious()
+        if prev is None or prev.tag != qn("w:p"):
+            continue
+        text = "".join(x.text or "" for x in prev.iter(qn("w:t"))).strip()
+        if not text or len(text) > 240 or prev.find(f".//{qn('w:drawing')}") is not None:
+            continue
+        ppr = prev.find(qn("w:pPr"))
+        if ppr is None:
+            ppr = prev.makeelement(qn("w:pPr"), {})
+            prev.insert(0, ppr)
+        if ppr.find(qn("w:keepNext")) is None:
+            ps = ppr.find(qn("w:pStyle"))
+            kn = ppr.makeelement(qn("w:keepNext"), {})
+            if ps is not None:
+                ps.addnext(kn)
+            else:
+                ppr.insert(0, kn)
+            intros += 1
+    # a content row needs no minimum height: a row of text taller than a page would push the row before it alone
+    # to the previous page (BDOI's rows carry the height of the row they were copied from)
+    heights = 0
+    for tr in body.iter(qn("w:tr")):
+        text = "".join(x.text or "" for x in tr.iter(qn("w:t")))
+        trpr = tr.find(qn("w:trPr"))
+        h = trpr.find(qn("w:trHeight")) if trpr is not None else None
+        if h is not None and len(text) > 600 and tr.find(f".//{qn('w:drawing')}") is None:
+            trpr.remove(h)
+            heights += 1
+    # the section rows of a requirements table (one cell across the table) are numbered in the text, 1., 2., 3.,
+    # so that Word and the PDF show the same numbers; an added section row without numbering gets its number
+    numbered = 0
+    for tbl in body.iter(qn("w:tbl")):
+        rows = [tr for tr in tbl.findall(qn("w:tr")) if len(tr.findall(qn("w:tc"))) == 1]
+        if not any(tr.find(f".//{qn('w:numPr')}") is not None for tr in rows):
+            continue
+        n = 0
+        for tr in rows:
+            text = "".join(x.text or "" for x in tr.iter(qn("w:t"))).strip()
+            if not text or len(text) > 80:
+                continue
+            paras = [p for p in tr.iter(qn("w:p")) if "".join(x.text or "" for x in p.iter(qn("w:t"))).strip()]
+            if not paras:
+                continue
+            p = paras[0]
+            n += 1
+            ppr = p.find(qn("w:pPr"))
+            if ppr is None:
+                ppr = p.makeelement(qn("w:pPr"), {})
+                p.insert(0, ppr)
+            num = ppr.find(qn("w:numPr"))
+            if num is not None:
+                ppr.remove(num)
+            if ppr.find(qn("w:ind")) is None:
+                ind = ppr.makeelement(qn("w:ind"), {qn("w:left"): "720", qn("w:hanging"): "360"})
+                ppr.append(ind)
+            first = p.find(qn("w:r"))
+            lead = p.makeelement(qn("w:r"), {})
+            rpr = first.find(qn("w:rPr")) if first is not None else None
+            if rpr is not None:
+                lead.append(copy.deepcopy(rpr))
+            t = lead.makeelement(qn("w:t"), {})
+            t.text = f"{n}."
+            lead.append(t)
+            lead.append(lead.makeelement(qn("w:tab"), {}))
+            if first is not None:
+                first.addprevious(lead)
+            else:
+                p.append(lead)
+            numbered += 1
+    # tracked changes left in BDOI's text are accepted: the final document carries no revision marks
+    accepted = 0
+    for d in list(body.iter(qn("w:del"))):
+        d.getparent().remove(d)
+        accepted += 1
+    for ins in list(body.iter(qn("w:ins"))):
+        parent = ins.getparent()
+        at = parent.index(ins)
+        for child in list(ins):
+            parent.insert(at, child)
+            at += 1
+        parent.remove(ins)
+        accepted += 1
+    for mark in list(body.iter(qn("w:rPrChange"), qn("w:pPrChange"), qn("w:tblPrChange"), qn("w:trPrChange"),
+                               qn("w:tcPrChange"), qn("w:sectPrChange"))):
+        mark.getparent().remove(mark)
+        accepted += 1
+    layout = polish_layout(doc)
+    conform = conform_to_template(doc, path)
+    doc.save(str(path))
+    return {"layout": layout, "template": conform, "guidance_removed": removed, "tables_fitted": fitted, "header_rows_repeated": headers,
+            "figures_kept_with_caption": kept, "columns_widened": widened,
+            "blank_pages_removed": blanks, "pictures_scaled": shrunk, "changes_accepted": accepted,
+            "row_heights_removed": heights, "section_rows_numbered": numbered, "table_intros_kept": intros,
+            "trailing_rows_removed": trailing, "trailing_breaks_removed": breaks}
+
+
+# ------------------------------------------------------------------------------------------- uniform layout
+# Order of the children of w:pPr (schema), so that an added property lands where Word expects it.
+_PPR_ORDER = ["pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr",
+              "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap",
+              "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid",
+              "spacing", "ind", "contextualSpacing", "mirrorIndents", "suppressOverlap", "jc", "textDirection",
+              "textAlignment", "textboxTightWrap", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"]
+_RPR_ORDER = ["rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike", "outline",
+              "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden", "color", "spacing", "w",
+              "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign",
+              "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath"]
+CAPTION_RE = re.compile(r"^\s*(?:Figure|Table|Screenshot)\s+[A-Z]{0,2}\.?\d+(?:\.\d+)*\s*(?:[-–:]|\()")
+CAPTION_SIZE = 18       # half-points: every caption at 9 pt, italic, centred, under its figure
+CELL_SPACE = "20"       # twips before and after each paragraph of a table cell
+PICTURE_SPACE = ("120", "60")
+
+
+def _set_child(parent, name: str, order: list[str], attrs: dict | None = None, replace: bool = True):
+    """The child w:name of parent (created in schema order when absent); its attributes set from attrs."""
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    el = parent.find(qn(f"w:{name}"))
+    if el is None:
+        el = parent.makeelement(qn(f"w:{name}"), {})
+        pos = order.index(name)
+        for child in parent:
+            cname = child.tag.split("}")[1]
+            if cname in order and order.index(cname) > pos:
+                child.addprevious(el)
+                break
+        else:
+            parent.append(el)
+    elif not replace:
+        return el
+    for k, v in (attrs or {}).items():
+        el.set(qn(f"w:{k}"), v)
+    return el
+
+
+def _ppr(p):
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    ppr = p.find(qn("w:pPr"))
+    if ppr is None:
+        ppr = p.makeelement(qn("w:pPr"), {})
+        p.insert(0, ppr)
+    return ppr
+
+
+def body_font(doc) -> str | None:
+    """The font family of the template's text: the font most runs of the body text (outside tables) name, else the
+    font of the Normal style or of the document defaults."""
+    from collections import Counter  # noqa: PLC0415
+
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    seen: Counter = Counter()
+    for p in doc.element.body.findall(qn("w:p")):
+        for r in p.findall(qn("w:r")):
+            rf = r.find(f"{qn('w:rPr')}/{qn('w:rFonts')}")
+            if rf is not None and rf.get(qn("w:ascii")):
+                seen[rf.get(qn("w:ascii"))] += len("".join(t.text or "" for t in r.findall(qn("w:t"))))
+    if seen:
+        return seen.most_common(1)[0][0]
+    styles = doc.styles.element
+    for st in styles.findall(qn("w:style")):
+        if st.get(qn("w:styleId")) == "Normal":
+            f = st.find(f"{qn('w:rPr')}/{qn('w:rFonts')}")
+            if f is not None and f.get(qn("w:ascii")):
+                return f.get(qn("w:ascii"))
+    f = styles.find(f"{qn('w:docDefaults')}/{qn('w:rPrDefault')}/{qn('w:rPr')}/{qn('w:rFonts')}")
+    return f.get(qn("w:ascii")) if f is not None and f.get(qn("w:ascii")) else None
+
+
+def polish_layout(doc) -> dict:
+    """One look for the whole document, whatever part of it a builder added:
+
+    - one font family: a table run in Calibri (the font of the added tables) takes the font of the template's text;
+    - table cells: the same small spacing above and below every line; header rows bold and centred vertically;
+    - tables narrower than the text width and not indented are centred;
+    - headings kept with the next paragraph and never split, so that no heading is left alone at a page foot;
+    - pictures centred with the same space around them; captions (Figure / Table n ...) italic 8.5 pt, centred,
+      kept on one page with their picture;
+    - list paragraphs of the text with the same space after them.
+    """
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    body = doc.element.body
+    font = body_font(doc)
+    out = {"fonts": 0, "cells": 0, "headers": 0, "tables_centred": 0, "headings_kept": 0, "pictures": 0,
+           "captions": 0, "lists": 0}
+
+    def text(el):
+        return "".join(x.text or "" for x in el.iter(qn("w:t")))
+
+    for tbl in body.iter(qn("w:tbl")):
+        rows = tbl.findall(qn("w:tr"))
+        tblpr = tbl.find(qn("w:tblPr"))
+        for p in tbl.iter(qn("w:p")):
+            ppr = _ppr(p)
+            sp = ppr.find(qn("w:spacing"))
+            if sp is None or (sp.get(qn("w:after")) in (None, "0") and sp.get(qn("w:before")) in (None, "0")):
+                _set_child(ppr, "spacing", _PPR_ORDER, {"before": CELL_SPACE, "after": CELL_SPACE})
+                out["cells"] += 1
+            for r in p.iter(qn("w:r")):
+                rf = r.find(f"{qn('w:rPr')}/{qn('w:rFonts')}")
+                if font and font != "Calibri" and rf is not None and rf.get(qn("w:ascii")) == "Calibri":
+                    for a in ("ascii", "hAnsi", "cs"):
+                        rf.set(qn(f"w:{a}"), font)
+                    out["fonts"] += 1
+        if rows:
+            head = rows[0]
+            trpr = head.find(qn("w:trPr"))
+            if trpr is not None and trpr.find(qn("w:tblHeader")) is not None and len(rows) > 1:
+                for tc in head.findall(qn("w:tc")):
+                    tcpr = tc.find(qn("w:tcPr"))
+                    if tcpr is not None:
+                        _set_child(tcpr, "vAlign", ["tcW", "gridSpan", "vMerge", "tcBorders", "shd", "noWrap",
+                                                    "tcMar", "textDirection", "tcFitText", "vAlign", "hideMark"],
+                                   {"val": "center"})
+                    for r in tc.iter(qn("w:r")):
+                        if r.find(qn("w:t")) is None:
+                            continue
+                        rpr = r.find(qn("w:rPr"))
+                        if rpr is None:
+                            rpr = r.makeelement(qn("w:rPr"), {})
+                            r.insert(0, rpr)
+                        _set_child(rpr, "b", _RPR_ORDER, replace=False)
+                out["headers"] += 1
+        if tblpr is not None and tblpr.find(qn("w:tblInd")) is None and tblpr.find(qn("w:jc")) is None \
+                and tblpr.find(qn("w:tblStyle")) is None and tbl.getparent() is body:
+            jc = tblpr.makeelement(qn("w:jc"), {qn("w:val"): "center"})
+            after = [c for c in tblpr if c.tag.split("}")[1] in ("tblCellSpacing", "tblInd", "tblBorders", "shd",
+                                                                  "tblLayout", "tblCellMar", "tblLook")]
+            (after[0].addprevious(jc) if after else tblpr.append(jc))
+            out["tables_centred"] += 1
+
+    # an empty paragraph between a table and a page that starts anew (a heading with a page break before it, or a
+    # section break) is made one point high, so that it never spills alone onto a blank page
+    out["spacers"] = 0
+    out["breaks_moved"] = 0
+    # a paragraph holding only a page break, before a paragraph of text: the break becomes "page break before" of
+    # that paragraph, so that a page filled to its foot is not followed by a blank page
+    for p in list(body.findall(qn("w:p"))):
+        if text(p).strip() or p.find(f".//{qn('w:drawing')}") is not None or p.find(f".//{qn('w:sectPr')}") is not None:
+            continue
+        brs = list(p.iter(qn("w:br")))
+        if not brs or not all(b.get(qn("w:type")) == "page" for b in brs):
+            continue
+        nxt = p.getnext()
+        while nxt is not None and nxt.tag == qn("w:p") and not text(nxt).strip() \
+                and nxt.find(f".//{qn('w:drawing')}") is None and nxt.find(f".//{qn('w:sectPr')}") is None \
+                and nxt.find(f".//{qn('w:br')}") is None:
+            nxt = nxt.getnext()
+        if nxt is None or nxt.tag != qn("w:p") or not text(nxt).strip():
+            continue
+        _set_child(_ppr(nxt), "pageBreakBefore", _PPR_ORDER, replace=False)
+        body.remove(p)
+        out["breaks_moved"] += 1
+    for tbl in body.findall(qn("w:tbl")):
+        p = tbl.getnext()
+        if p is None or p.tag != qn("w:p") or text(p).strip() or p.find(f".//{qn('w:drawing')}") is not None:
+            continue
+        nxt = p.getnext()
+        starts_page = p.find(f"{qn('w:pPr')}/{qn('w:sectPr')}") is not None or (
+            nxt is not None and nxt.tag == qn("w:p") and (
+                nxt.find(f"{qn('w:pPr')}/{qn('w:pageBreakBefore')}") is not None
+                or nxt.find(f"{qn('w:pPr')}/{qn('w:sectPr')}") is not None
+                or any(b.get(qn("w:type")) == "page" for b in nxt.iter(qn("w:br")))))
+        if not starts_page:
+            continue
+        ppr = _ppr(p)
+        _set_child(ppr, "spacing", _PPR_ORDER, {"before": "0", "after": "0", "line": "20", "lineRule": "exact"})
+        rpr = _set_child(ppr, "rPr", _PPR_ORDER, replace=False)
+        _set_child(rpr, "sz", _RPR_ORDER, {"val": "2"})
+        out["spacers"] += 1
+
+    for p in body.iter(qn("w:p")):
+        ppr = p.find(qn("w:pPr"))
+        ps = ppr.find(qn("w:pStyle")) if ppr is not None else None
+        style = (ps.get(qn("w:val")) or "") if ps is not None else ""
+        in_table = any(a.tag == qn("w:tc") for a in p.iterancestors())
+        if style.lower().startswith("heading") and not in_table:
+            ppr = _ppr(p)
+            _set_child(ppr, "keepNext", _PPR_ORDER, replace=False)
+            _set_child(ppr, "keepLines", _PPR_ORDER, replace=False)
+            out["headings_kept"] += 1
+            continue
+        if p.find(f".//{qn('w:drawing')}") is not None and not in_table and not text(p).strip():
+            ppr = _ppr(p)
+            _set_child(ppr, "spacing", _PPR_ORDER, {"before": PICTURE_SPACE[0], "after": PICTURE_SPACE[1]})
+            _set_child(ppr, "jc", _PPR_ORDER, {"val": "center"})
+            out["pictures"] += 1
+            continue
+        t = text(p)
+        if not in_table and len(t) < 400 and CAPTION_RE.match(t):
+            prev = p.getprevious()
+            under_picture = prev is not None and prev.tag == qn("w:p") and prev.find(f".//{qn('w:drawing')}") is not None
+            if not under_picture:
+                continue
+            ppr = _ppr(p)
+            _set_child(ppr, "keepLines", _PPR_ORDER, replace=False)
+            _set_child(ppr, "spacing", _PPR_ORDER, {"before": "40", "after": "160"})
+            _set_child(ppr, "jc", _PPR_ORDER, {"val": "center"})
+            for r in p.iter(qn("w:r")):
+                if r.find(qn("w:t")) is None:
+                    continue
+                rpr = r.find(qn("w:rPr"))
+                if rpr is None:
+                    rpr = r.makeelement(qn("w:rPr"), {})
+                    r.insert(0, rpr)
+                _set_child(rpr, "i", _RPR_ORDER, replace=False)
+                _set_child(rpr, "sz", _RPR_ORDER, {"val": str(CAPTION_SIZE)})
+                _set_child(rpr, "szCs", _RPR_ORDER, {"val": str(CAPTION_SIZE)})
+            out["captions"] += 1
+            continue
+        if style == "ListParagraph" and not in_table:
+            ppr = _ppr(p)
+            sp = ppr.find(qn("w:spacing"))
+            if sp is None or sp.get(qn("w:after")) is None:
+                _set_child(ppr, "spacing", _PPR_ORDER, {"after": "60"})
+                _set_child(ppr, "contextualSpacing", _PPR_ORDER, replace=False)
+                out["lists"] += 1
+    return out
+
+
+# ----------------------------------------------------------------------------------- BDOI's template styles
+# Measured from BDOI's own FRS (docs/source-documents, 11-Oct-2026); every paragraph, table and caption of the four
+# packs follows them, whatever part of the document a builder added:
+# - text: Arial (the font every run of BDOI's text names; the document default Times New Roman is never meant),
+#   10 pt (no size: the default 10 pt), justified where BDOI justifies;
+# - headings (styles Heading 1 / 2 / 3, Arial bold): a numbered chapter (1. Introduction) 14 pt; the unnumbered front
+#   and closing headings (Table of Contents, Document Revision Log, Signoff Sheet) at the style's 16 pt; an annex or
+#   appendix heading 12 pt; Heading 2 12 pt bold italic; Heading 3 12 pt bold;
+# - tables: Arial; BDOI's cells at their own size (10 to 11 pt); the added tables of annexes at 8 pt, the smallest
+#   size of BDOI's tables (User Access Maintenance), header row bold on the template's header fill (D9E2F3 in User
+#   Access Maintenance, D9E1F2 in the other three), single 0.5 pt black borders, repeated on each page;
+# - lists: ListParagraph, text at 0.5 in, bullet or number hanging 0.25 in (BDOI's lists);
+# - captions: BDOI's templates have no figure captions (the Caption style of Cashiering is never used); the added
+#   figures carry one italic 9 pt line, centred, directly under the figure.
+TEMPLATE_STYLE = {
+    "BRD-11": {"source": "FRS - BDOI BROKERSYS User Access Maintenance v1.1 (BDOI).docx", "head_fill": "D9E2F3"},
+    "BRD-06": {"source": "FRS - BDOI BROKERSYS Renewal v1.0 (BDOI).docx", "head_fill": "D9E1F2"},
+    "BRD-03": {"source": "FRS - BDOI BROKERSYS Product Maintenance v1.0 (BDOI, 19-Aug-2026).docx", "head_fill": "D9E1F2"},
+    "BRD-02": {"source": "FRS - BDOI Core Replacement Operations Cashiering v3.1 (BDOI).docx", "head_fill": "D9E1F2"},
+}
+TEXT_FONT = "Arial"
+TEXT_SIZE = "20"          # 10 pt
+TABLE_SIZE = "16"         # 8 pt: the added tables
+SMALL_NOTE_SIZE = "18"    # 9 pt: "(continued below)" between the parts of a screen
+H1_NUMBERED, H1_ANNEX, H2_SIZE = "28", "24", "24"
+FRONT_HEADINGS = ("Table of Contents", "Document Revision Log", "Signoff Sheet", "Sign-off Sheet",
+                  "Template Revision Log", "Process Flow")
+_ADDED_FILLS = ("D9E1F2", "D9E2F3")
+_SYMBOL_FONTS = ("Symbol", "Wingdings", "Courier New")
+# the width of a word at 1 pt (Liberation Sans Bold, metric-compatible with Arial Bold), in points
+try:
+    from PIL import ImageFont as _IF  # noqa: PLC0415
+    _BOLD = _IF.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 100)
+except Exception:  # noqa: BLE001
+    _BOLD = None
+
+
+def _word_twips(word: str, half_points: int) -> int:
+    if _BOLD is None:
+        return int(len(word) * half_points / 2 * 0.62 * 20)
+    return int(_BOLD.getlength(word) / 100 * half_points / 2 * 20)
+
+
+_SMALL_WORDS = {"a", "an", "the", "and", "or", "nor", "but", "of", "in", "on", "to", "for", "by", "with", "from",
+                "at", "as", "per", "vs", "via", "into", "than", "is", "are", "be", "its", "not"}
+
+
+def _title_case(s: str, first: bool) -> str:
+    """Title case as BDOI's headings: each word capitalised except the short joining words; words already holding a
+    capital or a digit (IDs, acronyms, screen codes) kept as written."""
+    import re as _re  # noqa: PLC0415
+
+    def fix(m):
+        w = m.group(0)
+        start = m.start() == 0 and first
+        if any(c.isupper() or c.isdigit() for c in w):
+            return w
+        if w in _SMALL_WORDS and not start:
+            return w
+        return w[0].upper() + w[1:]
+    return _re.sub(r"[A-Za-z][A-Za-z'\-]*", fix, s)
+
+
+def conform_to_template(doc, path) -> dict:
+    """Every run, heading, table and caption in BDOI's template styles (TEMPLATE_STYLE); BDOI's own paragraphs keep
+    their text (only their font is made the template's Arial where a run named none or another family)."""
+    from docx.oxml.ns import qn  # noqa: PLC0415
+
+    name = Path(path).name
+    tpl = next((v for k, v in TEMPLATE_STYLE.items() if k in name), None)
+    out = {"fonts": 0, "sizes": 0, "headings": 0, "fills": 0, "columns": 0, "spaces": 0, "empties": 0}
+    if tpl is None:
+        return out
+    body = doc.element.body
+
+    def text(el):
+        return "".join(x.text or "" for x in el.iter(qn("w:t")))
+
+    def rpr_of(r):
+        rpr = r.find(qn("w:rPr"))
+        if rpr is None:
+            rpr = r.makeelement(qn("w:rPr"), {})
+            r.insert(0, rpr)
+        return rpr
+
+    def set_font(rpr):
+        rf = rpr.find(qn("w:rFonts"))
+        if rf is not None and rf.get(qn("w:ascii")) in _SYMBOL_FONTS:
+            return
+        if rf is None or rf.get(qn("w:ascii")) != TEXT_FONT or rf.get(qn("w:hAnsi")) != TEXT_FONT:
+            rf = _set_child(rpr, "rFonts", _RPR_ORDER)
+            for a in list(rf.attrib):
+                if a.endswith("Theme"):
+                    del rf.attrib[a]
+            for a in ("ascii", "hAnsi", "cs"):
+                rf.set(qn(f"w:{a}"), TEXT_FONT)
+            out["fonts"] += 1
+
+    def set_size(rpr, val):
+        sz = rpr.find(qn("w:sz"))
+        if (sz.get(qn("w:val")) if sz is not None else None) != val:
+            if val is None:
+                for t in ("sz", "szCs"):
+                    el = rpr.find(qn(f"w:{t}"))
+                    if el is not None:
+                        rpr.remove(el)
+            else:
+                _set_child(rpr, "sz", _RPR_ORDER, {"val": val})
+                _set_child(rpr, "szCs", _RPR_ORDER, {"val": val})
+            out["sizes"] += 1
+
+    seen_numbered = False
+    for p in body.iter(qn("w:p")):
+        in_table = any(a.tag == qn("w:tc") for a in p.iterancestors())
+        ppr = p.find(qn("w:pPr"))
+        ps = ppr.find(qn("w:pStyle")) if ppr is not None else None
+        style = (ps.get(qn("w:val")) or "") if ps is not None else ""
+        if style.upper().startswith("TOC"):
+            continue
+        t = text(p).strip()
+        runs = [r for r in p.iter(qn("w:r")) if r.find(qn("w:t")) is not None]
+        # paragraph mark formatting follows the runs (font only)
+        mark = ppr.find(qn("w:rPr")) if ppr is not None else None
+        if mark is not None and not style.startswith("Heading"):
+            set_font(mark)
+        if style.startswith("Heading") and not in_table:
+            numbered = ppr is not None and ppr.find(qn("w:numPr")) is not None
+            level = style[7:]
+            if level == "1":
+                if numbered:
+                    seen_numbered = True
+                    size = H1_NUMBERED
+                elif not seen_numbered or t in FRONT_HEADINGS:
+                    size = None
+                else:
+                    size = H1_ANNEX
+            elif level == "2":
+                size = H2_SIZE
+            else:
+                size = "keep"
+            if level in ("1", "2"):
+                # BDOI's headings are in title case (Document Purpose, Business Requirements Mapping)
+                first = True
+                for tt in p.iter(qn("w:t")):
+                    if tt.text:
+                        tt.text = _title_case(tt.text, first)
+                        first = False
+            for r in runs:
+                rpr = rpr_of(r)
+                rf = rpr.find(qn("w:rFonts"))
+                if rf is not None and rf.get(qn("w:ascii")) not in _SYMBOL_FONTS:
+                    rpr.remove(rf)        # the heading style's Arial
+                    out["fonts"] += 1
+                if size != "keep":
+                    set_size(rpr, size)
+            out["headings"] += 1
+            continue
+        caption = not in_table and CAPTION_RE.match(t or "") and p.getprevious() is not None \
+            and p.getprevious().find(f".//{qn('w:drawing')}") is not None
+        for r in runs:
+            rpr = rpr_of(r)
+            set_font(rpr)
+            sz = rpr.find(qn("w:sz"))
+            cur = int(sz.get(qn("w:val"))) if sz is not None else 20
+            if in_table:
+                if cur < 16:
+                    set_size(rpr, TABLE_SIZE)
+                elif cur == 17:
+                    set_size(rpr, TABLE_SIZE)
+            elif caption:
+                set_size(rpr, str(CAPTION_SIZE))
+            elif t == "(continued below)":
+                set_size(rpr, SMALL_NOTE_SIZE)
+            elif cur < 24 and cur != 20:
+                set_size(rpr, TEXT_SIZE)
+    # the header fill of the template on the added tables
+    for tbl in body.iter(qn("w:tbl")):
+        rows = tbl.findall(qn("w:tr"))
+        if not rows:
+            continue
+        for shd in rows[0].iter(qn("w:shd")):
+            if shd.get(qn("w:fill")) in _ADDED_FILLS and shd.get(qn("w:fill")) != tpl["head_fill"]:
+                shd.set(qn("w:fill"), tpl["head_fill"])
+                for a in ("themeFill", "themeFillTint", "themeFillShade"):
+                    shd.attrib.pop(qn(f"w:{a}"), None)
+                out["fills"] += 1
+        # no header word broken mid-word: a column narrower than its longest header word takes the width it needs
+        # from the widest column of the table
+        grid = tbl.find(qn("w:tblGrid"))
+        cols = grid.findall(qn("w:gridCol")) if grid is not None else []
+        cells = rows[0].findall(qn("w:tc"))
+        if len(cells) != len(cols) or len(cols) < 2 or len(rows) < 2:
+            continue
+        widths = [int(c.get(qn("w:w")) or 0) for c in cols]
+        req = [0] * len(cols)        # the width the longest word of each header needs
+        for k, tc in enumerate(cells):
+            szs = [int(s.get(qn("w:val"))) for s in tc.iter(qn("w:sz"))] or [20]
+            words = text(tc).split()
+            if words:
+                req[k] = max(_word_twips(w, max(szs)) for w in words) + 2 * 108 + 40
+        need = [max(w, r) for w, r in zip(widths, req)]
+        extra = sum(n - w for n, w in zip(need, widths))
+        if extra <= 0:
+            continue
+        donors = sorted(range(len(cols)), key=lambda i: widths[i] - req[i], reverse=True)
+        new = list(need)
+        for i in donors:
+            if extra <= 0:
+                break
+            spare = new[i] - max(req[i], 900) if new[i] == widths[i] else 0
+            take = min(spare, extra)
+            if take > 0:
+                new[i] -= take
+                extra -= take
+        if extra > 0:
+            continue                    # no room: the table keeps its widths
+        for c, w in zip(cols, new):
+            c.set(qn("w:w"), str(w))
+        for tr in rows:
+            tcs = tr.findall(qn("w:tc"))
+            if len(tcs) != len(cols):
+                continue
+            for c, w in zip(tcs, new):
+                tcw = c.find(f"{qn('w:tcPr')}/{qn('w:tcW')}")
+                if tcw is not None and tcw.get(qn("w:type")) in (None, "dxa"):
+                    tcw.set(qn("w:w"), str(w))
+        out["columns"] += 1
+    # no double space inside a sentence (BDOI's justified text with several spaces between words included: the
+    # words are kept, the spaces between them made single)
+    import re as _re  # noqa: PLC0415
+    for p in body.iter(qn("w:p")):
+        if "  " not in text(p).strip():
+            continue
+        for t in p.iter(qn("w:t")):
+            if t.text and "  " in t.text:
+                new = _re.sub(r"(?<=\S) {2,}", " ", t.text)
+                if new != t.text:
+                    t.text = new
+                    out["spaces"] += 1
+        ts = [t for t in p.iter(qn("w:t")) if t.text]
+        for t1, t2 in zip(ts, ts[1:]):
+            if t1.text.endswith(" ") and t2.text.startswith(" ") and t1.text.strip():
+                t2.text = t2.text.lstrip(" ")
+                out["spaces"] += 1
+    # a tall figure with a caption and a "How to read it" note under it is made smaller, so that the note stays on
+    # the figure's page
+    ns_wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+    ns_a = "http://schemas.openxmlformats.org/drawingml/2006/main"
+    for p in body.findall(qn("w:p")):
+        if p.find(f".//{qn('w:drawing')}") is None:
+            continue
+        cap = p.getnext()
+        note = cap.getnext() if cap is not None else None
+        if note is None or note.tag != qn("w:p") or not text(note).strip().startswith("How to read it"):
+            continue
+        for ext in p.iter(f"{{{ns_wp}}}extent"):
+            cy = int(ext.get("cy") or 0)
+            if cy > int(4.6 * 914400):
+                cx, cy2 = int(int(ext.get("cx")) * 0.86), int(cy * 0.86)
+                ext.set("cx", str(cx))
+                ext.set("cy", str(cy2))
+                for xe in ext.getparent().iter(f"{{{ns_a}}}ext"):
+                    xe.set("cx", str(cx))
+                    xe.set("cy", str(cy2))
+        _set_child(_ppr(cap), "keepNext", _PPR_ORDER, replace=False)
+    # a short note right after a table never goes alone to a page of its own: the last row of the table goes with it
+    for tbl in body.findall(qn("w:tbl")):
+        nxt = tbl.getnext()
+        if nxt is None or nxt.tag != qn("w:p") or not (0 < len(text(nxt).strip()) < 500):
+            continue
+        rows = tbl.findall(qn("w:tr"))
+        if len(rows) < 2 or len(text(rows[-1])) > 600:
+            continue
+        for q in rows[-1].iter(qn("w:p")):
+            _set_child(_ppr(q), "keepNext", _PPR_ORDER, replace=False)
+    # no run of empty paragraphs after the front matter: one is kept
+    started = False
+    prev_empty = False
+    for el in list(body.iterchildren()):
+        if el.tag != qn("w:p"):
+            prev_empty = False
+            continue
+        ps = el.find(f"{qn('w:pPr')}/{qn('w:pStyle')}")
+        if ps is not None and ps.get(qn("w:val")) == "Heading1" and el.find(f"{qn('w:pPr')}/{qn('w:numPr')}") is not None:
+            started = True
+        is_empty = (not text(el).strip() and el.find(f".//{qn('w:drawing')}") is None
+                    and el.find(f".//{qn('w:sectPr')}") is None and el.find(f".//{qn('w:br')}") is None
+                    and el.find(f".//{qn('w:fldChar')}") is None and el.find(f".//{qn('w:pageBreakBefore')}") is None)
+        if started and is_empty and prev_empty:
+            body.remove(el)
+            out["empties"] += 1
+            continue
+        prev_empty = is_empty
+    return out
+
+
+MAX_PICTURE_H = 7.9  # inches: no picture taller than this, so that its caption stays on its page
+SCREENSHOT_WIDTH = 6.4  # inches: every screenshot of the screen annexes at the same width
+SCREENSHOT_PART_H = 4.4  # inches: the parts of a tall screen, top to bottom; two parts fill a page, one part fits under the text of its screen
+SCREENSHOT_WHOLE_H = 5.4  # inches: a screen up to this height at that width is shown whole (it fits under the text of its screen)
+DOCUMENT_WIDTH = 4.6  # inches: every document print (A4 portrait) at the same width, so that its table and caption fit on its page
+
+
+def bordered(pic_par):
+    """A light grey border around the picture of a paragraph (screenshots)."""
+    ns_a = "http://schemas.openxmlformats.org/drawingml/2006/main"
+    ns_pic = "http://schemas.openxmlformats.org/drawingml/2006/picture"
+    for sppr in pic_par.iter(f"{{{ns_pic}}}spPr"):
+        if sppr.find(f"{{{ns_a}}}ln") is None:
+            ln = sppr.makeelement(f"{{{ns_a}}}ln", {"w": "6350"})
+            fill = ln.makeelement(f"{{{ns_a}}}solidFill", {})
+            fill.append(fill.makeelement(f"{{{ns_a}}}srgbClr", {"val": "BFBFBF"}))
+            ln.append(fill)
+            sppr.append(ln)
+    return pic_par
+
+
+def _parts(png: Path, width: float, part_h: float, work: Path, whole_h: float | None = None) -> list[Path]:
+    """A tall screen cut into bands of equal width, top to bottom, each at most part_h inches tall at the
+    given width; the cut falls in a gap of blank rows where one is near, so that no line of text is split.
+    A screen up to whole_h inches (part_h when not given) stays whole."""
+    from PIL import Image  # noqa: PLC0415
+
+    with Image.open(png) as im:
+        w, h = im.size
+        inches = h / w * width
+        if inches <= (whole_h or part_h):
+            return [png]
+        n = math.ceil(inches / part_h)
+        px = h // n
+        work.mkdir(parents=True, exist_ok=True)
+        rgb = im.convert("RGB")
+        # a row is blank when nothing dark crosses it (no text, no dark line, no button): the darkest pixel of
+        # the row is light; the cut is made in a gap of blank rows nearest to the even cut, so that no line of
+        # text, no table row and no field is split between two parts
+        import numpy as np  # noqa: PLC0415
+
+        a = np.asarray(rgb).astype(np.int32)
+        lum = (a[:, :, 0] * 299 + a[:, :, 1] * 587 + a[:, :, 2] * 114) // 1000
+        blank = lum.min(axis=1) >= 200
+        cuts = [0]
+        for k in range(1, n):
+            target = px * k
+            win = max(80, px // 3)
+            best = None
+            for gap in (4, 2, 0):
+                for d in range(0, win):
+                    for y in (target - d, target + d):
+                        if 0 < y < h and blank[max(0, y - gap):y + gap + 1].all():
+                            best = y
+                            break
+                    if best is not None:
+                        break
+                if best is not None:
+                    break
+            cuts.append(best if best is not None else target)
+        cuts.append(h)
+        out = []
+        for k in range(n):
+            part = work / f"{png.stem}-part{k + 1}.png"
+            rgb.crop((0, cuts[k], w, cuts[k + 1])).save(part)
+            out.append(part)
+        return out
+
+
+def _shot_width(png: Path) -> float:
+    """The width of a screenshot in the document: a whole screen (crop main or full) at the standard width; a
+    dialog or a region of a screen at its natural size (2 device pixels per screen pixel, 96 per inch), never
+    wider than the standard width, so that a small window is not blown up."""
+    from PIL import Image  # noqa: PLC0415
+
+    with Image.open(png) as im:
+        kind = (im.text or {}).get("bibs-crop", "") if hasattr(im, "text") else ""
+        if kind in ("dialog", "region"):
+            return min(SCREENSHOT_WIDTH, max(3.0, im.size[0] / 192))
+    return SCREENSHOT_WIDTH
+
+
+def screenshot(b, png: Path, work: Path | None = None) -> list:
+    """A screenshot of a screen annex at the standard width of every annex, with a light border; a screen
+    taller than a page is shown in parts from top to bottom, each at the same width, with "(continued)" between
+    them. Returns the paragraphs to insert."""
+    work = work or Path(tempfile.gettempdir()) / "frs_shots"
+    width = _shot_width(Path(png))
+    parts = _parts(Path(png), width, SCREENSHOT_PART_H, work, SCREENSHOT_WHOLE_H)
+    out = []
+    for k, part in enumerate(parts):
+        out.append(bordered(b.picture(part, max_w=width, max_h=SCREENSHOT_WHOLE_H + 0.2)))
+        if k < len(parts) - 1:
+            out.append(b.para("(continued below)", italic=True, size=7.5, jc="center", space_after=40))
+    return out
+
+
+def document_image(b, png: Path):
+    """A document print (an A4 page) at the standard width of every document, with a light border."""
+    return bordered(b.picture(png, max_w=DOCUMENT_WIDTH, max_h=DOCUMENT_WIDTH * 1.5))
+
+
+def render_pages(pdf: Path, outdir: Path, dpi: int = 50) -> list[Path]:
+    """Every page of a PDF as PNG (page-NNN.png) for the page-by-page review."""
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["pdftoppm", "-r", str(dpi), "-png", str(pdf), str(outdir / "page")], check=True)
+    return sorted(outdir.glob("page-*.png"))
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) < 2:
+        print(__doc__)
+        return 2
+    cmd, args = argv[1], argv[2:]
+    if cmd == "scan":
+        for f in args:
+            found = reference_findings(Path(f))
+            print(Path(f).name, {k: len(v) for k, v in found.items()} or "clean")
+            for k, v in found.items():
+                for s in v[:3]:
+                    print(f"   {k}: ...{s}...")
+    elif cmd == "toc":
+        for f in args:
+            print(Path(f).name, populate_toc(Path(f)), "entries")
+    elif cmd == "render":
+        print(len(render_pages(Path(args[0]), Path(args[1]))), "pages")
+    else:
+        print(__doc__)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

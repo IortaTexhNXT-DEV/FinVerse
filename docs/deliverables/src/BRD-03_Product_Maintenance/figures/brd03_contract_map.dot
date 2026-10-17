@@ -1,0 +1,28 @@
+digraph contract {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.12, ranksep=0.9, bgcolor="white"];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@FIELD_BLUE", fontname="Arial", fontsize=9, fontcolor="@NEAR_BLACK", margin="0.1,0.05"];
+  edge [color="@CTA_BLUE", arrowsize=0.6];
+  core [label="Product Maintenance", fillcolor="@HEADER_BLUE", fontcolor="white", fontsize=16, color="@HEADER_BLUE", margin="0.3,0.25"];
+  in0 [label="BRD-1 New Business\n- Clients of client-specific packages"];
+  in0 -> core;
+  in1 [label="BRD-11 User Access Maintenance\n- Users"];
+  in1 -> core;
+  in2 [label="BRD-13 Data Migration\n- The go-live load of the product masters from the"];
+  in2 -> core;
+  out0 [label="BRD-1 Booking and BRD-2 Operations\n- Incentive criteria (for example CPC2) matched at"];
+  core -> out0;
+  out1 [label="BRD-1 New Business\n- Product lines\n- The package version in force (rate scheme"];
+  core -> out1;
+  out2 [label="BRD-12 Submitted Policies\n- Products and the package TSI limit of a product"];
+  core -> out2;
+  out3 [label="BRD-5 Accounting (remittance and commission)\n- Incentive criteria codes for commission incentiv"];
+  core -> out3;
+  out4 [label="BRD-6 Renewal\n- Package versions for renewal pricing (purpose Re"];
+  core -> out4;
+  out5 [label="BRD-6 Renewal and BRD-13 Data Migration\n- The BIBS package versions named as targets of th"];
+  core -> out5;
+  out6 [label="BRD-8 Employee Benefits\n- EB product lines (HMO"];
+  core -> out6;
+  out7 [label="Other BDOI systems (product master feed)\n- Released"];
+  core -> out7;
+}

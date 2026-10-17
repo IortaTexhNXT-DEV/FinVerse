@@ -1,0 +1,103 @@
+# Notifications catalogue of BRD-3 Product Maintenance: in-app notices (bell in the page header), alerts and e-mails.
+# Every row is traced to the code that raises it (source). Texts are verbatim; <name> is filled in by BIBS.
+# Columns: id | channel | trigger | recipient | template / text | content | screen | FR | source
+notifications:
+  - id: NT-01
+    channel: In-app
+    trigger: A package request moves to another stage (any workflow action, including return, void, not proceeded and the automatic release or return of its version)
+    recipient: The creator of the request and its current assignee, unless they made the move themselves
+    template: "Title: <request no.>: <new stage name>. Text: <request description> - <comment>"
+    content: The new stage, the request and the comment typed with the action; the notice opens the request
+    screen: Package Request record
+    frs: [FR-PM-024, FR-PM-072, FR-PM-073]
+    source: WorkflowService.notifyChange
+  - id: NT-02
+    channel: In-app
+    trigger: A package version set up from a request is validated and released
+    recipient: Every user who creates quotations (QUOTE_MAINTAIN, Marketing)
+    template: "Title: Package available: <risk code>. Text: <package name> (version <n>) sells from <effective date>."
+    content: The released package and its effective date; the notice opens the package request
+    screen: Package Request record; Package Version
+    frs: [FR-PM-043, FR-PM-072]
+    source: ReleaseFollowUp.released
+  - id: NT-03
+    channel: In-app
+    trigger: TSU sends an advisory (Send Advisory)
+    recipient: "The users of each recipient group: Marketing (QUOTE_MAINTAIN), TSU (PKG_NEGOTIATE), MBS (PRODUCT_MAINTAIN), Processing (ACCOUNT_PROCESS), Operations (OPS_VIEW)"
+    template: "Title: <advisory subject>. Text: <advisory text>"
+    content: The advisory as edited; the notice opens the package request
+    screen: Package Request record (Advisories tab)
+    frs: [FR-PM-044]
+    source: AdvisoryService.notifyGroups
+  - id: NT-04
+    channel: In-app
+    trigger: The daily package version step finds a package whose package end date has passed without a released renewal; the product becomes Expired
+    recipient: Every user with PKG_NEGOTIATE (TSU) and every user with PRODUCT_MAINTAIN (MBS)
+    template: "Title: Package expired: <risk code>. Text: Version <n> ended on <package end date> without a renewal; the package is no longer sold for new business."
+    content: The expired package; the notice opens Package Expiry
+    screen: Package Expiry
+    frs: [FR-PM-052, FR-PM-060]
+    source: ReleaseFollowUp.expired
+  - id: NT-05
+    channel: E-mail
+    trigger: A quotation slip is approved and sent (Approve and Send), or resent to one insurer (Resend)
+    recipient: The placement e-mail addresses of each insurer of the round
+    template: "Subject: Package quotation slip <PQS no.> - <package name>. Body: Dear <insurer>, Please find attached our package quotation slip <PQS no.> (round <n>) for <package name>. Kindly send your best terms on or before <reply date>. The document is password protected; the password follows separately. BDO Insurance and Reinsurance Brokers, Inc."
+    content: The quotation slip (PDF, template PKG_QUOTATION_SLIP), password protected; logged on the E-mails tab
+    screen: Package Request record (Negotiation tab, E-mails tab)
+    frs: [FR-PM-030, FR-PM-004]
+    source: NegotiationService.sendTo
+  - id: NT-06
+    channel: E-mail
+    trigger: An advisory is sent with e-mail addresses in E-mail to (optional)
+    recipient: The addresses entered on the advisory
+    template: "Subject: <advisory subject>. Body: <advisory text> The advisory is attached (password protected; the password follows separately). BDO Insurance and Reinsurance Brokers, Inc."
+    content: The advisory PDF with the list of supporting documents kept in BIBS
+    screen: Package Request record (Advisories tab, E-mails tab)
+    frs: [FR-PM-044, FR-PM-004]
+    source: AdvisoryService.email
+  - id: NT-07
+    channel: E-mail
+    trigger: Every e-mail sent with a password-protected attachment (NT-05, NT-06)
+    recipient: The same recipients as the document e-mail
+    template: "Subject: Password for: <subject of the document e-mail>. Body: The documents sent to you in the e-mail \"<subject>\" are password protected. Password: <password>. This e-mail was sent separately for your security. Please do not forward it."
+    content: The generated password
+    screen: Package Request record (E-mails tab)
+    frs: [FR-PM-004]
+    source: MessageService.queuePasswordMail
+  - id: NT-08
+    channel: Alert inbox
+    trigger: The daily PACKAGE_EXPIRY_MONITOR job (01:00 PHT) finds a released package ending within 60 days (PACKAGE_EXPIRY_NOTICE_DAYS), then within 30 and 7 days (PACKAGE_EXPIRY_REMINDER_DAYS); once per threshold
+    recipient: "Users of the Alerts screen (System Administrator, Auditor); in the app, every user with PKG_NEGOTIATE (TSU) and every user with PRODUCT_MAINTAIN (MBS)"
+    template: "Exception PACKAGE_EXPIRING (Package expiring): Package <risk code> version <n> ends on <dd-MMM-yyyy> (<n> days); no renewal request yet (or: renewal <request no.>). In-app notice: Title: Package ending: <risk code>, with the same text"
+    content: The package, its end date, the days left and the renewal request if any; the in-app notice opens Package Expiry
+    screen: Alerts; Package Expiry; Product Maintenance Home
+    frs: [FR-PM-060]
+    source: PackageExpiryService.alert
+  - id: NT-09
+    channel: Alert inbox
+    trigger: A package that an active incentive criterion names expires or is retired
+    recipient: "Users of the Alerts screen (System Administrator, Auditor); in the app, every user with PKG_NEGOTIATE (TSU) and every user with PRODUCT_MAINTAIN (MBS)"
+    template: "Exception INCENTIVE_PRODUCT_INACTIVE (Incentive criterion on an inactive product): Incentive criterion <code> applies to package <risk code>, which <expired or retired>: review or deactivate it. In-app notice: Title: Incentive criterion to review: <code>, with the same text"
+    content: The criterion and the package; the in-app notice opens Incentive Criteria
+    screen: Alerts; Incentive Criteria
+    frs: [FR-PM-081]
+    source: PackageIncentiveReview.productInactive
+  - id: NT-10
+    channel: In-app
+    trigger: A team leader assigns package requests (Package Requests › Assign, TSU Workbench › Assign)
+    recipient: The new assignee, unless the team leader assigns them to himself
+    template: "Title: <request no.> assigned to you. Text: <request description>"
+    content: The request now assigned; the notice opens the request
+    screen: Package Requests; TSU Workbench
+    frs: [FR-PM-024]
+    source: WorkAssignmentService.assign
+  - id: NT-11
+    channel: Alert inbox
+    trigger: The daily alert check (09:30 PHT) finds package requests past their stage service level
+    recipient: Users of the Alerts screen (System Administrator, Auditor); the Product Maintenance roles see the same requests as overdue on the home tiles, Package Requests and TSU Workbench
+    template: "Exception WORK_SLA_BREACH: Work item overdue"
+    content: A package request has stayed in its stage beyond the stage service level hours
+    screen: Alerts; Product Maintenance Home; Package Requests
+    frs: [FR-PM-073]
+    source: WorkSlaAlertCheck

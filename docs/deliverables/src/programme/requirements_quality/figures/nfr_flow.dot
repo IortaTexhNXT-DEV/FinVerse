@@ -1,0 +1,15 @@
+// Where the NFRs are verified, from every change to production.
+digraph nfr_flow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.22, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=10, fontcolor="@NEAR_BLACK", width=6.8, height=0.5, margin="0.12,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2];
+  ci   [label=<<b>Every change</b> - quality, coverage and security gates of the CI pipeline (MNT, SEC-07, CFG-01)>, fillcolor="@DIRTY_WHITE"];
+  sit  [label=<<b>SIT</b> - security, accessibility, responsive, configuration, interface and audit cases; baseline load (Jun 2027)>, fillcolor="@BG_BLUE"];
+  uat  [label=<<b>UAT</b> - usability, learnability, data-subject request, retention review by the owners>, fillcolor="@BG_BLUE"];
+  nft  [label=<<b>NFT on Pre-Prod</b> (1 Nov to 15 Dec 2027) - load, peak, volume, stress, resilience, DAST, penetration test>, fillcolor="@BG_BLUE"];
+  dr   [label=<<b>DR drill and dress rehearsal</b> (Nov to Dec 2027) - RPO, RTO, night window, rollback>, fillcolor="@BG_BLUE"];
+  orr  [label=<<b>ORR / PRR</b> (Dec 2027) - availability set-up, monitoring, alerts, backups, documentation>, fillcolor="@AMBER_BG"];
+  run  [label=<<b>Production</b> - monthly service report: availability, incidents, vulnerabilities, restore tests>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  ci -> sit -> uat -> nft -> dr -> orr -> run;
+}

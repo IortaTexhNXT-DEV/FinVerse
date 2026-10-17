@@ -1,0 +1,55 @@
+// BRD-2 Operations: life of a booked invoice by team (FRS section 2.2; BRD p.11-13).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: four rows of three steps; the fill colour of a step is its team (legend at the bottom).
+digraph ops_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=2.3, height=0.8, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  // Teams: New Business = @DIRTY_WHITE, Cashiering = @BG_BLUE, Remittance = @WHITE,
+  // Adjustment / Prod Recon / Commission = @AMBER_BG, Disbursement and insurer = @SUCCESS_BG
+  s1  [label=<<b>1. Invoice booked</b><br/><font point-size="9">New Business (BRD-1)<br/>copied to the invoice ledger</font>>, fillcolor="@DIRTY_WHITE"];
+  s2  [label=<<b>2. Payment received, AR</b><br/><font point-size="9">Cashier: OTC, files, PDC, pick-up<br/>CSHID.001, 008, 009</font>>, fillcolor="@BG_BLUE"];
+  s3  [label=<<b>3. Match and apply</b><br/><font point-size="9">by PR component; pre-booked;<br/>unapplied. CSHID.020, 022</font>>, fillcolor="@BG_BLUE"];
+  s4  [label=<<b>4. Unapplied disposition</b><br/><font point-size="9">apply, refund, reclass, transfer<br/>CSHID.024, 025</font>>, fillcolor="@BG_BLUE"];
+  s5  [label=<<b>5. Remittance extraction</b><br/><font point-size="9">eligible paid AR per insurer<br/>RMTID.001-023</font>>, fillcolor="@WHITE"];
+  s6  [label=<<b>6. Batch review, approval</b><br/><font point-size="9">exclude only; four eyes<br/>RMTID.002, 009-011</font>>, fillcolor="@WHITE"];
+  s7  [label=<<b>7. Disbursement pays</b><br/><font point-size="9">payment request, DV number<br/>RMTID.034, DBMID.001</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  s8  [label=<<b>8. Insurer OR recorded</b><br/><font point-size="9">OR schedule upload, exceptions<br/>RMTID.012, 013, 016</font>>, fillcolor="@WHITE"];
+  s9  [label=<<b>9. Production reconciliation</b><br/><font point-size="9">register to insurer, matching<br/>PRCID.001-039</font>>, fillcolor="@AMBER_BG"];
+  s10 [label=<<b>10. Adjustment / cancellation</b><br/><font point-size="9">endorsements, AR Insurer<br/>ADJID.001-028</font>>, fillcolor="@AMBER_BG"];
+  s11 [label=<<b>11. Direct payment commission</b><br/><font point-size="9">bill insurer, collect, reverse PR<br/>CMRID.001-015</font>>, fillcolor="@AMBER_BG"];
+  s12 [label=<<b>12. Minimal balance, write-off</b><br/><font point-size="9">sweep and 10-100 file<br/>CSHID.016, ADJID.026</font>>, fillcolor="@AMBER_BG"];
+
+  { rank=same; s1; s2; s3; }
+  { rank=same; s4; s5; s6; }
+  { rank=same; s7; s8; s9; }
+  { rank=same; s10; s11; s12; }
+
+  s1 -> s2 -> s3;
+  s3 -> s4 [constraint=false];
+  s1 -> s4 -> s7 -> s10 [style=invis, weight=10];
+  s2 -> s5 -> s8 -> s11 [style=invis, weight=10];
+  s3 -> s6 -> s9 -> s12 [style=invis, weight=10];
+  s3 -> s5 [constraint=false];
+  s5 -> s6;
+  s6 -> s7 [constraint=false];
+  s7 -> s8;
+  s8 -> s9 [style=dashed, color="@MUTED"];
+  s10 -> s11 [style=invis];
+  s11 -> s12 [style=invis];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Team:</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">New Business</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">Cashiering</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="9">Remittance</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="9">Adjustment / Prod Recon / Commission</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="9">Disbursement</font></td>
+      </tr>
+    </table>>];
+  s11 -> legend [style=invis];
+}

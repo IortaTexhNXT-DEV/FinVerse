@@ -1,0 +1,162 @@
+# The Cashiering requirements of the Operations BRD (v1.01 of 15-Apr-2026 with the Cashiering annex of May 2026,
+# version of 8-Oct-2026) and its non-functional lines, as mapped in the FRS v3.3. Read by brd02_v34_content.py.
+# frs: entries for a BRD ID that no requirement row names; note: a BRD ID removed from the BRD.
+brd:
+- id: BRQID.001
+  text: Access and log-in to the system.
+- id: BRQID.002
+  text: Restrict access to authorized users so that only authorized personnel can access the system.
+- id: BRQID.003
+  text: Upon successful login, the system must immediately present the User with access to the Operations functionality,
+    displayed prominently on the dashboard. The User must be able to select and view specific operational sections based
+    on their role, preference, or task at hand. The system must ensure intuitive navigation, allowing users to switch between
+    sections efficiently, with each section offering its full suite of functionalities, validations, reporting tools, ability
+    to open a link to applications it integrates with.
+- id: BRQID.004
+  text: Integrate with other systems / applications / modules to fetch or flow-in data. (i.e. Collection, Accounting, Disbursement,
+    Marketing, Claims).
+- id: BRQID.005
+  text: Facility to fetch from other systems / applications / modules the necessary data that are required to flow-in to
+    support Operations processes.
+- id: BRQID.006
+  text: Implement a batch job processing system that continues execution even if one or more records encounter errors during
+    processing. The system must log failed records for future evaluation and potential reprocessing. Additionally, generate
+    a comprehensive report summarizing the outcome of the batch run.
+- id: BRQID.007
+  text: Capabilities to include, record, update remittance details at the invoice level and ensure visible payment histories
+    including dates, amounts, and AR numbers.
+- id: CSHID.001
+  text: Create, cancel, and reinstate Acknowledgement Receipt (AR). 1. Premium Payments - Bills Payments, OTC, Trade, CLPC,
+    PDC. 2. Non-Premium Payments - Insurance Payments (Refund, Other expenses, AR Insurance)
+- id: CSHID.002
+  text: Create, cancel, and reinstate Official Receipt (OR). 1. Service Fee Income (e.g. risk management fee, consultancy
+    fee) 2. Insurance Profit Share 3. Commissions (e.g. e.g. VAT or W/Tax) 4. Incentives 5. Others (discount)
+- id: CSHID.003
+  text: Facility to allow User to choose the reason for AR or OR cancellation.
+- id: CSHID.004
+  text: Facility to allow User to choose the reason for Reinstatement.
+- id: CSHID.005
+  text: Facility to allow User to encode the required information for Reinstatement. 1. Premium Payment Invoice number Acknowledgment
+    Receipt number Assured/Payor name Amount reinstated Account officer Unit Head Team Leader 2. Direct Payment Invoice
+    number OR number Assured/Payor name Amount reinstated
+- id: CSHID.006
+  text: 'Auto-assign AR/OR numbers per transaction based on branch. Note: OR issuance is exclusively done by HO.'
+- id: CSHID.007
+  text: 'Issue an individual OR per commission check or credited amount or multiple payments in one OR as long as one Insurer
+    / Payee (one certificate). Source of data: 1. Uploaded commission payment details from collection. 2. Remittance Schedule.'
+- id: CSHID.008
+  text: 'For AR, allow uploads for Bills, Trade, CLPC payments, matured PDC, Direct Credit for batch processing. Sources
+    of files and file type: a. Bills Payment: TXT (FS01) from IT-DCO b. Trade Payment: TXT from CIB c. CLPC Payment: EXCEL
+    d. PDC Payment file in excel for upload e. Direct Credit: TXT FS01/04: All via batch process. Trade, Direct Credit,
+    CLPC – manually prepared by BU, send to IT, IT to run batch process – FS04.'
+- id: CSHID.009
+  text: Facility to accept check with “for check pick up” from Collection.
+  note: 'Removed from the BRD by the Cashiering annex of May 2026: check pick-up is not part of BDOI''s target process.'
+- id: CSHID.010
+  text: 'Access and perform search using the following parameter: AR Number OR Number Client Number Invoice Number Payor
+    Name Assured Name Amount Date of Issuance Policy Number Insurer Name'
+- id: CSHID.011
+  text: Facility to log in the Audit Trail the AR number and Username.
+- id: CSHID.012
+  text: Post Accounting entries once cancellation is posted.
+- id: CSHID.013
+  text: Post Accounting entries once reinstatement is posted.
+- id: CSHID.014
+  text: Post Accounting entries for AR/OR.
+- id: CSHID.015
+  text: Validate AR/OR series is not depleted before transaction processing.
+- id: CSHID.016
+  text: 'Automatically reverse Premium Receivables with minimal balances and below (Php 10.00 and below) if not equal to
+    the following: a. Two percent (2%) creditable withholding tax b. Amount of DST charged into the account c. Amount of
+    the entire premium'
+- id: CSHID.017
+  text: Facility to allow authorized Users to generate, download, or print reports.
+- id: CSHID.018
+  text: Facility to allow selected Users to view generated report.
+- id: CSHID.019
+  text: Facility to perform batch printing of AR / OR.
+- id: CSHID.020
+  text: Perform matching at the point of payment acceptance except for issued PDC.
+- id: CSHID.021
+  text: Facility to flow-in payment made from Insurer to AR Insurance. These are payment from Insurer that needs to be segregated
+    from premium payments and expected to flow-in to AR Insurance.
+- id: CSHID.022
+  text: 'Apply payments based on defined hierarchy of payment application. Per Transaction Level hierarchy: 1. Premium Receivable
+    - DST 2. Premium Receivable - Premium Tax (VAT) 3. Premium Receivable - LGT 4. Premium Receivable - Other Charges 5.
+    Premium Receivable - Basic Premium Mode of Payment hierarchy: 1. Check Cash'
+- id: CSHID.023
+  text: Capability to generate reports. 2. See Cashiering Reports list under Annex.
+- id: CSHID.024
+  text: 'Facility where users can view and manage dispositions for unapplied payments, ensuring proper tracking, approval,
+    and processing of various disposition types. Example of Disposition Types: Apply to other invoice DST payment application
+    Refund Reclass Transfer to other marketing unit Others (customizable)'
+- id: CSHID.025
+  text: Facility to display information as per Disposition Tabs 1. Unapplied - Displays payments with no disposition assigned.
+    2. Monitoring - Displays payments with disposition already assigned. 3. For Approval - Displays payments requiring Team
+    approval.
+- id: CSHID.026
+  text: Facility to receive tagged BIR 2307 data from Marketing Collection, process payments (cash or certificate), and
+    remit accordingly. Issue ARs, reverse premiums, and forward transactions to Disbursement.
+  note: 'Deleted in BRD v1.01: the BIR 2307 processing is done by Marketing Collection (MKTID.013).'
+- id: CSHID.027
+  text: Facility to provide capability to Operations to process BIR 2307 reversals using reference numbers given by
+    Marketing. This is to validate the data, generate the transaction report, and route it directly to Disbursement without
+    going through the Remittance function.
+  note: 'Deleted in BRD v1.01: BIR 2307 reversals are routed by Marketing Collection to Disbursement.'
+- id: MKTID.013
+  text: Facility to tag Reversal Transactions for BIR 2307, submit certificates received from clients, and enforce system
+    validations on reversal amounts. The system must validate certificate amounts against the computed PR 2307 amount, and
+    the outstanding PR balance, to ensure accuracy, compliance, and prevention of over-reversal.
+  frs:
+  - FRS.CSH.02.05
+- id: DBMID.001
+  text: Receive and process BIR 2307 Report. Receive sorted BIR 2307 certificates and supporting documents from Marketing
+    Collection.
+  frs:
+  - FRS.CSH.10.01
+nfr:
+- - Users
+  - Cashiering Head Office 11, branches 5; Team Leaders and Team Heads 5 + 5
+  - NFR-CAP-01
+- - Volumes
+  - Not stated
+  - NFR-CAP-02, NFR-CAP-03
+- - Response time
+  - Under 5 seconds for every function
+  - NFR-PRF-01, NFR-PRF-02
+- - Batch printing
+  - 50 documents under 10 seconds
+  - NFR-PRF-06
+- - Peak
+  - 15th and 30th of the month; 08:00-17:30
+  - NFR-CAP-05, NFR-PRF-07
+- - Availability
+  - 99.9%; used 07:00-18:30
+  - NFR-AVL-01, NFR-AVL-02
+- - Downtime
+  - RTO 4 hours, RPO 24 hours
+  - NFR-REC-01, NFR-REC-02
+- - Retention
+  - Logs and history 5 years online, 15 years archive
+  - NFR-RET-01, NFR-RET-03
+- - Devices
+  - Same speed on mobile and desktop
+  - NFR-RSP-01, NFR-RSP-02
+- - Security
+  - Authorised users only
+  - NFR-SEC-04, NFR-SEC-11
+- - Audit
+  - Every action logged
+  - NFR-AUD-01, NFR-AUD-02, NFR-AUD-03
+- - Maintenance
+  - As per bank standard
+  - NFR-AVL-03
+- - Disaster
+  - Business continuity threshold RTO 4 hours, RPO 24 hours
+  - NFR-REC-01, NFR-REC-02
+- - Programme NFR 10.07
+  - One session per device (Collections addendum)
+  - NFR-SEC-05
+- - Programme NFR 4.03
+  - Source address in the audit log (Claims, Collections, ReInsurance addenda)
+  - NFR-AUD-02

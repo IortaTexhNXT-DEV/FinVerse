@@ -1,0 +1,452 @@
+package com.iortatechnxt.brokerverse.cashiering.service;
+
+import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
+import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.DispositionStatus;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.UnappliedOrigin;
+import com.iortatechnxt.brokerverse.cashiering.domain.Disposition;
+import com.iortatechnxt.brokerverse.cashiering.domain.Disposition.DispositionDetails;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRule;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRuleRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionWords;
+import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
+import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
+import com.iortatechnxt.brokerverse.lov.service.LovService;
+import com.iortatechnxt.brokerverse.messaging.domain.Notice;
+import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
+import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
+import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
+import java.time.Clock;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * The unapplied payments workbench (CSHID.024/025, OQ15): assign a disposition to an unapplied
+ * item, update it before it is processed, submit it (types that need the team leader's approval go
+ * to For Approval, the others are processed at once), approve it with four eyes, and mark a
+ * completed disposition for reversal with a reason. Tabs follow the stages of the workflow {@code
+ * OPS_DISPOSITION}.
+ */
+@Service
+@Transactional
+public class DispositionService {
+
+  /** Unapplied tab. */
+  public static final List<String> TAB_UNAPPLIED = List.of(Unapplied.STAGE_INITIAL);
+
+  /** Monitoring tab. */
+  private static final String MONITORING = "MONITORING";
+
+  /** Stages of the Monitoring tab. */
+  public static final List<String> TAB_MONITORING = List.of(MONITORING, "IN_PROCESS");
+
+  /** For Approval tab. */
+  public static final List<String> TAB_FOR_APPROVAL = List.of("FOR_APPROVAL");
+
+  /** For Reversal tab. */
+  public static final List<String> TAB_FOR_REVERSAL = List.of("FOR_REVERSAL");
+
+  /** Completed and closed items. */
+  public static final List<String> TAB_DONE = List.of("COMPLETED", "CLOSED");
+
+  private static final String LOV = "DISPOSITION_TYPE";
+  private static final String APPROVE = "CASH_DISPOSITION_APPROVE";
+  private static final Collection<DispositionStatus> CURRENT =
+      EnumSet.of(
+          DispositionStatus.MONITORING,
+          DispositionStatus.FOR_APPROVAL,
+          DispositionStatus.IN_PROCESS,
+          DispositionStatus.COMPLETED,
+          DispositionStatus.FOR_REVERSAL);
+
+  private final UnappliedRepository items;
+  private final DispositionRepository dispositions;
+  private final DispositionTypeRuleRepository rules;
+  private final DispositionExecutor executor;
+  private final CollectorRequestTracker collectorRequests;
+  private final WorkflowService workflow;
+  private final LovService lovs;
+  private final NotificationService notifications;
+  private final AuditTrailService audit;
+  private final CurrentUser currentUser;
+  private final Clock clock;
+
+  /**
+   * Creates the service.
+   *
+   * @param items unapplied items
+   * @param dispositions dispositions
+   * @param rules disposition type rules
+   * @param executor execution of dispositions
+   * @param collectorRequests collector requests of the dispositions (BRCLXN.030-033)
+   * @param workflow workflow
+   * @param lovs lists of values
+   * @param notifications notifications
+   * @param audit audit trail
+   * @param currentUser current user
+   * @param clock clock
+   */
+  public DispositionService(
+      UnappliedRepository items,
+      DispositionRepository dispositions,
+      DispositionTypeRuleRepository rules,
+      DispositionExecutor executor,
+      CollectorRequestTracker collectorRequests,
+      WorkflowService workflow,
+      LovService lovs,
+      NotificationService notifications,
+      AuditTrailService audit,
+      CurrentUser currentUser,
+      Clock clock) {
+    this.items = items;
+    this.dispositions = dispositions;
+    this.rules = rules;
+    this.executor = executor;
+    this.collectorRequests = collectorRequests;
+    this.workflow = workflow;
+    this.lovs = lovs;
+    this.notifications = notifications;
+    this.audit = audit;
+    this.currentUser = currentUser;
+    this.clock = clock;
+  }
+
+  /**
+   * Items of a tab.
+   *
+   * @param companyId company
+   * @param stages stages of the tab
+   * @param text search text, may be null
+   * @param pageable page
+   * @return items, newest first
+   */
+  @Transactional(readOnly = true)
+  public Page<Unapplied> list(Long companyId, List<String> stages, String text, Pageable pageable) {
+    String like =
+        text == null || text.isBlank() ? null : "%" + text.strip().toLowerCase(Locale.ROOT) + "%";
+    return items.search(companyId, stages, like, pageable);
+  }
+
+  /**
+   * Items of a tab with the Data Migration origin filter.
+   *
+   * @param companyId company
+   * @param stages stages
+   * @param text search text
+   * @param origin BIBS or MIGRATED, null for both
+   * @param pageable page
+   * @return items
+   */
+  @Transactional(readOnly = true)
+  public Page<Unapplied> list(
+      Long companyId,
+      List<String> stages,
+      String text,
+      RecordOrigin.Origin origin,
+      Pageable pageable) {
+    if (origin == null) {
+      return list(companyId, stages, text, pageable);
+    }
+    String like =
+        text == null || text.isBlank() ? null : "%" + text.strip().toLowerCase(Locale.ROOT) + "%";
+    return items.searchByOrigin(
+        companyId,
+        stages,
+        like,
+        origin == RecordOrigin.Origin.MIGRATED,
+        UnappliedOrigin.MIGRATED,
+        pageable);
+  }
+
+  /**
+   * Dispositions of an item.
+   *
+   * @param unappliedId item
+   * @return dispositions, oldest first
+   */
+  @Transactional(readOnly = true)
+  public List<Disposition> history(Long unappliedId) {
+    return dispositions.findByUnappliedIdOrderByIdAsc(unappliedId);
+  }
+
+  /**
+   * The disposition types with their action and approval rule.
+   *
+   * @return rules
+   */
+  @Transactional(readOnly = true)
+  public List<DispositionTypeRule> types() {
+    return rules.findAll();
+  }
+
+  /**
+   * Assigns a disposition (Unapplied to Monitoring).
+   *
+   * @param unappliedId item
+   * @param typeCode disposition type
+   * @param details amount and target fields
+   * @return the disposition
+   */
+  public Disposition assign(Long unappliedId, String typeCode, DispositionDetails details) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, Unapplied.STAGE_INITIAL);
+    DispositionTypeRule rule = rule(typeCode);
+    executor.validate(item, rule, details);
+    Disposition d = dispositions.save(new Disposition(item.getId(), rule, details));
+    move(item, "assign_disposition", typeLabel(rule));
+    audit.record(
+        UnappliedService.ENTITY,
+        item.getReference(),
+        AuditAction.UPDATE,
+        "Disposition " + typeCode);
+    return d;
+  }
+
+  /**
+   * Assigns a disposition and processes it at once as a system action, for a type that needs no
+   * approval (income recognised on the request of another module, BRIDSP-31).
+   *
+   * @param unappliedId item
+   * @param typeCode disposition type
+   * @param details amount and remarks
+   * @param onAssigned called with the saved disposition before it is processed (links the request
+   *     that asked for it)
+   * @return the processed disposition
+   */
+  public Disposition processBySystem(
+      Long unappliedId,
+      String typeCode,
+      DispositionDetails details,
+      Consumer<Disposition> onAssigned) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, Unapplied.STAGE_INITIAL);
+    DispositionTypeRule rule = rule(typeCode);
+    if (rule.isRequiresApproval()) {
+      throw new BusinessRuleException(
+          "DISPOSITION_NEEDS_APPROVAL",
+          rule.getDescription() + " needs the team leader's approval and is not processed at once");
+    }
+    executor.validate(item, rule, details);
+    Disposition d = dispositions.save(new Disposition(item.getId(), rule, details));
+    String key = item.getId().toString();
+    workflow.systemTransition(
+        UnappliedService.ENTITY,
+        key,
+        "assign_disposition",
+        TransitionNote.comment(typeLabel(rule)));
+    onAssigned.accept(d);
+    executor.execute(item, d);
+    workflow.systemTransition(UnappliedService.ENTITY, key, "complete", TransitionNote.NONE);
+    reopenIfBalanceLeft(item);
+    audit.record(
+        UnappliedService.ENTITY,
+        item.getReference(),
+        AuditAction.POST,
+        "Disposition " + typeCode + " processed on request");
+    return d;
+  }
+
+  /**
+   * Changes the disposition before it is processed.
+   *
+   * @param unappliedId item
+   * @param typeCode disposition type
+   * @param details amount and target fields
+   * @return the disposition
+   */
+  public Disposition update(Long unappliedId, String typeCode, DispositionDetails details) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, MONITORING);
+    DispositionTypeRule rule = rule(typeCode);
+    executor.validate(item, rule, details);
+    Disposition d = current(item);
+    d.update(rule, details);
+    move(item, "update", typeLabel(rule));
+    return d;
+  }
+
+  /**
+   * Submits the disposition: to For Approval when its type needs approval, else processed now.
+   *
+   * @param unappliedId item
+   * @return the disposition
+   */
+  public Disposition submit(Long unappliedId) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, MONITORING);
+    Disposition d = current(item);
+    if (rule(d.getDispositionType()).isRequiresApproval()) {
+      d.markStatus(DispositionStatus.FOR_APPROVAL);
+      move(item, "submit", null);
+      notifications.notifyPermission(
+          APPROVE,
+          new Notice(
+              item.getReference() + " disposition for approval",
+              DispositionWords.of(d.getDispositionType())
+                  + " "
+                  + item.getCurrency()
+                  + " "
+                  + DisplayFormat.amount(d.getAmount()),
+              "/cashiering/unapplied/" + item.getId(),
+              UnappliedService.ENTITY,
+              item.getId().toString()),
+          "CASH_APPROVAL_REQUEST");
+      return d;
+    }
+    executor.execute(item, d);
+    workflow.systemTransition(
+        UnappliedService.ENTITY, item.getId().toString(), "complete", TransitionNote.NONE);
+    reopenIfBalanceLeft(item);
+    return d;
+  }
+
+  /**
+   * Approves and processes a disposition (four eyes).
+   *
+   * @param unappliedId item
+   * @return the disposition
+   */
+  public Disposition approve(Long unappliedId) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, "FOR_APPROVAL");
+    Disposition d = current(item);
+    requireChecker(d.getCreatedBy(), d.getUpdatedBy());
+    d.approve(currentUser.username(), clock.instant());
+    move(item, "approve", null);
+    executor.execute(item, d);
+    workflow.systemTransition(
+        UnappliedService.ENTITY, item.getId().toString(), "complete", TransitionNote.NONE);
+    reopenIfBalanceLeft(item);
+    return d;
+  }
+
+  /**
+   * Withdraws a disposition not yet submitted (back to Unapplied).
+   *
+   * @param unappliedId item
+   * @return the item
+   */
+  public Unapplied withdraw(Long unappliedId) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, MONITORING);
+    Disposition d = current(item);
+    d.markStatus(DispositionStatus.WITHDRAWN);
+    collectorRequests.withdrawn(item, d, currentUser.username());
+    move(item, "withdraw", null);
+    return item;
+  }
+
+  /**
+   * Marks a completed disposition for reversal (CSHID.025 For Reversal tab).
+   *
+   * @param unappliedId item
+   * @param reason reason
+   * @return the disposition
+   */
+  public Disposition markReversal(Long unappliedId, String reason) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, "COMPLETED");
+    if (reason == null || reason.isBlank()) {
+      throw new BusinessRuleException(
+          "REVERSAL_REASON_REQUIRED", "Enter the reason for the reversal");
+    }
+    Disposition d = current(item);
+    d.requestReversal(reason, currentUser.username());
+    workflow.transition(
+        UnappliedService.ENTITY,
+        item.getId().toString(),
+        "mark_reversal",
+        TransitionNote.comment(reason));
+    return d;
+  }
+
+  /**
+   * Approves a reversal: the disposition is undone and the item is back in Unapplied.
+   *
+   * @param unappliedId item
+   * @return the disposition
+   */
+  public Disposition approveReversal(Long unappliedId) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, "FOR_REVERSAL");
+    Disposition d = current(item);
+    requireChecker(d.getReversalRequestedBy(), null);
+    executor.reverse(item, d);
+    d.markStatus(DispositionStatus.REVERSED);
+    move(item, "approve_reversal", null);
+    return d;
+  }
+
+  private void reopenIfBalanceLeft(Unapplied item) {
+    if (item.getBalance().signum() > 0) {
+      workflow.systemTransition(
+          UnappliedService.ENTITY,
+          item.getId().toString(),
+          "reopen",
+          TransitionNote.comment("Balance " + item.getBalance() + " back to Unapplied"));
+    }
+  }
+
+  private void move(Unapplied item, String action, String comment) {
+    workflow.transition(
+        UnappliedService.ENTITY, item.getId().toString(), action, TransitionNote.comment(comment));
+  }
+
+  private void requireChecker(String maker, String lastMaker) {
+    String me = currentUser.username();
+    if (CurrentUser.sameUser(me, maker) || CurrentUser.sameUser(me, lastMaker)) {
+      throw new BusinessRuleException(
+          "MAKER_CHECKER_VIOLATION", "The requester cannot approve the disposition");
+    }
+  }
+
+  private DispositionTypeRule rule(String typeCode) {
+    lovs.requireValid(LOV, typeCode, BusinessClock.today(clock));
+    return rules
+        .findById(typeCode)
+        .orElseThrow(
+            () ->
+                new BusinessRuleException(
+                    "DISPOSITION_TYPE_NOT_CONFIGURED",
+                    "Disposition type " + typeCode + " has no processing rule"));
+  }
+
+  private Disposition current(Unapplied item) {
+    return dispositions
+        .findFirstByUnappliedIdAndStatusInOrderByIdDesc(item.getId(), CURRENT)
+        .orElseThrow(() -> new ResourceNotFoundException("Disposition of", item.getReference()));
+  }
+
+  private Unapplied item(Long id) {
+    return items
+        .findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException(UnappliedService.ENTITY, id));
+  }
+
+  private static void requireStage(Unapplied item, String stage) {
+    if (!stage.equals(item.getStage())) {
+      throw new BusinessRuleException(
+          "UNAPPLIED_WRONG_STAGE",
+          item.getReference() + " is " + item.getStage() + ", not " + stage);
+    }
+  }
+
+  /** The name of a disposition type in the workflow history ("Refund to Payor"), not its code. */
+  private String typeLabel(DispositionTypeRule rule) {
+    return lovs.label(LOV, rule.getTypeCode());
+  }
+}

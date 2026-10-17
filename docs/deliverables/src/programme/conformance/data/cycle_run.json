@@ -1,0 +1,319 @@
+{
+ "arn": "ARN-2026-000013",
+ "invoice": "BI-HO-2026-000012",
+ "steps": [
+  {
+   "no": "C01",
+   "area": "Client onboarding and KYC",
+   "persona": "Marketing AO, Marketing TL",
+   "action": "New client saved as prospect, KYC documents submitted, KYC verified, client confirmed",
+   "expected": "Client confirmed with a client number; the client is screened against the watchlists",
+   "status": "pass",
+   "amounts": [],
+   "observed": "Client CL-2026-000103 (prospect PR-2026-000102), onboarding CONFIRMED, risk rating -, 1 screening run(s) of the client",
+   "url": "/crm/clients/19",
+   "text": "Clients · Client\nVillareal, Rosalind Cruz\nGenerate Quotation\nEdit\nDeactivate\nPROSPECT\nPR-2026-000102\nCLIENT\nCL-2026-000103\nConfirmed\nKYC\nVerified\nBDO Bank Client\nProfile 9 of 9 Fields\nClient Type\nIndividual\nMarket Segment\nConsumer Banking Group (CBG)\nMobile\n09175550418\nE-mail\nrosalind.villareal@seed-client.ph\nTIN\n417-238-907-000\nNext KYC Review\n09-Oct-2029\nCreated By\nAileen Account Officer\nCreated\n09-Oct-2026\nProspect - KYC Documents to Complete\n(completed)\nKYC for Verification\n(completed)\nKYC Verified - to Confirm\n(completed)\n4\nConfirmed Client\n(current stage)\nCurrent Stage\nConfirmed Client\nSince\n09-Oct-2026 15:36\nDue\n—\nAssigned To\n—\nStage\tFrom Stage\tAction\tBy\tDate and Time\n\tRemarks\tDuration in Stage\n\nConfirmed Client\n\tKYC Verified - to Confirm\tConfirm\t\nAileen Account Officer\nMarketing Account Officer\n\t09-Oct-2026 15:36\t—\t0 min\n\nKYC Verified - to Confirm\n\tKYC for Verification\tVerify KYC\t\nMarites Marketing Lead\n\t09-Oct-2026 15:36\t—\t0 min\n\nKYC for Verification\n\tProspect - KYC Documents to Complete\tSubmit KYC\t\nAileen Account Officer\nMarketing Account Officer\n\t09-Oct-2026 15:36\t—\t0 min\n\nProspect - KYC Documents to Complete\n\t—\tStart\t\nAileen Account Officer\nMarketing Account Officer\n\t09-Oct-2026 15:36\t—\t0 min\nDetails\nKYC & Documents\nTags & Instructions\nQuotation\nConfirmed Proposals\nLinked Records\nHistory\nIdentity\nName\nVillareal, Rosalind Cruz\nBirth Date\n14-Mar-1988\nNationality\nFilipino\nCivil Status\nMarried\nOccupation\nArchitect\nTIN\n417-238-907-000\nID\nPassport, P4172390A\nContact & Address\nE-mail\nrosalind.villareal@seed-client.ph\nMobile\n09175550418\nLandline\n—\nAddress\n12 Mabini Street, Barangay San Antonio, Pasig City, Metro Manila, 1605\nSegment & Bank Relationship\nMarket Segment\nConsumer Banking Group (CBG)\nBank Relationship\nBDO bank client · CIF 0041723890\nSource of Funds\nSalary / employment\nKYC Risk Rating\n—\nSub-ledger Party\nCL-2026-000103\nOnboarding\nCreated\nAileen Account Officer\n09-Oct-2026 15:36\nKYC Submitted\nAileen Account Officer\n09-Oct-2026 15:36\nKYC Verified\nMarites Marketing Lead\n09-Oct-2026 15:36\nNext KYC Review\n09-Oct-2029\nConfirmed\nAileen Account Officer\n09-Oct-2026 15:36\nDeactivated\n—\n----\nClient confirmed as CL-2026-000103"
+  },
+  {
+   "no": "C02",
+   "area": "Quotation and acceptance",
+   "persona": "Marketing AO, Marketing TL",
+   "action": "Quotation of the Fire package rated, reviewed, approved, sent and accepted by the client",
+   "expected": "Quotation accepted; the account is created",
+   "status": "pass",
+   "amounts": [],
+   "observed": "Quotation QT-2026-000004 CONVERTED",
+   "url": "/quotations/12",
+   "text": "Quotation / Proposal · Quotation\nQT-2026-000004\n\nFire and Lightning Package PAR01 quotation for Villareal, Rosalind Cruz\n\nVersion\nv1 (current)\nPDF\nExcel\nVillareal, Rosalind Cruz\nARN\nARN-2026-000013\nConverted\nClient\nCL-2026-000103 – Villareal, Rosalind Cruz\nProduct\nFire and Lightning Package PAR01 (Property)\nInsurer\nMabuhay General Insurance Corp.\nPeriod\n09-Oct-2026 to 09-Oct-2027\nValid until\n08-Nov-2026\nGross premium\nPHP 14,315.88\nDraft\n(completed)\nFor Review\n(completed)\nApproved\n(completed)\nSent to Client\n(completed)\nAccepted by Client\n(completed)\nAccount Created\n(current stage, completed)\nCurrent Stage\nAccount Created\nSince\n09-Oct-2026 15:37\nAssigned To\n—\nDetails\nItems & Premium\nVersions\nDocuments\nE-mails\nHistory\nQuotation\nQuotation No.\nQT-2026-000004\nARN\nARN-2026-000013\nClient\nCL-2026-000103 – Villareal, Rosalind Cruz\nClient e-mail\nrosalind.villareal@seed-client.ph\nProduct\nFire and Lightning Package PAR01 (Property)\nMarket segment\nConsumer Banking Group (CBG)\nSource channel\nWalk-in / direct\nInsurer\nMabuhay General Insurance Corp. / Makati Head Office\nPeriod\n09-Oct-2026 to 09-Oct-2027\nValid until\n08-Nov-2026\nPremium payment\nVia BDOI\nRemarks\n—\nControl\nIntake template\nVersion 1\nVersion\n1 (submitted)\nCreated\nAileen Account Officer 09-Oct-2026 15:37\nSubmitted\nAileen Account Officer 09-Oct-2026 15:37\nApproved\nMarites Marketing Lead 09-Oct-2026 15:37\nSent to client\n09-Oct-2026 15:37\nAccepted\n09-Oct-2026 15:37\nAccepted risk groups\n1\nAccounts\nARN-2026-000013\n----\nAcceptance recorded: QT-2026-000004 is now accepted\nCreate accounts: QT-2026-000004 is now converted"
+  },
+  {
+   "no": "C03",
+   "area": "Account, placement, e-policy and booking",
+   "persona": "Marketing AO, Processing, E-policy Sender",
+   "action": "Account submitted and validated, billed through CLPC, placed with the insurer, e-policy confirmed and sent, account booked",
+   "expected": "Booked invoice with the premium, DST, premium tax, FST and LGT of the FRS rating rules; commission and VAT on commission",
+   "status": "pass",
+   "amounts": [
+    {
+     "name": "Basic premium",
+     "expected": 11250,
+     "observed": 11250,
+     "ok": true
+    },
+    {
+     "name": "DST (12.5% of the net premium, rounded up to the next 0.50)",
+     "expected": 1406.5,
+     "observed": 1406.5,
+     "ok": true
+    },
+    {
+     "name": "Premium tax (Property 12%)",
+     "expected": 1350,
+     "observed": 1350,
+     "ok": true
+    },
+    {
+     "name": "Fire service tax (Property 2%)",
+     "expected": 225,
+     "observed": 225,
+     "ok": true
+    },
+    {
+     "name": "LGT (rate of the insurer branch)",
+     "expected": 84.38,
+     "observed": 84.38,
+     "ok": true
+    },
+    {
+     "name": "Commission (rate of the insurer and product)",
+     "expected": 2812.5,
+     "observed": 2812.5,
+     "ok": true
+    },
+    {
+     "name": "VAT on commission (12%)",
+     "expected": 337.5,
+     "observed": 337.5,
+     "ok": true
+    },
+    {
+     "name": "Withholding tax on commission",
+     "expected": 281.25,
+     "observed": 281.25,
+     "ok": true
+    },
+    {
+     "name": "Gross premium = net premium + charges",
+     "expected": 14315.88,
+     "observed": 14315.88,
+     "ok": true
+    }
+   ],
+   "observed": "ARN-2026-000013 booked as BI-HO-2026-000012; TSI 4500000.00; LGT rate 0.75%",
+   "url": "/booking/invoices/18",
+   "text": "Premium & Commission\nJournal\nOpen Items\nService Invoices\nEndorsements\nInvoices of the Account\nJournal\nOpen Journal PRM-HO-2026-000070\nJournal\nJournal\tAccount\tParty\tDebit\tCredit\nPRM-HO-2026-000070\t1210.01 Premium Receivable - Basic Premium\tCL-2026-000103\t11,250.00\t—\nPRM-HO-2026-000070\t1210.02 Premium Receivable - DST\tCL-2026-000103\t1,406.50\t—\nPRM-HO-2026-000070\t1210.03 Premium Receivable - Premium Tax / VAT\tCL-2026-000103\t1,350.00\t—\nPRM-HO-2026-000070\t1210.04 Premium Receivable - LGT\tCL-2026-000103\t84.38\t—\nPRM-HO-2026-000070\t1210.05 Premium Receivable - Fire Service Tax\tCL-2026-000103\t225.00\t—\nPRM-HO-2026-000070\t2210 Payable to Insurance Companies\tINS-MGIC\t—\t14,315.88\nPRM-HO-2026-000070\t1220 Commission Receivable - Insurers\tINS-MGIC\t3,150.00\t—\nPRM-HO-2026-000070\t2220 Unrealized Commission\t—\t—\t2,812.50\nPRM-HO-2026-000070\t2221 Deferred Output VAT\t—\t—\t337.50\nTotal debit 17,465.88\nTotal credit 17,465.88\nBalanced\n----\n"
+  },
+  {
+   "no": "C04",
+   "area": "Billing and accounting entries",
+   "persona": "Processing",
+   "action": "Booking journal of the invoice",
+   "expected": "The journal debits the premium receivable by component and the commission receivable, credits the payable to the insurer, the unrealised commission and the deferred output VAT; debits equal credits",
+   "status": "pass",
+   "amounts": [],
+   "observed": "PRM-HO-2026-000070 PREMIUM 17465.88/17465.88"
+  },
+  {
+   "no": "C05",
+   "area": "Collection and ageing",
+   "persona": "Section Head, Collection Handler",
+   "action": "Worklist refreshed; the account is in the handler's worklist; effort logged; promise to pay recorded",
+   "expected": "The invoice on the PR Worklist with its aging bracket and outstanding premium; effort and promise recorded",
+   "status": "pass",
+   "amounts": [],
+   "observed": "Collection item OPEN, bracket 0-30, outstanding 14315.88",
+   "url": "/collections/promises",
+   "text": "Finance · Collections\nPromises to Pay\n\nPromises made by clients, checked every night against the payments applied in the invoice ledger.\n\nRecord Promise\nOpen Promises\nBroken\nKept\nWithdrawn\nSearch Invoice No. or ARN\nSearch\nWithdraw Promise\nCompact\nColumns\nPromises to pay\n\tInvoice No.\tName of Assured\tPromised On\tPromised Date\tPromised\tPaid in Time\tRecorded By\tStatus\n\tBI-HO-2026-000002\nARN-2026-940002\n\tGarcia, Antonio Luis Dizon\t09-Oct-2026\t19-Oct-2026\t5,567.18\t—\tMiguel Marketing Collection\t\nOpen\n\n\tBI-HO-2026-000010\nARN-2026-940007\n\tGarcia, Antonio Luis Dizon\t09-Oct-2026\t19-Oct-2026\t11,134.38\t—\tClara Collection Handler\t\nOpen\n\n\tBI-HO-2026-000012\nARN-2026-000013\n\tVillareal, Rosalind Cruz\t09-Oct-2026\t19-Oct-2026\t7,157.94\t—\tClara Collection Handler\t\nOpen\nShowing 1 to 3 of 3 results\n1\n----\nPromise to pay recorded"
+  },
+  {
+   "no": "C06",
+   "area": "Cashiering",
+   "persona": "Cashier",
+   "action": "Receive Payment of the full gross premium over the counter; Issue AR and Apply",
+   "expected": "AR issued for the gross premium and applied to each component; the invoice is Paid",
+   "status": "pass",
+   "amounts": [
+    {
+     "name": "AR amount = gross premium",
+     "expected": 14315.88,
+     "observed": 14315.88,
+     "ok": true
+    },
+    {
+     "name": "Premium receivable left after the application",
+     "expected": 0,
+     "observed": 0,
+     "ok": true
+    }
+   ],
+   "observed": "Receipt AR-HO-000012",
+   "url": "/cashiering/receipts/24",
+   "text": "Cashiering\nAcknowledgement Receipt AR-HO-000012\n\nPremium payments receipt, Over the Counter, PAY-2026-000012.\n\nPrint (PDF)\nCancel Receipt\nVillareal, Rosalind Cruz\nAR\nAR-HO-000012\nIssued\nReceipt Date\n02-Oct-2026\nPayor\nVillareal, Rosalind Cruz\nAmount\n14,315.88\nApplied / Unapplied\n14,315.88 / 0.00\nMode\nCash\nCurrency / Book Rate\nPHP · 1.0000\nApplications\nLines\nJournal\nHistory\nApplications\nInvoice\tBy Component\tApplied\tCommission Realized\tValue Date\tStatus\n\nBI-HO-2026-000012\nARN-2026-000013\n\tShow 5 components\t14,315.88\t2,812.50\t02-Oct-2026\t\nActive\n----\nAR-HO-000012 issued and applied to 1 invoice"
+  },
+  {
+   "no": "C07",
+   "area": "Collection and ageing",
+   "persona": "Section Head",
+   "action": "Worklist refreshed after the payment",
+   "expected": "The collection item is Completed; it is on Completed Collections",
+   "status": "pass",
+   "amounts": [],
+   "observed": "Collection item COMPLETED",
+   "url": "/collections/setup",
+   "text": "Finance · Collections\nCollections Setup\n\nListing threshold, aging, exports, disposition rules and Unit Heads.\n\nRefresh Worklist Now\nParameters\nCollections parameters\nParameter\tValue\tDescription\tChanged By\nAging Basis\tBooking date\tThe date the aging of an account counts from: the booking date or the inception date\tSystem\nAging Brackets\t0-30,31-45,46-60,61-90,91-120,121+\tAging brackets of the worklist, the home chart and the reports, in days\tSystem\nEdit Lock (Minutes)\t15\tMinutes after which the \"<user> is editing\" lock of a collection account expires\tSystem\nExport Row Limit\t50000\tMaximum rows of one export of the worklist to Collections Files\tSystem\nInvoice Number Format\t^(I\\d{8}|BI-.+)$\tFormat of the invoice number of \"For application to invoice\": a legacy invoice I followed by eight digits, or BI-…\tSystem\nMinimal Balance Threshold\t10.00\tNet outstanding PR above which an invoice enters the collection worklist\tSystem\nPromise Grace Days\t0\tDays after the promised date before an unpaid promise to pay is broken\tSystem\nDisposition Rules\nMaintain LOV Values\nPR Dispositions\nPR Dispositions\tCategory\tTagging Owner\tOperations Action\tReserved To\nDP PR for reversal\nDP_PR_FOR_REVERSAL\n\tNot set\tOperations\tDP reversal\tEvery collector\nPR 2307 for reversal\nPR2307_FOR_REVERSAL\n\tNot set\tOperations\tBIR 2307 reversal\tEvery collector\nFor check pick-up\nFOR_CHECK_PICKUP\n\tNot set\tMarketing\tCheck pick-up\tEvery collector\nCancel account\nCANCEL_ACCOUNT\n\tNot set\tOperations\tCancellation request\tEvery collector\nCoordinate further\nCOORDINATE_FURTHER\n\tNot set\tMarketing\tNone\tEvery collector\nRequest bank AO assistance\nBANK_AO_ASSISTANCE\n\tNot set\tMarketing\tNone\tEvery collector\nNo / missing policy number\nNO_POLICY_NUMBER\n\tNot set\tMarketing\tNone\tProcessing, Collection Handler, Collection Team Lead, Section Head\nDP returned by insurer\nDP_RETURNED\n\tNot set\tMarketing\tNone\tEvery collector\nUnapplied Payment Dispositions\nUnapplied Payment Dispositions\tRequires Invoice\tCashiering Action\nFor application to invoice\nFOR_APPLICATION_TO_INVOICE\n\tYes\tApply to invoice\nFor refund\nFOR_REFUND\n\tNo\tRefund\nFor reclass\nFOR_RECLASS\n\tNo\tReclass\nFor transfer to other unit\nFOR_TRANSFER\n\tNo\tTransfer\nHandling fee\nHANDLING_FEE\n\tNo\tRecognize Income\nCoordinate further\nCOORDINATE_FURTHER\n\tNo\tNone\nUnit Heads\nSales units\nUnit\tName\tLevel\tParent\tUnit Head\nCBG-NCR\tConsumer Banking Group - NCR\tDepartment\tNCR\tUrsula Section Head\nCBG-VIS\tConsumer Banking Group - Visayas\tDepartment\tVIS\tFrom the parent unit\nCORP-NCR\tCorporate Marketing - NCR\tDepartment\tNCR\tUrsula Section Head\nNCR\tNational Capital Region\tRegion\t—\tFrom the parent unit\nVIS\tVisayas\tRegion\t—\tUrsula Section Head\nT-CBG1\tCBG Metro Team 1\tTeam\tCBG-NCR\tMarites Marketing Lead\nT-CORP1\tCorporate Marketing Team 1\tTeam\tCORP-NCR\tRosario Renewal Team Lead\nT-VIS1\tCBG Cebu Team\tTeam\tCBG-VIS\tFrom the parent unit\n----\n0 listed, 12 refreshed, 0 closed, 0 reopened, 0 temporary assignment(s) ended, 0 assigned by rule"
+  },
+  {
+   "no": "C08",
+   "area": "Remittance to the insurer",
+   "persona": "Remittance Processor, Remittance TL, Disbursement",
+   "action": "Extraction of the paid invoice; batch submitted and approved; DV assigned; insurer OR uploaded",
+   "expected": "Net due = paid AR + WTAX - commission - VAT on commission; commission OR issued; the invoice Paid and Fully Remitted",
+   "status": "pass",
+   "amounts": [
+    {
+     "name": "Paid AR",
+     "expected": 14315.88,
+     "observed": 14315.88,
+     "ok": true
+    },
+    {
+     "name": "Commission realised",
+     "expected": 2812.5,
+     "observed": 2812.5,
+     "ok": true
+    },
+    {
+     "name": "VAT on commission",
+     "expected": 337.5,
+     "observed": 337.5,
+     "ok": true
+    },
+    {
+     "name": "Withholding tax",
+     "expected": 281.25,
+     "observed": 281.25,
+     "ok": true
+    },
+    {
+     "name": "Net due to the insurer",
+     "expected": 11447.13,
+     "observed": 11447.13,
+     "ok": true
+    },
+    {
+     "name": "Commission OR: commission",
+     "expected": 2812.5,
+     "observed": 2812.5,
+     "ok": true
+    },
+    {
+     "name": "Commission OR: VAT",
+     "expected": 337.5,
+     "observed": 337.5,
+     "ok": true
+    },
+    {
+     "name": "Commission OR: withholding tax",
+     "expected": 281.25,
+     "observed": 281.25,
+     "ok": true
+    },
+    {
+     "name": "Commission OR: amount = commission + VAT - withholding tax",
+     "expected": 2868.75,
+     "observed": 2868.75,
+     "ok": true
+    }
+   ],
+   "observed": "Batch RMB-INS-MGIC-2026-000004 OR_RECEIVED; commission OR OR-HO-100005",
+   "url": "/operations/invoices/BI-HO-2026-000012",
+   "text": "Components & Balances\nMovements\nInvoice Family\nPolicy Transactions\nReceipts (1)\nRemittances (2)\nAdjustments\nReconciliation\nCommission\nHistory\nDocuments\nRemittances and Holds\nRemittances and Holds\nRecord\tReference\tDate\tAmount\tStatus\tDescription\nRemittance Batch\tRMB-INS-MGIC-2026-000004\t09-Oct-2026\t14,315.88\t\nOR Received\n\tWith Incentives - insurer OR MGIC-OR-2026-900101 - DV-2026-900101\nExtraction Tag\tRMB-INS-MGIC-2026-000004\t09-Oct-2026\t14,315.88\t\nExtracted\n\tCurrent extraction tag\n----\n"
+  },
+  {
+   "no": "C09",
+   "area": "Commission recognition and reconciliation",
+   "persona": "Commission Receivables",
+   "action": "Commission receivable of the invoice after the remittance",
+   "expected": "Commission, VAT on commission and withholding tax realised in full (balances 0); the amount due to the insurer settled",
+   "status": "pass",
+   "amounts": [
+    {
+     "name": "Commission balance",
+     "expected": 0,
+     "observed": 0,
+     "ok": true
+    },
+    {
+     "name": "VAT on commission balance",
+     "expected": 0,
+     "observed": 0,
+     "ok": true
+    },
+    {
+     "name": "Withholding tax balance",
+     "expected": 0,
+     "observed": 0,
+     "ok": true
+    },
+    {
+     "name": "DTIP balance (due to the insurer)",
+     "expected": 0,
+     "observed": 0,
+     "ok": true
+    }
+   ],
+   "observed": "Commission realised in full; 0 line(s) on the production reconciliation register so far (it is filled by the next reconciliation cycle of the insurer)"
+  },
+  {
+   "no": "C10",
+   "area": "Accounting entries and BIR outputs",
+   "persona": "GL Officer, Tax",
+   "action": "Journals of the booking, the receipt and application, the remittance and the commission OR",
+   "expected": "Every journal of the account balances (booking, receipt, remittance and commission OR)",
+   "status": "pass",
+   "amounts": [],
+   "observed": "PRM-HO-2026-000070 PREMIUM 17465.88; RCT-HO-2026-000104 RECEIPT 17465.88; PAY-HO-2026-000155 PAYMENT 14597.13; VAT sales list of the month: 0 customer row(s) (the list reads the VAT worksheet of the month, generated by Tax at month end)"
+  },
+  {
+   "no": "C11",
+   "area": "Claims advocacy",
+   "persona": "Claims Officer, Claims Team Lead",
+   "action": "Notice of loss recorded on the policy; premium check; insurer claim number; settlement set",
+   "expected": "Claim number; premium PAID enables the authorization code; the insurer claim number recorded; settled claim",
+   "status": "pass",
+   "amounts": [],
+   "observed": "Claim BCL-2026-000008; premium check: PAID"
+  },
+  {
+   "no": "C12",
+   "area": "Customer servicing",
+   "persona": "Contact Center Agent",
+   "action": "Searches the client and opens the servicing view",
+   "expected": "The client with the booked account and its payment",
+   "status": "pass",
+   "amounts": [],
+   "observed": "Client CL-2026-000103 found",
+   "url": "/csf?key=NAME&q=CL-2026-000103",
+   "text": "Customer Service Facility\nCustomer Search\n\nFind the client of a caller by name, client ID, account, PN or application number.\n\nSearch By\nName\nClient ID\nAccount No.\nPN No.\nApplication No.\nValue\nSearch\nNo client found for Name: CL-2026-000103\n----\n"
+  },
+  {
+   "no": "C13",
+   "area": "Endorsement, cancellation and adjustment",
+   "persona": "Marketing Collection, Adjustment, Adjustment TL, Cashier",
+   "action": "Flat cancellation requested, validated, approved and posted; the payment re-applied; the excess refunded",
+   "expected": "Return invoice for the full premium; AR insurer for the premium remitted; unapplied payment refunded with approval to Disbursement",
+   "status": "pass",
+   "amounts": [
+    {
+     "name": "Return premium = - gross premium",
+     "expected": -14315.88,
+     "observed": -14315.88,
+     "ok": true
+    }
+   ],
+   "observed": "Return invoice BI-HO-2026-000013; account CANCELLED",
+   "url": "/cashiering/unapplied/15",
+   "text": "Cashiering\nUnapplied Payment UNP-2026-000010\n\nAn unapplied payment and its disposition.\n\nVillareal, Rosalind Cruz\nUNP-2026-000010\nCompleted\nReleased by Adjustment for Re-application\nAmount\n14,315.88\nBalance\n0.00\nPayor\nVillareal, Rosalind Cruz\nMarketing Unit\nCBG Metro Team 1\nSource\nCashiering · ENR-2026-000008 · BI-HO-2026-000012\nReceived\n09-Oct-2026\nUnapplied\n(completed)\nMonitoring\n(completed)\nFor Approval\n(completed)\nIn Process\n(completed)\n5\nCompleted\n(current stage)\n6\nFor Reversal\n(not started)\n7\nClosed\n(not started)\nCurrent Stage\nCompleted\nSince\n09-Oct-2026 15:41\nDue\n—\nAssigned To\n—\nMark for Reversal\nClose\nStage\tFrom Stage\tAction\tBy\tDate and Time\n\tRemarks\tDuration in Stage\n\nCompleted\n\tIn Process\tComplete\t\nSystem\nAutomatic step\n\t09-Oct-2026 15:41\t—\t0 min\n\nIn Process\n\tFor Approval\tApprove\t\nCecilia Cashiering Lead\nCashiering Team Leader / Head\n\t09-Oct-2026 15:41\t—\t0 min\n\nFor Approval\n\tMonitoring\tSubmit\t\nCarmela Cashier\n\t09-Oct-2026 15:40\t—\t0 min\n\nMonitoring\n\tUnapplied\tAssign Disposition\t\nCarmela Cashier\n\t09-Oct-2026 15:40\tRefund\t0 min\n\nUnapplied\n\t—\tStart\t\nAdrian Adjustment\n\t09-Oct-2026 15:40\t—\t0 min\nDisposition History\nDisposition history\nDisposition\tAmount\tTarget\tRequested\tApproved\tDocument\tStatus\nRefund to Payor\t14,315.88\tVillareal, Rosalind Cruz\t\nCarmela Cashier\n09-Oct-2026 15:40\n\t\nCecilia Cashiering Lead\n09-Oct-2026 15:41\n\tDSQ-2026-000007\t\nCompleted\n----\nDisposition updated"
+  },
+  {
+   "no": "C14",
+   "area": "Month-end reports",
+   "persona": "Processing TL, Remittance TL, GL Officer",
+   "action": "Production, remittance and cash reports of the month",
+   "expected": "The account in the production and remittance reports of the month",
+   "status": "pass",
+   "amounts": [],
+   "observed": "NB-PRODUCTION: 3 rows; REM-REMITTED-BATCH: 4 rows, the account included; CSH-DAILY-CASH-REC: 5 rows; TAX-SLS: 0 rows"
+  }
+ ]
+}

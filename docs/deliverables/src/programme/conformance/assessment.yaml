@@ -1,0 +1,844 @@
+# Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
+# evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
+# fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
+version: "1.7"
+date: 17 October 2026
+scope: >-
+  Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
+  script, the walkthroughs of the sign-off packs performed live by their personas, one client taken through the whole
+  broking cycle, the sidebar of every persona of the FRS persona tables, and the automated checks of the release
+  mapped to the 744 requirements and 1,772 acceptance criteria of the FRSs. Version 1.1 (16-Oct-2026): the walkthrough
+  script and the walkthroughs of the sign-off packs run again on a fresh SIT/UAT environment after the fixes since version 1.0
+  (gaps G03, G07, G10, G12 and G13 closed); BRD-02, BRD-03, BRD-06 and BRD-11 measured against the requirements of
+  their re-baselined BDOI-template FRS (v3.4, v1.4, v1.3 and v1.6; BRD-11 on the UIDM-ISC and Entra ID model), the
+  other BRDs against their FRS as before. Version 1.2 (16-Oct-2026): the walkthroughs of BRD-01, BRD-04 and BRD-11 and
+  journey step J1.1 run again on a fresh SIT/UAT environment with the updated recipes (KYC checklist, statement of
+  account by the Operations billing user, BRD-11 walkthroughs and J1.1 rewritten on the UIDM-ISC and Entra ID model
+  of FRS v1.6); gaps G14, G15 and G16 closed; the other results are carried over from version 1.1. Version 1.3
+  (16-Oct-2026): gaps G04 (report scheduling and subscriptions), G05 (master data change log), G08 (full
+  insurer page) and G09 (daily service-invoice batch per insurer) closed on the automated checks of the release; the
+  walkthrough and persona results are carried over from version 1.2. Version 1.4 (17-Oct-2026): case management of
+  the Customer Service Facility delivered (gap G01 closed); the 23 BRD-9 steps of the walkthrough script run again on
+  a fresh SIT/UAT environment (P2.1 to P2.12 now pass); the remaining parts of G04, G05, G08 and G09 delivered (run
+  time of day, last working day and relative periods of the report subscriptions; programme-wide Master Data Change
+  Log with export and the data scope of the change history; the insurer's ledger accounts; supplementary batches,
+  merged PDF and manifest of the service invoices); the other results are carried over from version 1.3. Version 1.5
+  (17-Oct-2026): the walkthrough-script steps of BRD-00, BRD-08, BRD-12 and BRD-13 run again on a fresh SIT/UAT
+  environment after the fixes of 17-Oct-2026: gap G11 closed (New Policy and Edit of Submitted Policies), gap G06 closed
+  (Layout panel of the report runner and the MIS fields catalogue), recipes of BRD-00 J1.3, BRD-08 P1.3, P3.1, P3.3
+  and BRD-13 FR-DM-125.1 and .2 corrected; the data scope of records addressed by id checked on every screen action; the
+  case routing notice copied to the account officer (BRD-9 FRS v1.2); the other results are carried over from v1.4.
+  Version 1.6 (17-Oct-2026): client decisions of 17-Oct-2026 - the partner portal (G02) and reinsurance (G17) are
+  deferred to Phase 2; their requirements and walkthrough steps are listed with the result Deferred to Phase 2 and left
+  out of the current-phase counts and percentages (the figures of v1.5 below are restated without them). The data
+  scope of records addressed by a text business key is checked; the case routing notice is e-mailed and copied to the
+  unit of the account (BRD-9 FRS v1.2); eleven partly conformant requirements of BRD-07, BRD-09 and BRD-10 are shown in
+  full by automated checks. The walkthrough-script steps of BRD-00, BRD-07, BRD-08, BRD-09, BRD-10, BRD-12 and BRD-13
+  run again on a fresh SIT/UAT environment (152 pass, none fail, 2 deferred); requirement evidence refreshed from the
+  automated checks of the release. The FRS in BDOI's format of Remittance (BRD-02) and Claims (BRD-07), v1.0 of 17-Oct-2026, are listed item
+  by item as not yet assessed and counted apart, so the current-phase figures stay comparable.
+  Version 1.7 (17-Oct-2026): co-insurance is in scope (client decision of 17-Oct-2026; only reinsurance stays in
+  Phase 2): the default co-insurance participation of the insurer delivered (CRQ08, FR-OP-007). The Remittance FRS
+  (BRD-02, v1.0) and the Claims FRS (BRD-07, v1.0) in BDOI's format are assessed item by item and counted: BRD-02 is
+  measured against the Cashiering FRS v3.4 and the Remittance FRS v1.0, BRD-07 against the Claims FRS v1.0. Items
+  delivered in the release of 17-Oct-2026 (extract files, settlement numbering, shared folder copy and Remittance
+  Settings; claim follow-ups, document checklist, motor details, return to the account officer, worklist export and
+  the BDOI heading, presentation and grouping of the claims reports) are shown by automated checks and the new
+  walkthrough steps; the other items take the result of their fit-gap in the FRS (Fit conformant, Partial partly
+  conformant, Gap not conformant, change requests not testable yet until BDOI approves them); the two items specified
+  in another FRS are not counted.
+
+# The FRS whose requirements are counted, per BRD (Summary); BIBS FRS when not listed.
+baselines:
+  BRD-02: BDOI FRS v3.4 + Remittance v1.0
+  BRD-03: BDOI FRS v1.7
+  BRD-06: BDOI FRS v1.3
+  BRD-07: BDOI FRS v1.0
+  BRD-11: BDOI FRS v1.6
+
+# Results of the previous version (Summary, Change since v<previous_version>).
+previous_version: "1.6"
+previous:
+  BRD-00: {frs: 25, ok: 21, partly: 1, nok: 0, nt: 3}
+  BRD-01: {frs: 95, ok: 69, partly: 24, nok: 0, nt: 2}
+  BRD-02: {frs: 28, ok: 16, partly: 12, nok: 0, nt: 0}
+  BRD-03: {frs: 30, ok: 19, partly: 10, nok: 0, nt: 1}
+  BRD-04: {frs: 52, ok: 36, partly: 13, nok: 0, nt: 3}
+  BRD-05: {frs: 119, ok: 66, partly: 52, nok: 0, nt: 1}
+  BRD-06: {frs: 49, ok: 27, partly: 22, nok: 0, nt: 0}
+  BRD-07: {frs: 39, ok: 29, partly: 8, nok: 0, nt: 2}
+  BRD-08: {frs: 31, ok: 15, partly: 12, nok: 0, nt: 4}
+  BRD-09: {frs: 29, ok: 21, partly: 4, nok: 0, nt: 4}
+  BRD-10: {frs: 44, ok: 39, partly: 4, nok: 0, nt: 1}
+  BRD-11: {frs: 12, ok: 4, partly: 8, nok: 0, nt: 0}
+  BRD-12: {frs: 35, ok: 14, partly: 19, nok: 0, nt: 2}
+  BRD-13: {frs: 48, ok: 18, partly: 19, nok: 0, nt: 11}
+  Total: {frs: 636, ok: 394, partly: 208, nok: 0, nt: 34}
+
+# What changed since the previous version, per BRD (Summary).
+changes:
+  BRD-00: Co-insurance back in scope (CRQ08); default co-insurance participation on the insurer used as the default
+    split of an invoice (FR-OP-007). Only reinsurance stays in Phase 2 (G17).
+  BRD-02: Baseline widened to the Remittance FRS v1.0 (15 requirements, 63 items counted); extract files, settlement
+    numbering, shared folder copy and Remittance Settings delivered. Not comparable with v1.6.
+  BRD-03: Co-insurance / Risk Participation tab on the insurer page.
+  BRD-07: Re-baselined to the Claims FRS v1.0 in BDOI's format (24 requirements, 75 items); follow-ups, document
+    checklist, motor details, return to the account officer, worklist export and report heading delivered; the 21
+    change-request items wait for BDOI's approval. Not comparable with v1.6.
+
+# Decisions on requirement items of the BDOI-template FRS (by item or group id): result, reason, evidence.
+bdoi_decisions:
+  # Remittance FRS v1.0 and Claims FRS v1.0: items delivered or shown working in the release of 17-Oct-2026.
+  FRID.RMT.001.03:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: Excel (.xls) and text files per batch"
+  FRID.RMT.001.04:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: file names with date, insurer code, settlement number and type"
+  FRID.RMT.001.05:
+    result: Partly conformant
+    reason: "Copied to the shared folder through the simulator of BDOI's file share; the share itself is confirmed in SIT"
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: shared folder copy, failure alert and resend"
+  FRID.RMT.001.08:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: heading and columns of the current report, Mall Assurance columns"
+  FRID.RMT.001.09:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: header and detail records with control totals"
+  FRID.RMT.002.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: batch lines in the columns of the extract"
+  FRID.RMT.003.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: Remittance Settings under maker-checker; REMITTANCE_SCHEDULE job"
+  FRID.RMT.006.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: settlement number and unique settlement reference per company"
+  FRID.RMT.007.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: extract files and schedule on the batch after submission"
+  FRID.RMT.008.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: insurer OR return read from Excel and text with control totals"
+  FRID.RMT.014.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: Mall Assurance columns on the Normal schedule; remitted batch report"
+  FRID.RMT.014.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the remittance extract files and settings; screenshots SCR-RMT-04 and SCR-RMT-13 of the UX Design v1.1: names follow the convention set on Remittance Settings"
+  FRCLM.001.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: outstanding, due and trend on the handler dashboard"
+  FRCLM.002.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: loss advice preview and claim view for the Marketing unit"
+  FRCLM.002.06:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: team lead and team head on the handler register"
+  FRCLM.003.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: statuses of Annex F with their status type"
+  FRCLM.005.01:
+    result: Partly conformant
+    reason: "The claim types of Annex M are loaded; the codes of the core system are confirmed with BDOI before go-live"
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: claim types of Annex M"
+  FRCLM.006.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: document checklist setup per claim type under maker-checker"
+  FRCLM.006.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: status Complete Documents blocked until the required documents are uploaded"
+  FRCLM.007.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: accredited repair shops (GARAGE) chosen on the motor details"
+  FRCLM.008.02:
+    result: Partly conformant
+    reason: "The common fields of Annex P are captured; the risk-code blocks other than Motor come with CR-CLM-108"
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: motor details on the claim"
+  FRCLM.008.04:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: unpaid or partly paid policy flagged; claims authorization code kept"
+  FRCLM.008.08:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: Formal Loss Advice previewed in PDF before sending"
+  FRCLM.009.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: follow-up count, last follow-up and days since on the worklist"
+  FRCLM.009.04:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: follow-up recorded with the fields of Annex Q"
+  FRCLM.009.08:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: worklist exported to Excel and PDF with its filters and sort"
+  FRCLM.017.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: prone locations by barangay with several location filters"
+  FRCLM.011.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.011.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.012.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.012.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.013.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.013.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.014.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.014.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.015.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.015.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.016.01:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRCLM.016.02:
+    result: Conformant
+    reason: ""
+    evidence: "Automated checks of the claims handling of the Claims FRS; walkthrough steps BRD-07 P1.3, P1.4, P2.1 and P4.1: BDOI heading, filters, detailed or summary presentation and grouping"
+  FRUM.001.01:
+    result: Conformant
+    reason: ""
+    evidence: Automated checks of the single sign-on through the identity provider (OpenID Connect, an unknown or
+      inactive identity refused), run against the identity provider simulator; the connection to the bank's Entra ID
+      is confirmed in SIT.
+  FRUM.002:
+    result: Conformant
+    reason: ""
+    evidence: Automated checks of identity provisioning over SCIM (joiner creates the user without a group profile; a
+      duplicate User ID or Windows ID refused and listed; the user maintenance screens no longer create or change
+      users); the connection to the bank's UIDM-ISC is confirmed in SIT.
+  FRUM.003.01:
+    result: Conformant
+    reason: ""
+    evidence: Automated checks of the SCIM mover and group membership events.
+  FRUM.003.02:
+    result: Conformant
+    reason: ""
+    evidence: Automated checks of the SCIM leaver event (user deactivated, open sessions ended).
+  FRUM.010:
+    result: Conformant
+    reason: ""
+    evidence: >-
+      Walkthrough WT-B of the BRD-11 pack run on 16-Oct-2026 (FRS v1.6 storyboard SB-3): the maker proposes the change
+      of a group profile and cannot decide it, the checker approves with a remark and the System Administrator
+      implements it (steps B.1 to B.3 pass); automated checks of the group-profile maker-checker. The approval of user
+      requests behind FR-UA-030 to FR-UA-034 is withdrawn in FRS v1.6 (users come from UIDM-ISC).
+  FRRN.027:
+    result: Partly conformant
+    reason: The CLPC billing job, its files per product line and the LMS directory are in place; no automated check
+      covers them yet and the file transfer to CLPC and LMS is confirmed in SIT.
+  FRRN.030:
+    result: Conformant
+    reason: ""
+    evidence: Automated checks of renewal placement (upload and matching of the insurer responses); the MFT folder of
+      enrolled insurers is confirmed in SIT.
+  FRRN.032:
+    result: Conformant
+    reason: ""
+    evidence: Automated checks of renewal placement (insurance advices of the selected accounts); the hand-off to CCM
+      is confirmed in SIT.
+  FRRN.033:
+    result: Conformant
+    reason: ""
+    evidence: Automated checks of the renewal e-policies (summary file and documents matched to the accounts, sending);
+      the MFT folder and CCM are confirmed in SIT.
+  FRRN.042:
+    result: Partly conformant
+    reason: The Renewal Annual Budget screen, its checks and upload are in place and the budget feeds the renewal
+      dashboard (automated check); the upload and the history of a budget are not covered by an automated check yet.
+  FRUM.014:
+    result: Conformant
+    reason: ""
+    evidence: >-
+      Automated checks: identity provisioning over SCIM with refused events and alerts, the daily reconciliation
+      with UIDM-ISC and the Identity Sync screen (identity events). The connection to the bank's UIDM-ISC is confirmed in SIT.
+
+# Further automated checks of a requirement that do not name it in their description (cross-BRD requirements).
+extra_checks:
+  FR-CR-001: [PersonaMenusIT, PermissionConsistencyTest, navigation/personaMenus.test.ts]
+  FR-CR-010: [ExecutiveDashboardIT, CollectionsHomeIT]
+  FR-CR-020: [NotificationEventWordingIT, MessagingIT]
+  FR-CR-030: [AuditTrailImmutabilityIT, SessionLogIT]
+  FR-CR-040: [ReportRenderingIT, ReportArchiveIT, ExportOptionsTest]
+  FR-CR-041: [NbReportApiIT, ConfigCatalogueSchemaIT]
+  FR-CR-050: [DocTemplateServiceIT, DocumentWordIT]
+  FR-CR-060: [LovServiceIT]
+  FR-CR-031: [MasterChangeLogIT, MasterChangesTest]
+  FR-CR-043: [ReportSubscriptionIT, ReportSubscriptionScheduleTest]
+  FR-CR-042: [ReportLayoutOptionsTest, ReportLayoutIT]
+  FR-CR-062: [ReportLayoutIT]
+  FR-SP-003: [ManualPolicyIT]
+  FR-CR-061: [CatalogIT, InsurerPageIT]
+  FR-CR-070: [UserAdminApiIT, LoginProtectionTest, SignInTokensIT]
+  FR-CR-071: [DocumentProtectorTest]
+  FR-CR-080: [WorkflowServiceIT]
+  FR-CR-081: [ServiceInvoiceIT, SiBatchIT]
+  FR-CR-083: [BulkServiceIT, BulkExtensionsIT, AdvisoryJobLockIT]
+  FR-CR-090: [InvoiceLedgerIT]
+  FR-CR-091: [CurrencyAndDimensionApiIT]
+  FR-CR-093: [ServiceInvoiceIT, BookingServiceIT]
+
+# Requirements shown by the persona access check (every persona signs in and sees the menu of the FRS; a screen
+# outside it opened by its address is refused).
+persona_frs: [FR-CR-001, FR-CR-070, FR-NB-130, FR-OP-001, FR-OP-002, FR-PM-001, FR-AC-001, FR-DS-001, FR-CM-001,
+  FR-CM-002, FR-EB-001, FR-SS-001, FR-UA-001, FR-RN-001]
+
+# The requirements each step of the broking cycle shows.
+cycle_frs:
+  C01: [FR-NB-034]
+  C02: [FR-NB-041, FR-NB-043, FR-NB-044, FR-NB-047]
+  C03: [FR-NB-080, FR-NB-081, FR-NB-092, FR-NB-110]
+  C04: [FR-NB-110]
+  C05: [FR-CL-017]
+  C06: [FR-OP-019]
+  C07: [FR-CL-017]
+  C08: [FR-OP-030, FR-OP-031, FR-OP-034, FR-OP-035, FR-OP-021]
+  C09: [FR-OP-021]
+  C11: [FR-CM-011, FR-CM-016]
+  C12: [FR-CSF-010]
+  C13: [FR-OP-050, FR-OP-057]
+  C14: [FR-NB-122, FR-OP-041]
+
+# Steps of the broking cycle not run on the account of the scenario, with how they are covered.
+cycle_notes:
+  - step: C15
+    area: Renewal
+    action: Renewal of the policy of the scenario
+    observed: >-
+      Not run on the account of the scenario: its policy expires in one year and enters the expiry list 120 days
+      before. Renewal is shown on the expiring accounts of the SIT/UAT data by the BRD-6 walkthroughs (see
+      Walkthrough results, BRD-06).
+    result: Blocked
+  - step: C16
+    area: Employee Benefits
+    action: Employee benefits programme of a corporate client
+    observed: >-
+      Employee Benefits runs on its own programmes, not on a retail policy; it is shown on the programmes of the
+      SIT/UAT data by the BRD-8 steps of the walkthrough script (see Walkthrough results, BRD-08).
+    result: Blocked
+
+# Requirements whose result is decided by the review (result and reason).
+requirements:
+  FR-CL-091:
+    result: Not testable yet
+    reason: Draft requirement waiting for BDOI's confirmation (CQ01); separate incentive receivables follow it.
+  FR-CL-093:
+    result: Not testable yet
+    reason: Draft requirement waiting for BDOI's confirmation (CQ01) and the archiving criteria (CQ26).
+  FR-CL-094:
+    result: Not testable yet
+    reason: Draft requirement waiting for BDOI's confirmation (CQ01) and how a partial direct payment is evidenced (CQ19).
+  FR-DM-126:
+    result: Not testable yet
+    reason: Proposed position, waiting for BDOI's decision on the renewals in progress at the freeze.
+  FR-DM-130:
+    result: Not testable yet
+    reason: Carried out only on BDOI's confirmation that open legacy claims are migrated.
+  FR-DM-131:
+    result: Not testable yet
+    reason: Carried out only on BDOI's confirmation that the e-policies are linked to the migrated accounts.
+  FR-CR-082:
+    result: Not testable yet
+    reason: The coexistence feed of legacy client batches waits for BDOI's decision on coexistence (CRQ19); migrated
+      clients load through the bulk client upload with the duplicate check.
+
+# What the platform lacks for the steps of an open gap (step_checks.yaml, gap).
+step_gaps: {}
+
+# Walkthrough steps checked by hand after the run: "BRD step" -> result, observed, evidence.
+step_notes:
+  BRD-00 J1.3:
+    evidence: Screens opened by the persona's sign-in and checked for the step's actions; the recipe looked for the
+      Commission rates section on the first tab of the insurer page, which since the full insurer page (G08) sits on
+      the Branches & Commissions tab. Recipe corrected in v1.5.
+  BRD-08 P1.3:
+    evidence: Screens opened by the Marketing AO's sign-in and checked for the step's actions; in Drop 2 the AO
+      uploads the master list and utilization report received from the client HR user by e-mail and records the
+      feedback (FRS BRD-8 assumption A-EB-06; the portal is outside Drop 2, gap G02). Recipe corrected in v1.5.
+  BRD-08 P3.1:
+    evidence: Screens opened by the Marketing AO's sign-in and checked for the step's actions; in Drop 2 the AO records
+      the proposal received from the insurer by e-mail (Record Proposal) and validates it (FRS BRD-8 assumption
+      A-EB-06; the portal is outside Drop 2, gap G02). Recipe corrected in v1.5.
+  BRD-08 P3.3:
+    evidence: Screens opened by the Marketing AO's sign-in and checked for the step's actions; in Drop 2 the AO records
+      the client's decision received by e-mail (Record Confirmation) (FRS BRD-8 assumption A-EB-06; the portal is
+      outside Drop 2, gap G02). Recipe corrected in v1.5.
+  BRD-13 FR-DM-125.1:
+    evidence: Screens opened by the persona's sign-in and checked for the step's actions; the maker takes the load
+      template of layout P03 from Layouts and compiles it from the Excel trackers outside BIBS, as FR-DM-125 lays
+      down (the trackers are not migrated, DMQ38). Recipe corrected in v1.5 (was Blocked).
+  BRD-13 FR-DM-125.2:
+    evidence: Screens opened by the persona's sign-in and checked for the step's actions; the checker reads the
+      columns and rules of layout P03 and compares the file with the trackers outside BIBS before releasing it to the
+      Migration Operator, as FR-DM-125 lays down. Recipe corrected in v1.5 (was Blocked).
+
+fixes:
+  - id: F01
+    brd: BRD-00
+    area: Configuration promotion
+    found: >-
+      The standard report variants (the saved report settings offered to every user) did not move with the
+      configuration from one environment to the next; only users' own variants should stay behind.
+    fix: >-
+      The standard variants are now part of the configuration promoted from SIT to UAT and production, with the
+      same comparison and approval as the other configuration; users' own variants stay in their environment.
+    check: Automated check that the standard variants move with the configuration and the users' variants stay behind
+  - id: F02
+    brd: BRD-05
+    area: Tax set-up
+    found: Party tax profiles (TX-01) and tax forms (TX-02) could only be entered one by one on their screens.
+    fix: >-
+      Upload of both from the screen: template with the layout of the BDOI input tabs, preview with the rules of the
+      screen, approval by a second user, and export of the current values.
+    check: Automated checks of the uploads of the configuration screens
+  - id: F03
+    brd: BRD-05
+    area: Currencies and exchange rates
+    found: Currencies (MD-02) and exchange rates (MD-03) could only be entered one by one.
+    fix: >-
+      Upload of both from the Currency Rates screen with the same template, preview, approval and export; the base
+      currency and a currency of an active bank account cannot be deactivated; the export of rates covers the last
+      90 days.
+    check: Automated checks of the uploads of the configuration screens
+  - id: F04
+    brd: BRD-00
+    area: SIT/UAT data
+    found: 64 standard reports returned no row on a fresh SIT/UAT environment, so UAT could not check them.
+    fix: >-
+      SIT/UAT data added in line with the seed story (Cebu branch receipts, cancellations, minimal balances,
+      disbursements and end-of-day runs, remittance batches, commission certificates, employee benefits invoices,
+      submitted policies, screening cases, LAMD results, migration batches, headcount, payment requests, PDCs,
+      completed collections, a claims follow-up due today, the GL to sub-ledger reconciliation of the day): 50 of
+      the 64 reports now return rows; the other 14 are listed as gap G03.
+    check: Each of the 64 reports run on a fresh SIT/UAT environment
+
+  - id: F05
+    brd: BRD-03
+    area: Product lines and accounting
+    found: >-
+      A product line added in the catalog had no business line for the accounting entries, so a payment applied
+      to an account of the line was refused (seen on the Employee Benefits lines HMO, GLI and GPA).
+    fix: >-
+      A new product line gets its business line in every company when it is created; the business lines of the
+      Employee Benefits lines are added to the SIT/UAT data.
+    check: Automated check that a new product line has its business line for the accounting entries
+  - id: F06
+    brd: BRD-00
+    area: SIT/UAT data
+    found: >-
+      Records added to the SIT/UAT data for the reports took numbers that the platform would also issue later
+      (for example DV-2026-000901), the Employee Benefits accounts had no sales unit and an opening-balance
+      adjustment of FY2027 was recorded before the cut-off.
+    fix: >-
+      The records are numbered in the block kept for the SIT/UAT data of each series (900901 and up), the
+      Employee Benefits accounts belong to their corporate sales unit, and the adjustment is removed (the
+      reconciliation of the trial load stays).
+    check: The automated checks of the SIT/UAT data and of the numbering of booked invoices
+
+gaps:
+  - id: G01
+    brd: BRD-09
+    frs: [FR-CSF-050, FR-CSF-051, FR-CSF-052, FR-CSF-053, FR-CSF-054, FR-CSF-055, FR-CSF-056, FR-CSF-057, FR-CSF-058,
+          FR-CSF-059, FR-CSF-060, FR-CSF-061]
+    gap: Case management of the Customer Service Facility is not on the platform yet (logging, categories and turnaround, statuses,
+      notes, documents, routing to the fulfilment units, ageing and SLA, follow-up cases, dashboard).
+    impact: Storyboard P2 of BRD-9 (12 steps of the walkthrough script) cannot be run; customer requests are tracked
+      outside BIBS.
+    proposal: >-
+      Add the case module on the existing workflow, documents and notification services: case types with their
+      turnaround times and routing table (lists of values), the case record with notes, documents and history, the
+      team and fulfilment unit queues with reassign, escalate, resolve and return, SLA ageing with reminders, linked
+      follow-up cases, the case dashboard and the case reports; log a case from the Servicing View.
+    size: Large
+    status: Closed
+    closed: >-
+      Delivered in the release of 17-Oct-2026: Log Case on the Servicing View and on the Cases list (caller who is not a
+      client), with the Case ID, the due date from the turnaround time of the case type in working days and the
+      duplicate rule; routing to the fulfilment unit proposed by the routing table; the queues My Cases, Returned to
+      Me, CSR Action Required, Team Queue, Fulfilment Unit Queue, All Open and Closed; Resolve and Close, Return to
+      Agent, Request CSR Action, Re-endorse and Close by the agent; Reassign, Escalate and Change Category by the
+      supervisor; append-only notes, documents linked to the case and the client, linked follow-up cases and the case
+      history on the audit trail; the CSF_CASE_SLA check every 15 minutes with the approaching-breach and breach
+      notices and automatic escalation; the Case Dashboard and the reports Case Register, Case Ageing and SLA and Case
+      Summary; Case Routing (turnaround times, routing table, fulfilment unit members) on Broking Setup. The automated
+      checks of case management pass and steps P2.1 to P2.12 of the walkthrough script pass on a fresh SIT/UAT
+      environment. Open: the complete lists of values of the addendum (natures of transaction, product types, market
+      segments, fulfilment units) to be loaded from the list of Contact Center Management (CSQ19); the copy of the
+      routing notice to the account officer of the account.
+  - id: G02
+    brd: BRD-08
+    frs: [FR-EB-010, FR-EB-011, FR-EB-012, FR-EB-013, FR-EB-014, FR-EB-015, FR-EB-045, FR-EB-056]
+    result: Not testable yet
+    gap: The insurer and client HR portal is outside Drop 2 (Employee Benefits without the portal feature).
+    decision: Partner portal deferred to Phase 2 by the client decision of 17-Oct-2026; not counted in the current
+      phase
+    impact: Insurers and client HR send proposals, confirmations, member changes and billing by e-mail; the EB officer
+      records them in BIBS (FRS BRD-8 v1.2, assumption A-EB-06). Steps P1.2 and P1.4 of the walkthrough script are
+      deferred with the portal.
+    proposal: >-
+      Deliver the portal in Phase 2: external users provisioned through User Access requests, the task inbox and
+      structured proposal form for insurers, the client HR pages, and the staging and review of portal uploads. Its
+      hosting, sign-in, one-time code and user administration (EBQ13, closed for the current phase) and the UIDM-ISC
+      provisioning of external users are taken up again when Phase 2 is planned.
+    size: Large
+    status: Deferred to Phase 2
+    closed: >-
+      Client decision of 17-Oct-2026: the partner portal is deferred to Phase 2. Its eight requirements and the two
+      walkthrough steps are listed with the result Deferred to Phase 2 and left out of the current-phase counts. No
+      portal function exists on the platform; the portal permissions are not granted to any BDOI group profile (the
+      automated check of the Phase 2 functions passes). FRS BRD-8 v1.2 records the decision (scope, EBQ13 closed,
+      assumption A-EB-06).
+  - id: G03
+    brd: BRD-00
+    frs_text: "Reports BCL-OUTSTANDING-PAST-DUE, EB-PLACEMENT, RNW-RA-DISPATCH, ADJ-VALIDATION-LIST, ADJ-MINBAL-FILE,
+      FIN-AR-SOO-FC, FIN-BRS-PAYNOTIFY, FIN-GL-ALLOCJV, PRC-LEGACY-CHANGES, TAX-MAP, TAX-QAP, TAX-SLS,
+      MIG-TRUEUP-REGISTER, MIG-TRUEUP-RECON"
+    gap: 14 standard reports still return no row on a fresh SIT/UAT environment until the walkthroughs have created
+      their records.
+    impact: UAT checks these reports after the walkthrough steps that create their records (or on a later day for the
+      past-due claims), not on day one.
+    proposal: >-
+      Add the records through the business services of the SIT/UAT data loader (posted adjustments with an
+      accounting entry, a minimal-balance invoice between PHP 10 and 100, foreign-currency receivables, bank
+      payment notifications, allocation journals, legacy invoice changes, withholding and VAT postings for the
+      tax returns, renewal advices dispatched, an EB placement with its confirmation, and a claim reported 90 days
+      before the seed date); the two reports of the opening-balance adjustments fill after the FY2027 cut-off.
+    size: Medium
+    status: Closed
+    closed: >-
+      Re-measured on the fresh SIT/UAT environment of 16-Oct-2026 through the report service with the standard
+      variant: BCL-OUTSTANDING-PAST-DUE 1 row, EB-PLACEMENT 2, RNW-RA-DISPATCH 1, ADJ-VALIDATION-LIST 5, ADJ-MINBAL-FILE
+      1, FIN-AR-SOO-FC 9, FIN-BRS-PAYNOTIFY 1, FIN-GL-ALLOCJV 1, PRC-LEGACY-CHANGES 5, TAX-MAP 1, TAX-QAP 1; the automated
+      check of the standard reports on the SIT/UAT data passes. Exceptions, accepted: TAX-SLS (0 rows: the broker's sales are entered on the
+      VAT return and not read from a source document, so the worksheet has no line to list) and MIG-TRUEUP-REGISTER and
+      MIG-TRUEUP-RECON (0 rows: they fill only after the FY2027 cut-off of the opening-balance true-up).
+  - id: G04
+    brd: BRD-00
+    frs: [FR-CR-043]
+    gap: Reports cannot be scheduled or subscribed to; they are run on demand and saved in the report archive.
+    impact: Recurring reports (daily, weekly, month-end) are run by hand by their users.
+    proposal: >-
+      Add Schedule on the report runner for a saved variant (daily, weekly on chosen days, monthly on a chosen day or
+      the last working day, time in Philippine time, formats, BIBS users and allowed e-mail recipients) and My
+      Subscriptions under Reports; a scheduled job runs the variant with the owner's access, stores the file in the
+      report archive and e-mails it, password protected when the report is confidential.
+    size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 16-Oct-2026: Subscribe on the report screen (parameters of the screen, daily, weekly on a
+      day or monthly on a day with the last day of a shorter month, file format, e-mail recipients) and My Report
+      Subscriptions under Reports with the runs of each subscription and Stop. The REPORT_SUBSCRIPTIONS job runs the
+      subscriptions due on the business date as their subscriber, checks the export permission and the data scope of
+      the parameters at run time (a refused run is recorded as denied), archives the file in the report archive and
+      e-mails it; one run per subscription and date. The automated checks of the
+      subscriptions pass. Delivered in the release of 17-Oct-2026: the time of day of a run (the job checks every hour),
+      the last working day of the month on the holiday calendar of the company of the report, and relative periods of
+      the date parameters (previous day, month to date, previous month, quarter to date, previous quarter, year to
+      date, previous year). Open: the password protection of confidential reports.
+  - id: G05
+    brd: BRD-00
+    frs: [FR-CR-031]
+    gap: There is no master data change log with the old and new value of each changed field; the audit trail
+      records the action and the access change log covers users and roles only.
+    impact: A reviewer cannot see field by field what changed on a product, insurer, commission rate, list of values,
+      account of the chart, payee or parameter.
+    proposal: >-
+      Record each approved change of the registered master data field by field (old value, new value, maker,
+      approver, time, approval reference) through the common maker-checker of the set-up screens, and add the
+      Master Data Change Log screen under Setup & Administration with filters by data, record, user and date and an
+      export.
+    size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 16-Oct-2026: every insert and update of a maker-checker master record (products, insurers
+      and their branches, contacts, bank accounts and commission rates, rates, coverages, clauses, rules, lists of
+      values, parties and the other authorizable masters) and of a client writes one row per changed field (field,
+      old value, new value, maker, time) in the same transaction; the authorization adds the checker and its time.
+      The history is shown in a Change History tab on the insurer, product and client records and read by the
+      Auditor (AUDIT_VIEW, MASTER_VIEW). The automated checks of the change log pass. Delivered in the release of
+      17-Oct-2026: the programme-wide Master Data Change Log screen under Administration with filters by record type,
+      date range, maker and checker and the export to Excel, both limited to the records of the reader's data scope;
+      the history of a record owned by a company outside the reader's data scope answers as not found.
+  - id: G06
+    brd: BRD-00
+    frs: [FR-CR-042, FR-CR-062]
+    gap: The report runner offers the choice and order of columns and the filters, but no grouping, subtotals or
+      chart, and there is no catalogue of MIS fields.
+    impact: Users regroup and chart report exports in Excel.
+    proposal: >-
+      Add the MIS Fields set-up screen (business label, data type, list of values per core entity, delivered with
+      the fields of BR-173 and the MIS columns of the Report List) and a Layout panel on the report runner (one or two
+      grouping fields, subtotals and counts, one bar or line chart) saved with the variant and applied to the screen,
+      Excel and PDF.
+    size: Large
+    status: Closed
+    closed: >-
+      Delivered in the release of 17-Oct-2026: the report runner has a Layout panel after a run (one or two grouping fields, MIS fields
+      first with their catalogue label, subtotals and the number of records per group, one bar or line chart of a
+      totalled amount or the count drawn in the PDF and on a Chart sheet of the Excel file), saved with the variant
+      and applied to the exports and subscriptions; reports with a prescribed layout offer none. MIS Fields under
+      Broking Setup (maker-checker, one field per data element, delivered with the fields of BR-173 and the MIS
+      columns of the Report List, changes in the Master Data Change Log). The automated checks of the report
+      layout, the MIS fields and their screens pass.
+  - id: G07
+    brd: BRD-00
+    frs: [FR-CR-010]
+    result: Partly conformant
+    gap: The role home pages and their widgets are in place, but the System Administrator cannot maintain the widgets
+      of a role (Role Home Set-up).
+    impact: A change of the widgets of a role needs a release.
+    proposal: Add Role Home Set-up under Setup & Administration to choose and order the widgets of each role, with
+      approval.
+    size: Small
+    status: Closed
+    closed: >-
+      Role Home Set-up under Setup & Administration: the System Administrator chooses and orders the widgets of each
+      role with approval; the home page reads them. The automated checks of Role Home Set-up
+      and of the home widgets pass.
+  - id: G08
+    brd: BRD-00
+    frs: [FR-CR-061]
+    result: Partly conformant
+    gap: The insurer page shows the profile, the branches with their LGT rates and the commission rates; the
+      contacts, the payment terms and remittance schedule per remittance type, the risk participation (CRQ08) and the
+      read-only views of the products and packages and of the GL and sub-ledger accounts are not on it.
+    impact: The insurer's contacts and payment terms are kept outside BIBS.
+    proposal: Add the Contacts, Payment Terms and Remittance, Products and Packages and Accounts sections to the
+      insurer page with the catalog maker-checker; add Risk Participation when BDOI confirms CRQ08.
+    size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 16-Oct-2026: the insurer page has the tabs Details, Contacts, Payment & Remittance (payment
+      terms, remittance cycle, mode, advice e-mail and currency), Bank Accounts, Products (package versions and
+      commission rates naming the insurer), Branches & Commissions and Change History; contacts and bank accounts are
+      maker-checker masters authorized from the approval inbox, and a change of the remittance details sends the
+      insurer back for authorization. The automated checks of the insurer page pass. Delivered in the release of
+      17-Oct-2026: the read-only Ledger Accounts tab with the general ledger accounts posted for the insurer and its
+      sub-ledger open items. Delivered in the release of 17-Oct-2026 (client decision of 17-Oct-2026: co-insurance is in scope, only
+      reinsurance is deferred): the Co-insurance / Risk Participation tab (CRQ08) with the participating insurers,
+      share %, lead insurer flag and effective dates under maker-checker and the change log; shares of one period
+      cannot exceed 100 %, and the authorized shares in force, when they total 100 %, are the default co-insurance
+      split of an invoice booked without one (FR-OP-007). The automated checks of the co-insurance participation
+      pass.
+  - id: G09
+    brd: BRD-00
+    frs: [FR-CR-081]
+    gap: Service invoices are e-mailed to the insurer one by one; there is no daily batch per insurer with its
+      delivery report.
+    impact: Insurers receive many e-mails a day instead of one batch.
+    proposal: >-
+      Add the daily job (after booking closes, 20:00 by default) that makes one batch of the day's service invoices
+      per insurer (merged PDF or ZIP with a manifest), stores it, sends it through the insurer's channel (e-mail;
+      file transfer when BDOI supplies the addresses, CRQ18) and lists each batch in a delivery report.
+    size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 16-Oct-2026: the SI_DAILY_BATCH job (21:30 Philippine time by default) makes one batch per
+      company, insurer and date of the service invoices issued that day, unique so that a rerun leaves the existing
+      batches unchanged, and e-mails it to the insurer's billing address with each service invoice attached and the
+      list in the body. Service Invoice Batches under Booking lists the batches with totals and delivery status
+      (generated, sent, failed with the reason, retried) and sends a failed batch again. The automated checks of the batches pass.
+      Delivered in the release of 17-Oct-2026: a service invoice issued after the day's batch goes into the next run or
+      into a supplementary batch run from the batch screen; each batch is e-mailed as one PDF with a manifest, both
+      downloadable. Open: the file-transfer channel (CRQ18).
+  - id: G10
+    brd: BRD-00
+    frs: [FR-CR-090]
+    result: Partly conformant
+    gap: The invoice ledger of Operations does not yet show the cover number, version number, Marketing and Processing
+      assignees, placement status, approval dates and cancellation status of the Invoice Master List.
+    impact: Users open the account to see these values.
+    proposal: Add the columns to the invoice ledger (hidden by default, chosen with Columns) and a link to the audit
+      trail of the invoice.
+    size: Small
+    status: Closed
+    closed: >-
+      The invoice ledger shows the cover number, version, Marketing and Processing assignees, placement status,
+      approval dates and cancellation status (hidden by default, chosen with Columns) and links to the audit trail of
+      the invoice. The automated checks of the invoice ledger, its
+      columns and the audit trail link pass.
+  - id: G11
+    brd: BRD-12
+    frs: [FR-SP-003]
+    result: Partly conformant
+    gap: A policy cannot be created or edited by hand on the screens; the Masterlist has no New Policy and the policy
+      record no Edit, although the platform accepts and checks such records. The renewal tag can be set by hand.
+    impact: Step P1.2 of the walkthrough script cannot be done; a Non-CBG Corporate policy outside the bank files is
+      kept outside BIBS until it is loaded by upload.
+    proposal: Add New Policy on the Masterlist and Edit on the policy record (segment, business type, loan, assured,
+      terms, risk, marks and tracking), with the validations of the upload and the history of the changed fields.
+    size: Medium
+    status: Closed
+    closed: >-
+      Delivered in the release of 17-Oct-2026: New Policy on the Masterlist and Edit on the policy record (segment, business type,
+      loan, assured, terms, risk and marks), saved VALIDATED with the checks of the MANUAL source and the history of
+      the changed fields (automated check of the manual policy); step P1.2 of the walkthrough script passes on a fresh SIT/UAT environment.
+  - id: G12
+    brd: BRD-12
+    frs: [FR-SP-082]
+    result: Partly conformant
+    gap: Submitted Policies Setup has no Notification Recipients; the events notify the assigned handler only.
+    impact: Step P4.4 of the walkthrough script cannot be done; the bank counterpart and named users are informed
+      by e-mail outside BIBS.
+    proposal: Add the Notification Recipients tab (per event type and segment - roles, named users, the assigned
+      handler or AO, outside e-mail addresses of the bank counterpart) with approval, read by the notification of each
+      lifecycle event.
+    size: Small
+    status: Closed
+    closed: >-
+      Submitted Policies Setup has the Notification Recipients tab (per event type and segment: roles, named users,
+      assigned handler or AO, outside e-mail addresses) with approval, read by the lifecycle notices. The automated checks
+      of Submitted Policies and its screens pass; step P4.4 of the walkthrough script run again.
+  - id: G13
+    brd: BRD-07
+    frs_text: FR-CM-055 (claims worklist, reassignment)
+    gap: When a Team Lead reassigns claims, the handler who receives them gets no notice in the bell in the
+      automated check of the claims worklist.
+    impact: A handler may not notice claims reassigned to him until he opens his worklist, which lists them.
+    proposal: Confirm the in-app notice of the event Claim assigned for the new handler (the default setting of
+      the event and the handler's notification preferences) and correct it if it is not sent.
+    size: Small
+    status: Closed
+    closed: >-
+      The new handler gets the bell notice "Claim assigned to you" (or "n claims assigned to you"); the Team Lead who
+      reassigns gets none. The automated check of the claims worklist passes.
+  - id: G14
+    brd: BRD-01
+    frs_text: Walkthroughs WT-A and WT-C of the BRD-1 sign-off pack (automated recipes)
+    gap: The automated walkthroughs of New Business no longer match two screens changed since v1.0 (the KYC checklist
+      of the client record and the return reason of the account), so steps A.2 to A.17, C.5 and C.6 stop.
+    impact: These steps are not shown by the automated run; the screens themselves work (automated checks pass).
+      UAT performs them by hand from the walkthrough script.
+    proposal: Update the recipe of the BRD-1 pack (upload on the KYC checklist, return reason) and run the
+      walkthroughs again on a fresh SIT/UAT environment.
+    size: Small
+    status: Closed
+    closed: >-
+      Recipe updated: walkthrough A step 2 uploads one document per mandatory item of the KYC checklist (document type chosen from its list of values) and submits the KYC; the account documents of step C.5 choose the document type from its list of values. Run again on the fresh SIT/UAT environment of 16-Oct-2026: steps A.1 to A.17, B.1 to B.9 and C.1 to C.9 pass (35 of 35); the walkthrough client is confirmed with KYC verified and booked, C.5 shows Client PR-2026-900004 is not yet confirmed and C.6 returns the account to Marketing.
+  - id: G15
+    brd: BRD-11
+    frs_text: Walkthroughs WT-A to WT-C of the BRD-11 sign-off pack; steps J1.1 and the BRD-11 steps of the walkthrough script
+    gap: The User Access walkthroughs still follow the access-request lifecycle of FRS v1.4 (enrol, modify and
+      deactivate requests in BIBS), withdrawn in FRS v1.6; the group-profile request walkthrough does not match the
+      current screens.
+    impact: 16 steps are blocked as out of scope of FRS v1.6 and 4 fail in the automated run; the UIDM-ISC joiner,
+      mover and leaver events, Identity Sync and reconciliation have no walkthrough yet (they are shown by automated
+      checks).
+    proposal: Rewrite the BRD-11 walkthroughs and the UAT walkthrough script on the FRS v1.6 storyboards (SCIM joiner,
+      mover, leaver; refused event; Identity Sync; reconciliation; group-profile maker-checker) and update the recipe.
+    size: Medium
+    status: Closed
+    closed: >-
+      The BRD-11 walkthroughs are rewritten on the storyboards SB-1 to SB-5 of the BPS v1.6 (A: joiner and group profile sent from the SCIM simulator, first sign-in through Entra ID; B: group-profile change under maker-checker and implementation; C: refused event dismissed, reconciliation mismatch resolved after the leaver; D: certification extract, audit log, access matrix), with the recipe and the UAT walkthrough script (v1.1); journey step J1.1 follows the joiner. Run on the fresh SIT/UAT environment of 16-Oct-2026: the 19 steps and J1.1 pass.
+  - id: G16
+    brd: BRD-04
+    frs_text: Walkthrough WT-D of the BRD-4 sign-off pack (statement of account of an installment cycle)
+    gap: On a new installment plan the cycle not yet due offers only Record Promise; Generate SOA, which the
+      walkthrough uses to bill the first cycle ahead of its due date, is not offered.
+    impact: Steps D.2 to D.4 of the walkthrough fail; a statement of account of a cycle is produced only once the
+      cycle is due.
+    proposal: Confirm with BDOI whether a statement of account may be generated before the due date of the cycle;
+      either offer Generate SOA on a cycle not yet due or correct the walkthrough to generate it on a due cycle.
+    size: Small
+    status: Closed
+    closed: >-
+      Rule checked: BRCLXN.058 asks for a statement of account per applicable billing cycle and sets no earliest date; FRS FR-CL-060 bills a single cycle from its plan (alternate flow) and limits only the billing run to the cycles due in its period, and gives Generate SOA to the Operations billing user (CLX_SOA_ISSUE, CLR-CL-32), not to the Collection Handler. The platform already offers Generate SOA on a cycle not yet due to that user; the walkthrough had signed in as the Collection Handler. The walkthrough now performs D.2 to D.4 as the Cashiering Team Leader and the rule is recorded as FR-CL-060 R6. Run again: SOA-2026-000004 of cycle 1 (due 01-Nov-2026, Not Due) generated and sent; D.1 to D.4 pass.
+  - id: G17
+    brd: BRD-00
+    frs_text: "Capability 15 Reinsurance (CORE-15.01 to 15.10, ReInsurance BRD)"
+    gap: Reinsurance is not part of the current phase. Co-insurance is not part of this gap.
+    decision: Reinsurance deferred to Phase 2 by the client decision of 17-Oct-2026
+    impact: No requirement of the current FRSs is affected; the umbrella BRD already places capability 15 in Phase 2.
+      The reinsurance functions of the platform (reinsurer and reinsurance broker parties, receipts from a reinsurer,
+      reinsurance settlement payments) are hidden from every BDOI group profile and refused by the server; the super
+      user of DEV, SIT and UAT keeps them. Co-insurance stays in the current phase and open to the BDOI roles, namely the
+      co-insurer parties, the co-insurance split of an invoice (FR-OP-007) and the default co-insurance participation
+      on the insurer (CRQ08, FR-CR-061, gap G08).
+    proposal: >-
+      Deliver the reinsurance broking of the ReInsurance BRD in Phase 2 on what the platform keeps (party types, placement slip
+      and SOA templates, open-item matching, accounting events); grant its permission to the BDOI roles then.
+    size: Large
+    status: Deferred to Phase 2
+    closed: >-
+      Client decision of 17-Oct-2026. The reinsurance functions are held through one permission that no BDOI group
+      profile holds; the automated checks of the Phase 2 functions pass (the super user keeps them, every BDOI profile
+      is refused). Corrected the same day: CRQ08 (risk participation) was first recorded as deferred with reinsurance;
+      it is the default co-insurance participation on the insurer and is delivered in the current phase (G08).
+frs_corrections:
+  - id: C01
+    brd: BRD-07
+    where: Storyboard step P2.2 (process walkthrough)
+    current: "Claim record (Update Status)"
+    proposed: "Claim record (Change Status)"
+    reason: The action on the claim record is Change Status, as FR-CM-041 and FR-CM-042 of the same FRS already name it.
+  - id: C02
+    brd: BRD-12
+    where: Storyboard step P1.4; FR-SP-035 (screens)
+    current: "Upload & Intake (Loan Files)"
+    proposed: "Upload & Intake (Upload Loan File, for the LAMD, LMS or LAD report)"
+    reason: The action on Upload & Intake is Upload Loan File, with the loan report chosen in it.
+  - id: C03
+    brd: BRD-12
+    where: Storyboard step P3.5; FR-SP-063 (screens)
+    current: "Renewal Work List (Insurer Not Accepted; Re-assign Insurer)"
+    proposed: "Renewal Work List (Pending tab); policy record, Renewal tab (Re-assign Insurer while the hold cover is not accepted)"
+    reason: The Renewal Work List has the tabs All, With Renewal, Pending and Refused; Re-assign Insurer is on the
+      Renewal tab of the policy record while the insurer has not accepted the hold cover.
+  - id: C04
+    brd: BRD-11
+    where: Menu by persona (sign-off workbook and FRS), personas Processing (Employee Benefits) and its supervisor
+    current: Only the Employee Benefits screens and the shared screens are listed.
+    proposed: Also list the Processing screens these personas see (accounts, placement, e-policy, booking, billing and
+      the collection work screens), as the persona table of FRS BRD-8 states.
+    reason: The EB processing roles hold the Processing permissions to book EB accounts; the sidebar shown at sign-in
+      has these screens.

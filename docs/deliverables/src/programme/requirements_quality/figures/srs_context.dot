@@ -1,0 +1,48 @@
+// System context of BIBS: users, the platform and the BDO / external systems it exchanges data with.
+digraph srs_context {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.1, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=2.3, height=0.62, margin="0.1,0.05", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  users [label=<<b>BDOI users</b> - 1,344 named, 429 concurrent at peak; browser on BDO-issued devices<br/><font point-size="9">Marketing, TSU, Processing, Operations, Collections, Finance, Claims, EB desk,<br/>Contact Center, Compliance, Business and System Administrators, Auditors</font>>, fillcolor="@BG_BLUE", width=7.2];
+
+  bibs [label=<<b>BIBS - BDOI Broker System on iNXT BrokerVerse</b><br/><font point-size="9">web tier (React, nginx); web, jobs and integration workloads (OpenJDK 21, Spring Boot 3.5);<br/>PostgreSQL 16, Valkey 8, Kafka 3.9, S3 document store; managed Kubernetes in AWS ap-southeast-1</font>>,
+        fillcolor="@HEADER_BLUE", fontcolor="@WHITE", width=7.2, height=0.9];
+
+  eiam   [label=<<b>EIAM</b><br/><font point-size="9">Microsoft Entra ID<br/>OIDC or SAML 2.0 sign-in</font>>, fillcolor="@AMBER_BG"];
+  uidm   [label=<<b>UIDM-ISC</b><br/><font point-size="9">identity governance<br/>SCIM provisioning (planned)</font>>, fillcolor="@AMBER_BG"];
+  apigee [label=<<b>Apigee X gateway</b><br/><font point-size="9">every system-to-system<br/>interface</font>>, fillcolor="@DIRTY_WHITE"];
+
+  loans [label=<<b>LMS, HL-LOAS, LFS</b><br/><font point-size="9">loan data, quotation requests,<br/>submitted policies</font>>, fillcolor="@AMBER_BG"];
+  pay   [label=<<b>PMS, OBPCS, Old BOB,<br/>CMS / New BOB, AFTS</b><br/><font point-size="9">collections and payments</font>>, fillcolor="@AMBER_BG"];
+  ins   [label=<<b>Insurer systems</b><br/><font point-size="9">placements, remittance,<br/>feedback, claims (Drop 2)</font>>, fillcolor="@AMBER_BG"];
+
+  egl [label=<<b>EGL, EDP, CARMS</b><br/><font point-size="9">GL feed, data platform<br/>(Drop 2)</font>>, fillcolor="@AMBER_BG"];
+  ccm [label=<<b>CCM, M365</b><br/><font point-size="9">outbound e-mail,<br/>mailboxes</font>>, fillcolor="@AMBER_BG"];
+  ecm [label=<<b>ECM</b><br/><font point-size="9">legacy documents<br/>(to confirm)</font>>, fillcolor="@AMBER_BG"];
+
+  brg    [label=<<b>Bridger Insight XG</b><br/><font point-size="9">screening result,<br/>entered by hand</font>>, fillcolor="@DIRTY_WHITE"];
+  tfs    [label=<<b>Trade Finance System</b><br/><font point-size="9">clients and payment file,<br/>entered or uploaded by hand</font>>, fillcolor="@DIRTY_WHITE"];
+  legacy [label=<<b>Legacy systems</b><br/><font point-size="9">QPS, EBIX and others:<br/>one-off migration (BRD-13)</font>>, fillcolor="@DIRTY_WHITE", style="rounded,filled,dashed"];
+
+  users -> bibs [label=" browser "];
+  bibs -> eiam [dir=both];
+  uidm -> bibs [constraint=false];
+  bibs -> uidm [style=invis];
+  bibs -> apigee [dir=both];
+  apigee -> loans [dir=both];
+  apigee -> pay [dir=both];
+  apigee -> ins [dir=both];
+  loans -> egl [style=invis];
+  pay -> ccm [style=invis];
+  ins -> ecm [style=invis];
+  apigee -> egl [dir=both, constraint=false];
+  egl -> brg [style=invis];
+  ccm -> tfs [style=invis];
+  ecm -> legacy [style=invis];
+  {rank=same; eiam; uidm; apigee}
+  {rank=same; loans; pay; ins}
+  {rank=same; egl; ccm; ecm}
+  {rank=same; brg; tfs; legacy}
+}

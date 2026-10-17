@@ -1,0 +1,20 @@
+// Incident, problem, change and release: how a ticket moves through the processes.
+digraph sup_incident {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.25, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=5.6, height=0.5, margin="0.12,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+  d  [label=<<b>1 Detect</b> - user call, monitoring alert or job failure alert>, fillcolor="@DIRTY_WHITE"];
+  l  [label=<<b>2 Log and classify (L1)</b> - minimum content, category, proposed severity>];
+  t  [label=<<b>3 Triage (L2)</b> - confirm severity, check configuration, data, jobs and alerts>];
+  r  [label=<<b>4 Resolve or escalate</b> - L2 fix or workaround; L3 for BIBS faults and data fixes>];
+  s  [label=<<b>5 Restore and confirm</b> - user confirms; L1 closes after 5 business days without reply>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  p  [label=<<b>6 Problem record</b> - every P1, P2 without known cause, 3 or more incidents of one cause>, fillcolor="@AMBER_BG"];
+  k  [label=<<b>7 Known error and knowledge article</b> - symptom, cause, workaround published to L1>, fillcolor="@AMBER_BG"];
+  c  [label=<<b>8 Change request</b> - standard, normal or emergency; approved by the BIBS CAB>, fillcolor="@BG_BLUE"];
+  v  [label=<<b>9 Release</b> - SIT and UAT regression, Pre-Prod rehearsal, deploy in the window>, fillcolor="@BG_BLUE"];
+  d -> l -> t -> r -> s;
+  r -> p [label=" root cause unknown "];
+  p -> k -> c -> v;
+  v -> s [label=" permanent fix ", style=dashed];
+}

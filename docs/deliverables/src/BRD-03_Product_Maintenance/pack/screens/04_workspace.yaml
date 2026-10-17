@@ -1,0 +1,236 @@
+# Screen specifications of BRD-3 Product Maintenance: the workspace of BDOI's FRS - dashboard, deactivation of
+# packages, product master transfers, the Consolidated Placement Update Report, the audit logs, the comparative table
+# of the quotation requests with the proposal slips and the client response, and the routing of a package request.
+# Schema: docs/deliverables/src/signoff/README.md. Field rows:
+#   section | label | type | length / format | mandatory | source / master | default | editable in | validation | message
+# Action rows:
+#   button | who | enabled when | what happens | resulting status | notification
+area: Product Maintenance workspace
+screens:
+  - id: SCR-PM-23
+    title: Product Maintenance Dashboard
+    route: /product-maintenance/dashboard
+    purpose: >-
+      The figures of Product Maintenance for a period: incoming, in-progress, for-approval, expiring, issued and
+      deactivation figures, each opening its list of requests with the request type, line, requester, assigned TSU
+      officer, status, submission date and aging; the package requests by stage with the overdue ones; the packages
+      ending within 30, 60 and 90 days; and the shortcuts to the versions for validation, the advisories not sent and
+      the comparative outputs of the week. Exported to Excel, PDF and CSV.
+    entry:
+      - Product Maintenance › Product Maintenance Dashboard
+    shots:
+      - {state: view, user: tsuhead, caption: "Product Maintenance Dashboard with the key figures and the incoming requests"}
+    fields:
+      - "Filters | Period From / Period To | Date | dd-MMM-yyyy | N | - | The last three months to today | - | To on or after From | The end date must be on or after the start date"
+      - "Filters | TSU Officer / Product Line / Package Type | Look-up; drop-downs | Names of the TSU officers; lines; Package, Non-Package | N | Users; product lines; fixed list | All | - | - | -"
+      - "Key Figures | Incoming Requests / In-Progress Requests / For Approval / Expiring Packages / Issued Proposals / Deactivation Requests | Tile | Count of the period; the chosen tile opens its list below | - | Package and quotation requests, package versions, deactivation requests | Incoming Requests | Read only | - | -"
+      - "[List of the chosen figure] | Request Number / Request Type / Product Line / Requested By / Assigned TSU Officer / Current Status / Submission Date / Aging | Columns | PKR or PRF number; type; line; names; status; dd-MMM-yyyy; working days | - | Requests | - | Read only | - | -"
+      - "Package requests by stage | Drafts / For Approval / TSU Review / Negotiation / ManCom / With MBS / For Validation / Released | Tile | Count of requests; '· n Overdue' and Needs attention when a request of the tile is past its due time | - | Package requests | - | Read only | - | -"
+      - "Packages ending soon | Within 30 Days / Within 60 Days / Within 90 Days | Tile | Count of released packages whose end date falls in the window | - | Package versions in force | - | Read only | - | -"
+      - "Shortcuts | Versions for validation / Advisories pending / Comparative outputs this week / Package Expiry | Tile | 'n set up by MBS, waiting for the checkpoint'; 'n drafted, not sent yet'; 'n master and client outputs generated' | - | Requests, advisories, outputs | - | Read only | - | -"
+    actions:
+      - "Excel / PDF / CSV | Every user of the screen | Always | Exports the figures and the list on screen, named by the convention <name>_MMDDYYYY | - | -"
+      - "[A key figure] | Every user of the screen | Always | Shows the list of the figure under the tiles | - | -"
+      - "[A stage or expiry tile] | Every user of the screen | Always | Opens Package Requests on the tab of the tile, or Package Expiry with the window | - | -"
+    rules:
+      - "The figures are those of the company selected in the page header and of the filters (FR-PM-070)."
+      - "A request is overdue when its stage due time has passed; the due time comes from the service level hours of the stage (FR-PM-073)."
+    outcome: TSU and Marketing see the workload, the approvals waiting and the packages that end soon, and open each list in one click.
+    frs: [FR-PM-070, FR-PM-073, FR-PM-071]
+    tests: [HOME]
+
+  - id: SCR-PM-24
+    title: Deactivation Requests
+    route: /product-maintenance/deactivations
+    purpose: >-
+      The requests to deactivate a package with an effective date: the list with the approval status and the new
+      expiry date, the request with its details, supporting documents and audit log, and the decision of the approver
+      (approve or reject with remarks); the Deactivate Package dialog of the product record raises the request.
+    entry:
+      - Product Maintenance › Deactivation Requests
+      - Products › a package › Deactivate Package
+      - "The notice <request no>: deactivation of <risk code> for your approval"
+    shots:
+      - {state: list, user: tsuhead, caption: "Deactivation Requests with their approval status"}
+      - {state: record, user: tsuhead, click: "^view details$", caption: "Deactivation request waiting for the approval of the TSU Head"}
+      - {state: new, user: mbs, open: deactivation_product, click: "^deactivate package$", caption: "Deactivate Package dialog of a package"}
+    fields:
+      - "List | Search Request Number or Package | Text | Part of the number or the package name | N | - | Blank | - | - | -"
+      - "List | Approval Status / Requested From / Requested To | Drop-down; dates | Pending Approval, Approved, Rejected, Cancelled; dd-MMM-yyyy | N | Fixed list | All | - | - | -"
+      - "List | Request Number / Package Name / Deactivation Effective Date / Approval Status | Columns | PKD-yyyy-nnnnnn; name with the risk code; dd-MMM-yyyy; status | - | Deactivation requests | - | Read only | - | -"
+      - "List | Requested By / Request Date / Package Expiry Date | Columns | Name; dd-MMM-yyyy; the new expiry date once approved | - | Deactivation requests | - | Read only | - | -"
+      - "Deactivate Package | Package / Expiry Date | Values | Name and risk code; current expiry date or None | - | Product | - | Read only | - | -"
+      - "Deactivate Package | Deactivation Effective Date | Date | dd-MMM-yyyy | Y | - | Blank | Dialog | Today or later | Enter the deactivation effective date; The deactivation effective date must be today or later"
+      - "Deactivate Package | Reason for Deactivation | Drop-down | Insurer withdrew the terms, Replaced by another package, Loss experience, Low uptake, Regulatory change, Others (see remarks) | Y | List of values | Select… | Dialog | - | Select the reason for deactivation"
+      - "Deactivate Package | Approver | Look-up | Users with the deactivation approval right | Y | Users | Blank | Dialog | - | Select the approver"
+      - "Deactivate Package | Remarks / Supporting Documents | Text area; files | Up to 1,000 characters; documents named PKD-yyyy-nnnnnn_TYPE_n | N | - | Blank | Dialog | File checks of every upload | -"
+      - "Deactivation Request | Request Number / Package / Deactivation Effective Date / Approval Status / Reason / Remarks / Requested By / Request Date / Approver / Package Expiry Date / Approval Remarks / Approval Date and Time / New Expiry Date | Values | As recorded | - | Deactivation request | - | Read only | - | -"
+      - "Deactivation Request | Approval Remarks | Text area | Up to 1,000 characters | Cond.: rejection | - | Blank | Pending, for the approver | Mandatory to reject | Enter the approval remarks of the rejection"
+      - "Deactivation Request | Reassign To | Look-up | Approvers other than the current one | Cond.: reassignment | Users | Blank | Pending, for a team head | - | Select the new approver"
+    actions:
+      - "Deactivate Package | MBS (product maintenance right) | Active package without a deactivation waiting | Opens the dialog | - | -"
+      - "Submit for Approval | The requester | Fields complete | Records the request PKD-yyyy-nnnnnn and sends it to the approver | Pending Approval | E-mail and notice to the approver"
+      - "View Details | Every user of the screen | Always | Opens the request | - | -"
+      - "Approve | The approver named on the request | Pending Approval | Approves; the package expires on the effective date (daily run) and the change goes to the product master transfer | Approved | E-mail and notice to the requester"
+      - "Reject | The approver named on the request | Pending Approval; approval remarks entered | Rejects; the package stays active | Rejected | E-mail and notice to the requester"
+      - "Reassign | A team head (work assignment or TSU Head approval right) | Pending Approval | Gives the request to another approver | Pending Approval | Notice to the new approver"
+      - "Withdraw | The requester | Pending Approval | Withdraws the request | Cancelled | -"
+    rules:
+      - "As delivered (setting Package deactivation route: effective-dated) a package is deactivated through this request; the earlier retirement through a package request stays available by the setting (FR-PM-045)."
+      - "The approver never approves his own request; every decision and every change of the request is in its audit log (FR-PM-045, FR-PM-005)."
+      - "On the effective date the daily run sets the package to expired, it is no longer offered for new business and the change is sent to the receiving systems (FR-PM-045, FR-PM-072)."
+    outcome: A package ends on an approved date, with the reason, the documents and the decision recorded.
+    frs: [FR-PM-045, FR-PM-005, FR-PM-072]
+    tests: [PRODUCT]
+
+  - id: SCR-PM-25
+    title: Product Master Transfers
+    route: /product-maintenance/master-changes
+    purpose: >-
+      The product master changes (new, updated, deactivated or expired packages) sent to the other systems of the
+      bank: every change with its package, version, effective date, request, status, file and time sent, the error of a
+      failed transfer, Send Now and, in SIT and UAT, the inbox of the receiving system simulator.
+    entry:
+      - Product Maintenance › Product Master Transfers
+    shots:
+      - {state: list, user: mbs, caption: "Product Master Transfers with the change sent to the receiving system"}
+    fields:
+      - "Receiving System | Receiving System / Connected / Waiting / Failed | Values | Name of the receiving system (the simulator in SIT and UAT); Yes or No; counts | - | Transfer settings | - | Read only | - | -"
+      - "Changes | All / Waiting / Failed / Sent | Tab | Status filter | N | Fixed list | All | - | - | -"
+      - "Changes | Package / Version / Change / Effective Date / Request | Columns | Risk code; version; Package added, updated, deactivated or expired; dd-MMM-yyyy; request number | - | Product master changes | - | Read only | - | -"
+      - "Changes | Status / File / Sent / Error | Columns | Waiting, Sent, Failed; ProductMaster_yyyyMMddHHmmss.csv; dd-MMM-yyyy HH:mm; reason of a failure | - | Product master changes | - | Read only | - | -"
+      - "Receiving System (SIT/UAT) | File / Records / Received / Content | Columns | Files received by the simulator with their records | - | Simulator inbox | - | Read only | - | -"
+    actions:
+      - "Send Now | MBS (product maintenance right) | Changes waiting or failed | Writes the waiting changes to the transfer file now instead of at the next scheduled run | Sent or Failed | Alert when the transfer fails"
+    rules:
+      - "Every approved change of the Product Matrix, every deactivation and every expiry is queued for the receiving systems and sent by the scheduled transfer or Send Now (FR-PM-072)."
+      - "In SIT and UAT a simulator receives the files so that the flow runs end to end; the folder of the receiving systems is set at SIT with the details of BDOI IT; until then the transfer fails with an alert (FR-PM-072)."
+    outcome: The other systems of the bank receive every product master change, and MBS sees what was sent and what failed.
+    frs: [FR-PM-072]
+    tests: [PRODUCTS]
+
+  - id: SCR-PM-26
+    title: Placement Update Reports
+    route: /product-maintenance/placement-reports
+    purpose: >-
+      The Consolidated Placement Update Report of the quotation requests: its schedule (every Thursday at 08:00 for
+      the last 7 days as delivered), the scope, Generate Now, the Report Builder and the repository of every report
+      generated, with preview and download.
+    entry:
+      - Product Maintenance › Placement Update Reports
+      - The notice PlacementUpdate_<MMDDYYYY>.xlsx generated
+    shots:
+      - {state: list, user: tsuhead, click: "^generate now$", caption: "Placement Update Reports with the schedule and a report generated"}
+    fields:
+      - "Schedule | Schedule / Next Run / Scope | Values | Weekday, time and reporting period; dd-MMM-yyyy HH:mm; Quotation requests, or Quotation and package requests | - | Settings of the report | - | Read only | - | -"
+      - "Repository | File Name / Report Date / Reporting Period | Columns | PlacementUpdate_MMDDYYYY.xlsx; dd-MMM-yyyy; from – to | - | Placement reports | - | Read only | - | No Placement Update Report has been generated yet"
+      - "Repository | Generated Date/Time / Generated By / Run / Records | Columns | dd-MMM-yyyy HH:mm; name or System; Scheduled or On request; count | - | Placement reports | - | Read only | - | -"
+    actions:
+      - "Generate Now | Users of the Product Maintenance reports | Always | Generates the report for the period ending today and stores it in the repository | - | Notice PlacementUpdate_<MMDDYYYY>.xlsx generated"
+      - "Report Builder | Users of the Product Maintenance reports | Always | Opens the report builder of the Product Maintenance reports (columns, filters, sort) | - | -"
+      - "Preview / Download | Users of the Product Maintenance reports | A report of the repository | Shows the report on screen, or downloads the Excel file | - | -"
+    rules:
+      - "The day, time, period and scope of the scheduled report are settings (Thursday, 08:00, 7 days, quotation requests as delivered) (FR-PM-071)."
+      - "Every report generated is kept in the repository with who generated it and when (FR-PM-071, FR-PM-005)."
+    outcome: TSU and Marketing get the weekly placement status of every quotation request without compiling it by hand.
+    frs: [FR-PM-071]
+    tests: [REPORTS]
+
+  - id: SCR-PM-27
+    title: Audit Logs
+    route: /product-maintenance/audit-logs
+    purpose: >-
+      Who changed packages, products and requests, and when: every action of Product Maintenance with the module,
+      reference number, client or assured, action type, description, old and new value, the user and the remarks,
+      with filters and the CSV and Excel exports named Audit Logs_MMDDYYYY.
+    entry:
+      - Product Maintenance › Audit Logs
+    shots:
+      - {state: list, user: auditor, caption: "Audit Logs of Product Maintenance for a period"}
+    fields:
+      - "Filters | From / To | Date | dd-MMM-yyyy | N | - | Today | - | To on or after From | The end date must be on or after the start date"
+      - "Filters | Action Type / Reference Number / User | Drop-down; text; look-up | Action types; part of the number; name | N | Fixed list; users | All | - | - | -"
+      - "List | Timestamp / Module / Reference Number / Client/Assured's Name | Columns | dd-MMM-yyyy HH:mm; Product Maintenance area; request, package or product number; name | - | Audit trail | - | Read only | - | No activity for these filters."
+      - "List | Action Type / Description / Old Value / New Value / Performed By / Remarks | Columns | Action; what changed; values before and after; name; remarks | - | Audit trail | - | Read only | - | -"
+    actions:
+      - "CSV / Excel | Every user of the screen | Always | Downloads the audit log of the filters on screen, named Audit Logs_MMDDYYYY | - | -"
+    rules:
+      - "No user can change or delete an audit record (FR-PM-005)."
+    outcome: Audit and the business see every change of Product Maintenance with its old and new value.
+    frs: [FR-PM-005]
+    tests: [AUDIT]
+
+  - id: SCR-PM-28
+    title: "Proposal request: Comparative Table, proposal slips and client response"
+    route: /proposals/:id
+    parent: /product-maintenance
+    purpose: >-
+      The quotation request of a non-package product (proposal request PRF-yyyy-nnnnnn), as TSU and Marketing see it
+      on the Comparative Table and Proposal Slip tabs: the insurer responses, the comparative table with the value of
+      the quotation slip, every option of each insurer and the Final Terms for Proposal, the insurers chosen for the
+      proposal, the proposal slip generated per insurer, and the client response recorded by Marketing.
+    entry:
+      - Product Maintenance Home › Quotation Request List › View Quotation Request
+      - Proposal request › Comparative Table, Proposal Slip
+    shots:
+      - {state: table, user: tsu, open: terms_received, tab: Comparative Table, caption: "Comparative Table with the options of each insurer and the Final Terms for Proposal"}
+      - {state: option, user: tsu, open: terms_received, tab: Comparative Table, caption: "Option of an insurer with its response"}
+      - {state: proposals, user: tsu, open: terms_received, tab: Comparative Table, caption: "Proposal slips generated for the insurers selected"}
+      - {state: response, user: ao, open: accepted, tab: Proposal Slip, caption: "Proposal Slip tab with the client response"}
+    fields:
+      - "Comparative Table | Field / QS Value | Rows | Coverage, Sum Insured, Period of Insurance, Premium, Premium Rate (%), Commission Rate (%), Deductibles, Terms and Conditions, Warranties, Clauses, Extensions of Cover, Other Quotation Details; the value of the quotation slip | - | Quotation slip | - | Read only | - | -"
+      - "Comparative Table | [Insurer – Option n] | Column | Response (Approved, Not Covered, Others) and the values of the option | - | Insurer responses and options | - | Edit / Add Option | - | -"
+      - "Comparative Table | Final Terms for Proposal | Column | Value of each field for the proposal | Cond.: before Proceed to Proposal | - | Blank | Terms received | - | -"
+      - "Option | Insurer Response | Drop-down | Approved, Not Covered, Others | Y | Fixed list | - | Option dialog | - | -"
+      - "Option | Insurer's Response | Text | The actual response of the insurer | Cond.: Others | - | Blank | Option dialog | Mandatory for Others | Specify the insurer's actual response for Others"
+      - "Choose Comparison Fields | [Field check boxes] | Check boxes | Fields shown in the table and to the client | Y (at least one) | Comparison fields | Every field | Dialog | - | -"
+      - "Final Terms History | Field / Previous Value / New Value / Changed By / Changed On | Table | Every change of a final term | - | Final terms history | - | Read only | - | -"
+      - "Insurers for the Proposal | [Insurer check boxes] | Check boxes | Insurers that gave terms | Y (at least one) | Insurer responses | None | Terms received | An insurer of the request | <insurer> is not an insurer of this request"
+      - "Proposal Slips | Insurer / Version / File Name / Generated By / Generated On | Table | One proposal slip per selected insurer, by version | - | Proposal files | - | Read only | - | No proposal has been generated yet"
+      - "Client Response | Response / Response Date / Client Remarks / Recorded By / Recorded On | Table | Accepted, Rejected or Returned; dd-MMM-yyyy; remarks; name; date and time | - | Client responses | - | Read only | - | No client response recorded yet"
+      - "Record Client Response | Client Response / Response Date / Client Remarks | Drop-down; date; text | Accepted, Rejected, Returned | Y (response) | Fixed list | Today | Sent to Client | - | -"
+    actions:
+      - "Edit / Add Option | TSU (negotiation right) | Terms received | Keys the response and values of an insurer, or a further option of the same insurer | - | -"
+      - "Choose Fields / Final Terms History / Excel / PDF | TSU and Marketing | Always | Chooses the fields shown; shows the changes of the final terms; exports the table | - | -"
+      - "Proceed to Proposal | The requestor (Marketing) or TSU | Terms received; at least one insurer selected | Records the insurers chosen; the TSU officer who prepared the quotation slip is told to generate the proposal | Terms agreed | Notice <reference no.>: Terms Agreed"
+      - "[Generate proposal] | TSU (negotiation right) | Terms agreed | Generates one proposal slip per selected insurer (PDF), listed under Proposal Slips | Proposal slip for approval | -"
+      - "Record Client Response | Marketing | Sent to Client | Records Accepted, Rejected or Returned with the date and remarks; Returned sends the request back to TSU for revision | Accepted, Rejected or Terms received | Notice to TSU"
+    rules:
+      - "The final terms are keyed by TSU in the table; every change is kept with the previous and new value (FR-PM-033)."
+      - "A proposal slip is generated for each insurer selected by the requestor, numbered by version (FR-PM-035, FR-PM-044)."
+      - "The client response is recorded once the proposal is sent to the client; a returned proposal goes back to TSU for revision (FR-PM-036)."
+    outcome: Marketing chooses the insurers on one comparative table, TSU issues one proposal slip per insurer and the client's answer is recorded.
+    frs: [FR-PM-033, FR-PM-034, FR-PM-035, FR-PM-036]
+    tests: [COMP]
+
+  - id: SCR-PM-29
+    title: "Package Request record: Routing & Approvals tab"
+    route: /product-maintenance/requests/:id
+    parent: /product-maintenance/requests
+    purpose: >-
+      The routing of a package request as BDOI's FRS sets it: the source and package details of the request form, the
+      Marketing approvals by level, the ManCom approval with the selected approvers and the President last, and the
+      package deployment request that forwards the approved package to MBS.
+    entry:
+      - Package Request record › Routing & Approvals
+    shots:
+      - {state: tab, user: tsuhead, open: for_mancom, tab: Routing, caption: "Routing & Approvals tab with the ManCom approvers to select"}
+    fields:
+      - "Source and Package Details | Source / Business Origin / Account Officer / Unit Head / Insured's Name / Estimated No. of Policies / Estimated Total Basic Premium / Type of Cover / Description of Cover / Cover / Undertaking / Extensions of Cover / Warranties, Clauses / Other Instructions / Maximum Limit/s / Premium / Incentive Eligible / Incentive Amount / Incentive Commission Rate | Values | As entered on the request form | - | Package request | - | Read only | - | -"
+      - "Marketing Approvals | [Chain] | Text | One approval by the Team Leader, Team Head or Unit Head; or Team Leader, then Team Head, then Unit Head | - | Setting of the Marketing chain | - | Read only | - | -"
+      - "Marketing Approvals | Level / Approver / Decision / Remarks / Approved | Columns | Marketing Team Leader, Team Head or Unit Head; name; decision; remarks; dd-MMM-yyyy HH:mm | - | Marketing approvals | - | Read only | - | No Marketing approval yet."
+      - "ManCom Approval | Select ManCom Approvers | Check boxes | ManCom members; the President marked (President, approves last) | Y (at least one) | ManCom members | None | For ManCom sign-off | - | -"
+      - "ManCom Approval | Round / Approver / Approval Progress / Remarks / Decided | Columns | Round; name; Pending Approval, Waiting for the others, Approved, Returned for Revision, Rejected; remarks; date and time | - | ManCom approvals | - | Read only | - | No ManCom approvers selected yet."
+      - "ManCom Approval | Remarks | Text area | Up to 1,000 characters | Cond.: return or rejection | - | Blank | For the approver | - | Enter the remarks of the rejection or the return"
+      - "Package Deployment Request | Forwarding to MBS / Deployment Request Number / Requested / Requested By | Values | Automatic or By the Request for Deployment button; PDR-yyyy-nnnnnn; date and time; name | - | Deployment request | - | Read only | - | -"
+    actions:
+      - "Send for ManCom Approval | TSU (negotiation or TSU Head approval right) | For ManCom sign-off; at least one approver selected | Sends the request to the selected ManCom approvers at once, the President after the others | For ManCom sign-off | ManCom approvers selected and told"
+      - "Approve / Return for Revision / Reject | The selected ManCom approver | His approval pending | Records the decision; a return or rejection needs remarks | Approved, returned or rejected | Workflow notice"
+      - "Request for Deployment | TSU | ManCom approved; forwarding by the button | Raises the deployment request PDR-yyyy-nnnnnn and forwards the package to MBS for set-up | With MBS for set-up | Package deployment request <no> sent to MBS"
+    rules:
+      - "The Marketing chain is a setting: one approval by the Team Leader, Team Head or Unit Head (as delivered), or the three in order (BDOI's FRS) (FR-PM-021)."
+      - "The ManCom routing is a setting: the selected approvers in parallel, then the President (as delivered, BDOI's FRS), or one sign-off by any member (FR-PM-041)."
+      - "The forwarding to MBS is a setting: automatic at the ManCom approval (as delivered) or by the Request for Deployment button (FR-PM-041, FR-PM-042)."
+    outcome: Every approval of the package request is routed and recorded as BDOI's process requires, and MBS receives the approved package with its deployment request.
+    frs: [FR-PM-021, FR-PM-041, FR-PM-042]
+    tests: [REQ]

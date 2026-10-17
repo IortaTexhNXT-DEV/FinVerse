@@ -1,0 +1,27 @@
+// BRD-5 Volume 2: workflow DISB_FUNDING (V890). FRS section 5.4.
+digraph v2_funding {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.7, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.4, height=0.6];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=11, fontcolor="@TEXT"];
+
+  CR  [label="CREATED\nmaker (TL)"];
+  FV  [label="FOR_VERIFICATION\nanother TL"];
+  F1  [label="FOR_APPROVAL_1\napprover"];
+  F2  [label="FOR_APPROVAL_2\nsecond approver"];
+  AP  [label="APPROVED\ntransfer posted", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  DE  [label="DECLINED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  CA  [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  { rank=same; CR; CA; }
+  { rank=same; F2; DE; }
+  CR -> CA [label=" cancel"];
+  CR -> FV [label=" submit"];
+  FV -> F1 [label=" verify"];
+  F1 -> F2 [label=" approve"];
+  F2 -> AP [label=" approve"];
+  F1 -> DE [label=" decline"];
+  F2 -> DE [label=" decline"];
+  FV -> CR [label=" return", style=dashed, constraint=false];
+  F1 -> CR [label=" return", style=dashed, constraint=false];
+  F2 -> CR [label=" return", style=dashed, constraint=false];
+}

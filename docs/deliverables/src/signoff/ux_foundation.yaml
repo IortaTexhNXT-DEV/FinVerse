@@ -1,0 +1,171 @@
+# Shared components of the BIBS screens, shown in the design foundation of every UX Screen Deck (07) with a real
+# screenshot each (build_ux_deck.py). Each image is a screenshot of a sign-off set: `brd` names the set, `image` the
+# file of its screenshot folder (a crop taken for the deck, ux-...-cmp-..., or an image of the screen
+# specifications). `screens` lists, per set, screens where the component is used. The rules are those of the BDO
+# UX guidelines of the screens and of the screen standards appendix of the FRS.
+components:
+  - name: Workflow step bar
+    brd: BRD-03
+    image: ux-scr-pm-04-cmp-stepper
+    caption: The workflow header of a package request in negotiation
+    what: >-
+      The stages of the record in their order, with one row of Current Stage, Since, Due and Assigned To and the
+      actions of the stage on the right.
+    rules:
+      - "Passed stages ticked on CTA Blue; the current stage highlighted; the stages ahead grey with their number"
+      - "Returned or on hold in amber after the stage it came from; rejected, cancelled, voided or not proceeded in red, and the path ends there"
+      - "The last stage turns green when it is reached"
+      - "Under a thin rule: Current Stage, Since, Due with the Overdue pill, Assigned To; actions aligned right"
+      - "Narrow widths keep the first, last and current stage and its neighbours"
+    screens:
+      BRD-02: [SCR-OP-10, SCR-OP-12, SCR-OP-26, SCR-OP-29, SCR-OP-31, SCR-OP-34, SCR-OP-39, SCR-OP-45, SCR-OP-54, SCR-OP-59]
+      BRD-03: [SCR-PM-04, SCR-PM-05, SCR-PM-06, SCR-PM-07, SCR-PM-08]
+      BRD-11: [SCR-UA-08]
+      BRD-13: [SCR-DM-07]
+
+  - name: Notice standard
+    brd: BRD-11
+    image: ux-scr-ua-07-cmp-notice
+    caption: The error notice at the top of a request form submitted with missing fields
+    what: One standard for errors, warnings, information and success messages, and for the toasts.
+    rules:
+      - "White surface, thin border, 4 px bar and icon in the colour of the kind: red error, amber warning, blue information, green success"
+      - "A bold short title, then the business message with one bullet per missing item"
+      - "No codes, references or technical terms; only an unexpected system error offers Retry and a reference behind Details"
+      - "Field errors stay under their fields; a long form lists them at the top with a link to each field"
+    screens:
+      BRD-02: [SCR-OP-08, SCR-OP-26, SCR-OP-38]
+      BRD-03: [SCR-PM-03, SCR-PM-13, SCR-PM-20]
+      BRD-11: [SCR-UA-01, SCR-UA-07, SCR-UA-09]
+      BRD-13: [SCR-DM-05, SCR-DM-07]
+
+  - name: Data table in a work list
+    brd: BRD-03
+    image: ux-scr-pm-02-cmp-table
+    caption: The package requests of a stage, with the status tabs, the search and the pager
+    what: Every list of records is a table in a titled card, with the status tabs and the toolbar above it.
+    rules:
+      - "Header row in Header Blue with white bold text that stays in view; rows alternate white and Background Blue"
+      - "A long list scrolls inside its card with the header row in view; the card is as high as its rows, never higher than the window"
+      - "Text left, amounts right with two decimals, dates dd-MMM-yyyy; codes in a fixed column that never wraps"
+      - "One value per cell with at most one muted line under it; a dash for an empty value"
+      - "Showing x to y of n results with the page numbers; Enter on a row opens it"
+    screens:
+      BRD-02: [SCR-OP-02, SCR-OP-09, SCR-OP-11, SCR-OP-25, SCR-OP-37, SCR-OP-44, SCR-OP-53]
+      BRD-03: [SCR-PM-02, SCR-PM-09, SCR-PM-10, SCR-PM-11, SCR-PM-14, SCR-PM-17]
+      BRD-11: [SCR-UA-06, SCR-UA-11, SCR-UA-15]
+      BRD-13: [SCR-DM-02, SCR-DM-05, SCR-DM-06, SCR-DM-18]
+
+  - name: Tree table
+    brd: BRD-03
+    image: ux-scr-pm-20-cmp-tree
+    caption: The sales organisation with every branch open
+    what: Hierarchies (regions, branches, teams and their members) in the table style.
+    rules:
+      - "A chevron and one indentation step per level; arrow keys, Home, End and Enter move through the tree"
+      - "A search that opens the branches that match; Expand All, Collapse All and Show Inactive"
+      - "A summary line of the units and members shown"
+    screens:
+      BRD-03: [SCR-PM-20]
+
+  - name: Row action menu
+    brd: BRD-03
+    image: scr-pm-20-02-actions
+    caption: The actions of a team, opened from the more button of its row
+    what: The actions of a row of a table, never as links inside the row.
+    rules:
+      - "One more button per row opens the menu"
+      - "Destructive actions last, in red, after a separator"
+      - "Each action that changes the record asks for confirmation"
+    screens:
+      BRD-02: [SCR-OP-09, SCR-OP-14, SCR-OP-17, SCR-OP-19, SCR-OP-32, SCR-OP-36, SCR-OP-46, SCR-OP-61]
+      BRD-03: [SCR-PM-20]
+
+  - name: Confirmation dialog with reason
+    brd: BRD-03
+    image: scr-pm-04-03-return
+    caption: Return to requester with the mandatory reason
+    what: Every approve, authorise, post, release, cancel, void and deactivate is confirmed in a dialog.
+    rules:
+      - "The dialog names the record and the effect of the action"
+      - "Every reject, return, cancel and void needs a reason from its list before it can be confirmed; the comment is optional"
+      - "Cancel on the left, the action on the right; a destructive action uses the red button"
+      - "The reason is kept in the history and sent with the notification"
+    screens:
+      BRD-02: [SCR-OP-10, SCR-OP-26, SCR-OP-39]
+      BRD-03: [SCR-PM-04, SCR-PM-13, SCR-PM-22]
+      BRD-11: [SCR-UA-08, SCR-UA-12]
+      BRD-13: [SCR-DM-02, SCR-DM-07, SCR-DM-09]
+
+  - name: Status pills
+    brd: BRD-11
+    image: scr-ua-06-01-list
+    caption: The Status column of the access requests
+    what: One pill per record status, in its own column.
+    rules:
+      - "Outlined: a border and text in the colour of the state group on a light tint of it"
+      - "One size everywhere: 24 px high, 12 px bold, centred, 112 to 184 px wide; a pill never wraps"
+      - "Green done or approved; yellow waiting for review or approval; blue in process; red exception or rejected; grey draft or inactive"
+      - "The full label up to 21 characters; a longer label has its agreed short form with the full label in the tooltip"
+      - "Flags (Generic, Client-specific, Locked, LEGACY) are tags in their own column, never pills"
+    screens:
+      BRD-02: [SCR-OP-02, SCR-OP-25, SCR-OP-36, SCR-OP-37]
+      BRD-03: [SCR-PM-02, SCR-PM-11, SCR-PM-16]
+      BRD-11: [SCR-UA-06, SCR-UA-15]
+      BRD-13: [SCR-DM-02, SCR-DM-06]
+
+  - name: Period cell
+    brd: BRD-03
+    image: scr-pm-10-01-list
+    caption: Package terms in the expiry list
+    what: A period (period of cover, package term, statement period) in a list.
+    rules:
+      - "The start date on the first line and \"to\" the end date on the second, each date kept whole"
+      - "An open end reads \"to open\"; in a sentence or a label and value grid the period is one line"
+      - "The column is at least 132 px wide"
+    screens:
+      BRD-02: [SCR-OP-03, SCR-OP-62]
+      BRD-03: [SCR-PM-10, SCR-PM-12]
+
+  - name: Form with its validation summary
+    brd: BRD-11
+    image: scr-ua-07-03-error
+    caption: The request form after Submit with a short user ID and no justification
+    what: Labels above the fields, the error under each field and the summary at the top of a long form.
+    rules:
+      - "Labels above the fields on one baseline, fields of one height, required fields marked"
+      - "The error in red under the field with the field outlined; the summary lists every error with a link"
+      - "The actions at the bottom right: Cancel, then the main action"
+      - "Only short format hints under a field; other guidance in the tooltip of the label"
+    screens:
+      BRD-02: [SCR-OP-08, SCR-OP-38]
+      BRD-03: [SCR-PM-03, SCR-PM-13]
+      BRD-11: [SCR-UA-07, SCR-UA-12]
+
+  - name: Upload with the error file
+    brd: BRD-11
+    image: scr-ua-09-02-validated
+    caption: A bulk request after the upload, with the check of each row
+    what: Every upload checks all rows before anything is saved.
+    rules:
+      - "Download Template next to the upload; a drop zone with the accepted types and the maximum size"
+      - "Rows Read, Valid and Rejected with the rows; the rejected rows come back in the error file (the template with an Error column)"
+      - "Upload Corrected File keeps the link to the first upload; a file uploaded before is refused"
+    screens:
+      BRD-02: [SCR-OP-15, SCR-OP-27, SCR-OP-41, SCR-OP-47, SCR-OP-51]
+      BRD-11: [SCR-UA-09, SCR-UA-10]
+      BRD-13: [SCR-DM-05]
+
+  - name: Key facts of a record
+    brd: BRD-03
+    image: scr-pm-13-06-released
+    caption: The released package version with the result of its validation
+    what: The icon, label and value grid of the record header and of an outcome card.
+    rules:
+      - "Four columns of key facts under the record name, reference chips and status"
+      - "Outcome facts (result, by, on, figures compared) as facts, never as a sentence"
+      - "A dash for an empty value"
+    screens:
+      BRD-02: [SCR-OP-03, SCR-OP-10, SCR-OP-26, SCR-OP-39]
+      BRD-03: [SCR-PM-13]
+      BRD-13: [SCR-DM-07]

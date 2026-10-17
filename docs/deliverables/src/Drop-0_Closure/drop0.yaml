@@ -1,0 +1,978 @@
+# Drop 0 (Setup and Data Migration) closure: the source of
+#   01_BIBS_Drop-0_Configuration_Inputs_v2.1.xlsx  (every configuration input BDOI provides before go-live) and
+#   the tables of 02_BIBS_Drop-0_Closure_Summary_v2.1.docx (CLOSURE_SUMMARY_DROP0.md, ```pack blocks).
+# Built by tools/deliverables/drop_closure.py:
+#   python tools/deliverables/drop_closure.py            # workbook and summary
+#   python tools/deliverables/drop_closure.py --check    # checks only
+#
+# What is typed here and what is read:
+#   * typed: the register items (one per configuration item, with its owner, due date and one route), the Drop 0
+#     templates D0-nn, the owner of each module, the due milestones, the decisions and the risks of the summary;
+#   * read from the BRD-03 and BRD-11 packs: their configuration input templates (pack/config_inputs.yaml); since the
+#     FRS in BDOI's format superseded their sign-off sets (10-Oct-2026), this workbook is where BDOI fills them in;
+#   * read from the BRD-13 pack: the migration objects, milestones, proposals and open decisions (pack/catalogue.yaml);
+#   * read from the platform: every system parameter, list of values, notification event and document template the
+#     platform delivers, the chart of accounts upload template, the screens of the menu and the master tables that the
+#     SIT seed data fills. The check refuses a seeded master table that no item claims or that two items claim, a
+#     parameter, list, event or document template without exactly one route, a screen that is not in the menu, a
+#     migration object that is not in the catalogue and a template field that is not a column of its table.
+# Routes: screen (BDOI keys it on the named screen; its row of the Start here index records the decision), template (BDOI fills the
+# template sheet; the rows are then entered on the named screen or uploaded), migration (loaded from the legacy
+# extracts by the data migration object; prepared in the Migration Workbook, not in this workbook).
+
+meta:
+  title: Drop 0 Configuration Inputs
+  doc_type: Configuration inputs workbook
+  version: "2.1"
+  date: 8 October 2026
+  go_live: 2028-01-03
+  go_live_text: "Go-live is proposed for Monday 3 January 2028 (T), at the year-end boundary (option A of the Data Migration set, for Comptrollership to confirm)."
+  statuses: [Not started, In progress, Ready for review, Confirmed, Not applicable]
+
+# Due milestones, in date order. weeks before go-live are computed from the date.
+due:
+  - {code: D1, label: "Drafts with the Drop 0 sign-off", date: 2026-12-01, note: "Sign-off of BRD-11 on 1-Dec-2026, the last of the three Drop 0 sets"}
+  - {code: D2, label: "Platform set-up for Drop 1 SIT", date: 2027-01-04, note: "Drop 1 SIT runs Jan - Jul 2027 on the BDOI organisation, chart of accounts and banks"}
+  - {code: D3, label: "Reference data for Trial migration 1 (M4)", date: 2027-04-09, note: "Extracts for Trial migration 1; reference data and clients first"}
+  - {code: D4, label: "Code maps approved (M5)", date: 2027-06-18, note: "Code maps approved for Trial migration 2, including the package code map"}
+  - {code: D5, label: "Values for UAT", date: 2027-07-16, note: "UAT plans and sign-off forms due 16-Jul-2027; UAT Aug - Dec 2027 runs on the production values"}
+  - {code: D6, label: "Production values before the dress rehearsal", date: 2027-11-01, note: "Dress rehearsal in November 2027; the values loaded for it are the go-live values"}
+  - {code: D7, label: "Map freeze (T-7)", date: 2027-12-27, note: "No change of a code map or reference value after the freeze except by change request"}
+
+# BDOI owner, BRD and drop of each module. The owners are the business owners named in the sign-off sets.
+modules:
+  PLATFORM: {name: Platform set-up, brd: BRD-00, drop: "Drop 0", owner: "BDOI IT"}
+  ORG: {name: Organisation and finance set-up, brd: BRD-05, drop: "Drop 0", owner: "Head, Comptrollership"}
+  NB: {name: New Business, brd: BRD-01, drop: "Drop 1", owner: "Product Owner, BDOI (New Business)"}
+  OPS: {name: Operations, brd: BRD-02, drop: "Drop 1", owner: "Head, Operations Services"}
+  PM: {name: Product Maintenance, brd: BRD-03, drop: "Drop 0", owner: "Product Owner, Marketing Business System (MBS)"}
+  CLX: {name: Collections, brd: BRD-04, drop: "Drop 1", owner: "VP and Head, BDOI Operations (Collections)"}
+  ACC: {name: "Accounting, Disbursement and ACSL", brd: BRD-05, drop: "Drop 1", owner: "Head, Comptrollership"}
+  RNW: {name: Renewal, brd: BRD-06, drop: "Drop 1", owner: "Product Owner, Renewal"}
+  CLM: {name: Claims, brd: BRD-07, drop: "Drop 2", owner: "Product Owner, Claims"}
+  EB: {name: Employee Benefits, brd: BRD-08, drop: "Drop 2", owner: "Product Owner, Employee Benefits"}
+  CSF: {name: Customer Servicing Facility, brd: BRD-09, drop: "Drop 1", owner: "Product Owner, Customer Servicing Facility"}
+  SCR: {name: Sanction Screening, brd: BRD-10, drop: "Drop 1", owner: "Compliance"}
+  UAM: {name: User Access Maintenance, brd: BRD-11, drop: "Drop 0", owner: "Business Administration (User Access)"}
+  SEC: {name: Security settings, brd: BRD-11, drop: "Drop 0", owner: "BDOI Information Security"}
+  SBM: {name: Submitted Policies, brd: BRD-12, drop: "Drop 1", owner: "Product Owner, Submitted Policies"}
+  DM: {name: Data Migration, brd: BRD-13, drop: "Drop 0", owner: "Program Manager, Business Project Services (Data Migration)"}
+
+# Module of each group of system parameters (the group shown on System Parameters).
+# Parameter groups of the product modules the client does not use (the insurer suite): not asked for.
+parameter_groups_not_in_use: [UNDERWRITING]
+parameter_groups:
+  ACCOUNTING: ACC
+  ACSL: ACC
+  BOOKING: NB
+  BROKING: NB
+  BULK: PLATFORM
+  CLAIMS_HANDLING: CLM
+  COLLECTIONS: CLX
+  CONFIG_PROMOTION: PLATFORM
+  CONTROLS: ACC
+  CRM: NB
+  CUSTOMER_SERVICE: CSF
+  DATA_MIGRATION: DM
+  DISBURSEMENT: ACC
+  EMPLOYEE_BENEFITS: EB
+  ISSUANCE: NB
+  MESSAGING: PLATFORM
+  NB_REPORTS: NB
+  OPERATIONS: OPS
+  PLACEMENT: NB
+  PRODUCT_MAINTENANCE: PM
+  RENEWAL: RNW
+  REPORTING: ACC
+  SCREENING: SCR
+  SECURITY: SEC
+  SUBMITTED: SBM
+  TAX: ACC
+
+# Client wording of the parameters whose platform description is written for the support team.
+parameter_text:
+  AUTH_MODE: "Sign-in mode: LOCAL (BIBS passwords) or DIRECTORY (BDO directory sign-in by Windows ID, when the EIAM sign-in is specified)"
+  DISB_AUTO_APPROVER_ROUTING: "Request types whose disbursement voucher is prepared automatically and routed straight to the approver"
+  CSF_SEARCH_MAX_RESULTS: "Maximum clients a customer search returns before the contact centre officer must refine it"
+  EPOLICY_PASSWORD_HINT: "Text telling the client how the password of the e-policy is formed"
+  RNW_CCM_MODE: "Connection of CCM: LIVE (the CCM interface at the address below) or SIMULATOR (the CCM simulator of SIT and UAT)"
+  RNW_CCM_KEY_SETTING: "Name of the environment setting that holds the CCM access key (kept by BDOI IT, never shown in BIBS)"
+  RNW_MFT_KEY_SETTING: "Name of the environment setting that holds the MFT access key (kept by BDOI IT, never shown in BIBS)"
+
+# Module of each list of values: by the start of the list code (longest match first), then by the full code.
+lov_prefixes:
+  ACSL_: ACC
+  ADJ_: OPS
+  BCL_: CLM
+  CLIENT_: NB
+  CLX_: CLX
+  CSF_: CSF
+  DISB_: ACC
+  EB_: EB
+  ENDORSEMENT_: OPS
+  KYC_: NB
+  MIG_: DM
+  PKG_: PM
+  PRQ_: ACC
+  RECON_: OPS
+  REMIT_: OPS
+  RNW_: RNW
+  RRF_: ACC
+  SBM_: SBM
+  SCR_: SCR
+  UAM_: UAM
+lov_codes:
+  LEGACY_RECORD_STATUS: DM
+  AR_CLASS: OPS
+  BRANCH_EMAIL: OPS
+  CANCELLATION_REASON: OPS
+  CIVIL_STATUS: NB
+  CLAUSE_KIND: PM
+  CONSTRUCTION_CLASS: NB
+  COVERAGE_KIND: PM
+  DISBURSEMENT_TYPE: ACC
+  DISPOSITION_TYPE: OPS
+  DOCUMENT_TYPE: PM
+  DP_FEEDBACK_REASON: CLX
+  EPOLICY_REJECT_REASON: NB
+  FFY_CANCEL_REASON: NB
+  HOLD_REASON: OPS
+  ID_TYPE: NB
+  INCENTIVE_EXCLUSION_RULE: NB
+  INCENTIVE_TYPE: PM
+  INSTRUCTION_TYPE: NB
+  LEGACY_RECORD_STATUS: DM
+  LEGACY_RECORD_TYPE: DM
+  MARKET_SEGMENT: PM
+  MORTGAGEE_BANK: NB
+  NATIONALITY: NB
+  OCCUPANCY: NB
+  OPS_EXTERNAL_LINK: OPS
+  OR_TYPE: OPS
+  PAYEE_CLASS: ACC
+  RECEIPT_CANCEL_REASON: OPS
+  REFUND_REASON: ACC
+  REINSTATEMENT_REASON: OPS
+  REMITTANCE_TYPE: OPS
+  RETURN_REASON: NB
+  SERVICE_FEE_SEGMENT: ACC
+  SOURCE_CHANNEL: NB
+  SOURCE_OF_FUNDS: NB
+  SPECIAL_REMIT_CONDITION: OPS
+  VEHICLE_BODY_TYPE: NB
+  VOID_REASON: OPS
+
+# Module of each notification event, by the module the platform gives the event.
+event_modules:
+  ACSL: ACC
+  ADJUSTMENT: OPS
+  BOOKING: NB
+  CASHIERING: OPS
+  CLAIMS_HANDLING: CLM
+  COLLECTIONS: CLX
+  COMMISSION: CLX
+  CONFIG_PROMOTION: PLATFORM
+  EMPLOYEE_BENEFITS: EB
+  OPSLEDGER: OPS
+  PAYREQUEST: ACC
+  PRODRECON: OPS
+  PRODUCT_MAINTENANCE: PM
+  REMITTANCE: OPS
+  RENEWAL: RNW
+  SCREENING: SCR
+  STORAGE: PLATFORM
+  SUBMITTED: SBM
+  USER_ACCESS: UAM
+
+# Module of each document template, by the start of the template code.
+document_prefixes:
+  BCL_: CLM
+  CLX_: CLX
+  DSB_: ACC
+  EB_: EB
+  ENDORSEMENT_: OPS
+  EPOLICY_: NB
+  HOLD_COVER_: NB
+  INSURANCE_ADVICE: NB
+  PKG_: PM
+  PLACEMENT_: NB
+  PRODRECON_: OPS
+  PROPOSAL_: NB
+  PRQ_: ACC
+  QUOTATION_: NB
+  REMITTANCE_: OPS
+  RNW_: RNW
+  SBM_: SBM
+  SERVICE_INVOICE_: NB
+  VALIDATION_: NB
+
+# Where each generated list goes: the parameters named in a BRD template column (or all the parameters of a group)
+# and the lists named in a BRD template are prepared there; every other one on the sheet of this workbook.
+list_templates:
+  parameters:
+    - {template: UA-05, keys_from_column: 1}            # BRD-11 CI-05: the parameters listed in its first column
+    - {template: PM-09, groups: [PRODUCT_MAINTENANCE]}  # BRD-03 CI-09: the Product Maintenance parameters
+  lovs:
+    - {template: UA-06, codes: [UAM_BUSINESS_UNIT, UAM_USER_LEVEL, UAM_DEACTIVATION_REASON]}
+    - {template: PM-09, codes: [PKG_REQUEST_REASON, PKG_RESPONSE_OUTCOME, PKG_ADVISORY_GROUP, PKG_NOT_PROCEEDED_REASON,
+                                PKG_REQUEST_TYPE, INCENTIVE_TYPE, COVERAGE_KIND, CLAUSE_KIND, DOCUMENT_TYPE]}
+  documents:
+    - {template: PM-08, prefix: PKG_}
+
+# --------------------------------------------------------------------------------------------------------------
+# Register items. One row per configuration item. area: the heading of the register. route: screen, template or
+# migration; screen: the menu route of the screen where it is entered or uploaded; template: the template sheet
+# (PM-nn of BRD-03, UA-nn of BRD-11, D0-nn of this workbook, or a generated list sheet LIST-...); object: the
+# migration object. tables: the platform tables the item fills (checked against the seed data; not printed).
+areas:
+  - Organisation
+  - Chart of accounts and accounting
+  - Banks and bank accounts
+  - Document numbering
+  - Lists of values
+  - System and security parameters
+  - Notifications and documents
+  - Products and packages
+  - Insurers and partners
+  - Users, roles and approvals
+  - Module rules and set-up
+  - Data migration reference data
+
+items:
+  # ---------------------------------------------------------------- Organisation
+  - {id: CFG-001, area: Organisation, module: ORG, name: Company, due: D2, route: template, template: D0-01, screen: /setup/companies,
+     provides: "The BDOI company record: code, registered name, TIN, address, base currency, fiscal year start and the value-date window of postings",
+     tables: [org_company]}
+  - {id: CFG-002, area: Organisation, module: ORG, name: Branches and invoicing branches, due: D2, route: template, template: D0-02, screen: /setup/branches,
+     provides: "Every BDOI branch with its region, address, opening date, head-office flag, contact and weekly rest days; the legacy branch codes are mapped to them by the migration (R02, check only)",
+     tables: [org_branch]}
+  - {id: CFG-003, area: Organisation, module: ORG, name: Holiday calendar, due: D2, route: template, template: D0-03, screen: /setup/holidays,
+     provides: "Public and company holidays of 2027 and 2028, company-wide or per branch; they drive the working days of service levels, value dates and jobs",
+     tables: [org_holiday]}
+  - {id: CFG-004, area: Organisation, module: ORG, name: Cost centres and business lines, due: D2, route: template, template: D0-04, screen: /setup/dimensions,
+     provides: "The cost centres and business lines used on journal lines and in the cost-centre rules; the legacy cost centres are mapped by code map COST_CENTER",
+     tables: [dim_value]}
+  - {id: CFG-005, area: Organisation, module: ORG, name: Employees, due: D5, route: template, template: D0-05, screen: /setup/employees,
+     provides: "Employees with their branch and cost centre, for the cost-centre rules, petty cash custodians and staff advances",
+     tables: [org_employee]}
+  - {id: CFG-006, area: Organisation, module: ORG, name: Cost-centre rules, due: D5, route: screen, screen: /setup/cost-centre-rules,
+     provides: "Which cost centre an automatic posting takes by module, event, branch, party or account",
+     tables: []}
+  - {id: CFG-007, area: Organisation, module: NB, name: "Sales organisation (regions, departments, teams, unit heads, account officers)", due: D3, route: migration, object: R03, screen: /catalog/sales-organisation,
+     provides: "The sales units and account officers in force, and the inactive officers of open items; after go-live maintained on Sales Organisation",
+     tables: [cat_sales_unit, cat_sales_officer]}
+  - {id: CFG-008, area: Organisation, module: NB, name: Production targets, due: D5, route: screen, screen: /nb/targets,
+     provides: "The 2028 production targets per sales unit and officer for the New Business reports",
+     tables: [nbr_sales_target]}
+  - {id: CFG-009, area: Organisation, module: ORG, name: Financial year and periods, due: D6, route: screen, screen: /gl/periods,
+     provides: "Financial year 2028 and its periods, opened by Comptrollership; FY2027 stays in legacy (year-end option A)",
+     tables: [per_fiscal_year, per_period]}
+  - {id: CFG-010, area: Organisation, module: ORG, name: Currencies and exchange rates, due: D5, route: screen, screen: /setup/currencies,
+     provides: "The currencies in use and the source and owner of the daily BOOK rate; the legacy currency codes are mapped by code map CURRENCY",
+     tables: [cur_exchange_rate]}
+
+  # ---------------------------------------------------------------- Chart of accounts and accounting
+  - {id: CFG-020, area: Chart of accounts and accounting, module: ORG, name: Chart of accounts, due: D2, route: template, template: D0-06, screen: /gl/accounts/upload,
+     provides: "The production chart of accounts of BDOI in the chart upload template: every account with its parent, class, level, control and sub-ledger flags, currencies and report group",
+     tables: [coa_account, coa_account_currency]}
+  - {id: CFG-021, area: Chart of accounts and accounting, module: ORG, name: Account categories and numbering scheme, due: D2, route: template, template: D0-07, screen: /gl/accounts,
+     provides: "The GL categories (with the bank categories) and the numbering scheme under each parent (separator and width)",
+     tables: [coa_category]}
+  - {id: CFG-022, area: Chart of accounts and accounting, module: ORG, name: Accounting rules per event, due: D2, route: template, template: D0-08, screen: /accounting/rules,
+     provides: "For each accounting event of the platform, the debit and credit accounts per amount component, business line and currency",
+     tables: [acc_rule, acc_rule_line]}
+  - {id: CFG-023, area: Chart of accounts and accounting, module: ORG, name: Legacy control accounts and Migration Clearing, due: D1, route: template, template: D0-09, screen: /gl/accounts,
+     provides: "The account codes of the legacy control accounts and of Migration Clearing in the production chart (proposed rule PR-DM-02)",
+     tables: [acc_account_legacy]}
+  - {id: CFG-024, area: Chart of accounts and accounting, module: DM, name: Chart of accounts mapping (legacy GL account to BIBS account), due: D4, route: migration, object: R08, screen: /migration/maps,
+     provides: "The map of every legacy GL account of EBIX and ISYS to a BIBS account; control accounts to Migration Clearing",
+     tables: []}
+  - {id: CFG-025, area: Chart of accounts and accounting, module: ACC, name: Tax codes and forms, due: D5, route: template, template: D0-10, screen: /tax/codes,
+     provides: "The withholding, VAT and percentage tax codes with their ATC, rate, GL account and effective dates; the RDO code",
+     tables: [tax_code]}
+  - {id: CFG-026, area: Chart of accounts and accounting, module: ACC, name: Financial statement formats and account schedules, due: D5, route: screen, screen: /frbs/schedules,
+     provides: "The lines of the financial statements and MIS formats and the accounts in each, as Comptrollership reports them",
+     tables: [fin_statement_format, fin_statement_format_line]}
+  - {id: CFG-027, area: Chart of accounts and accounting, module: ACC, name: Recurring journals, due: D6, route: screen, screen: /gl/recurring,
+     provides: "The monthly accruals and allocations Comptrollership posts as recurring journals from January 2028",
+     tables: [jnl_recurring_template, jnl_recurring_line]}
+  - {id: CFG-028, area: Chart of accounts and accounting, module: ACC, name: Asset categories, due: D5, route: screen, screen: /assets/categories,
+     provides: "Fixed-asset categories with their useful life, method and accounts",
+     tables: [fa_category]}
+  - {id: CFG-029, area: Chart of accounts and accounting, module: ACC, name: Investment portfolios, due: D5, route: screen, screen: /investments/portfolios,
+     provides: "The investment portfolios and their accounts, when BDOI keeps investments in BIBS",
+     tables: [inv_portfolio]}
+  - {id: CFG-030, area: Chart of accounts and accounting, module: ACC, name: GL-SL reconciliation controls (ACSL), due: D5, route: screen, screen: /acsl/gl-sl,
+     provides: "The control accounts reconciled against their sub-ledgers and the tolerance of each",
+     tables: [acsl_glsl_control]}
+  - {id: CFG-031, area: Chart of accounts and accounting, module: ACC, name: Service fee rates, due: D5, route: screen, screen: /frbs/service-fee/setup,
+     provides: "The service fee rates per segment and their recipients",
+     tables: []}
+
+  # ---------------------------------------------------------------- Banks and bank accounts
+  - {id: CFG-040, area: Banks and bank accounts, module: ORG, name: Company bank accounts, due: D2, route: template, template: D0-11, screen: /disbursement/banks,
+     provides: "Every BDOI bank account used for collections and disbursements: bank, account number, currency, branch, GL account and PDC clearing account",
+     tables: [pay_bank_account]}
+  - {id: CFG-041, area: Banks and bank accounts, module: ACC, name: Check books, due: D6, route: template, template: D0-12, screen: /disbursement/banks,
+     provides: "The check books in stock per bank account at go-live: first, last and next check number",
+     tables: [pay_cheque_book]}
+  - {id: CFG-042, area: Banks and bank accounts, module: ACC, name: Petty cash funds, due: D6, route: template, template: D0-13, screen: /payables/petty-cash,
+     provides: "Each petty cash fund: branch, custodian, imprest amount, GL account and replenishment bank account",
+     tables: [pay_petty_cash_fund]}
+  - {id: CFG-043, area: Banks and bank accounts, module: ORG, name: Bank statement layouts, due: D5, route: template, template: D0-14, screen: /setup/statement-layouts,
+     provides: "The column layout of the statement file of each bank account for the bank reconciliation",
+     tables: []}
+  - {id: CFG-044, area: Banks and bank accounts, module: OPS, name: Payment file layouts of the collection channels, due: D5, route: screen, screen: /cashiering/setup,
+     provides: "Confirmation of the payment files received from Bills Payment, Trade, Direct Credit, CLPC and PMS and their field names",
+     tables: []}
+  - {id: CFG-045, area: Banks and bank accounts, module: NB, name: Bank list (mortgagee banks), due: D3, route: template, template: LIST-LOV, screen: /broking-setup/lists,
+     provides: "The banks named as mortgagee or payout bank; the legacy bank codes are mapped to this list by code map BANK",
+     tables: []}
+
+  # ---------------------------------------------------------------- Document numbering
+  - {id: CFG-050, area: Document numbering, module: OPS, name: Receipt series in use (AR and OR), due: D7, route: migration, object: R11, screen: /cashiering/series,
+     provides: "The BIR-authorised AR and OR series of each branch in use at the freeze (ATP, range and next number), so BIBS continues them without gap or overlap",
+     tables: [csh_receipt_series]}
+  - {id: CFG-051, area: Document numbering, module: PLATFORM, name: Document number prefixes, due: D5, route: template, template: LIST-NUMBERING,
+     provides: "The prefix of every numbered document (quotations, proposals, slips, package requests, renewals, submitted policies, screening cases); the year and the running number follow the prefix",
+     tables: [document_sequence]}
+  - {id: CFG-052, area: Document numbering, module: ORG, name: Account numbering scheme, due: D2, route: template, template: D0-07,
+     provides: "Covered by CFG-021: the separator and width of the account codes under each parent",
+     tables: []}
+
+  # ---------------------------------------------------------------- Lists of values
+  - {id: CFG-060, area: Lists of values, module: PLATFORM, name: Lists of values (every list of the platform), due: D3, route: template, template: LIST-LOV, screen: /broking-setup/lists,
+     provides: "For every list: its owner, and the values BDOI keeps, adds or retires. The lists whose values come from the legacy systems are loaded by R01; the others are entered on Lists of Values under maker-checker (see the sheet Ref Lists of values for the route of each list)",
+     tables: [lov_value]}
+  - {id: CFG-061, area: Lists of values, module: DM, name: Values of the lists used by migrated records, due: D4, route: migration, object: R01, screen: /migration/maps,
+     provides: "The legacy values of the lists mapped by the code maps LOV and MIS, and the BIBS value of each",
+     tables: []}
+
+  # ---------------------------------------------------------------- System and security parameters
+  - {id: CFG-070, area: System and security parameters, module: PLATFORM, name: System parameters (every parameter of the platform), due: D5, route: template, template: LIST-PARAMETERS, screen: /admin/parameters,
+     provides: "For every parameter: the value BDOI wants against the value proposed, with the reason and the approver (see the sheet Ref System parameters)",
+     tables: []}
+  - {id: CFG-071, area: System and security parameters, module: SEC, name: "Sign-in, password, session and access-request parameters", due: D5, route: template, template: UA-05, screen: /admin/parameters,
+     provides: "The security values agreed with BDOI Information Security (BRD-11 template CI-05)",
+     tables: []}
+  - {id: CFG-072, area: System and security parameters, module: PLATFORM, name: Exception codes and alert thresholds, due: D5, route: screen, screen: /admin/exception-codes,
+     provides: "Which exceptions raise an alert, with their severity and the amount or day threshold of each",
+     tables: []}
+  - {id: CFG-073, area: System and security parameters, module: PLATFORM, name: Scheduled job times, due: D5, route: screen, screen: /admin/jobs,
+     provides: "The run time of each daily and monthly job in Philippine time, and the blackout windows",
+     tables: []}
+  - {id: CFG-074, area: System and security parameters, module: SCR, name: Data retention rules, due: D5, route: screen, screen: /broking-setup/retention,
+     provides: "Years online and in the archive per record type, and the action at the end, as Compliance sets them",
+     tables: []}
+  - {id: CFG-075, area: System and security parameters, module: PLATFORM, name: "Directory sign-in and provisioning (EIAM, UIDM-ISC)", due: D1, route: screen, screen: /admin/parameters,
+     provides: "The sign-in mode, the EIAM tenant and claims, and the UIDM-ISC option (clarifications CLR-UA-01 and CLR-UA-03)",
+     tables: []}
+
+  # ---------------------------------------------------------------- Notifications and documents
+  - {id: CFG-080, area: Notifications and documents, module: PLATFORM, name: Notification events and recipients, due: D5, route: template, template: LIST-NOTIFICATIONS, screen: /operations/notifications,
+     provides: "For every notification event: in-app and e-mail by default, and any unit mailbox that must receive it besides the users of the step (see the sheet Ref Notifications)",
+     tables: []}
+  - {id: CFG-081, area: Notifications and documents, module: PLATFORM, name: Fixed recipients and sender address, due: D5, route: template, template: LIST-PARAMETERS, screen: /admin/parameters,
+     provides: "The sender address of BIBS e-mails and the recipients of job failures and watchlist loads (parameters MAIL_FROM_ADDRESS, JOB_FAILURE_RECIPIENTS, SCR_INGEST_ALERT_RECIPIENTS)",
+     tables: []}
+  - {id: CFG-082, area: Notifications and documents, module: PLATFORM, name: "Document templates (letters, slips, advices, e-mails)", due: D5, route: template, template: LIST-DOCUMENTS, screen: /broking-setup/templates,
+     provides: "The BDOI wording and layout of every generated document (see the sheet Ref Document templates)",
+     tables: []}
+  - {id: CFG-083, area: Notifications and documents, module: SCR, name: Screening forms and STR layout, due: D5, route: screen, screen: /screening-setup/templates,
+     provides: "The screening forms and the STR report layout Compliance submits",
+     tables: [scr_template, scr_template_field, scr_str_layout, scr_str_layout_column, scr_str_field]}
+
+  # ---------------------------------------------------------------- Products and packages
+  - {id: CFG-090, area: Products and packages, module: PM, name: Product catalogue, due: D3, route: migration, object: R05, template: PM-01, screen: /catalog/products,
+     provides: "Product lines, cover types and products (risk codes) with their features, prepared in BRD-03 template CI-01",
+     tables: [cat_product_line, cat_product]}
+  - {id: CFG-091, area: Products and packages, module: PM, name: "Coverages, perils and field rules", due: D5, route: template, template: PM-02, screen: /catalog/coverages, provides: "BRD-03 template CI-02", tables: []}
+  - {id: CFG-092, area: Products and packages, module: PM, name: Clause library, due: D5, route: template, template: PM-03, screen: /catalog/coverages, provides: "BRD-03 template CI-03", tables: []}
+  - {id: CFG-093, area: Products and packages, module: PM, name: Rate tables, due: D5, route: template, template: PM-04, screen: /catalog/rates, provides: "BRD-03 template CI-04", tables: []}
+  - {id: CFG-094, area: Products and packages, module: PM, name: Packages in force at go-live, due: D6, route: template, template: PM-06, screen: /product-maintenance/requests/new,
+     provides: "BRD-03 template CI-06: one package request per package, set up and validated before the map freeze",
+     tables: [cat_product_version, cat_package_coverage, cat_package_insurer, cat_package_insurer_term]}
+  - {id: CFG-095, area: Products and packages, module: PM, name: Package map (legacy package to BIBS package version), due: D4, route: migration, object: R06, template: PM-07, screen: /migration/maps,
+     provides: "BRD-03 template CI-07, loaded as reference data for the package check of the Renewal sanitation",
+     tables: [rnw_package_map]}
+  - {id: CFG-096, area: Products and packages, module: PM, name: Incentive criteria, due: D5, route: template, template: PM-10, screen: /catalog/incentives,
+     provides: "BRD-03 template CI-10",
+     tables: [cat_incentive_criteria, cat_incentive_criteria_product]}
+  - {id: CFG-097, area: Products and packages, module: PM, name: Lists and parameters of Product Maintenance, due: D5, route: template, template: PM-09, screen: /broking-setup/lists,
+     provides: "BRD-03 template CI-09 (the lists and parameters it names are listed with this route on the sheets Ref Lists of values and Ref System parameters)",
+     tables: []}
+  - {id: CFG-098, area: Products and packages, module: PM, name: Package document templates, due: D5, route: template, template: PM-08, screen: /broking-setup/templates,
+     provides: "BRD-03 template CI-08: the texts of the package documents",
+     tables: []}
+
+  # ---------------------------------------------------------------- Insurers and partners
+  - {id: CFG-100, area: Insurers and partners, module: OPS, name: Insurers and insurer branches, due: D3, route: migration, object: R04, template: PM-05, screen: /catalog/insurers,
+     provides: "The insurer panel with accreditation, placement e-mails and credit days, and the insurer branches with their LGT rate (BRD-03 template CI-05)",
+     tables: [cat_insurer, cat_insurer_branch]}
+  - {id: CFG-101, area: Insurers and partners, module: OPS, name: Commission rates by insurer and product, due: D3, route: migration, object: R07, template: PM-05, screen: /catalog/insurers,
+     provides: "The commission rates in force at cut-over and later (commission rows of BRD-03 template CI-05)",
+     tables: [cat_commission_rate]}
+  - {id: CFG-102, area: Insurers and partners, module: ACC, name: "Business partners other than insurers (suppliers, service providers)", due: D5, route: screen, screen: /setup/parties,
+     provides: "Suppliers and other partners paid through Payables, with TIN, address and bank details",
+     tables: [pty_party]}
+  - {id: CFG-103, area: Insurers and partners, module: ACC, name: Payees, due: D3, route: migration, object: R09, screen: /disbursement/payees,
+     provides: "Active payees of EBIX, loaded by the payee registration of Disbursement if BDOI brings R09 into scope (conditional object, DMQ30); otherwise registered on Payees",
+     tables: [dsb_payee]}
+  - {id: CFG-104, area: Insurers and partners, module: CLM, name: Insurer location references (claims), due: D5, route: screen, screen: /claims-handling/location-refs,
+     provides: "The claim location references of each insurer, entered or uploaded on Insurer Location References",
+     tables: [bcl_location_ref]}
+
+  # ---------------------------------------------------------------- Users, roles and approvals
+  - {id: CFG-110, area: "Users, roles and approvals", module: UAM, name: Users at go-live, due: D6, route: template, template: UA-01, screen: /user-access/bulk,
+     provides: "BRD-11 template CI-01, uploaded as a bulk request and approved; users are not migrated (R10 excluded, legacy user IDs only mapped)",
+     tables: [sec_user, sec_user_role]}
+  - {id: CFG-111, area: "Users, roles and approvals", module: UAM, name: Role-to-permission matrix, due: D3, route: template, template: UA-02, screen: /user-access/group-profiles,
+     provides: "BRD-11 template CI-02",
+     tables: [sec_role, sec_role_permission]}
+  - {id: CFG-112, area: "Users, roles and approvals", module: UAM, name: "Approvers, approval rules and authorisation limits", due: D5, route: template, template: UA-03, screen: /user-access/requests/new,
+     provides: "BRD-11 template CI-03: the access approvers and the authorisation limit of each user who approves by amount",
+     tables: []}
+  - {id: CFG-113, area: "Users, roles and approvals", module: SEC, name: Separation-of-duties rules, due: D5, route: template, template: UA-04, screen: /user-access/sod-rules,
+     provides: "BRD-11 template CI-04",
+     tables: [nba_sod_rule]}
+  - {id: CFG-114, area: "Users, roles and approvals", module: PLATFORM, name: Approval limits and matrices of the modules, due: D5, route: template, template: D0-15,
+     provides: "The approval levels by amount, sum insured or segment of Submitted Policies, Employee Benefits, Sanction Screening and Disbursement, with the approver role and the signatory",
+     tables: [sbm_approval_matrix, eb_threshold_rule, scr_approval_route]}
+  - {id: CFG-115, area: "Users, roles and approvals", module: SBM, name: User scope of Submitted Policies, due: D5, route: screen, screen: /submitted/setup,
+     provides: "The segments and units each Submitted Policies user may see",
+     tables: [sbm_user_scope]}
+
+  # ---------------------------------------------------------------- Module rules and set-up (confirmed with each module's sign-off set)
+  - {id: CFG-120, area: Module rules and set-up, module: NB, name: Booking rules and incentive rules, due: D5, route: screen, screen: /booking/setup,
+     provides: "The automatic booking rules and the booking incentive rules", tables: [bkg_auto_book_rule, bkg_incentive_rule]}
+  - {id: CFG-121, area: Module rules and set-up, module: OPS, name: Remittance incentive rules, due: D5, route: screen, screen: /remittance/incentive-rules,
+     provides: "The incentive deductions applied at remittance", tables: [rem_incentive_rule]}
+  - {id: CFG-122, area: Module rules and set-up, module: CLX, name: Commission incentive schemes, due: D5, route: screen, screen: /commission/incentives/schemes,
+     provides: "The commission incentive schemes and their rates", tables: [cmr_incentive_scheme]}
+  - {id: CFG-123, area: Module rules and set-up, module: CLX, name: Collections assignment and escalation rules, due: D5, route: screen, screen: /collections/setup,
+     provides: "How accounts are assigned to collectors and when they escalate to the team lead and the unit head", tables: [clx_assignment_rule, clx_escalation_rule]}
+  - {id: CFG-124, area: Module rules and set-up, module: RNW, name: Renewal buckets and decision matrix, due: D5, route: screen, screen: /renewal/setup,
+     provides: "The renewal bucket rules, the decision matrix and the non-renewable risk codes", tables: [rnw_bucket_rule_set, rnw_bucket_rule, rnw_decision_matrix, rnw_decision_rule, rnw_non_renewable_risk_code]}
+  - {id: CFG-125, area: Module rules and set-up, module: SBM, name: "Submitted Policies rules, limits and letters", due: D5, route: screen, screen: /submitted/setup,
+     provides: "The processing rules, insurer rules and limits, and the letter rules of Submitted Policies", tables: [sbm_rule_set, sbm_rule, sbm_rule_condition, sbm_insurer_rule, sbm_limit_rule, sbm_letter_rule]}
+  - {id: CFG-126, area: Module rules and set-up, module: SCR, name: Screening configuration, due: D5, route: screen, screen: /screening-setup/config,
+     provides: "Match rules, risk categories and rules, assignment, service levels and validation rules of Sanction Screening", tables: [scr_config_version, scr_match_rule, scr_risk_category, scr_risk_rule, scr_assignment_rule, scr_sla_rule, scr_validation_rule]}
+  - {id: CFG-127, area: Module rules and set-up, module: SCR, name: Watchlist sources and entries, due: D5, route: screen, screen: /screening-setup/sources,
+     provides: "The sanctions and PEP list sources, their load schedule and the first load", tables: [scr_watchlist_entry, scr_watchlist_alias]}
+  - {id: CFG-128, area: Module rules and set-up, module: EB, name: Employee Benefits set-up, due: D5, route: screen, screen: /eb/setup,
+     provides: "The required documents per process and the other Employee Benefits settings", tables: [eb_required_document]}
+  - {id: CFG-129, area: Module rules and set-up, module: CLM, name: Claims handlers and set-up, due: D5, route: screen, screen: /claims-handling/setup,
+     provides: "The claims handlers per unit and the Claims settings", tables: [bcl_handler]}
+  - {id: CFG-130, area: Module rules and set-up, module: OPS, name: Production reconciliation extract schedules, due: D5, route: screen, screen: /prodrecon/schedules,
+     provides: "The insurers and the schedule of the production extracts sent for reconciliation", tables: [prc_schedule]}
+  - {id: CFG-131, area: Module rules and set-up, module: NB, name: New Business report variants, due: D5, route: screen, screen: /nb/reports,
+     provides: "The report variants the units use", tables: [nbr_report_variant]}
+
+  # ---------------------------------------------------------------- Data migration reference data
+  - {id: CFG-140, area: Data migration reference data, module: DM, name: Code maps of the reference data, due: D4, route: migration, object: R01, screen: /migration/maps,
+     provides: "The approved versions of the code maps (branches, sales units, officers, users, cost centres, banks, currencies, dispositions, statuses) that turn legacy codes into BIBS codes",
+     tables: [mig_code_map_version, mig_code_map_entry]}
+  - {id: CFG-141, area: Data migration reference data, module: DM, name: Branch code map, due: D4, route: migration, object: R02, screen: /migration/maps,
+     provides: "The map of every legacy branch and invoicing branch to a BIBS branch of CFG-002",
+     tables: []}
+
+# Master tables that the SIT seed data fills but that are records, not configuration (not claimed by an item).
+records_not_configuration:
+  - [acc_account, acc_account_pn, acc_account_policy, acc_risk_item, acc_risk_item_detail]   # accounts and risks (New Business records)
+  - [acct_seed_gl, bkg_seed_account, bkg_seed_account_hold, bkg_seed_gl, mig_seed_gl, ops_seed_gl, sbm_seed_rule, seed_client, seed_wording]  # SIT data helpers
+  - [con_group, con_group_member, ic_relationship]   # group and inter-company tables of the removed insurer-company suite (dropped by V2501)
+  - [bkg_queue, crm_client, crm_client_instruction, crm_client_note_history, crm_client_tag, crm_kyc_document]
+  - [csf_activity, csf_contact_change, csf_contact_change_field, csf_sync_outbox, csf_verification, csf_verification_check, csh_pickup_request]
+  - [doc_attachment, doc_attachment_content, eb_activity_log, eb_cycle, eb_feedback, eb_programme, eb_programme_contact, eb_programme_line, eb_renewal_advice, eb_tracked_item]
+  - [iss_epolicy, iss_insurance_advice, mig_object_decision, mig_signoff, msg0_text, msg_outbound, msg_outbound_attachment]
+  - [nba_access_request, nba_access_request_approver, nba_access_request_batch, nba_access_request_event, npk_insurer_response, npk_insurer_response_history, npk_proposal, npk_proposal_insurer]
+  - [plc_billing_batch, plc_billing_item, plc_hold_cover, plc_insurer_return, plc_payment_evidence, plc_payment_report, plc_payment_report_line, plc_slip, plc_slip_account, plc_slip_file]
+  - [pm_advisory, pm_insurer_response, pm_insurer_response_history, pm_negotiation_round, pm_request, pm_round_insurer, pm_signoff]
+  - [quo_quotation, quo_quotation_account, quo_request, quo_version, sbm_lamd_loan]
+  - [scr_case, scr_case_event, scr_committee_vote, scr_ingestion_error, scr_ingestion_run, scr_match, scr_screening_run, scr_str, scr_str_extraction, scr_str_extraction_item, scr_str_transaction]
+  - [sec_access_change_log, wf_case, wf_case_history]
+  # transactions and run records of the SIT seed data of October 2026 (bookings, cashiering, disbursement, remittance,
+  # renewal, submitted policies, product maintenance requests, migration runs, directory sign-in records) and its helpers
+  - [bkg_invoice, bulk_job, bulk_row, clx_item, cmr_certificate, cmr_certificate_or, cmr_incentive_run, cmr_incentive_run_line]
+  - [csh_application, csh_certificate_of_payment, csh_cwt_batch, csh_cwt_tag, csh_legacy_batch, csh_legacy_batch_line, csh_minimal_balance, csh_payment, csh_reapplication, csh_receipt, csh_receipt_action, csh_receipt_line, csh_unapplied]
+  - [dsb_eod_run, dsb_instrument, dsb_request, dsb_voucher, dsb_voucher_tag, eb_franchise_request, idn_directory_profile, idn_identity_event, idn_sim_directory_account]
+  - [mig_batch, mig_client_match, mig_extract, mig_issue, mig_ra_sent, mig_recon_line, mig_recon_run, mig_stage_row, pm_deactivation_request, pm_master_change, prq_request, prq_request_line]
+  - [rcv_pdc, rem_batch, rem_batch_line, rem_extraction_tag, rem_special_request, rnw_budget, rnw_budget_month, rnw_lamd_line, rnw_lamd_report]
+  - [sbm_iaaf, sbm_intake_run, sbm_letter, sbm_policy, sbm_renewal, seed_csh_receipt, seed_dsb, seed_eb_account, seed_mig_policy, seed_rem_batch, seed_sbm]
+
+# --------------------------------------------------------------------------------------------------------------
+# Drop 0 templates. Columns: header | mandatory (Y, N or the condition) | format | what to enter | example, as in
+# the BRD templates. table / fields: the platform table and the column of each template column, for the check
+# (blank field = a column that is not a table column, such as a reference or a decision). upload: the template
+# columns are read from the upload of the named screen instead of being typed. checks and depends: the drop-down or
+# check of a column and the templates whose codes it uses, as in the BRD templates (BRD-03 pack/config_inputs.yaml);
+# a code of a BRD template is named by its ID in this workbook (UA-02). The Start here index lists the register items
+# by due date and, within a due date, in the order the templates are filled in (dependencies first).
+lists:
+  DIMENSION: {name: Dimension, values: [[COST_CENTER, Cost centre], [BUSINESS_LINE, Business line]]}
+  ACCOUNT_CLASS: {name: Account class, values: [[ASSET, Asset], [LIABILITY, Liability], [EQUITY, Equity], [INCOME, Income], [EXPENSE, Expense]]}
+  ACCOUNT_CLASS_CHART: {name: Account class of the chart, values: [[ASSET, Asset], [LIABILITY, Liability], [EQUITY, Equity], [INCOME, Income], [EXPENSE, Expense], [MEMORANDUM, Memorandum]]}
+  ACCOUNT_LEVEL: {name: Account level, values: [[GROUP, Group], [MAIN, Main account], [SUB, Sub-account], [MICRO, Micro account]]}
+  NEGATIVE_BALANCE: {name: Negative balance, values: [[ALLOW, Allowed], [WARN, Allowed with a warning], [BLOCK, Refused]]}
+  CATEGORY_ROW: {name: Category or numbering row, values: [[CATEGORY, GL category], [NUMBERING, Numbering scheme under a parent account]]}
+  ACCOUNTING_EVENT: {name: Accounting event, accounting_events: true}
+  DEBIT_CREDIT: {name: Debit or credit, values: [[DEBIT, Debit], [CREDIT, Credit]]}
+  LEGACY_ACCOUNT: {name: Legacy control account, values: [[Premium Receivable - Legacy, Per component], [PR 2307 - Legacy, ""], [Due to Insurers - Legacy, ""], [Commission Receivable - Legacy, ""], [Unrealised Commission - Legacy, ""], [Deferred Output VAT - Legacy, ""], [Unapplied Collections - Legacy, ""], [Migration Clearing, Nets to zero after the opening]]}
+  TAX_TYPE: {name: Tax type, values: [[EWT, Expanded withholding tax], [FWT, Final withholding tax], [VAT, Value-added tax], [PT, Percentage tax]]}
+  PAYEE_CLASS: {name: Payee class, lov: PAYEE_CLASS}
+  APPROVAL_MODULE: {name: Module of an approval matrix, values: [[Submitted Policies, ""], [Employee Benefits, ""], [Sanction Screening, ""], [Disbursement, ""]]}
+templates:
+  - id: D0-01
+    name: Company
+    content: The company record of BDOI
+    owner: "Head, Comptrollership"
+    source: BDOI registration documents and the current chart of accounts
+    load: "Companies (Setup & Administration), entered by the System Administrator and authorised by Comptrollership"
+    table: org_company
+    fields: [code, name, tax_id, address, base_currency, fiscal_year_start_month, back_value_days, forward_value_days, retained_earnings_account]
+    checks:
+      Company code: text:10
+      Registered name: text:200
+      Base currency: text:3
+      Fiscal year start month: whole:1-12
+      Back-value days: whole:0-365
+      Forward-value days: whole:0-365
+      Retained earnings account: code:D0-06/Account Code
+    columns:
+      - "Company code | Y | Up to 10 capitals | Code of the company on every record | BDOI"
+      - "Registered name | Y | Up to 200 characters | Name as registered with the SEC | BDO Insurance and Reinsurance Brokers, Inc."
+      - "TIN | Y | 000-000-000-00000 | Tax identification number with branch code | 000-000-000-00000"
+      - "Registered address | Y | Text | Address printed on receipts and BIR forms | 7899 Makati Avenue, Makati City"
+      - "Base currency | Y | ISO 4217 | Currency of the books | PHP"
+      - "Fiscal year start month | Y | 1 to 12 | First month of the financial year | 1"
+      - "Back-value days | Y | Whole number | How many days before today a posting may be dated | 5"
+      - "Forward-value days | Y | Whole number | How many days after today a posting may be dated | 0"
+      - "Retained earnings account | Y | Account code of D0-06 | Account that receives the year-end result | 3200"
+  - id: D0-02
+    name: Branches
+    content: Every BDOI branch and invoicing branch
+    owner: "Head, Comptrollership"
+    source: BDOI branch list; EBIX branch codes for the code map BRANCH
+    load: "Branches (Setup & Administration), before the first migration mock; the legacy branches are mapped to them by the code map BRANCH (object R02)"
+    table: org_branch
+    fields: [code, name, region, address, opening_date, head_office, forex_authorized, contact_phone, contact_email, manager_name, weekly_holidays, ""]
+    checks:
+      Branch code: text:10
+      Branch name: text:120
+      Opening date: date
+      Head office: yn
+      Foreign currency authorised: yn
+    columns:
+      - "Branch code | Y | Up to 10 capitals | Code of the branch; unique | HO"
+      - "Branch name | Y | Up to 120 characters | Name shown on screens and documents | Head Office"
+      - "Region | N | Text | Region of the branch | NCR"
+      - "Address | N | Text | Address printed on documents | 7899 Makati Avenue, Makati City"
+      - "Opening date | Y | dd-MMM-yyyy | Date the branch opened | 01-Jan-2010"
+      - "Head office | Y | Y or N | Y for one branch only | Y"
+      - "Foreign currency authorised | Y | Y or N | May receive and pay in foreign currency | Y"
+      - "Contact phone | N | Text | Branch telephone | (02) 8888-0000"
+      - "Contact e-mail | N | E-mail address | Branch mailbox | ho@bdoi.example.ph"
+      - "Branch manager | N | Name | Head of the branch | -"
+      - "Weekly rest days | N | SAT, SUN | Days the branch is closed each week | SAT,SUN"
+      - "Legacy branch codes | N | EBIX codes separated by commas | For the code map BRANCH (R02) | 001"
+  - id: D0-03
+    name: Holiday calendar
+    content: Public and company holidays of 2027 and 2028
+    owner: "Head, Comptrollership; Human Resources"
+    source: Proclamations of the national holidays; BDOI company holidays
+    load: "Holiday Calendar (Setup & Administration); 2028 before the dress rehearsal, later years each December"
+    table: org_holiday
+    fields: ["", holiday_date, description]
+    checks:
+      Branch code: code:D0-02/Branch code
+      Date: date
+      Description: text:120
+    columns:
+      - "Branch code | N | Code of D0-02; blank = every branch | Branch the holiday applies to | -"
+      - "Date | Y | dd-MMM-yyyy | Date of the holiday | 01-Jan-2028"
+      - "Description | Y | Up to 120 characters | Name of the holiday | New Year's Day"
+  - id: D0-04
+    name: Cost centres and business lines
+    sheet: Dimensions
+    content: The values of the dimensions of journal lines
+    owner: "Head, Comptrollership"
+    source: Current cost centre list of Comptrollership; the product lines for the business lines
+    load: "Dimensions (Setup & Administration); the legacy cost centres are mapped by the code map COST_CENTER"
+    table: dim_value
+    fields: [dimension_type, code, name, active]
+    checks:
+      Dimension: list:DIMENSION
+      Code: text:20
+      Name: text:120
+      Active: yn
+    columns:
+      - "Dimension | Y | COST_CENTER or BUSINESS_LINE | Dimension of the value | COST_CENTER"
+      - "Code | Y | Up to 20 capitals or digits | Code of the value | FIN"
+      - "Name | Y | Up to 120 characters | Name shown on screens and reports | Finance and Accounting"
+      - "Active | Y | Y or N | N keeps the value for history only | Y"
+  - id: D0-05
+    name: Employees
+    content: Employees used by the cost-centre rules, petty cash and staff advances
+    owner: "Human Resources; Head, Comptrollership"
+    source: HR employee list
+    load: "Employees (Setup & Administration)"
+    table: org_employee
+    fields: [employee_no, full_name, "", cost_center, position, email, hired_on]
+    checks:
+      Full name: text:120
+      Branch code: code:D0-02/Branch code
+      Cost centre: code:D0-04/Code
+      Hired on: date
+    columns:
+      - "Employee number | Y | HR number | Unique | 1203344"
+      - "Full name | Y | Up to 120 characters | Name of the employee | Andrea Mercado"
+      - "Branch code | Y | Code of D0-02 | Home branch | HO"
+      - "Cost centre | Y | Cost centre of D0-04 | Cost centre of the employee | FIN"
+      - "Position | N | Text | Position title | Accounting Officer"
+      - "E-mail | N | Company e-mail | For advices and statements | andrea.mercado@bdoi.example.ph"
+      - "Hired on | N | dd-MMM-yyyy | Date of hire | 03-Mar-2019"
+  - id: D0-06
+    name: Chart of accounts
+    content: The production chart of accounts, in the columns of the chart upload
+    owner: "Head, Comptrollership"
+    source: The BDOI chart of accounts in use, completed with the legacy control accounts (D0-09)
+    load: "Chart Upload (General Ledger): the file is checked row by row and every account is created pending authorisation by Comptrollership"
+    checks:
+      Parent Code: code:D0-06/Account Code
+      Class: list:ACCOUNT_CLASS_CHART
+      Level: list:ACCOUNT_LEVEL
+      Category: code:D0-07/Category code
+      Control Account: yn
+      Manual Posting: yn
+      Cost Centre Required: yn
+      Revaluation Required: yn
+      Negative Balance: list:NEGATIVE_BALANCE
+    upload: CoaUploadHandler
+  - id: D0-07
+    name: Account categories and numbering
+    sheet: Categories and numbering
+    content: The GL categories and the numbering scheme under each parent account
+    owner: "Head, Comptrollership"
+    source: The BDOI chart of accounts
+    load: "Chart of Accounts (General Ledger)"
+    table: coa_category
+    fields: ["", code, name, account_class, bank_category, "", "", ""]
+    checks:
+      Row: list:CATEGORY_ROW
+      Category code: text:20
+      Account class: list:ACCOUNT_CLASS
+      Bank category: yn
+      Width: whole:1-6
+    columns:
+      - "Row | Y | CATEGORY or NUMBERING | What the row defines | CATEGORY"
+      - "Category code | Cond.: CATEGORY | Up to 20 capitals | GL category | CASH_IN_BANK"
+      - "Category name | Cond.: CATEGORY | Text | Name of the category | Cash in bank"
+      - "Account class | Cond.: CATEGORY | ASSET, LIABILITY, EQUITY, INCOME, EXPENSE | Class of the accounts of the category | ASSET"
+      - "Bank category | Cond.: CATEGORY | Y or N | Y for the accounts of bank accounts (D0-11) | Y"
+      - "Parent account | Cond.: NUMBERING | Account code of D0-06 | Parent whose children are numbered | 1110"
+      - "Separator | Cond.: NUMBERING | . or - or none | Between the parent code and the running number | ."
+      - "Width | Cond.: NUMBERING | 1 to 6 | Digits of the running number | 2"
+  - id: D0-08
+    name: Accounting rules
+    content: The debit and credit accounts of each accounting event of the platform
+    owner: "Head, Comptrollership"
+    source: The posting rules of EBIX and ISYS; the accounting events listed on the sheet Ref Accounting events
+    load: "Accounting Rules (Accounting Engine), checked with the Rule Simulator and authorised by Comptrollership"
+    table: acc_rule_line
+    fields: ["", "", "", "", "", line_no, side, account_code, amount_component, narration]
+    checks:
+      Event type: list:ACCOUNTING_EVENT
+      Business line: code:D0-04/Code
+      Effective from: date
+      Line: whole:1-99
+      Debit or credit: list:DEBIT_CREDIT
+      Account code: code:D0-06/Account Code
+    columns:
+      - "Event type | Y | Code of the sheet Ref Accounting events | Event that the rule posts | PREMIUM_BOOKED"
+      - "Rule name | Y | Text | Name of the rule | Premium booked - non-life"
+      - "Business line | N | Code of D0-04; blank = every line | Line the rule applies to | -"
+      - "Currency | N | ISO 4217; blank = every currency | Currency the rule applies to | -"
+      - "Effective from | Y | dd-MMM-yyyy | First posting date of the rule | 01-Jan-2028"
+      - "Line | Y | 1, 2, 3 | Order of the line in the entry | 1"
+      - "Debit or credit | Y | DEBIT or CREDIT | Side of the line | DEBIT"
+      - "Account code | Y | Account of D0-06 | Account posted | 1210.07"
+      - "Amount component | Y | Component of the event | Amount the line posts | GROSS_PREMIUM"
+      - "Narration | N | Text | Text of the journal line | Premium receivable"
+  - id: D0-09
+    name: Legacy control accounts
+    sheet: Legacy accounts
+    content: The accounts that carry the migrated invoices and unapplied payments until they run off, and Migration Clearing
+    owner: "Head, Comptrollership"
+    source: Proposed rule PR-DM-02 of the Data Migration set
+    load: "Created with the chart of accounts (D0-06); named in the accounting rules of the legacy items"
+    table: ""
+    fields: []
+    checks:
+      Legacy account: list:LEGACY_ACCOUNT
+      BIBS account code: code:D0-06/Account Code
+    columns:
+      - "Legacy account | Y | Premium Receivable - Legacy (per component), PR 2307 - Legacy, Due to Insurers - Legacy, Commission Receivable - Legacy, Unrealised Commission - Legacy, Deferred Output VAT - Legacy, Unapplied Collections - Legacy, Migration Clearing | One row per account | Migration Clearing"
+      - "Component | Cond.: Premium Receivable - Legacy | Basic premium, DST, premium tax or VAT, LGT, FST, other charges | Component the account holds | -"
+      - "BIBS account code | Y | Account of D0-06 | Account in the production chart | 1990.01"
+      - "Legacy GL accounts | N | EBIX and ISYS account codes separated by commas | The legacy accounts it replaces (for the code map GL_ACCOUNT, R08) | 1210-01"
+      - "Remarks | N | Text | End state after the run-off | Nets to 0.00 after the opening"
+  - id: D0-10
+    name: Tax codes
+    content: The tax codes with their ATC, rate and GL account
+    owner: "Head, Comptrollership (Tax)"
+    source: BIR ATC list; current tax set-up
+    load: "Tax Codes & Forms (Tax & Statutory), authorised by Comptrollership"
+    table: tax_code
+    fields: [code, name, tax_type, atc, payee_class, rate, gl_account_code, income_nature, effective_from, effective_to]
+    checks:
+      Tax code: text:20
+      Tax type: list:TAX_TYPE
+      Payee class: list:PAYEE_CLASS
+      Rate %: number:0-100
+      GL account: code:D0-06/Account Code
+      Effective from: date
+      Effective to: date
+    columns:
+      - "Tax code | Y | Up to 20 capitals | Code of the tax | EWT_WC158"
+      - "Name | Y | Text | Name shown on screens | EWT 1% - goods"
+      - "Tax type | Y | EWT, FWT, VAT, PT | Kind of tax | EWT"
+      - "ATC | Cond.: withholding | BIR ATC | Alphanumeric tax code | WC158"
+      - "Payee class | N | List PAYEE_CLASS | Payees it applies to | CORPORATE"
+      - "Rate % | Y | 0 to 100 | Rate of the tax | 1"
+      - "GL account | Y | Account of D0-06 | Account of the tax | 2150.02"
+      - "Income nature | N | Text | Nature of the income payment | Purchase of goods"
+      - "Effective from | Y | dd-MMM-yyyy | First date of the rate | 01-Jan-2028"
+      - "Effective to | N | dd-MMM-yyyy | Last date of the rate | -"
+  - id: D0-11
+    name: Company bank accounts
+    sheet: Bank accounts
+    content: The bank accounts of BDOI used for collections and disbursements
+    owner: "Head, Comptrollership; Treasury"
+    source: BDOI bank account list
+    load: "Bank Accounts and Checks (Disbursement), authorised by Comptrollership"
+    table: pay_bank_account
+    fields: [code, name, bank_name, account_no, currency, gl_account_code, pdc_clearing_account_code, "", notification_format]
+    checks:
+      Bank account code: text:20
+      Currency: text:3
+      GL account: code:D0-06/Account Code
+      PDC clearing account: code:D0-06/Account Code
+      Branch code: code:D0-02/Branch code
+    columns:
+      - "Bank account code | Y | Up to 20 capitals | Code of the account in BIBS | BDO-CA-001"
+      - "Name | Y | Text | Name shown on screens | BDO Makati current account"
+      - "Bank | Y | Bank name | Bank of the account | BDO Unibank, Inc."
+      - "Account number | Y | As printed by the bank | Account number | 000123456789"
+      - "Currency | Y | ISO 4217 | Currency of the account | PHP"
+      - "GL account | Y | Account of D0-06 with a bank category | Cash-in-bank account | 1110.01"
+      - "PDC clearing account | N | Account of D0-06 | Account of issued post-dated checks | 2241"
+      - "Branch code | N | Code of D0-02 | Branch that uses the account | HO"
+      - "Payment notification format | Y | Format of the bank advice | Format of the notification to the payee | EMAIL"
+  - id: D0-12
+    name: Check books
+    content: The check books in stock per bank account at go-live
+    owner: "Treasury; Product Owner, Comptrollership - Disbursement"
+    source: Check book register of Treasury
+    load: "Bank Accounts and Checks (Disbursement)"
+    table: pay_cheque_book
+    fields: ["", first_no, last_no, next_no, received_on]
+    checks:
+      Bank account code: code:D0-11/Bank account code
+      Received on: date
+    columns:
+      - "Bank account code | Y | Code of D0-11 | Account of the check book | BDO-CA-001"
+      - "First check number | Y | Digits | First number of the book | 0001001"
+      - "Last check number | Y | Digits | Last number of the book | 0001100"
+      - "Next check number | Y | Digits | Next number to issue at go-live | 0001001"
+      - "Received on | Y | dd-MMM-yyyy | Date the book was received | 01-Dec-2027"
+  - id: D0-13
+    name: Petty cash funds
+    content: The petty cash funds of the branches
+    owner: "Head, Comptrollership"
+    source: Petty cash register
+    load: "Petty Cash (Payables & Cash)"
+    table: pay_petty_cash_fund
+    fields: ["", code, name, custodian, gl_account_code, "", currency, imprest_amount]
+    checks:
+      Branch code: code:D0-02/Branch code
+      Fund code: text:20
+      Custodian: code:D0-05/Employee number
+      GL account: code:D0-06/Account Code
+      Replenishment bank account: code:D0-11/Bank account code
+      Currency: text:3
+      Imprest amount: number
+    columns:
+      - "Branch code | Y | Code of D0-02 | Branch of the fund | HO"
+      - "Fund code | Y | Up to 20 capitals | Code of the fund | PCF-HO"
+      - "Name | Y | Text | Name of the fund | Head Office petty cash"
+      - "Custodian | Y | Employee of D0-05 | Custodian of the fund | 1203344"
+      - "GL account | Y | Account of D0-06 | Petty cash account | 1101.01"
+      - "Replenishment bank account | Y | Code of D0-11 | Account that replenishes the fund | BDO-CA-001"
+      - "Currency | Y | ISO 4217 | Currency of the fund | PHP"
+      - "Imprest amount | Y | Amount | Amount of the fund | 20000.00"
+  - id: D0-14
+    name: Bank statement layouts
+    sheet: Statement layouts
+    content: The columns of the statement file of each bank account
+    owner: "Head, Comptrollership; Treasury"
+    source: Statement files of the banks
+    load: "Bank Statement Layouts (Setup & Administration)"
+    table: brs_statement_layout
+    fields: ["", name, date_column, description_column, reference_column, debit_column, credit_column, amount_column, balance_column, date_pattern]
+    checks:
+      Bank account code: code:D0-11/Bank account code
+    columns:
+      - "Bank account code | Y | Code of D0-11 | Account of the statement | BDO-CA-001"
+      - "Layout name | Y | Text | Name of the layout | BDO CSV statement"
+      - "Date column | Y | Column header or number | Column of the transaction date | Posting Date"
+      - "Description column | Y | Column header or number | Column of the description | Description"
+      - "Reference column | N | Column header or number | Column of the reference | Reference No."
+      - "Debit column | Cond.: separate columns | Column header or number | Column of the debits | Debit"
+      - "Credit column | Cond.: separate columns | Column header or number | Column of the credits | Credit"
+      - "Amount column | Cond.: one signed column | Column header or number | Column of a signed amount | -"
+      - "Balance column | N | Column header or number | Column of the running balance | Balance"
+      - "Date format | Y | For example dd/MM/yyyy | Format of the dates in the file | MM/dd/yyyy"
+  - id: D0-15
+    name: Approval limits and matrices
+    sheet: Approval limits
+    content: The approval levels by amount, sum insured or segment of the modules that approve by level
+    owner: "Owners of the modules; Head, Comptrollership for the amounts"
+    source: BDOI approval matrix and signing authorities
+    load: "Submitted Policies Setup, EB Setup, Compliance Setup (Configuration Versions) and Disbursement approver routing; the authorisation limit of a user is in UA-03"
+    table: sbm_approval_matrix
+    fields: ["", document, segment, tsi_from, tsi_to, level, permission, approver_username, signatory_title]
+    checks:
+      Module: list:APPROVAL_MODULE
+      From amount: number
+      To amount: number
+      Approval level: whole:1-9
+      Approver role: code:UA-02/Group profile code
+      Named approver: code:UA-01/User ID
+    columns:
+      - "Module | Y | Submitted Policies, Employee Benefits, Sanction Screening, Disbursement | Module of the approval | Submitted Policies"
+      - "Document or transaction | Y | Text | What is approved | Terms of reference"
+      - "Segment or case type | N | Segment, benefit line or case type | Scope of the row | CBG"
+      - "From amount | N | PHP | Lower bound (sum insured, premium or amount) | 0.00"
+      - "To amount | N | PHP; blank = no limit | Upper bound | 10000000.00"
+      - "Approval level | Y | 1, 2, 3 | Order of the approval | 1"
+      - "Approver role | Y | Group profile of UA-02 | Profile that approves | SBM_APPROVER"
+      - "Named approver | N | User ID of UA-01 | Only when one person approves | -"
+      - "Signatory title | N | Text | Title printed on the document | Unit Head, Combank"
+
+# --------------------------------------------------------------------------------------------------------------
+# Closure summary data (02 Closure Summary, pack blocks). The decision refs are checked against the clarification
+# chapters of the three sets (CLR-PM, CLR-UA, PR-DM) and the open decisions of the Data Migration set (DMQ, DCR).
+# BRD-03 and BRD-11: the FRS in BDOI's format (v1.2, v1.3) and its review workbooks in folder (under out/Programme/
+# BDOI_Template_FRS/) are the only documents; source is the FRS source whose clarification chapter they carry.
+sets:
+  - brd: BRD-03
+    folder: Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance
+    source: BRD-03_Product_Maintenance/FRS_BRD03_PRODUCT_MAINTENANCE.md
+    clarifications: CLR-PM
+    questions: PQ
+    owner: "Product Owner, Marketing Business System"
+    signoff: "30-Nov-2026"
+    confirms:
+      - "The package request, negotiation, ManCom sign-off, set-up and release of packages, the package versions and rate schemes, expiry, monitoring and incentive criteria, as specified screen by screen"
+      - "The masters of Product Maintenance: product catalogue, coverages and clauses, rates and taxes, insurers and sales organisation"
+      - "The configuration inputs of templates CI-01 to CI-10 and who provides each"
+  - brd: BRD-11
+    folder: Programme/BDOI_Template_FRS/BRD-11_User_Access_Maintenance
+    source: BRD-11_User_Access_Maintenance/FRS_BRD11_USER_ACCESS_MAINTENANCE.md
+    clarifications: CLR-UA
+    questions: UQ
+    owner: "Product Owner, Marketing Business System; Business Administration; BDOI Information Security; BDOI IT"
+    signoff: "1-Dec-2026"
+    confirms:
+      - "Sign-in, session and password rules; the access requests, approvals and group-profile requests under four eyes; the System Administrator functions and the access reports"
+      - "The menus of every persona and the role-to-permission matrix"
+      - "The security parameters and the configuration inputs of templates CI-01 to CI-06"
+  - brd: BRD-13
+    folder: BRD-13_Data_Migration
+    source: BRD-13_Data_Migration/HANDBOOK_BRD13_DATA_MIGRATION.md
+    clarifications: PR-DM
+    questions: DMQ
+    owner: "Program Manager, Business Project Services; Data Migration Lead; data owners; Comptrollership; BDOI IT"
+    signoff: "30-Oct-2026"
+    confirms:
+      - "The decision per data object (migrate, carry forward, conditional, archive, excluded), the owners and stewards, and the load templates and code maps"
+      - "The Migration Console screens, the reconciliation levels and the sign-off gates G1 to G6"
+      - "The cut-over runbook, the year-end cut-over option, the run-off of the legacy items and the decommissioning criteria"
+
+# Consolidated decisions BDOI takes to close Drop 0. refs: the items of the clarification chapters and open decisions.
+decisions:
+  - {id: DEC-01, topic: "Year-end cut-over: option A", refs: [PR-DM-01, DMQ39, DMQ25], owner: "Head, Comptrollership; Program Manager", by: "M6 (1-Oct-2027); confirmation asked with the Drop 0 closure",
+     decision: "Confirm go-live on Monday 3 January 2028 at the year-end boundary, with legacy closing FY2027 and BIBS opening from a provisional balance-sheet opening, trued up after the legacy close and the audited statements."}
+  - {id: DEC-02, topic: Legacy account codes and Migration Clearing, refs: [PR-DM-02, DMQ18], owner: "Head, Comptrollership", by: "M1 (16-Oct-2026)",
+     decision: "Confirm the separate legacy control accounts and Migration Clearing, and assign their codes in the production chart (template D0-09)."}
+  - {id: DEC-03, topic: Conditional migration objects, refs: [PR-DM-05, PR-DM-26, DMQ30, DMQ21, DMQ33], owner: "Program Manager; Head, Operations", by: "M1 (16-Oct-2026) and M2 (30-Oct-2026)",
+     decision: "Decide for remittances in flight (F04), PDCs and pick-ups (F06), open claims (F07), submitted-policy masterlists (P04), Employee Benefits programmes (P05) and payees (R09) whether each is completed in legacy, carried or brought into scope."}
+  - {id: DEC-04, topic: Access request stages, refs: [CLR-UA-18, CLR-UA-19, CLR-UA-12], owner: "Business Administration; BDOI Information Security", by: "Sign-off of BRD-11 (1-Dec-2026)",
+     decision: "Confirm the stage list of an access request (Draft, Pending approval, Second approval where needed, Approved; For implementation and Implemented for a group-profile request) and that the System Administrator implements every approved group-profile change."}
+  - {id: DEC-05, topic: Directory sign-in and provisioning, refs: [CLR-UA-01, CLR-UA-03, IQ04, IQ05], owner: "BDOI IT", by: "Before SIT of the sign-in (Q1 2027)",
+     decision: "Specify the EIAM sign-in (tenant, claims, session life) and choose the UIDM-ISC option: accounts only, accounts and roles, or aggregation only."}
+  - {id: DEC-06, topic: "Security values: passwords, sessions, dormancy, working hours", refs: [CLR-UA-08, CLR-UA-14, UQ07, UQ08], owner: "BDOI Information Security", by: "D5 (16-Jul-2027)",
+     decision: "Confirm or change the security parameters of template CI-05, the dormancy period and notice, and whether public holidays count as out of hours."}
+  - {id: DEC-07, topic: Business unit groups and user levels, refs: [CLR-UA-05, UQ05], owner: "Business Administration", by: "D3 (9-Apr-2027)",
+     decision: "Give the values of the two lists before the users are loaded."}
+  - {id: DEC-08, topic: Package approval chain and ManCom quorum, refs: [CLR-PM-03, CLR-PM-05, PQ07, PQ08], owner: "Product Owner, Marketing Business System", by: "Sign-off of BRD-03 (30-Nov-2026)",
+     decision: "Confirm one Marketing approval by the TL, TH or UH (or give the chain by segment or amount) and that one ManCom member's sign-off completes the step (or give the quorum)."}
+  - {id: DEC-09, topic: Package documents and risk-code naming, refs: [CLR-PM-01, CLR-PM-02, PQ02], owner: "Product Owner, Marketing Business System; TSU", by: "D5 (16-Jul-2027)",
+     decision: "Provide the layouts of the package documents and the risk-code naming convention of each product line."}
+  - {id: DEC-10, topic: Package remapping at Renewal sanitation, refs: [CLR-PM-14, PR-DM-24, DMQ36], owner: "Product Owner, Marketing Business System; TSU", by: "M2 (30-Oct-2026)",
+     decision: "Confirm the answer of 26-Sep-2026 and name the TSU preparer of the package code map (template CI-07, object R06)."}
+  - {id: DEC-11, topic: Client scope and matching, refs: [PR-DM-08, PR-DM-09, DMQ04, DMQ05, DCR-173], owner: "Product Owner, Marketing Business System", by: "M1 (16-Oct-2026)",
+     decision: "Confirm the clients migrated (from 2020 to present, plus older clients with in-force business), the daily batches up to the freeze, and the matching keys and thresholds."}
+  - {id: DEC-12, topic: In-force policy headers and legacy invoices, refs: [PR-DM-11, PR-DM-23, DMQ09, DMQ10], owner: "Head, Operations; Head, Comptrollership", by: "M1 (16-Oct-2026)",
+     decision: "Confirm the header scope and the treatment of a legacy invoice (not re-booked; processed like a BIBS invoice on the legacy control accounts)."}
+  - {id: DEC-13, topic: Point of no return, refs: [PR-DM-16, DMQ32], owner: "Program Manager", by: "M6 (1-Oct-2027)",
+     decision: "Confirm the end of the first business day as the point of no return and who decides a rollback."}
+  - {id: DEC-14, topic: Advisory recipients and alert channel, refs: [CLR-PM-06, CLR-PM-07, PQ12], owner: "Product Owner, Marketing Business System", by: "D5 (16-Jul-2027)",
+     decision: "Name the recipient units of package advisories and confirm in-app notices to TSU and MBS for the expiry and incentive alerts (sheet Notifications)."}
+  - {id: DEC-15, topic: Full status labels, refs: [CLR-PM-20, CLR-UA-20], owner: "Business owners of BRD-03 and BRD-11", by: "Sign-off of each set",
+     decision: "Confirm full stage and status labels on the screens, with the short forms of the labels above 21 characters."}
+
+entry_exit:
+  close_entry:
+    - "The three Drop 0 sets are issued: the FRS in BDOI's format of BRD-03 Product Maintenance (v1.2) and of BRD-11 User Access Maintenance (v1.3), each with its review workbooks (business unit requirements collection, fit-gap, test cases and traceability, change request register, walkthrough users), and the BRD-13 Data Migration sign-off set v2.1 with its test plan."
+    - "The configuration inputs workbook of Drop 0 is issued and each owner has received the sheets of the items it owns."
+    - "The walkthrough sessions of each set are held on the SIT environment with seed data."
+  close_exit:
+    - "The Signoff Sheet of the BRD-03 and BRD-11 FRS and the sign-off certificate of the BRD-13 set are signed (BRD-13 by 30-Oct-2026, BRD-03 by 30-Nov-2026, BRD-11 by 1-Dec-2026)."
+    - "Every proposed rule and clarification of the three sets is decided, or accepted as the working assumption with its decision date."
+    - "Every consolidated decision of this summary has an owner and a date; those due at M1 and M2 are taken."
+    - "Every configuration item of the workbook has an owner, a due date and one route; the items due at D1 are Provided or In progress."
+    - "The review comments of the three sets are closed: answered, corrected in the next version of the document, or raised in the change request register."
+  drop1_entry:
+    - "Drop 0 is closed: the three sets are signed and the decisions of this summary are recorded."
+    - "The BRD-1 New Business sign-off set v2.1 is issued (folder Drop-1_Transactional); its review and sign-off follow the same steps."
+    - "The platform set-up that Drop 1 SIT uses is provided by D2 (4-Jan-2027): company, branches, holidays, dimensions, chart of accounts and numbering, accounting rules, bank accounts."
+    - "The users and group profiles of the SIT and UAT reviewers are created through access requests."
+    - "The lists of values and parameters of New Business are confirmed on the sheets Lists of values and System parameters."
+
+risks:
+  - {id: RSK-01, risk: "Configuration inputs arrive after their due date, so Drop 1 SIT or a trial migration runs on seed values", impact: "SIT results do not hold for production; trial migrations are repeated", mitigation: "Owner per item and due date in the workbook; status reviewed at the weekly programme meeting from December 2026", owner: "Program Manager"}
+  - {id: RSK-02, risk: "The production chart of accounts and the accounting rules are not final before Drop 1 SIT", impact: "Postings of Drop 1 are tested against a draft chart; the GL opening (G01) and Migration Clearing cannot be reconciled", mitigation: "Chart and rules due at D2; legacy accounts (D0-09) and the GL map (R08) due at D3 and D4", owner: "Head, Comptrollership"}
+  - {id: RSK-03, risk: "Year-end option A is not confirmed by M6", impact: "The cut-over calendar, the GL opening and the true-ups change", mitigation: "Confirmation asked with the Drop 0 closure (DEC-01)", owner: "Head, Comptrollership"}
+  - {id: RSK-04, risk: "EIAM and UIDM-ISC specifications are late", impact: "Sign-in stays local for SIT; the directory sign-in is tested late", mitigation: "Local sign-in with the Windows ID captured on every user; directory mode switched on when specified (DEC-05)", owner: "BDOI IT"}
+  - {id: RSK-05, risk: "Conditional migration objects are decided late", impact: "Layouts, trial migrations and reconciliation of those objects are added late", mitigation: "Decisions at M1 and M2 (DEC-03); objects not decided are completed in legacy before the freeze", owner: "Program Manager"}
+  - {id: RSK-06, risk: "An item reaches BIBS by two routes (keyed on a screen and loaded by the migration)", impact: "Duplicate or conflicting reference values at go-live", mitigation: "One route per item in the workbook; the Migration cross-reference sheet names the object of every migrated item", owner: "Data Migration Lead"}
+  - {id: RSK-07, risk: "Changes to signed Drop 0 content during Drop 1 reviews", impact: "Rework of screens and templates of a signed set", mitigation: "Change control: every change is a change request with its effect on the other BRDs and a delta sign-off", owner: "Program Manager"}
+
+dependencies:
+  - {id: DEP-01, what: "BDOI answers to the M1 and M2 decisions of the Data Migration set", from: "BDOI business owners", needed: "16-Oct-2026 and 30-Oct-2026"}
+  - {id: DEP-02, what: "Organisation, chart of accounts, accounting rules and bank accounts for Drop 1 SIT", from: "Comptrollership", needed: "4-Jan-2027 (D2)"}
+  - {id: DEP-03, what: "First full extracts with control files and volumes", from: "BDOI IT", needed: "29-Jan-2027 (M3)"}
+  - {id: DEP-04, what: "EIAM and UIDM-ISC specifications", from: "BDOI IT", needed: "Q1 2027"}
+  - {id: DEP-05, what: "Role-to-permission matrix and users of the SIT and UAT reviewers", from: "Business Administration; Information Security", needed: "9-Apr-2027 (D3)"}
+  - {id: DEP-06, what: "Code maps approved, including the package code map", from: "Data owners; TSU", needed: "18-Jun-2027 (M5)"}
+  - {id: DEP-07, what: "Production values of every configuration item", from: "Owners in the workbook", needed: "1-Nov-2027 (D6), dress rehearsal"}
+
+signatories:
+  - {role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
+  - {role: "Product Owner, Marketing Business System", organisation: BDOI}
+  - {role: "Head, Comptrollership", organisation: BDOI}
+  - {role: "Head, BDOI Information Security", organisation: BDOI}
+  - {role: "Head, BDOI IT", organisation: BDOI}
+  - {role: "Data Migration Lead", organisation: BDOI}
+  - {role: Project Manager, organisation: iorta TechNXT}

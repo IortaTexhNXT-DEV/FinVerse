@@ -1,0 +1,26 @@
+// Gateway API routing (Deployment Architecture, chapter 5).
+digraph da_gateway {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.45, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>Edge routing with the Kubernetes Gateway API</b></font><br/><font point-size="9" color="@MUTED">GatewayClass per environment: AWS Load Balancer Controller (default) or Envoy Gateway. The longest matching path prefix wins.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.55, penwidth=0.9, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+
+  u [label=<<b>Users</b><br/><font point-size="9.5">BDO network, VDI<br/>Route 53 private zone</font>>, fillcolor="@BG_BLUE"];
+  s [label=<<b>BDO systems</b><br/><font point-size="9.5">through Apigee X,<br/>private route</font>>, fillcolor="@BG_BLUE"];
+  waf [label=<<b>AWS WAF web ACL</b><br/><font point-size="9.5">managed rule groups, rate rule on sign-in,<br/>integration prefix only from Apigee ranges, 26 MB upload rule</font>>, fillcolor="@AMBER_BG"];
+  gc [label=<<b>GatewayClass bibs-alb</b><br/><font point-size="9.5">AWS Load Balancer Controller 2.14+<br/>LoadBalancerConfiguration: internal, ACM certificate,<br/>TLS 1.3/1.2 policy, source ranges, idle time-out 300 s</font>>, fillcolor="@DIRTY_WHITE"];
+  g [label=<<b>Gateway bibs</b><br/><font point-size="9.5">listener https, port 443, host name of BIBS</font>>, fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  r1 [label=<<b>HTTPRoute bibs-users</b><br/><font point-size="9.5">PathPrefix api  -&gt;  bibs-web:8443<br/>PathPrefix /  -&gt;  bibs-frontend:8443</font>>];
+  r2 [label=<<b>HTTPRoute bibs-integration</b><br/><font point-size="9.5">PathPrefix integration  -&gt;  bibs-integration:8443</font>>];
+  web [label=<<b>bibs-web</b><br/><font point-size="9.5">health check readyz</font>>, fillcolor="@BG_BLUE"];
+  fe [label=<<b>bibs-frontend</b><br/><font point-size="9.5">health check healthz</font>>, fillcolor="@BG_BLUE"];
+  integ [label=<<b>bibs-integration</b><br/><font point-size="9.5">Apigee token check</font>>, fillcolor="@BG_BLUE"];
+  u -> waf; s -> waf; waf -> g; gc -> g [style=dashed, label=" implements"];
+  g -> r1; g -> r2;
+  r1 -> web [label=" HTTPS"]; r1 -> fe [label=" HTTPS"]; r2 -> integ [label=" HTTPS"];
+  {rank=same; u; s}
+  {rank=same; waf; gc}
+  {rank=same; web; fe; integ}
+}

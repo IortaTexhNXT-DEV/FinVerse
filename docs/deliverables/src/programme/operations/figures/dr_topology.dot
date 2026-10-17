@@ -1,0 +1,43 @@
+// DR topology: production in ap-southeast-1 across three availability zones, warm standby in the DR region.
+digraph dr_topology {
+  graph [rankdir=TB, fontname="Arial", nodesep=1.1, ranksep=0.32, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=13, fontcolor="@NEAR_BLACK", width=3.9, height=0.7, margin="0.12,0.05", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=11, fontcolor="@MUTED"];
+
+  users [label=<<b>Users and BDO systems</b><br/><font point-size="11">BDO network and VDI; Apigee X for systems</font>>, fillcolor="@DIRTY_WHITE"];
+  dns   [label=<<b>Route 53 private zone</b><br/><font point-size="11">one BIBS host name, switched at failover</font>>, fillcolor="@DIRTY_WHITE"];
+
+  subgraph cluster_p {
+    label=<<b>Production - ap-southeast-1, three zones</b>>; fontsize=13; fontcolor="@HEADER_BLUE"; style=rounded; color="@HEADER_BLUE"; margin=12;
+    pgw  [label=<<b>WAF and Gateway</b><br/><font point-size="11">internal load balancer</font>>, fillcolor="@BG_BLUE"];
+    peks [label=<<b>EKS - four workloads</b><br/><font point-size="11">web 3-10, jobs 2, integration 2, frontend 2-4</font>>, fillcolor="@BG_BLUE"];
+    prds [label=<<b>RDS PostgreSQL 16 Multi-AZ</b><br/><font point-size="11">PITR; snapshots every 4 hours</font>>, fillcolor="@BG_BLUE"];
+    pval [label=<<b>ElastiCache for Valkey 8</b><br/><font point-size="11">primary and replica</font>>, fillcolor="@BG_BLUE"];
+    pmsk [label=<<b>MSK Kafka 3.9</b><br/><font point-size="11">three brokers</font>>, fillcolor="@BG_BLUE"];
+    ps3  [label=<<b>S3 buckets (SSE-KMS)</b><br/><font point-size="11">versioning, Object Lock</font>>, fillcolor="@BG_BLUE"];
+    pgw -> peks -> prds -> pval -> pmsk -> ps3 [style=invis];
+  }
+  subgraph cluster_d {
+    label=<<b>DR region (to be approved) - warm standby</b>>; fontsize=13; fontcolor="@MUTED"; style="rounded,dashed"; color="@MUTED"; margin=12;
+    dgw  [label=<<b>WAF and Gateway</b><br/><font point-size="11">pre-provisioned</font>>, fillcolor="@AMBER_BG"];
+    deks [label=<<b>EKS standby cluster</b><br/><font point-size="11">current release; scaled up at failover</font>>, fillcolor="@AMBER_BG"];
+    drds [label=<<b>RDS cross-region replica</b><br/><font point-size="11">promoted at failover</font>>, fillcolor="@AMBER_BG"];
+    dval [label=<<b>Valkey</b><br/><font point-size="11">created at failover</font>>, fillcolor="@AMBER_BG"];
+    dmsk [label=<<b>MSK</b><br/><font point-size="11">created at failover; outbox resends</font>>, fillcolor="@AMBER_BG"];
+    ds3  [label=<<b>S3 replica buckets</b><br/><font point-size="11">replication time control 15 min</font>>, fillcolor="@AMBER_BG"];
+    dgw -> deks -> drds -> dval -> dmsk -> ds3 [style=invis];
+  }
+  users -> dns;
+  dns -> pgw [label=" normal "];
+  dns -> dgw [label=" after failover ", style=dashed];
+  prds -> drds [label=" asynchronous log shipping ", style=bold];
+  ps3 -> ds3 [label=" cross-region replication ", style=bold];
+  peks -> deks [label=" every release deployed ", style=dashed];
+  {rank=same; pgw; dgw}
+  {rank=same; peks; deks}
+  {rank=same; prds; drds}
+  {rank=same; pval; dval}
+  {rank=same; pmsk; dmsk}
+  {rank=same; ps3; ds3}
+}

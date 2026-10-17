@@ -1,0 +1,32 @@
+// BRD-11: status of a user access request (nba_access_request). FRS section 5.1. Grey boxes = built today.
+digraph ua_states {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.55, ranksep=0.35, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.3, height=0.5, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DRAFT          [label="DRAFT\nRequestor"];
+  PENDING        [label="PENDING\nChosen approver", fillcolor="@DIRTY_WHITE"];
+  PENDING_SECOND [label="PENDING_SECOND\nSecond approver", fillcolor="@AMBER_BG"];
+  RETURNED       [label="RETURNED\nRequestor", fillcolor="@AMBER_BG"];
+  SCHEDULED      [label="SCHEDULED\n(effective date later)"];
+  APPROVED       [label="APPROVED\n(applied)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  REJECTED       [label="REJECTED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  CANCELLED      [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> PENDING [label=" submit", weight=10];
+  PENDING -> PENDING_SECOND [label=" approve\n (risk flag)"];
+  PENDING -> APPROVED [label=" approve\n (applied now)", weight=10];
+  PENDING_SECOND -> APPROVED [label=" second approve"];
+  PENDING -> SCHEDULED [label=" approve\n (future date)"];
+  SCHEDULED -> APPROVED [label=" applied by job\n on the date"];
+  PENDING -> RETURNED [label=" return", style=dashed];
+  RETURNED -> PENDING [label=" re-submit", style=dashed, constraint=false];
+  PENDING -> REJECTED [label=" reject", style=dotted];
+  DRAFT -> CANCELLED [label=" cancel", style=dotted, constraint=false];
+  RETURNED -> CANCELLED [style=dotted];
+
+  { rank=same; PENDING; RETURNED; }
+  { rank=same; PENDING_SECOND; SCHEDULED; }
+  { rank=same; APPROVED; REJECTED; CANCELLED; }
+}

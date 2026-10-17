@@ -1,0 +1,29 @@
+// BRD-5 Volume 2: workflow PRQ_REFUND (V890). FRS section 5.6. DRAFT can also submit or send for validation directly.
+digraph v2_refund {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.7, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.4, height=0.6];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=11, fontcolor="@TEXT"];
+
+  DR  [label="DRAFT\nAO"];
+  PR  [label="PREPARING\nassigned preparer"];
+  FV  [label="FOR_VALIDATION\nACSL and Cashiering", fillcolor="@AMBER_BG"];
+  FR  [label="FOR_REVIEW\nreviewer"];
+  FA  [label="FOR_APPROVAL\napprover"];
+  SD  [label="SENT_TO_DISBURSEMENT"];
+  DI  [label="DISBURSED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CA  [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  { rank=same; PR; FV; }
+  { rank=same; FR; CA; }
+  DR -> PR [label=" assign"];
+  PR -> FV [label=" send for\n validation"];
+  FV -> PR [label=" rejected", style=dotted, constraint=false];
+  PR -> FR [label=" submit"];
+  FV -> FR [label=" validated", style=dotted];
+  FR -> FA [label=" endorse"];
+  FR -> PR [label=" return", style=dashed, constraint=false];
+  FA -> FR [label=" return", style=dashed, constraint=false];
+  FA -> SD [label=" approve"];
+  SD -> DI [label=" paid", style=dotted];
+  FR -> CA [label=" cancel"];
+}

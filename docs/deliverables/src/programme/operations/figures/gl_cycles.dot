@@ -1,0 +1,18 @@
+// Mock migrations, dress rehearsal and the drop test windows on the way to the January 2028 go-live.
+digraph gl_cycles {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.18, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.1, fontname="Arial",
+         fontsize=10.5, fontcolor="@NEAR_BLACK", width=7.0, height=0.48, margin="0.12,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1];
+  s1 [label=<<b>Jan-Jul 2027</b> - SIT Drop 0 and Drop 1; <b>Jul-Sep 2027</b> - SIT Drop 2>, fillcolor="@DIRTY_WHITE"];
+  m1 [label=<<b>Mock 1 = Trial migration 1</b> - 19-30 Apr 2027, SIT: reference data, clients, headers, RA-sent file>, fillcolor="@BG_BLUE"];
+  m2 [label=<<b>Mock 2 = Trial migration 2</b> - 5-16 Jul 2027, SIT: all objects, L1-L5 reconciliation>, fillcolor="@BG_BLUE"];
+  m3 [label=<<b>Mock 3 = Trial migration 3</b> - 2-13 Aug 2027, UAT load for the end-to-end UAT>, fillcolor="@BG_BLUE"];
+  u1 [label=<<b>Aug-Dec 2027</b> - UAT Drop 1 end to end; <b>Oct-Nov 2027</b> - UAT Drop 2>, fillcolor="@DIRTY_WHITE"];
+  m4 [label=<<b>Mock 4 = Trial migration 4</b> - 4-15 Oct 2027, UAT refresh timed as a cut-over>, fillcolor="@BG_BLUE"];
+  r1 [label=<<b>Dress rehearsal 1</b> - 15-26 Nov 2027, Pre-Prod: full volume, technical cutover, rollback>, fillcolor="@AMBER_BG"];
+  r2 [label=<<b>Dress rehearsal 2 (reserve)</b> - 6-10 Dec 2027, Pre-Prod: repeat if rehearsal 1 missed an exit criterion>, fillcolor="@AMBER_BG"];
+  o  [label=<<b>ORR / PRR</b> - evidence pack 15 Dec 2027; GNG-1 19 Dec; GNG-2 29 Dec 2027>, fillcolor="@AMBER_BG"];
+  c  [label=<<b>Production cutover</b> - freeze 31 Dec 22:00; load 1 Jan; GNG-3 2 Jan 18:00; go-live Mon 3 Jan 2028>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  s1 -> m1 -> m2 -> m3 -> u1 -> m4 -> r1 -> r2 -> o -> c;
+}

@@ -1,0 +1,26 @@
+// Test levels of BIBS and the environments they run in.
+digraph ts_levels {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.3, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.1, fontname="Arial",
+         fontsize=10, fontcolor="@NEAR_BLACK", width=3.2, height=0.55, margin="0.1,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+
+  dev  [label=<<b>DEV and CI pipeline</b><br/><font point-size="8">unit testing, component testing, static<br/>analysis, SAST, dependency and image scans</font>>, fillcolor="@DIRTY_WHITE"];
+  int  [label=<<b>Integration testing</b><br/><font point-size="8">modules against PostgreSQL 16, Valkey 8,<br/>Kafka 3.9; service interface (API) testing</font>>, fillcolor="@DIRTY_WHITE"];
+  sit  [label=<<b>SIT</b><br/><font point-size="8">test plans of each BRD, end-to-end flows,<br/>interfaces through Apigee X, seed data</font>>, fillcolor="@BG_BLUE"];
+  mig  [label=<<b>Trial migrations 1 and 2</b><br/><font point-size="8">SIT; reconciliation L1 to L5</font>>, fillcolor="@BG_BLUE"];
+  uat  [label=<<b>UAT</b><br/><font point-size="8">business scenarios by BDOI testers<br/>on migrated, masked data</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  mig2 [label=<<b>Trial migrations 3 and 4</b><br/><font point-size="8">UAT load; timed as a cut-over</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  nft  [label=<<b>NFT on Pre-Prod</b><br/><font point-size="8">performance, volume, resilience,<br/>DAST and penetration test</font>>, fillcolor="@AMBER_BG"];
+  dr   [label=<<b>DR drill and dress rehearsal</b><br/><font point-size="8">Pre-Prod and DR region</font>>, fillcolor="@AMBER_BG"];
+  prod [label=<<b>Production</b><br/><font point-size="8">go-live check (T), hypercare regression<br/>of each fix</font>>, fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+
+  dev -> int -> sit -> uat -> nft -> prod;
+  mig -> mig2 -> dr -> prod;
+  sit -> mig [style=dashed, label=" same environment "];
+  uat -> mig2 [style=dashed];
+  nft -> dr [style=dashed];
+  {rank=same; sit; mig}
+  {rank=same; uat; mig2}
+  {rank=same; nft; dr}
+}

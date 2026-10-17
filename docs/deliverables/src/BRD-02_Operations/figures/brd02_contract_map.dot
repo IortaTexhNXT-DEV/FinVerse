@@ -1,0 +1,34 @@
+digraph contract {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.12, ranksep=0.9, bgcolor="white"];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@FIELD_BLUE", fontname="Arial", fontsize=9, fontcolor="@NEAR_BLACK", margin="0.1,0.05"];
+  edge [color="@CTA_BLUE", arrowsize=0.6];
+  core [label="Operations", fillcolor="@HEADER_BLUE", fontcolor="white", fontsize=16, color="@HEADER_BLUE", margin="0.3,0.25"];
+  in0 [label="BDOI IT\n- Scheduled jobs of Operations (remittance extract"];
+  in0 -> core;
+  in1 [label="BRD-1 New Business\n- Every booked invoice (booking"];
+  in1 -> core;
+  in2 [label="BRD-13 Data Migration\n- Legacy invoices"];
+  in2 -> core;
+  in3 [label="BRD-3 Product Maintenance\n- Products"];
+  in3 -> core;
+  in4 [label="BRD-4 Collections\n- Collector requests to dispose of an unapplied pa"];
+  in4 -> core;
+  in5 [label="BRD-5 Accounting, Disbursement and ACSL\n- Remittance deductions against an insurer (AR Ins"];
+  in5 -> core;
+  in6 [label="BRD-6 Renewal\n- Renewal invoices booked for the new policy year"];
+  in6 -> core;
+  in7 [label="BRD-7 Claims\n- Special remittance of the premium of a policy wi"];
+  in7 -> core;
+  in8 [label="Banks and payment channels\n- Payment files of bills payment"];
+  in8 -> core;
+  in9 [label="Insurers\n- Official receipts of remitted premium"];
+  in9 -> core;
+  out0 [label="BRD-1 New Business\n- Payment confirmation of an account waiting for p\n- Endorsements and cancellations raised in Operati"];
+  core -> out0;
+  out1 [label="BRD-4 Collections\n- Payment status"];
+  core -> out1;
+  out2 [label="BRD-5 Accounting, Disbursement and ACSL\n- Journal entries of receipts\n- Payment requests of approved remittance batches"];
+  core -> out2;
+  out3 [label="Insurers\n- Remittance schedules"];
+  core -> out3;
+}

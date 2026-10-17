@@ -1,0 +1,24 @@
+# Technical cutover tasks of the Go-Live, Cutover and Data Migration Plan (programme level, BRD-00). They run beside
+# the migration and business tasks CT-001 to CT-095 of the Data Migration Handbook (BRD-13, pack/cutover.yaml).
+# T = Monday 3 January 2028 (recommended go-live, DMQ39 option A). Times are Philippine time (PHT).
+# Owner codes as in the cutover roles: IDO iorta TechNXT infrastructure team, BIT BDOI IT, IQA iorta TechNXT QA,
+# IPM iorta Project Manager, PM BDOI Program Manager; CLO BDO Cloud Operations (added by this plan).
+# [when, id, task, owner, hours, evidence]
+tech_cutover:
+  - ["T-35", TC-01, "Production and DR environments accepted - EKS clusters, RDS PostgreSQL 16 Multi-AZ with the cross-region replica, ElastiCache for Valkey 8, MSK Kafka 3.9, S3 buckets with versioning, Object Lock and replication, KMS keys, WAF, Gateway, private DNS record", "CLO", 16, "Environment acceptance checklist signed (readiness items OPS-01 to OPS-06)"]
+  - ["T-30", TC-02, "Production secrets created in the secrets store (signing key, second-factor key, database owner and application logins, Valkey and Kafka credentials, single sign-on client secret, mail); nothing in files", "CLO", 4, "Secret inventory without values; start-up safeguards pass"]
+  - ["T-28", TC-03, "Go-live release installed in production (with CT-005); release package identical to the one accepted in UAT and rehearsed in Pre-Prod", "IDO", 4, "Deployment record; Application Info shows the release"]
+  - ["T-28", TC-04, "Break-glass administrators created and enrolled with the second factor; recovery codes sealed in the safe; initial administrator password removed from the secrets store", "BIT", 2, "Sealed envelope log; secret removed"]
+  - ["T-27", TC-05, "EIAM production application (OpenID Connect) registered; group gate set; sign-in tested with one user per persona", "BIT", 4, "Sign-in test record per persona"]
+  - ["T-26", TC-06, "Apigee X production proxies, credentials and scopes; connectivity check through Apigee from each BDO system that calls BIBS; outbound targets of BIBS reachable through Apigee", "BIT", 8, "Connectivity check record per interface"]
+  - ["T-25", TC-07, "Monitoring live - synthetic checks, alert rules and routing to L1, L2, L3 and Cloud Operations, dashboards, log shipping; one test alert per responder group", "IDO", 8, "Alert test record; dashboard links"]
+  - ["T-21", TC-08, "Backups - automated backups and point-in-time recovery on; snapshot restore test into an isolated instance; S3 replication and replica lag within 15 minutes", "CLO", 6, "Restore test record (time, recovery point, row counts)"]
+  - ["T-18", TC-09, "Performance and penetration test findings of severity Critical and High closed or accepted by the Information Security Officer", "IQA", 4, "Findings register"]
+  - ["T-15", TC-10, "Production schedules of the scheduled jobs checked against the jobs catalogue (Philippine times, non-production overrides removed, switched-off jobs as planned)", "IDO", 2, "Job list printed from Scheduled Jobs"]
+  - ["T-7", TC-11, "Production release freeze; configuration baseline exported (parameters, lists of values, accounting rules, workflows, code map versions)", "IDO", 2, "Baseline export kept with the cutover records"]
+  - ["T-3 21:30", TC-12, "Hold the scheduled jobs for the load window: the jobs workload is scaled to zero; the Migration Console loads and the integration workload are not affected", "IDO", 0.5, "Scheduled Jobs shows no run after 21:30"]
+  - ["T-2 01:30", TC-13, "Pre-snapshot checks - no job running, outbox empty, replica lag below 1 minute; then CT-040 takes the rollback point", "IDO", 0.5, "Check record"]
+  - ["T-1 13:00", TC-14, "Technical readiness for Monday (with CT-057) - alerts green, backups after the load completed, DR replica in sync, certificates valid for more than 30 days", "IDO", 2, "Technical readiness record for GNG-3"]
+  - ["T 03:30", TC-15, "Release the job hold - jobs workload scaled back; one-off runs decided at GNG-3 (KYC_REVIEW_DUE and MIG_RUNOFF_SNAPSHOT of 1 January deferred to 3 January 10:00; BOOK rates of January checked by Comptrollership)", "IDO", 0.5, "Scheduled Jobs shows the next runs"]
+  - ["T 05:30", TC-16, "Synthetic checks green; error-budget clock starts at 06:00; L1 and L2 queues staffed", "IDO", 0.5, "Dashboard screenshot in the cutover records"]
+  - ["T+1 07:00", TC-17, "First daily operations check of the runbook (jobs of the night, alerts, backups, replication, certificates)", "IDO", 1, "Daily operations check record"]

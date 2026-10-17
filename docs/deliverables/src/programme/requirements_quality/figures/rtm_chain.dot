@@ -1,0 +1,18 @@
+// The traceability chain of BIBS, from the BDOI requirement to the drop in which it is accepted.
+digraph rtm_chain {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.22, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=10, fontcolor="@NEAR_BLACK", width=6.6, height=0.5, margin="0.12,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+  brd  [label=<<b>BRD requirement</b> - ID and page in the BDOI BRD (for example BRPM.008, p.18)>, fillcolor="@DIRTY_WHITE"];
+  fr   [label=<<b>Functional requirement</b> - FR-xx-nnn of the FRS, with rules, fields and acceptance criteria>, fillcolor="@BG_BLUE"];
+  us   [label=<<b>User story</b> - appendix of the FRS: persona, need, outcome, acceptance criteria>, fillcolor="@BG_BLUE"];
+  tc   [label=<<b>Test condition and test cases</b> - TC-xx-nnn.c and TC-xx-nnn.c-nn of the test plan>, fillcolor="@BG_BLUE"];
+  scr  [label=<<b>Screen</b> - SCR-xx-nn of the sign-off set and the UX screen register>, fillcolor="@BG_BLUE"];
+  drop [label=<<b>Drop</b> - SIT and UAT window of the BDOI drop; UAT sign-off certificate per BRD>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  brd -> fr [label=" traceability chapter of the FRS "];
+  fr -> us [label=" one story per BRD ID "];
+  us -> tc [label=" acceptance criteria to conditions "];
+  tc -> scr [label=" screen of each case "];
+  scr -> drop [label=" brand drop map "];
+}

@@ -1,0 +1,133 @@
+# Screen specifications of BRD-6 Renewal: the Renewal Setup tabs (maker-checker master data and rule versions) and the
+# go-live take-over.
+area: Renewal Setup
+screens:
+  - id: SCR-RN-17
+    title: "Renewal Setup: Non-renewable Risk Codes and Checks"
+    route: /renewal/setup
+    purpose: >-
+      The risk codes that are never renewed (the renewal gets Not for Renewal and the Not for Renewal Letter) and the
+      sanitation checks with their severity and parameters. A new or changed risk code or check applies once another
+      user authorizes it; a risk code is end-dated or deactivated, never deleted.
+    entry:
+      - Client & Policy › Renewal › Renewal Setup › Non-renewable Risk Codes or Checks
+    shots:
+      - {state: risk, user: badmin, caption: "Non-renewable Risk Codes with their row action menu"}
+      - {state: checks, user: badmin, tab: Checks, caption: "Checks: the sanitation checks with their severity"}
+      - {state: new, user: badmin, fill: new_risk_code, caption: "New non-renewable risk code dialog"}
+    fields:
+      - "Tabs | Non-renewable Risk Codes / Checks / Classification Rules / Decision Matrix / Package Map / Package Choices / Go-live | Tab | - | - | By permission | Non-renewable Risk Codes | - | - | -"
+      - "Risk codes | Risk Code / Line / Reason / From / To / Status | Column | Code; name of the line or All; dates dd-MMM-yyyy; Active, Pending Authorization or Inactive with the maker's name | - | Non-renewable risk codes | - | Read only | - | No non-renewable risk codes"
+      - "Risk code dialog | Risk Code / Line of Business | Text | The risk code; the line, blank for every line | Y / N | Product catalogue | Blank | Pending, Active | Not blank | Enter the risk code"
+      - "Risk code dialog | Effective From / Effective To | Date | dd-MMM-yyyy; the end after the start | Y / N | - | Blank | Pending, Active | The end after the start | The effective-to date is before the effective-from date"
+      - "Risk code dialog | Reason | Text | Up to 200 characters | Y | - | Blank | Pending, Active | Not blank | Enter the reason and the effective date"
+      - "Checks | Check / Active / Severity / Parameters / Status | Column | Name of the check; Yes or No; Fail – Exception, Fail – Review, Warning, Information or System (sets the disposition); the settings of the check | - | Check settings | - | Read only | - | No checks"
+      - "Check dialog | Active / Severity / Parameters | Check box, drop-down, text | Optional settings of the check, e.g. days=30 | N / Y / N | Severities | As set | Pending, Active | - | Choose the severity of the check"
+    actions:
+      - "New Risk Code | Business Administrator | Always | Opens the dialog; Save for Authorization keeps the code waiting for a second user | Pending Authorization | -"
+      - "Authorize (row menu) | Another Business Administrator than the maker | Pending Authorization | Asks for confirmation; the change takes effect | Active | -"
+      - "Edit (row menu) | Business Administrator | Always | Opens the dialog; the change waits for authorization | Pending Authorization | -"
+      - "Deactivate (row menu) | Business Administrator | Active | Asks for confirmation; the code is no longer used for new renewals | Inactive | -"
+    rules:
+      - "A renewal whose risk code is non-renewable gets Not for Renewal (reason Non-renewable Accounts) by the system and its Not for Renewal Letter (FR-RN-024)."
+      - "The checks run on initiation and again when the expiring account changes; their severity decides the classification through the classification rules (FR-RN-020, FR-RN-112)."
+      - "Maker-checker: the maker of a change cannot authorize it (FR-RN-112)."
+    outcome: The business keeps the non-renewable risk codes and the checks.
+    frs: [FR-RN-020, FR-RN-024, FR-RN-112]
+    tests: [SETUP]
+
+  - id: SCR-RN-18
+    title: "Renewal Setup: Classification Rules and Decision Matrix"
+    route: /renewal/setup
+    purpose: >-
+      The versioned rules: the classification rules turn the check results into Clean, Review or Exception; the
+      decision matrix proposes the disposition by segment, line, product, mortgage, classification, claims,
+      endorsement, payment and days to expiry, automatic or as a proposal to the officer, with the letter. A new
+      version is a draft from the active one, submitted, then activated or rejected by another user; activation
+      retires the active version.
+    entry:
+      - Client & Policy › Renewal › Renewal Setup › Classification Rules or Decision Matrix
+    shots:
+      - {state: matrix, user: badmin, tab: Decision Matrix, caption: "Decision Matrix: the versions with their row action menu and the rules of the active version"}
+      - {state: rules, user: badmin, tab: Classification Rules, caption: "Classification Rules: the versions and the rules of the active version"}
+    fields:
+      - "Versions | Version / Status / Effective / Description / Maker / Approved by | Column | Number; Draft, Submitted, Active, Retired or Rejected; dd-MMM-yyyy; users' names | - | Rule versions | - | Read only | - | No versions"
+      - "Classification rules | Priority / Check / Severity / Outcome / Classification | Column | Order of the rule; the check or Any; the severity or Any; Failed or Warning; Clean, Review or Exception | - | Classification rules | - | Read only | - | No rules"
+      - "Decision matrix | Priority / Segment / Line / Product / Mortgaged / Classification / Claims / Endorsement / Payment / Days from / Days to | Column | The conditions of the rule; Any when blank | - | Decision matrix | - | Read only | - | No rules"
+      - "Decision matrix | Disposition / Automation / Letter | Column | The disposition proposed; Automatic or Proposal to the officer; Renewal Advice, Not for Renewal, No Advice Letter or None | - | Decision matrix | - | Read only | - | -"
+      - "New version dialog | Effective From / Description | Date, text | dd-MMM-yyyy; up to 200 characters | N / N | - | Blank | Draft | - | -"
+      - "New version dialog | [The rules of the version, one row each, with Add Rule and Remove rule] | Table | The columns of the rules | Y | - | The rules of the active version | Draft | Each rule its own priority; a failed check never gives Clean | Two rules have the priority <p>"
+    actions:
+      - "New Version | Business Administrator | Always | Opens the dialog with the rules of the active version; Save Draft keeps the draft | Draft | -"
+      - "Submit (row menu) | Business Administrator | Draft | Submits the version for a second user | Submitted | -"
+      - "Activate (row menu) | Another Business Administrator than the maker | Submitted | Asks for confirmation; the version replaces the active one from its effective date | Active | -"
+      - "Reject (row menu) | Another Business Administrator than the maker | Submitted | Asks for the reason; the version returns to its maker | Rejected | -"
+    rules:
+      - "A failed check never gives the Clean classification (FR-RN-022)."
+      - "The first matching rule of the active matrix proposes the disposition; an automatic rule on a Clean renewal disposes it without the officer (FR-RN-023)."
+      - "A version is activated by another user than its maker; activation retires the active version (FR-RN-112)."
+    outcome: The rules agreed by the business classify the renewals and propose their dispositions.
+    frs: [FR-RN-022, FR-RN-023, FR-RN-112]
+    tests: [SETUP]
+
+  - id: SCR-RN-19
+    title: "Renewal Setup: Package Map, Package Choices and Propose Package"
+    route: /renewal/setup
+    purpose: >-
+      The package of a migrated policy: the package map gives the BIBS product and version a legacy package renews
+      on (or rejects it), by risk code, insurer and sum insured band; when the map gives no answer, a Processing Officer
+      proposes the package on the renewal and another member of the team approves or rejects the choice.
+    entry:
+      - Client & Policy › Renewal › Renewal Setup › Package Map or Package Choices
+      - Renewal (migrated packaged policy) › Propose Package
+    shots:
+      - {state: map, user: proctl, tab: Package Map, caption: "Package Map of the migrated policies with the row action menu"}
+      - {state: choices, user: proctl, tab: Package Choices, caption: "Package Choices waiting for a second team member"}
+    fields:
+      - "Package map | Legacy Package / Risk / Insurer / Sum Insured band / Renews on / Source / Status | Column | Legacy code with its version; risk code and insurer name or Any; the band or Any; product name with its version, or Rejected (not renewable as is); Data migration, Entered on screen or Upload; the approval status | - | Package map | - | Read only | - | No package mappings"
+      - "Mapping dialog | Legacy Package Code / Legacy Package Version / Risk Code / Insurance Company / Sum Insured From / Sum Insured To | Text, amount | The legacy package and its qualifiers, blank for any | Y / N | - | Blank | Pending, Active | - | -"
+      - "Mapping dialog | Product Code (blank to reject) / Product Version / Remarks | Text, number | The BIBS product and version | N | Product catalogue | Blank | Pending, Active | - | -"
+      - "Package choices | Renewal / Client / Legacy Package / Proposed / Reason / Proposed by | Column | Renewal reference; client; legacy package; product name with its version; the reason; the maker's name with the time | - | Package choices | - | Read only | - | No package choices waiting"
+      - "Propose Package dialog | Product Code / Product Version / Reason | Text, number, text area | A product that can be sold for renewal; version 1 or more; up to 200 characters | Y / Y / Y | Product catalogue | Blank | Open renewal of a migrated packaged policy | - | Enter the reason of the choice"
+    actions:
+      - "New Mapping | Processing (package permission) | Always | Opens the dialog; Save for Authorization keeps the mapping waiting for a second user | Pending Authorization | -"
+      - "Upload | Processing (package permission) | Always | Opens the upload of the package map | Pending Authorization | -"
+      - "Authorize, Edit, Deactivate (row menu) | Processing (package permission); Authorize by another user than the maker | By status | As for the risk codes (SCR-RN-17) | Active, Pending Authorization or Inactive | -"
+      - "Approve, Reject (row menu) | Another member of the Renewal processing team than the maker | Choice waiting | Asks for remarks (mandatory to reject); an approved choice applies to the renewal | Approved or Rejected | Package choice decided (NT-10)"
+      - "Propose Package (renewal) | Processing Officers | Open renewal of a migrated packaged policy | Opens the dialog; Submit for Approval keeps the choice waiting | Pending | -"
+    rules:
+      - "A migrated packaged policy whose legacy package is not mapped, retired or ambiguous is an Exception until its package is chosen (FR-RN-028)."
+      - "A package choice is approved by another member of the team than its maker (FR-RN-028)."
+    outcome: Every migrated packaged policy renews on a BIBS package version.
+    frs: [FR-RN-028]
+    tests: [SETUP]
+
+  - id: SCR-RN-20
+    title: "Renewal Setup: Go-live"
+    route: /renewal/setup
+    purpose: >-
+      The take-over of the renewals of the migrated policies expiring from the go-live date within the renewal
+      horizon, the upload of the migrated policies when the migration source is not connected, and the Renewal
+      Advices sent by hand before go-live, recorded so they are never sent again, with the corrections approved by a
+      second team member.
+    entry:
+      - Client & Policy › Renewal › Renewal Setup › Go-live
+    shots:
+      - {state: golive, user: proctl, tab: Go-live, caption: "Go-live tab of the Processing Team Leader: the uploads of the go-live and the corrections to approve"}
+      - {state: takeover, user: badmin, tab: Go-live, caption: "Go-live tab of the Business Administrator: the take-over"}
+    fields:
+      - "Go-live take-over | Go-live Date | Date | dd-MMM-yyyy | Y | - | Blank | - | - | -"
+      - "Go-live take-over | [Migrated policies source: connected or loaded by upload] | Text | - | - | Data migration | - | Read only | - | -"
+      - "Uploads | Upload Migrated Policies / Upload RAs Already Sent | Upload | Templates of the expiring policies of the legacy systems and of the Renewal Advices sent before go-live | - | - | - | - | Every row checked before anything is saved | Legacy policy <legacy ref> is already a renewal"
+      - "Corrections | Legacy Reference / RA Date / Correction / Upload / Prepared by | Column | The Renewal Advice recorded and the correction proposed; the upload and row; the maker's name | - | Renewal Advices already sent | - | Read only | - | No corrections waiting"
+    actions:
+      - "Run Take-over | Business Administrator | Go-live date entered | Takes over the renewals of the migrated policies expiring from the date within the horizon; expiries up to the urgent date are flagged Urgent | Extracted | Go-live renewal extraction completed (NT-09)"
+      - "Upload Migrated Policies | Users with the extract permission | Always | Opens the upload of the migrated policies | - | -"
+      - "Upload RAs Already Sent | Users with the send permission | Always | Opens the upload of the Renewal Advices sent by hand | - | -"
+      - "Approve, Reject (row menu) | Another member of the Renewal processing team than the maker | Correction waiting | Asks for remarks (mandatory to reject) | Approved or Rejected | -"
+    rules:
+      - "The renewals expiring from go-live to 31 May 2028 are taken over; those up to 31 January 2028 are Urgent (FR-RN-016)."
+      - "A Renewal Advice recorded as sent before go-live is never sent again (FR-RN-016)."
+    outcome: The renewals of the go-live window continue in BIBS without a second Renewal Advice.
+    frs: [FR-RN-016]
+    tests: [SETUP]

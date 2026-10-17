@@ -1,0 +1,40 @@
+// Integration landscape by pattern (Integration Architecture, chapter 3).
+digraph in_landscape {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.15, ranksep=0.7, bgcolor="white", pad=0.2, newrank=true,
+         label=<<font point-size="15" color="@HEADER_BLUE"><b>Integration landscape by pattern</b></font><br/><font point-size="9" color="@MUTED">INT numbers as in the interface catalogue. Synchronous calls go through Apigee X; events through Kafka; files through the S3 inbound and reports buckets.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial", fontsize=11,
+         fontcolor="@NEAR_BLACK", margin="0.08,0.04", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.5, penwidth=0.8];
+
+  bibs [label=<<b>BIBS</b><br/><font point-size="8">bibs-web<br/>bibs-integration<br/>bibs-jobs</font>>, fillcolor="@HEADER_BLUE", fontcolor="@WHITE", fontsize=11];
+  subgraph cluster_sync {
+    label=<<b>Synchronous APIs (Apigee X) and sign-in</b>>; fontsize=11; style="rounded,filled"; fillcolor="@BG_BLUE"; color="@HEADER_BLUE";
+    i01 [label="INT-01 EIAM sign-in (OIDC)"]; i02 [label="INT-02 UIDM-ISC (SCIM)"];
+    i04 [label="INT-04 HL-LOAS quotation requests"]; i14 [label="INT-14 M365 mailboxes"];
+  }
+  subgraph cluster_evt {
+    label=<<b>Events (Kafka)</b>>; fontsize=11; style="rounded,filled"; fillcolor="@SUCCESS_BG"; color="@SUCCESS";
+    i12 [label="INT-12 ECM records archive"]; i13 [label="INT-13 CCM e-mail (consumer)"];
+  }
+  subgraph cluster_in {
+    label=<<b>Inbound files (inbound bucket, malware scan)</b>>; fontsize=11; style="rounded,filled"; fillcolor="@DIRTY_WHITE"; color="@HEADER_BLUE";
+    i03 [label="INT-03 LMS"]; i05 [label="INT-05 LFS"]; i06 [label="INT-06 PMS"];
+    i08 [label="INT-08 OBPCS"]; i09 [label="INT-09 Old BOB"]; i21 [label="INT-21 Watchlists"];
+    i27 [label="INT-27 Legacy extracts"];
+  }
+  subgraph cluster_out {
+    label=<<b>Outbound files (reports bucket, links)</b>>; fontsize=11; style="rounded,filled"; fillcolor="@AMBER_BG"; color="@HEADER_BLUE";
+    i07 [label="INT-07 CMS / New BOB (both ways)"]; i16 [label="INT-16 EDP"]; i17 [label="INT-17 EGL"];
+    i19 [label="INT-19 Insurers (both ways)"]; i24 [label="INT-24 File server"]; i25 [label="INT-25 Mail house"];
+  }
+  subgraph cluster_man {
+    label=<<b>Manual (user action in BIBS)</b>>; fontsize=11; style="rounded,dashed"; color="@MUTED";
+    i15 [label="INT-15 TFS"]; i20 [label="INT-20 Bridger"]; i22 [label="INT-22 AMLC STR"]; i23 [label="INT-23 BIR e-filing"];
+  }
+  {i01 i02 i04 i14} -> bibs;
+  bibs -> {i12 i13};
+  {i03 i05 i06 i08 i09 i21 i27} -> bibs;
+  bibs -> {i07 i16 i17 i19 i24 i25};
+  bibs -> {i15 i20 i22 i23} [style=dashed, dir=both];
+}

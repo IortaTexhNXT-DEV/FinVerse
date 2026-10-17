@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+  "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!--
+  iNXT BrokerVerse coding standard (Java).
+  Layout/whitespace is owned by google-java-format (Spotless); this file enforces
+  naming, size, complexity and design rules that a formatter cannot fix.
+-->
+<module name="Checker">
+  <property name="severity" value="error"/>
+  <property name="charset" value="UTF-8"/>
+  <property name="fileExtensions" value="java"/>
+
+  <module name="FileLength"><property name="max" value="600"/></module>
+  <module name="LineLength"><property name="max" value="120"/>
+    <property name="ignorePattern" value="^(package|import) .*|^\s*\* .*https?://.*$"/>
+  </module>
+  <module name="NewlineAtEndOfFile"/>
+  <module name="FileTabCharacter"/>
+  <module name="SuppressWarningsFilter"/>
+
+  <module name="TreeWalker">
+    <module name="SuppressWarningsHolder"/>
+
+    <!-- Naming -->
+    <module name="PackageName"><property name="format" value="^com\.iortatechnxt\.brokerverse(\.[a-z][a-z0-9]*)*$"/></module>
+    <module name="TypeName"/>
+    <module name="MethodName"/>
+    <module name="MemberName"/>
+    <module name="ParameterName"/>
+    <module name="LocalVariableName"/>
+    <module name="ConstantName"/>
+    <module name="StaticVariableName"/>
+    <module name="AbbreviationAsWordInName"><property name="allowedAbbreviationLength" value="3"/></module>
+
+    <!-- Imports -->
+    <module name="AvoidStarImport"/>
+    <module name="RedundantImport"/>
+    <module name="UnusedImports"/>
+    <module name="IllegalImport"/>
+
+    <!-- Size & complexity (mirrors Sonar java:S138, S107, S3776) -->
+    <module name="MethodLength"><property name="max" value="60"/></module>
+    <!-- Constructors are exempt: Spring constructor injection lists collaborators, whose
+         number is governed by the single-responsibility review of the class, not this rule. -->
+    <module name="ParameterNumber"><property name="max" value="7"/>
+      <property name="ignoreOverriddenMethods" value="true"/>
+      <property name="tokens" value="METHOD_DEF"/>
+    </module>
+    <module name="CyclomaticComplexity"><property name="max" value="10"/></module>
+    <module name="NPathComplexity"><property name="max" value="200"/></module>
+    <module name="BooleanExpressionComplexity"><property name="max" value="4"/></module>
+    <module name="NestedIfDepth"><property name="max" value="2"/></module>
+    <module name="NestedTryDepth"><property name="max" value="1"/></module>
+    <module name="ReturnCount"><property name="max" value="4"/></module>
+
+    <!-- Coding -->
+    <module name="EqualsHashCode"/>
+    <module name="SimplifyBooleanExpression"/>
+    <module name="SimplifyBooleanReturn"/>
+    <module name="StringLiteralEquality"/>
+    <module name="MissingSwitchDefault"/>
+    <module name="FallThrough"/>
+    <module name="EmptyStatement"/>
+    <module name="EmptyBlock"><property name="option" value="TEXT"/></module>
+    <module name="EmptyCatchBlock"/>
+    <module name="IllegalCatch"><property name="illegalClassNames" value="java.lang.Throwable, java.lang.Error"/></module>
+    <module name="IllegalThrows"/>
+    <module name="MultipleVariableDeclarations"/>
+    <module name="OneStatementPerLine"/>
+    <module name="ModifiedControlVariable"/>
+    <module name="NeedBraces"/>
+    <module name="InnerAssignment"/>
+    <module name="MagicNumber">
+      <property name="ignoreNumbers" value="-1, 0, 1, 2, 10, 100"/>
+      <property name="ignoreHashCodeMethod" value="true"/>
+      <property name="ignoreAnnotation" value="true"/>
+      <property name="ignoreFieldDeclaration" value="true"/>
+    </module>
+    <module name="ExplicitInitialization"/>
+    <module name="UnnecessaryParentheses"/>
+    <module name="UpperEll"/>
+    <module name="ArrayTypeStyle"/>
+    <module name="TodoComment"><property name="format" value="(TODO|FIXME|XXX)"/></module>
+
+    <!-- Design -->
+    <module name="FinalClass"/>
+    <module name="HideUtilityClassConstructor"/>
+    <module name="VisibilityModifier">
+      <property name="protectedAllowed" value="true"/>
+    </module>
+    <module name="OneTopLevelClass"/>
+    <module name="InterfaceIsType"/>
+
+    <!-- Javadoc: every public type documents its responsibility -->
+    <module name="MissingJavadocType">
+      <property name="scope" value="public"/>
+      <property name="skipAnnotations" value="Generated, SpringBootTest, Test"/>
+      <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, RECORD_DEF"/>
+    </module>
+  </module>
+
+  <!-- Spring Boot entry point: the framework instantiates it, so it is not a utility class. -->
+  <module name="SuppressionSingleFilter">
+    <property name="files" value="BrokerVerseApplication\.java"/>
+    <property name="checks" value="HideUtilityClassConstructor"/>
+  </module>
+
+  <module name="SuppressionSingleFilter">
+    <property name="files" value="[\\/]src[\\/]test[\\/]"/>
+    <property name="checks" value="MagicNumber|MissingJavadocType|MethodLength|ReturnCount"/>
+  </module>
+</module>

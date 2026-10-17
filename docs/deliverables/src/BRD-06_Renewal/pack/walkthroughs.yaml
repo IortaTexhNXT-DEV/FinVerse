@@ -1,0 +1,88 @@
+# End-to-end walkthroughs of BRD-6 Renewal, shown step by step with screenshots of the seed profile.
+# Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and the
+# screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
+# The steps of the Corporate Marketing Team 1 are taken by its Team Leader (Rosario Renewal Team Lead) and its Account Officer
+# (Arnel Account Officer); those of CBG Metro Team 1 by Marites Marketing Lead and Aileen Account Officer.
+walkthroughs:
+  - id: WT-A
+    title: An expiring account from the Expiry List to the Team Leader's post
+    summary: >-
+      The booked accounts expiring in the renewal horizon are extracted and initiated; the renewal of Pacific Harbor
+      Logistics Inc. waits in the Unassigned Disposition tab of Corporate Marketing Team 1, classified Review: its expiring
+      premium is outstanding, a claim is open and an endorsement is in progress. The Team Leader assigns it to the
+      Account Officer, who reads the account history, gives the disposition For Renewal and pushes it. The Team
+      Leader's post is refused while the blocking checks fail; she overrides them with a reason and posts the
+      renewal to Processing.
+    data: "Seed data: renewal of account ARN-2026-940004 (Pacific Harbor Logistics Inc., Luzon Assurance Co.), Corporate Marketing Team 1"
+    steps:
+      - [MKT_TL, SCR-RN-02, "Opens the Expiry List, tab Unassigned Disposition, ticks the renewal of Pacific Harbor Logistics Inc. and clicks Assign Disposition: Arnel Account Officer, then Assign and Push", "Message: 1 assigned; the renewal leaves the tab", Assigned, wt-a-01]
+      - [MKT_AO, SCR-RN-06, "Opens My Dispositions", "The renewal assigned to him with its expiry, the Review classification and the flags Outstanding and Claims", For disposition, wt-a-02]
+      - [MKT_AO, SCR-RN-04, "Opens the renewal, tab Account History, and clicks View Account History", "The payments of the expiring invoice and the open claim; the viewing is recorded", History viewed, wt-a-03]
+      - [MKT_AO, SCR-RN-07, "Clicks Set Disposition: For Renewal with the remarks of the client's call, then Save", "Message: Saved; the disposition For Renewal on the renewal", Dispositioned, wt-a-04]
+      - [MKT_AO, SCR-RN-07, "Clicks Push", "Message: Pushed to the Team Leader; the status Review in Progress", Pushed, wt-a-05]
+      - [MKT_TL, SCR-RN-08, "Opens TL Review, tab For Review, ticks the renewal and clicks Post, then confirms", "The outcome: 1 refused, the renewal cannot be posted while the claims, endorsement and outstanding premium checks fail", Refused, wt-a-06]
+      - [MKT_TL, SCR-RN-08, "Clicks Override: Outstanding balance, reason Approved by the Team Leader, with remarks (the open claim and the endorsement are overridden the same way)", "Message: 1 overridden; the override kept in the History tab of the renewal", Overridden, wt-a-07]
+      - [MKT_TL, SCR-RN-08, "Clicks Post again and confirms", "Message: 1 posted; the renewal moves to Processing", Posted, wt-a-08]
+    downstream:
+      - "The Processing Team Leaders are notified of the renewal posted for processing (walkthrough B); the renewal account is created from the expiring account."
+      - "A renewal posted For Quotation or For Proposal continues as a New Business quotation or proposal request."
+
+  - id: WT-B
+    title: Processing, the insurer's answer and the Renewal Advice
+    summary: >-
+      The Processing Team Leader assigns the renewal of walkthrough A to a Processing Officer, who sends it to the
+      insurer in a batch and records the insurer's answer Renew as is. The renewal is then ready for its Renewal
+      Advice: the Account Officer generates the first notice and sends it to the client, protected.
+    data: "Seed data: the renewal posted in walkthrough A; Patricia Processing Lead and Paolo Processor"
+    steps:
+      - [PROCESSING_TL, SCR-RN-10, "Opens the Processing Worklist, tab For Processing, ticks the renewal and clicks Assign PO: Paolo Processor, then Assign", "Message: 1 assigned; the renewal In Processing", In processing, wt-b-01]
+      - [PROCESSOR, SCR-RN-11, "Opens Insurer Batches, clicks New Batch with Luzon Assurance Co. and the expiry date of the renewal, then Create Batch, and opens the batch", "The batch Draft with the renewal and the columns of the insurer extract", Batch ready, wt-b-02]
+      - [PROCESSOR, SCR-RN-11, "Clicks Send to Insurer and confirms", "Message: Batch sent to the insurer; the batch Sent with its reply date", With the insurer, wt-b-03]
+      - [PROCESSOR, SCR-RN-12, "Opens the renewal and clicks Record Insurer Response: Renew as is with the insurer reference, then Record", "Message: Saved; the renewal RA Ready", RA ready, wt-b-04]
+      - [MKT_AO, SCR-RN-13, "Opens Letters, tab RA Ready, ticks the renewal, clicks Generate RA: First notice, then Generate", "Message: 1 generated; the renewal in RA Generated, locked on the Marketing side", RA generated, wt-b-05]
+      - [MKT_AO, SCR-RN-13, "Opens the tab RA Generated, ticks the renewal, clicks Send and confirms", "Message: 1 sent; the Renewal Advice e-mailed protected to the client", RA sent, wt-b-06]
+    downstream:
+      - "The client receives the Renewal Advice as a protected PDF and its password in a separate e-mail."
+      - "Without acceptance after the second-notice days, the second notice is generated from the RA Sent tab."
+
+  - id: WT-C
+    title: The Contact Center follow-up and the client's acceptance
+    summary: >-
+      The renewal of walkthrough B waits for the client's reply. The Contact Center calls the client and records the
+      follow-up; the client pays the renewal premium, and the Account Officer records the acceptance by payment. The
+      renewal account goes on to placement and booking without re-keying.
+    data: "Seed data: the renewal sent in walkthrough B; Cecilia Contact Center"
+    steps:
+      - [CONTACT_CENTER, SCR-RN-15, "Opens Follow-ups, tab RA Sent", "The renewal waiting for the client's reply", Awaiting response, wt-c-01]
+      - [CONTACT_CENTER, SCR-RN-15, "Opens the renewal and clicks Add Follow-up: Call, Client will renew, the next action date and the remarks, then Save", "Message: Saved; the follow-up on the Remarks & Follow-ups tab", Followed up, wt-c-02]
+      - [MKT_AO, SCR-RN-14, "Opens the renewal and clicks Record Acceptance: Payment with the payment reference, then Record", "Message: Saved; the renewal For Placement and Booking", Accepted, wt-c-03]
+      - [MKT_AO, SCR-RN-05, "Opens the tab Letters", "The Renewal Advice in the e-mail queue to the client and the acceptance by payment", Kept, wt-c-04]
+    downstream:
+      - "The renewal account is fast-tracked to the payment gate, placed and booked through New Business as business type Renewal; the booking closes the renewal as renewed."
+
+  - id: WT-D
+    title: Not for Renewal and the closing letter
+    summary: >-
+      Aileen Account Officer learns that the client's loan is fully paid: she gives the disposition Not for Renewal
+      with that reason and pushes it; the Team Leader posts it to the letter step and the Not for Renewal Letter is
+      sent, which closes the renewal.
+    data: "Seed data: the renewal of the migrated motor policy QPS-FI-0100007 (Jose Miguel Reyes), CBG Metro Team 1, assigned to Aileen Account Officer by the Team Leader"
+    steps:
+      - [MKT_AO, SCR-RN-07, "Opens the renewal, views its account history, clicks Set Disposition: Not for Renewal, reason Loan fully paid, with remarks, then Save", "Message: Saved; the disposition Not for Renewal with its reason", Dispositioned, wt-d-01]
+      - [MKT_TL, SCR-RN-08, "After the Account Officer's push, ticks the renewal on TL Review, clicks Post and confirms", "Message: 1 posted; the renewal goes to the closing letters", Letter pending, wt-d-02]
+      - [MKT_AO, SCR-RN-13, "Opens Letters, tab NAL / NFR, ticks the renewal, clicks Send Letters and confirms", "Message: 1 sent; the renewal is closed", Closed, wt-d-03]
+      - [MKT_AO, SCR-RN-05, "Opens the renewal, tab Letters", "The Not for Renewal Letter in the e-mail queue to the client", Letter kept, wt-d-04]
+    downstream:
+      - "Until the re-open days after expiry, the Account Officer may re-open the renewal for a new disposition."
+
+  - id: WT-E
+    title: A transfer to another unit, and the controls the user sees
+    summary: >-
+      CBG Metro Team 1 transferred the renewal of a corporate client to Corporate Marketing Team 1; its Team Leader accepts it. Then
+      two controls of Renewal with the message the user sees: a disposition before the account history, and a
+      transfer to the own unit.
+    data: "Seed data: the transfer request of the migrated policy EBIX-CG-0100005 (Luzon Agri-Industrial Corp.) to Corporate Marketing Team 1; the renewal of the migrated policy QPS-FI-0100002 (Jose Miguel Reyes) of CBG Metro Team 1"
+    steps:
+      - [MKT_TL, SCR-RN-09, "The Team Leader of Corporate Marketing Team 1 opens Transfers, tab Incoming, chooses Accept in the row action menu and confirms with remarks", "Message: Transfer accepted; the renewal joins the Unassigned tab of the unit", Transferred, wt-e-01]
+      - [MKT_AO, SCR-RN-07, "Aileen Account Officer gives a disposition on a renewal without opening its account history", "Open the Account History before you give the disposition", Refused, wt-e-02]
+      - [MKT_TL, SCR-RN-02, "Marites Marketing Lead transfers a renewal of her unit to CBG Metro Team 1, her own unit", "The receiving unit must be another unit", Refused, wt-e-03]

@@ -1,0 +1,203 @@
+# Screen specifications of BRD-2 Operations: the Operations home, the invoice ledger (Invoice Search, Invoice 360 with
+# the Policy Transactions), hand-offs and extracts, the report archive and the notification settings.
+# Row formats: docs/deliverables/src/signoff/README.md (fields: 10 cells, actions: 6 cells, separated by " | ").
+area: Operations home and invoice ledger
+screens:
+  - id: SCR-OP-01
+    title: Operations Home
+    route: /operations
+    purpose: >-
+      The landing page of every Operations user: one card per team section the user works in (Cashiering,
+      Remittance, Production Reconciliation, Adjustment, Commission Receivables, Disbursement, Interfaces), each with
+      its live work tiles counted from the invoice ledger, an invoice finder and the links to the applications
+      Operations works with.
+    entry:
+      - The sidebar group Operations
+    shots:
+      - {state: home, user: cashier, caption: "Operations Home of a Cashier: the invoice finder and the Cashiering work tiles"}
+      - {state: home_tl, user: remittl, caption: "Operations Home of the Remittance Team Leader: the Remittance work tiles"}
+    fields:
+      - "Find an Invoice | Search Invoice No., ARN, policy or client | Text | ARN, invoice, policy or client, partial | N | Invoice ledger | Blank | - | - | -"
+      - "Find an Invoice | Search | Button | Opens Invoice Search with the text | - | - | - | - | - | -"
+      - "Section card | Cashiering | Card | One card per section the user's roles cover | - | Role grants | - | Read only | - | -"
+      - "Section card | Open | Link | Opens the section's workbench | - | - | - | - | - | -"
+      - "Section card | [Work tiles] | Tile | Title Case label and live count; amber or red bar with Needs attention when the queue needs action | - | Invoice ledger and the Operations records | - | Read only | A tile opens the list behind it | -"
+      - "Integrated Applications | Integrated Applications | Card | Links to the applications Operations works with | - | List of values of external links | - | Read only | Only web addresses are opened | No application links yet"
+      - "Page | No Operations section is assigned to your role | Empty state | Shown when the role covers no Operations section | - | - | - | - | - | -"
+    actions:
+      - "Search | Every Operations user | Text entered or blank | Opens Invoice Search filtered on the text | - | -"
+      - "Open | Every Operations user | Always | Opens the workbench of the section | - | -"
+      - "[A work tile] | Every Operations user | Always | Opens the screen of the queue, filtered on it (for example Batches for Approval opens Remittance Batches on For Approval) | - | -"
+    rules:
+      - "A section card is shown only for the teams whose permissions the user holds (FR-OP-003)."
+      - "Tile counts are read live from the invoice ledger and the Operations records; a tile of a queue that needs action carries Needs attention (FR-OP-003)."
+      - "The links to the integrated applications are list values maintained by the Business Administrator (FR-OP-003)."
+    outcome: The user sees the work waiting for each of the user's teams and opens it in one click.
+    frs: [FR-OP-002, FR-OP-003]
+    tests: [OPSHOME]
+
+  - id: SCR-OP-02
+    title: Invoice Search
+    route: /operations/invoices
+    purpose: >-
+      Every booked invoice, endorsement and return invoice of the Operations ledger with its gross and outstanding
+      premium, payment and remittance status and flags; status tabs, a search box and filters find an invoice and a
+      row opens its Invoice 360.
+    entry:
+      - Operations Home › Find an Invoice
+      - Section workbenches › Search Invoices
+    shots:
+      - {state: list, user: cashier, caption: "Invoice Search, All Invoices tab"}
+      - {state: filters, user: cashier, click: "^filters$", caption: "Invoice Search with the filter panel open"}
+    fields:
+      - "Tabs | All Invoices / Outstanding / Paid, Not Extracted / On Hold / Locked / Direct Payment | Tab | - | - | Fixed | All Invoices | - | A tab keeps the text and panel filters | -"
+      - "Toolbar | Search Invoice No., ARN, policy, client or assured | Text | Partial, not case-sensitive | N | Invoice ledger | Blank | - | - | -"
+      - "Toolbar | Origin | Drop-down | All origins, BIBS, Migrated | N | Fixed list | All origins | - | - | -"
+      - "Filters | Insurer / Name of Assured / Account Officer | Drop-down, text | Insurers by name | N | Insurers | Blank | - | Contains | -"
+      - "Filters | Booked From / Booked To / Inception From / Inception To | Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
+      - "List | Invoice No. | Column | Invoice number with the ARN as the second line; migrated invoices carry the LEGACY tag | - | Invoice ledger | - | Read only | - | -"
+      - "List | Assured / Client Code | Column | Assured name with the client code | - | Invoice ledger | - | Read only | - | -"
+      - "List | Insurer | Column | Insurer name | - | Insurers (BRD-3) | - | Read only | - | -"
+      - "List | Booked / Inception | Column | dd-MMM-yyyy, two lines | - | Invoice ledger | - | Read only | - | -"
+      - "List | Account Officer | Column | User name | - | Invoice ledger | - | Read only | - | -"
+      - "List | Gross Premium / Outstanding | Column | Amount, two decimals; a return invoice in brackets | - | Invoice ledger | - | Read only | - | -"
+      - "List | Status / Remittance | Column | Payment status and remittance status pills | - | Invoice ledger | - | Read only | - | -"
+      - "List | Flags | Column | Direct Payment, 2% CWT, Incentive, On Hold, Pending Negative Adjustment, Written Off, Cancelled, Estimated, Locked by <team> | - | Invoice ledger | - | Read only | - | -"
+    actions:
+      - "Search | Every Operations user | Always | Filters the list on the text | - | -"
+      - "Filters / Apply Filters | Every Operations user | Always | Opens the filter panel / applies the filters; the button shows the number of filters set | - | -"
+      - "Open a row | Every Operations user | Always | Opens Invoice 360 of the invoice | - | -"
+    rules:
+      - "The search is partial and not case-sensitive on the invoice number, ARN, policy number, client and assured (FR-OP-005)."
+      - "Payment status is derived from the premium receivable balances: Unpaid, Partially Paid, Paid; Not Applicable for direct payment and return invoices (FR-OP-004)."
+      - "Every invoice booked in New Business, every endorsement and every return invoice is in the ledger with its components as booked (FR-OP-004)."
+    outcome: The user finds any booked invoice and sees where its money is.
+    frs: [FR-OP-004, FR-OP-005]
+    tests: [INVSEARCH]
+
+  - id: SCR-OP-03
+    title: Invoice 360
+    route: /operations/invoices/:no
+    parent: /operations/invoices
+    purpose: >-
+      One invoice as Operations sees it: the reference chips (invoice, ARN, policy, endorsement, root invoice), the
+      payment and remittance status and the flags, the account workflow, the premium receivable by component with
+      its balance, every movement, the invoice family, the Policy Transactions with their accounting entries, one tab
+      per Operations team with its records, the history and the documents.
+    entry:
+      - Invoice Search › open a row
+      - Receipt, Remittance Batch, Endorsement Request, DTIP Status › invoice number
+      - Policy Transactions of any screen › invoice number
+    shots:
+      - {state: record, user: remittl, open_invoice: remitted, caption: "Invoice 360 of a paid and fully remitted invoice, Components & Balances tab"}
+      - {state: transactions, user: remittl, open_invoice: family, tab: "Policy Transactions", after: expand_journal, caption: "Policy Transactions tab: the original booking and the endorsement, with the journal of the booking expanded"}
+      - {state: remittances, user: remittl, open_invoice: remitted, tab: "Remittances", caption: "Remittances tab: the remittance batches of the invoice"}
+      - {state: movements, user: remittl, open_invoice: remitted, tab: "Movements", caption: "Movements tab: booking, application and remittance movements"}
+    fields:
+      - "Header | Invoice / ARN / Policy No. / Endorsement / Root Invoice | Reference chip | Endorsement and root invoice only for an endorsement or return invoice | - | Invoice ledger | - | Read only | - | -"
+      - "Header | [Payment status and remittance status pills] | Status pill | For example Paid and Fully Remitted | - | Invoice ledger | - | Read only | - | -"
+      - "Header | [Flags] | Tag | Direct Payment, 2% CWT, Incentive, On Hold, Pending Negative Adjustment, Written Off, Cancelled, Estimated, Locked by <team> | - | Invoice ledger | - | Read only | - | -"
+      - "Header | Client / Insurer(s) / Period / Gross / Outstanding Premium / Booked | Display | Insurer shares in %; period dd-MMM-yyyy to dd-MMM-yyyy; booked date, cost center and Account Officer | - | Invoice ledger | - | Read only | - | -"
+      - "Workflow | [Account workflow header] | Stepper | The stages of the account from Draft to Booked with the history table | - | Account (BRD-1) | - | Read only | - | -"
+      - "Tabs | Components & Balances / Movements / Invoice Family / Policy Transactions / Receipts / Remittances / Adjustments / Reconciliation / Commission / History / Documents | Tab | A team tab shows its number of records | - | Fixed | Components & Balances | - | - | -"
+      - "Components & Balances | Component / Booked / Applied / Reversed / Remitted / Adjusted / Written Off / Balance | Column | PR - DST, PR - Premium Tax / VAT, PR - LGT, PR - Fire Service Tax, PR - Other Charges, PR - Basic Premium, PR - CWT 2307, Due to Insurer (DTIP), Commission Receivable, VAT on Commission, Withholding Tax | - | Invoice ledger | - | Read only | Balance = booked + adjusted - applied + reversed - remitted - written off | -"
+      - "Components & Balances | Premium Due / Premium Collected / Premium Outstanding | Display | Amount | - | Invoice ledger | - | Read only | - | -"
+      - "Components & Balances | Insurer Shares | Table | Insurer, Share %, Lead | - | Booking | - | Read only | - | -"
+      - "Movements | Value Date / Movement / Component / Amount / Source / Documents / Posted | Column | AR, OR, batch and journal numbers in Documents | - | Invoice ledger | - | Read only | - | -"
+      - "Invoice Family | Invoice No. / Transaction / Booked / Gross Premium / Outstanding / Payment / Remittance | Column | The original booking first, then every endorsement and cancellation; family totals under the table | - | Invoice ledger | - | Read only | - | -"
+      - "Policy Transactions | Date / Transaction / Reference / Premium Change / Taxes / Commission / Gross Premium After / Status / Accounting | Column | Amounts in the invoice currency; the reference under the transaction, the commission change under the taxes, the accounting under the status; Not posted for an open request; a row opens its GL journals | - | Invoice ledger, booked invoices, endorsement requests, journals | - | Read only | - | -"
+      - "Policy Transactions | GL Account / Party / Narration / Debit / Credit | Column | The lines of each journal with the totals | - | Journals (BRD-5) | - | Read only | Debits equal credits | -"
+      - "Team tabs | Record / Reference / Date / Amount / Status / Description | Column | The receipts and applications, remittance batches and holds, endorsement requests, reconciliation items or direct payment accounts of the invoice | - | Operations records | - | Read only | - | No <records> for this invoice yet"
+      - "History | When / What / Change / Module / Reason / By | Column | Status, flag and lock changes, newest first | - | Invoice ledger | - | Read only | - | No status changes yet"
+      - "Documents | [Documents panel] | Panel | Documents of the invoice (Common screen elements) | - | Documents | - | - | File type, size and content checks | -"
+    actions:
+      - "Open Booked Invoice | Processing and Adjustment users | The invoice was booked in BIBS | Opens the booked invoice of New Business | - | -"
+      - "[A reference in a tab] | Every Operations user | Always | Opens the receipt, batch, request, cycle or billing | - | -"
+      - "[Journals button of a Policy Transactions row] | Every Operations user | The transaction posted journals | Shows the journal lines under the row; the journal number opens the journal for users who may view journals | - | -"
+    rules:
+      - "Each team tab lists only the records of that team with their count; an empty tab says so (FR-OP-005)."
+      - "The hold and remittance statuses are shown with their history and time stamps (FR-OP-005)."
+      - "Policy Transactions show the original booking, then every endorsement, adjustment, cancellation and refund in date order, with the position after each posted row and its journals; the history reads the invoice ledger and the journals, no second ledger is kept (FR-OP-061)."
+      - "A co-insured invoice stays one invoice with its insurer shares (FR-OP-007)."
+      - "While an invoice is locked by a team, the other teams may only apply payments to it (FR-OP-006)."
+    outcome: The user sees the balances, statuses, history and accounting of the invoice in one place.
+    frs: [FR-OP-004, FR-OP-005, FR-OP-006, FR-OP-007, FR-OP-061]
+    tests: [INV360]
+
+  - id: SCR-OP-04
+    title: Hand-offs and Extracts
+    route: /operations/handoffs
+    purpose: >-
+      Work that an Operations team completes by hand when the module that would do it is not active (an official
+      receipt to issue, an unapplied item to set up), and the extract repository: the files Operations produces for
+      the shared folders (remittance extracts, production registers, collection files), kept with their fingerprint.
+    entry:
+      - Operations Home › Hand-offs to Complete tile
+    shots:
+      - {state: extracts, user: cashier, tab: "Extract Repository", caption: "Extract Repository tab with the files produced by Remittance and Production Reconciliation"}
+    fields:
+      - "Tabs | Open Hand-offs / Closed Hand-offs / Extract Repository | Tab | - | - | Fixed | Open Hand-offs | - | - | -"
+      - "Hand-offs | Work / What To Do / From / Amount / Created / Status | Column | - | - | Hand-offs | - | Read only | - | -"
+      - "Close Hand-off dialog | What Was Done | Text | Up to 200 characters | Y | - | Blank | Open hand-off | Not blank | Say what was done"
+      - "Extract Repository | Folder / File / From / Size / Stored | Column | Size in KB; stored time and user | - | Extract repository | - | Read only | - | -"
+      - "Extract Repository | Download | Button | - | - | - | - | - | The stored file passes its checksum | The stored file failed its checksum verification"
+    actions:
+      - "Close Hand-off | Cashier, Cashiering Team Leader, System Administrator | Open hand-off | Asks what was done and closes the hand-off | Closed | -"
+      - "Download | Every Operations user | Always | Downloads the stored file | - | -"
+    rules:
+      - "A hand-off records work a team completes by hand; closing it needs a note of what was done (FR-OP-130)."
+      - "Files for the shared folders are kept in the extract repository with their fingerprint until the shared drive is specified (FR-OP-130)."
+    outcome: Work handed over is completed and closed; every extract file can be downloaded again.
+    frs: [FR-OP-130]
+    tests: [HANDOFFS]
+
+  - id: SCR-OP-05
+    title: Report Archive
+    route: /operations/report-archive
+    purpose: >-
+      Every Operations report generated on screen or exported, and every file produced by a scheduled report job,
+      with its parameters, the user and time, the number of rows and the file to download again.
+    entry:
+      - Reports › Report Centre › an Operations report (each run is archived)
+    shots:
+      - {state: list, user: cashier, caption: "Report Archive with the runs and their parameters"}
+    fields:
+      - "Toolbar | Report | Drop-down | Report titles of the catalogue | N | Report catalogue | All reports | - | - | -"
+      - "List | Report | Column | Report title with its code | - | Report catalogue | - | Read only | - | -"
+      - "List | Parameters | Column | The parameters of the run | - | Report run | - | Read only | - | -"
+      - "List | Action | Column | Generated or exported, with the format | - | Report run | - | Read only | - | -"
+      - "List | Rows | Column | Number | - | Report run | - | Read only | - | -"
+      - "List | Generated | Column | dd-MMM-yyyy HH:mm and the user's name | - | Report run | - | Read only | - | -"
+      - "List | File | Column | Download, or Available from <date and time> for a file of a scheduled job | - | Report run | - | Read only | - | -"
+    actions:
+      - "Search | Every Operations user | Always | Lists the runs of the report code | - | -"
+      - "Download | Users who may export Operations reports | The file is available | Downloads the archived file | - | -"
+    rules:
+      - "Viewing a report and exporting it are separate permissions; a view-only user sees the list without Download (FR-OP-009)."
+      - "Every generation and download is archived with its parameters, user and time (FR-OP-009)."
+    outcome: Every Operations report run can be traced and its file downloaded again.
+    frs: [FR-OP-009]
+    tests: [ARCHIVE]
+
+  - id: SCR-OP-06
+    title: Notification Settings
+    route: /operations/notifications
+    purpose: >-
+      Each Operations event with its description and whether the user receives it in the notification bell, by
+      e-mail or both; events the user never changed follow their default.
+    entry:
+      - The bell › Notifications page
+    shots:
+      - {state: list, user: cashier, caption: "Notification Settings of the Operations events"}
+    fields:
+      - "List | Event | Column | Event name with its description | - | Notification events | - | Read only | - | -"
+      - "List | Module | Column | Team that raises the event | - | Notification events | - | Read only | - | -"
+      - "List | In-App / E-mail | Check box | - | N | - | The event's default | Always | - | -"
+      - "List | Setting | Column | Default or Yours | - | Notification preferences | Default | Read only | - | -"
+    actions:
+      - "[Tick or untick a channel] | Every Operations user | Always | Saves the user's choice for the event | - | -"
+    rules:
+      - "The user's choice applies to the in-app notice and the e-mail of the event; events not changed follow their default (FR-OP-036)."
+    outcome: Each user receives the Operations notices in the channels of the user's choice.
+    frs: [FR-OP-036]
+    tests: [NOTIFSET]

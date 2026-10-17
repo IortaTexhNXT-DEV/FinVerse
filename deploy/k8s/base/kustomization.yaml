@@ -1,0 +1,27 @@
+# BIBS on Amazon EKS: the four workloads of ARCHITECTURE_OPTION_DECISION.md section 2 and the
+# controls of section 5 (Gateway API edge: internal ALB with WAF by default, TLS on every hop,
+# NetworkPolicies deny by default, IRSA). Do not apply the base directly: build an overlay
+# (overlays/uat, overlays/prod), which chooses the gateway controller (components/gateway-*) and sets
+# the image tags, host names and the AWS placeholders (<...>). See docs/operations/DEPLOYMENT.md.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: bibs
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: bibs
+    includeSelectors: false
+resources:
+  - namespace.yaml
+  - serviceaccounts.yaml
+  - backend-config.yaml
+  - bibs-web.yaml
+  - bibs-jobs.yaml
+  - bibs-integration.yaml
+  - bibs-frontend.yaml
+  - autoscaling.yaml
+  - disruption-budgets.yaml
+  - limit-range.yaml
+  - network-policies.yaml
+  - certificates.yaml
+  - gateway.yaml
+  - ../../nginx

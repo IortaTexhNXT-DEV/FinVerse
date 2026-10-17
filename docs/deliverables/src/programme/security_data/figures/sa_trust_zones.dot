@@ -1,0 +1,61 @@
+// Security Architecture: trust zones of BIBS and the trust boundaries TB1 to TB7 of the threat model.
+digraph sa_trust_zones {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fontcolor="@NEAR_BLACK",
+         fillcolor="@WHITE", margin="0.10,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.1, fontname="Arial", fontsize=8, fontcolor="@NEAR_BLACK"];
+
+  subgraph cluster_users {
+    label=<<b>Zone 1 - BDO network and VDI (users)</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    user [label=<<b>BDOI users</b><br/><font point-size="8">browser on BDO device or VDI</font>>, fillcolor="@BG_BLUE"];
+    eiam [label=<<b>EIAM</b> (Microsoft Entra ID)<br/><font point-size="8">OIDC / SAML 2.0, MFA, conditional access</font>>, fillcolor="@AMBER_BG"];
+    isc  [label=<<b>UIDM-ISC</b> (IGA)<br/><font point-size="8">joiner, mover, leaver (SCIM 2.0, planned)</font>>, fillcolor="@AMBER_BG"];
+  }
+  subgraph cluster_bdo {
+    label=<<b>Zone 2 - BDO systems</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    sys [label=<<b>BDO systems</b><br/><font point-size="8">CMS / New BOB, OBPCS, EGL, EDP, LMS, HL-LOAS,<br/>Bridger Insight XG, CCM (SMTP)</font>>, fillcolor="@BG_BLUE"];
+    apigee [label=<<b>Apigee X</b><br/><font point-size="8">OAuth 2.0 tokens, scopes per API</font>>, fillcolor="@AMBER_BG"];
+  }
+  subgraph cluster_edge {
+    label=<<b>Zone 3 - Edge (AWS account of BIBS)</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    waf [label=<<b>AWS WAF + internal load balancer</b><br/><font point-size="8">TLS 1.3/1.2, managed rules, rate rules, BDO ranges only</font>>];
+    gw  [label=<<b>Kubernetes Gateway API</b><br/><font point-size="8">routes: users to web and frontend, systems to integration</font>>];
+  }
+  subgraph cluster_app {
+    label=<<b>Zone 4 - Application (managed Kubernetes, namespace bibs, restricted Pod Security)</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    fe  [label=<<b>bibs-frontend</b><br/><font point-size="8">nginx, React client, CSP</font>>];
+    web [label=<<b>bibs-web</b><br/><font point-size="8">user APIs, permissions, data scope</font>>, fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    jobs [label=<<b>bibs-jobs</b><br/><font point-size="8">batch jobs</font>>, fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    integ [label=<<b>bibs-integration</b><br/><font point-size="8">Apigee tokens only, outbox relay</font>>, fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  }
+  subgraph cluster_data {
+    label=<<b>Zone 5 - Data (private subnets, encrypted at rest with KMS)</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    pg  [label=<<b>PostgreSQL 16</b> (RDS Multi-AZ)<br/><font point-size="8">verify-full TLS, least-privilege login</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    vk  [label=<<b>Valkey 8</b><br/><font point-size="8">TLS, ACL user</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    kf  [label=<<b>Apache Kafka 3.9</b> (MSK)<br/><font point-size="8">SASL_SSL</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    s3  [label=<<b>Amazon S3</b><br/><font point-size="8">SSE-KMS (BDOI keys), Object Lock, malware scan</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    sm  [label=<<b>Secrets Manager + KMS</b><br/><font point-size="8">secrets, BDOI-owned keys</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  }
+  subgraph cluster_ops {
+    label=<<b>Zone 6 - Delivery and operations</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    ci  [label=<<b>CI pipeline</b><br/><font point-size="8">SAST, SCA, secrets, image scan, SBOM</font>>, fillcolor="@DIRTY_WHITE"];
+    mon [label=<<b>Monitoring and SIEM</b><br/><font point-size="8">metrics, logs, alerts</font>>, fillcolor="@DIRTY_WHITE"];
+  }
+
+  {rank=same; user; sys; isc}
+  {rank=same; eiam; apigee}
+  {rank=same; waf; ci}
+  {rank=same; pg; vk; kf; s3; sm; mon}
+  user -> eiam [label=" TB1 sign-in"];
+  user -> waf [label=" TB2 HTTPS"];
+  isc -> apigee [label=" provisioning", style=dashed];
+  sys -> apigee [label=" TB3"];
+  apigee -> waf [label=" private route"];
+  waf -> gw;
+  gw -> fe; gw -> web [label=" TB4"]; gw -> integ;
+  web -> pg [label=" TB5"]; jobs -> pg; integ -> pg;
+  web -> vk; web -> s3 [label=" TB6"]; integ -> kf;
+  web -> sm [style=dashed]; integ -> apigee [label=" TB3 outbound", style=dashed];
+  ci -> gw [label=" TB7 images", style=dashed];
+  web -> mon [style=dashed, label=" logs, metrics"];
+}

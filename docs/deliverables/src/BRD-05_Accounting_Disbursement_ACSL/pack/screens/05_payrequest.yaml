@@ -1,0 +1,176 @@
+# Screen specifications of BRD-5 Payment Requests (Marketing): the requests home, the Refund Request Form, the
+# Request for Payment of a cash advance, the cancellation of a disbursed check, the request with its workflow, its
+# validations, its disbursement and its liquidation, and the liquidation accounts.
+area: Refund and cash-advance requests
+screens:
+  - id: SCR-AC-39
+    title: Requests Home
+    route: /payment-requests
+    purpose: >-
+      The Marketing requests by stage (Draft, Preparing, For Validation, For Review, For Approval, For HR Approval,
+      With Disbursement, Disbursed, Cancelled) with their counts: client refunds (RRF), employee cash advances (RFP)
+      and the cancellations of disbursed checks. The reviewer endorses and the approvers approve the selected requests
+      at once.
+    shots:
+      - {state: list, user: mktrev, caption: "Refund & Cash Advance Requests: the requests by stage with kind, payee, amount, disbursement and status"}
+      - {state: approve, user: mktappr, tab: "For Approval", caption: "For Approval: the requests selected for Approve Selected"}
+    fields:
+      - "Tabs | All / Draft / Preparing / For Validation / For Review / For Approval / For HR Approval / With Disbursement / Disbursed / Cancelled | Tab | With the count of each | - | Requests | All | - | - | -"
+      - "Toolbar | Search Request No. | Text | RRF, RFP or cancellation number | N | - | Blank | - | Contains | -"
+      - "Filters | Kind / Request Date From / Request Date To | Drop-down, date | Refund (RRF), Cash Advance (RFP), Check Cancellation; dd-MMM-yyyy | N | Fixed list | All | - | - | -"
+      - "List | Request No. / Kind / Payee / Amount / Disbursement / Requested By / Status / Flags | Column | The request number with its date; the payee by name; the DV and its status in Disbursement; the requester's name; Returned and Validation flags | - | Requests | - | Read only | - | -"
+      - "Bulk Decision Results dialog | [Outcome of each request] | Column | Each selected request with its outcome or the reason it was not moved | - | Requests | - | Read only | - | -"
+    actions:
+      - "New Refund Request / New Cash Advance / Cancel a Check | Marketing Processor, Reviewer (request create) | Always | Opens the form | Draft | -"
+      - "Endorse Selected | Marketing Reviewer (request review) | For Review tab, requests selected | Endorses each selected request on its own | For Approval | Workflow notice"
+      - "Approve Selected / Approve Selected (HR) | Marketing Approver; HR Approver | For Approval or For HR Approval tab, requests selected | Approves each selected request; an approved request goes to Disbursement or to HR | For HR Approval or With Disbursement | Workflow notice"
+      - "[Row] | Request users | Always | Opens the request | - | -"
+    rules:
+      - "A request is never endorsed or approved by the user who raised it or last moved it (FR-PQ-008, FR-PQ-009)."
+      - "Approving several requests approves each on its own; the outcome of each is listed (FR-PQ-009)."
+    outcome: Marketing sees every request by stage and moves them on.
+    frs: [FR-PQ-001, FR-PQ-008, FR-PQ-009, FR-PQ-012]
+    tests: [PQHOME]
+
+  - id: SCR-AC-40
+    title: New Refund Request
+    route: /payment-requests/new-refund
+    also: [/payment-requests/requests/:id/edit-refund]
+    purpose: >-
+      The Refund Request Form (RRF) of a client: the segment, reference, requesting unit and purpose; the mode of
+      payment with the client's account or the name on the check; and the accounts to refund, one line per AR number
+      with the invoice, client, assured, amount, reason, branch or unit and the two categories.
+    entry:
+      - Requests Home › New Refund Request
+      - Request › Change (a draft or returned refund)
+    shots:
+      - {state: filled, user: mktao, fill: refund_form, caption: "New Refund Request: the request, the credit to the client's account and the account to refund"}
+      - {state: error, user: mktao, fill: refund_duplicate, submit: "^save request$", caption: "An AR number already in another refund request: the request is refused"}
+    fields:
+      - "Request | Segment / Reference / Requesting Unit | Text | Up to 40, 80 and 60 characters; reference such as 2025_331 Refund | N | - | Blank | Draft, Returned | - | -"
+      - "Request | Purpose / Remarks | Text area | Up to 500 characters | N | - | Blank | Draft, Returned | - | -"
+      - "Mode of Payment | Mode of Payment | Drop-down | Credit to CA / SA or Check | Y | Payment mode list | Blank | Draft, Returned | - | Select the mode of payment"
+      - "Mode of Payment | Known CA / SA | Drop-down | Account captured from an earlier refund of the client | N | Client payout accounts | Blank | Draft, Returned | - | -"
+      - "Mode of Payment | Account No. / Account Name / Check / Payee Name | Text | BDO account of 10 to 16 digits and its name; or the name on the check | Cond.: mode | - | Blank | Draft, Returned | Digits only | Enter the account name"
+      - "Accounts to Refund | AR No. / Invoice No. / Client No. / Assured / Client / Amount / Reason / Branch / Unit / Category A / B | Row | One line per AR number; the invoice looked up; the reason from its list | Y / N / Y / Y / Y / Y / N / N | Receipts, invoice ledger, refund reason and category lists | Blank | Draft, Returned | An AR number in one open refund only; all lines of one client | -"
+    actions:
+      - "Add Account / [Remove] | Marketing Processor | Draft or returned | Adds or removes an account line | - | -"
+      - "Save Request | Marketing Processor, Reviewer (request create) | Mandatory fields filled | Saves the request and opens it | Draft | -"
+      - "Cancel | Same users | Always | Leaves without saving | - | -"
+    rules:
+      - "An AR number is refunded once: an AR already in another open or paid refund request is refused (FR-PQ-014)."
+      - "All accounts of one refund request belong to one client; the fields follow the Refund Request Form of Appendix D (FR-PQ-003)."
+      - "The client's account is recorded on the client record when the refund is approved, without duplicates (FR-PQ-016)."
+    outcome: The refund request is saved with its accounts to refund.
+    frs: [FR-PQ-003, FR-PQ-014, FR-PQ-016]
+    tests: [NEWRRF]
+
+  - id: SCR-AC-41
+    title: New Cash Advance
+    route: /payment-requests/new-cash-advance
+    also: [/payment-requests/requests/:id/edit-cash-advance]
+    purpose: >-
+      The Request for Payment (RFP) of an employee cash advance: the employee, the type, the amount, the purpose,
+      segment and requesting unit, and the mode of payment.
+    entry:
+      - Requests Home › New Cash Advance
+    shots:
+      - {state: filled, user: mktao, fill: cash_advance, caption: "New Cash Advance: the employee, amount and purpose, paid by credit to the employee's account"}
+    fields:
+      - "Request for Payment | Employee No. / Employee Name | Text | The employee of the employee master | Y | Employees | Blank | Draft, Returned | - | -"
+      - "Request for Payment | Type | Drop-down | Cash Advance and the other RFP types | Y | RFP type list | Cash Advance | Draft, Returned | - | -"
+      - "Request for Payment | Amount / Purpose | Number, text area | Amount above zero in the base currency; purpose up to 500 characters | Y | - | Blank | Draft, Returned | Above zero | -"
+      - "Request for Payment | Segment / Requesting Unit | Text | Up to 40 and 60 characters | N | - | Blank | Draft, Returned | - | -"
+      - "Mode of Payment | Mode of Payment / Account No. / Account Name | Drop-down, text | Credit to CA / SA or Check | Y | Payment mode list | Blank | Draft, Returned | - | Select the mode of payment"
+    actions:
+      - "Save Request / Cancel | Marketing Processor, Reviewer (request create) | Mandatory fields filled | Saves the request and opens it | Draft | -"
+    rules:
+      - "A cash advance is approved by Marketing, then by Human Resources, before it goes to Disbursement (FR-PQ-004, FR-PQ-015)."
+    outcome: The cash advance is requested.
+    frs: [FR-PQ-004]
+    tests: [NEWCA]
+
+  - id: SCR-AC-42
+    title: Cancel a Check
+    route: /payment-requests/check-cancellation
+    purpose: >-
+      Asks Disbursement to cancel the check of a paid refund or cash advance, after review and approval: the paid
+      request, the check number, the reason and remarks.
+    entry:
+      - Requests Home › Cancel a Check
+      - Request › Cancel the Check
+    shots:
+      - {state: form, user: mktao, caption: "Cancel a Disbursed Check: the paid request, the check and the reason"}
+    fields:
+      - "Check to Cancel | Paid Request No. | Text | The RRF or RFP whose check was disbursed | Y | Requests | Blank | - | A disbursed request paid by check | -"
+      - "Check to Cancel | Check No. / Reason / Remarks | Text, drop-down | The check number; the reason from its list | N / Y / N | Cancellation reason list | Blank | - | - | Choose a reason"
+    actions:
+      - "Raise Cancellation | Marketing Processor, Reviewer (request create) | Paid request and reason given | Raises a check-cancellation request for review and approval | Draft | -"
+    rules:
+      - "After approval the cancellation is handed to the Disbursement approvers, who cancel the approved voucher (FR-PQ-011, FR-DS-044)."
+    outcome: The cancellation of the check is requested.
+    frs: [FR-PQ-011]
+    tests: [CCR]
+
+  - id: SCR-AC-43
+    title: Request
+    route: /payment-requests/requests/:id
+    parent: /payment-requests
+    purpose: >-
+      One Marketing request: the payee, kind, amount, mode of payment, request date and DV number; the workflow
+      (assign, submit, send for validation, endorse, approve, approve for HR, return, cancel); the tabs Details,
+      Validation (the checks of ACSL and Cashiering on the refund of a cancelled policy), Disbursement (the voucher and
+      its status), Liquidation (of a cash advance) and Documents.
+    entry:
+      - Requests Home › open a row
+      - New Refund Request, New Cash Advance › saved
+    shots:
+      - {state: details, user: mktao, open_request: draft_refund, caption: "A refund request: header, workflow and the accounts to refund"}
+      - {state: disbursement, user: mktao, open_request: disbursed, tab: "Disbursement", caption: "Disbursement tab: the voucher of the refund and its status in Disbursement"}
+      - {state: assign, user: mktrev, open_request: preparing, click: "^assign preparer$", caption: "Assign the request to the Marketing user who prepares it"}
+    fields:
+      - "Header | [Request and Root Invoice chips, status pill] | Reference chip, status pill | Request number; root invoice of the first line; the stage | - | Request | - | Read only | - | -"
+      - "Facts | Kind / Payee / Amount / Mode of Payment / Request Date / DV No. | Display | Refund (RRF), Cash Advance (RFP) or Check Cancellation; payee name; currency and amount | - | Request | - | Read only | - | -"
+      - "Details | [Request details] | Display | Segment, reference, requesting unit, purpose and the payout account | - | Request | - | Read only | - | -"
+      - "Details | Item / AR No. / Invoice / Root / Assured / Client / Amount / Reason / Branch / Unit / Category A / B | Column | The accounts to refund | - | Refund lines | - | Read only | - | -"
+      - "Validation | Round / Item / Validator / Ticket / Status / Result | Column | ACSL and Cashiering checks with their ticket and result; the new AR when the payment went back to unapplied | - | Validations | - | Read only | - | No validation needed for this request"
+      - "Record Result dialog | Result / New AR No. / Remarks | Drop-down, text | Confirmed or Rejected; the AR issued when the payment went back to unapplied | Y / N / N | - | - | For validation | - | -"
+      - "Disbursement | [DV, status and payment] | Display | The voucher of the request with its stage and the payment | - | Disbursement | - | Read only | - | -"
+      - "Liquidation | Job Level / Cost Centre / Cash Advanced / Over / (Short) | Drop-down, display | The job level and cost centre; the amounts | Y / Y / - / - | Liquidation accounts | - | Disbursed cash advance | - | -"
+      - "Liquidation | Date / Particulars / [Expense categories] | Row | One line per day with the per diem, representation, transport, lodging and others | Y | - | - | Disbursed cash advance | - | -"
+      - "Assign dialog | Preparer | Drop-down | A Marketing user who prepares refunds, by name | Y | Users who may create requests | Blank | Preparing | A user who may create requests | -"
+    actions:
+      - "Assign Preparer | Marketing Reviewer (request assign) | Received refund | Assigns the request to a preparer | Preparing | Workflow notice"
+      - "Submit for Review / Send for Validation | Preparer (request create) | Draft or preparing | Sends the request for review, or first to ACSL and Cashiering for a refund of a cancelled policy | For Review or For Validation | Workflow notice"
+      - "Record Result | Marketing Reviewer (request assign) | Open validation | Records the result of a validation | For Review when all are confirmed | -"
+      - "Endorse for Approval | Marketing Reviewer (request review) | For review | Endorses the request | For Approval | Workflow notice"
+      - "Approve and Send / Approve and Send to HR / Approve (HR) and Send to Disbursement | Marketing Approver; HR Approver | For approval or HR approval | Approves the request; an approved request becomes a payment request in Disbursement | With Disbursement or For HR Approval | Workflow notice"
+      - "Cancel the Check | Marketing Processor | A disbursed request paid by check | Opens Cancel a Check for the request | - | -"
+      - "Add Day / Save Liquidation / Submit Liquidation / Return to Employee / Check and Post | Employee; reviewer | Disbursed cash advance | Records, submits, returns or posts the liquidation | Liquidated | -"
+    rules:
+      - "The refund of a cancelled policy is validated by ACSL and Cashiering before the review (FR-PQ-006)."
+      - "A request is endorsed and approved by other users than the one who raised or last moved it; a returned request goes back to its maker with the reason (FR-PQ-005, FR-PQ-008, FR-PQ-009)."
+      - "An approved refund or check cancellation goes to Disbursement; an approved cash advance goes to HR, then to Disbursement (FR-PQ-015)."
+      - "Disbursement reports each stage of the voucher back to the request (FR-PQ-013)."
+      - "A cash advance is liquidated with its expenses by day; the excess or shortage is shown and the expenses post to the liquidation accounts (FR-PQ-017)."
+    outcome: The request is validated, approved, paid and, for a cash advance, liquidated.
+    frs: [FR-PQ-001, FR-PQ-005, FR-PQ-006, FR-PQ-007, FR-PQ-008, FR-PQ-009, FR-PQ-010, FR-PQ-012, FR-PQ-013, FR-PQ-015, FR-PQ-017]
+    tests: [REQ]
+
+  - id: SCR-AC-44
+    title: Liquidation Accounts
+    route: /payment-requests/liquidation-accounts
+    purpose: >-
+      The GL account each expense category of a cash-advance liquidation posts to (per diem, representation,
+      transport, lodging, others, the excess and the shortage).
+    shots:
+      - {state: list, user: mktrev, caption: "Liquidation Accounts: the GL account of each expense category"}
+    fields:
+      - "List | Account Role / GL Account | Column, text | The expense category and its account code | Y | Chart of accounts | Seed accounts | - | An active postable account | -"
+    actions:
+      - "Save | Comptrollership administrator (accounting rule manage), Marketing Reviewer | Account changed | Saves the account of the category | - | -"
+    rules:
+      - "The liquidation posts each expense category to its account against the advances to employees (FR-PQ-017)."
+    outcome: The liquidation posts to the right accounts.
+    frs: [FR-PQ-017]
+    tests: [LIQACC]

@@ -1,0 +1,31 @@
+// BRD-2: workflow OPS_ENDORSEMENT (V780; ADJID.001-010). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_endorsement {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DRAFT [label="DRAFT\nRequester (ADJ_REQUEST)"];
+  FOR_VALIDATION [label="FOR_VALIDATION\nAdjustment processor (ADJ_PROCESS)"];
+  FOR_APPROVAL [label="FOR_APPROVAL\nAdjustment TL (ADJ_APPROVE)"];
+  FOR_POSTING [label="FOR_POSTING\nAdjustment processor (ADJ_POST)"];
+  AWAITING_REAPPLICATION [label="AWAITING_REAPPLICATION\nADJ_POST"];
+  POSTED [label="POSTED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  RETURNED [label="RETURNED\nRequester (ADJ_REQUEST)"];
+  CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> FOR_VALIDATION [label=" Submit for validation"];
+  FOR_VALIDATION -> FOR_APPROVAL [label=" Validate for approval"];
+  FOR_VALIDATION -> FOR_POSTING [label=" Validate for posting", style=dashed];
+  FOR_APPROVAL -> FOR_POSTING [label=" Approve"];
+  FOR_POSTING -> POSTED [label=" Post"];
+  FOR_POSTING -> AWAITING_REAPPLICATION [label=" Post - payments to re-apply", style=dashed];
+  AWAITING_REAPPLICATION -> POSTED [label=" Re-apply payments", style=dashed];
+  FOR_VALIDATION -> RETURNED [label=" Return to requester", style=dashed, constraint=false];
+  RETURNED -> FOR_VALIDATION [label=" Resubmit", style=dashed, constraint=false];
+  RETURNED -> CANCELLED [label=" Cancel request", style=dotted];
+  DRAFT -> CANCELLED [label=" Cancel request", style=dotted];
+  { rank=same; POSTED; AWAITING_REAPPLICATION; }
+  { rank=same; FOR_APPROVAL; RETURNED; }
+}

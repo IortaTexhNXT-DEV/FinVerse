@@ -1,0 +1,26 @@
+// Project Plan: critical path to the go-live (dates from plan.yaml), read down the left column, then the right.
+digraph pp_critical_path {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.9, ranksep=0.18, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fillcolor="@WHITE", fontname="Arial", fontsize=12,
+         fontcolor="@NEAR_BLACK", width=3.8, height=0.55, margin="0.08,0.04"];
+  edge  [color="@HEADER_BLUE", penwidth=1.2, arrowsize=0.7];
+  a [label=<<b>30-Nov / 1-Dec-2026</b><br/>Drop 0 and Drop 1 sets signed>];
+  b [label=<<b>4-Jan-2027</b><br/>SIT environment and D2 set-up>];
+  c [label=<<b>29-Jan-2027</b><br/>First full extracts (M3)>];
+  d [label=<<b>19-Apr-2027</b><br/>Trial migration 1>];
+  e [label=<<b>18-Jun-2027</b><br/>Code maps approved (M5)>];
+  f [label=<<b>30-Jul-2027</b><br/>Trial migration 2; Drop 1 SIT exit>];
+  g [label=<<b>2-Aug-2027</b><br/>Drop 1 UAT on Trial migration 3>];
+  h [label=<<b>1-Oct-2027</b><br/>Pre-Prod; cut-over agreed (M6)>];
+  i [label=<<b>1-Nov-2027</b><br/>Production values D6; production and DR>];
+  j [label=<<b>26-Nov-2027</b><br/>Dress rehearsal signed>];
+  k [label=<<b>17-Dec-2027</b><br/>Drop 1 UAT signed; training complete>];
+  l [label=<<b>27-Dec-2027</b><br/>Map freeze (T-7)>];
+  m [label=<<b>2-Jan-2028</b><br/>Go / no-go (T-1)>, fillcolor="@BG_BLUE"];
+  n [label=<<b>3-Jan-2028</b><br/>Go-live (T)>, fillcolor="@YELLOW", color="@NEAR_BLACK"];
+  { rank=same; a; h; } { rank=same; b; i; } { rank=same; c; j; } { rank=same; d; k; }
+  { rank=same; e; l; } { rank=same; f; m; } { rank=same; g; n; }
+  a -> b -> c -> d -> e -> f -> g;
+  h -> i -> j -> k -> l -> m -> n;
+  g -> h [constraint=false, style=dashed];
+}

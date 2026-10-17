@@ -1,0 +1,120 @@
+# Cross-BRD dependencies and interface contract of BRD-6 Renewal.
+# direction: In = Renewal takes it from the other BRD or system; Out = Renewal hands it over.
+# Columns: id | party | direction | what | when / how | owner of the data | Renewal screens | FR
+# The technical detail of each interface is in the Technical Specification, reviewed by BDOI IT.
+change_rule: >-
+  A change of an exchange below is assessed with the owner of the other BRD; when it changes what the other BRD
+  receives or shows, both owners approve it and the affected pages of both sets are signed again (delta sign-off).
+contract:
+  - id: IC-01
+    party: BRD-2 Operations (invoice ledger)
+    direction: In
+    what: The booked root invoices of the expiring policies with their balances, payments and the endorsements booked in the term
+    how: Read by the daily extraction at the lead days before expiry and by Generate Expiry List; the outstanding balance is read again at every check run and after each payment
+    owner: Operations (Cashiering, Remittance)
+    screens: Expiry List, Renewal (Details, Checks, Account History)
+    frs: [FR-RN-010, FR-RN-011, FR-RN-042, FR-RN-051]
+  - id: IC-02
+    party: BRD-1 New Business (account)
+    direction: In
+    what: The expiring account, client, policy, insurer, product, sales unit and account officer of each renewal
+    how: Read with the invoice at extraction and refreshed at each evaluation
+    owner: Processing (BRD-1)
+    screens: Expiry List, Renewal (Details)
+    frs: [FR-RN-010, FR-RN-041]
+  - id: IC-03
+    party: BRD-1 New Business (account, placement, issuance, booking)
+    direction: Out
+    what: The renewal account (business type Renewal), created from the expiring account; after acceptance it is fast-tracked to placement and booking, and booked through the New Business booking with the booking source Renewal
+    how: Created by Create Renewal Account; acceptance moves it to the payment gate, the placement slip and the booking queue without re-keying; the booking is reported back and closes the renewal as renewed
+    owner: Renewal (renewal), New Business (placement, issuance, booking)
+    screens: Processing Worklist, Renewal (Computations, Record Acceptance)
+    frs: [FR-RN-063, FR-RN-084]
+  - id: IC-04
+    party: BRD-1 New Business (quotation and proposal request)
+    direction: Out
+    what: A quotation (For Quotation) or a proposal request (For Proposal) pre-filled from the expiring account, with the renewal reference
+    how: Started from the renewal once the Team Leader posts it; the outcome of the quotation or proposal closes the renewal as renewed or lost
+    owner: Renewal (start), New Business (quotation and proposal)
+    screens: Renewal (Start Quotation / Proposal)
+    frs: [FR-RN-048]
+  - id: IC-05
+    party: BRD-3 Product Maintenance
+    direction: In
+    what: The product and package version of the expiring account, whether it can be sold for renewal, and the BIBS package of a migrated policy
+    how: Read at the checks (product renewable) and on the package map and package choices
+    owner: Product Maintenance
+    screens: Renewal (Checks), Renewal Setup (Package Map, Package Choices)
+    frs: [FR-RN-020, FR-RN-028]
+  - id: IC-06
+    party: BRD-2 Operations (Adjustment)
+    direction: In
+    what: The open endorsement requests of the expiring invoice family
+    how: Read at each check run; a pending endorsement fails its check until it is posted or cancelled
+    owner: Adjustment
+    screens: Renewal (Checks)
+    frs: [FR-RN-027]
+  - id: IC-07
+    party: BRD-7 Claims
+    direction: In
+    what: The claims summary of the account and policy year (number and status of the claims)
+    how: Read at each check run; open claims fail the claims check and feed the decision matrix
+    owner: Claims
+    screens: Expiry List (Claims), Renewal (Checks, Account History)
+    frs: [FR-RN-020, FR-RN-023, FR-RN-042]
+  - id: IC-08
+    party: BRD-1 New Business (client)
+    direction: In
+    what: The KYC review date of the client
+    how: Read at each check run; a review due in the window flags the renewal KYC due, which never blocks it
+    owner: New Business (client maintenance)
+    screens: Expiry List, Follow-ups
+    frs: [FR-RN-026]
+  - id: IC-09
+    party: BRD-12 Submitted Policies
+    direction: In
+    what: The renewal of a submitted policy handed over by Submitted Policies (free first year and mortgaged submitted policies)
+    how: The hand-off creates the renewal with the source Submitted Policy; its letters use the submitted-policy templates; the status is reported back
+    owner: Submitted Policies (hand-off), Renewal (renewal)
+    screens: Expiry List, Renewal, Letters
+    frs: [FR-RN-090]
+  - id: IC-10
+    party: BRD-13 Data Migration
+    direction: In
+    what: The migrated in-force policies of the go-live window with their legacy package, and the Renewal Advices sent by hand before go-live
+    how: The go-live take-over reads the migrated policies (or their upload); the Renewal Advices already sent are uploaded once at go-live
+    owner: Data Migration
+    screens: Renewal Setup (Go-live, Package Map)
+    frs: [FR-RN-016, FR-RN-028]
+  - id: IC-11
+    party: Insurers (outside BIBS)
+    direction: Out / In
+    what: The insurer extract of the renewals (28 columns); the insurer's responses (Renew As Is, Revise, Reject)
+    how: The extract is e-mailed protected from Insurer Batches; the insurer's file is uploaded on Insurer Batches or a response is recorded on the renewal; no system-to-system channel with the insurers
+    owner: Processing (extract), the insurer (responses)
+    screens: Insurer Batches, Record Insurer Response
+    frs: [FR-RN-070, FR-RN-071]
+  - id: IC-12
+    party: LAMD of the bank (outside BIBS)
+    direction: In
+    what: The monthly paid-off and past-due (RMU) loan reports
+    how: Uploaded by the LAMD user on LAMD Reports; each line is matched to the renewals by PN number
+    owner: LAMD
+    screens: LAMD Reports
+    frs: [FR-RN-025]
+  - id: IC-13
+    party: Clients (outside BIBS)
+    direction: Out / In
+    what: The Renewal Advice and the closing letters; the client's acceptance (e-mail, signed Renewal Advice or payment)
+    how: The letters are e-mailed protected from Letters; the acceptance is recorded on the renewal or uploaded on Letters; a payment of the renewal premium is evidence of acceptance
+    owner: Marketing and Processing
+    screens: Letters, Record Acceptance, Follow-ups
+    frs: [FR-RN-080, FR-RN-081, FR-RN-082, FR-RN-084]
+  - id: IC-14
+    party: BRD-11 User Access Maintenance
+    direction: In
+    what: The users, their roles and units (Account Officers, Team Leaders, Processing Officers, LAMD and Contact Center)
+    how: Read at each assignment and for the data scope of every list
+    owner: User Access Maintenance
+    screens: Every Renewal screen
+    frs: [FR-RN-002, FR-RN-003]

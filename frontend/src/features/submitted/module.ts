@@ -1,0 +1,153 @@
+import {
+  BadgeDollarSign,
+  ClipboardCheck,
+  FileSearch,
+  FileSignature,
+  FileText,
+  Inbox,
+  ListChecks,
+  Mails,
+  PlayCircle,
+  ReceiptText,
+  RefreshCcw,
+  Settings2,
+  ShieldCheck,
+  Upload,
+} from 'lucide-react';
+import { lazyWithRetry } from '@/app/loadRecovery';
+import type { FeatureModule } from '@/navigation/types';
+
+/**
+ * Submitted Policies (BRD-12; docs/architecture/SUBMITTED_POLICIES_DESIGN.md section 12): the
+ * masterlist of the bank-submitted policies from intake and processing to the reviews, IAAF and
+ * TOR, the hand-off to Renewal, the letters, the handling fees and the No Touch billing, in Client
+ * & Policy after Renewal. The reports are in the Report Centre under Submitted Policies.
+ */
+export const submittedModule: FeatureModule = {
+  id: 'submitted',
+  section: 'Submitted Policies',
+  screens: [
+    {
+      path: '/submitted',
+      label: 'Submitted Policies Home',
+      icon: Inbox,
+      permission: 'SBM_VIEW',
+      component: lazyWithRetry(() => import('./home/SubmittedHomePage')),
+    },
+    {
+      path: '/submitted/masterlist',
+      label: 'Masterlist',
+      icon: ListChecks,
+      permission: 'SBM_VIEW',
+      component: lazyWithRetry(() => import('./masterlist/MasterlistPage')),
+    },
+    {
+      path: '/submitted/intake',
+      label: 'Upload & Intake',
+      icon: Upload,
+      permission: 'SBM_INTAKE',
+      alsoPermissions: ['SBM_MIGRATE'],
+      component: lazyWithRetry(() => import('./intake/IntakePage')),
+    },
+    {
+      path: '/submitted/extractions',
+      label: 'Extraction Review',
+      icon: FileSearch,
+      permission: 'SBM_MAINTAIN',
+      component: lazyWithRetry(() => import('./extraction/ExtractionPage')),
+    },
+    {
+      path: '/submitted/runs',
+      label: 'Processing Runs',
+      icon: PlayCircle,
+      permission: 'SBM_VIEW',
+      component: lazyWithRetry(() => import('./runs/RunsPage')),
+    },
+    {
+      path: '/submitted/reviews',
+      label: 'Reviews & IAAF',
+      icon: ClipboardCheck,
+      permission: 'SBM_VIEW',
+      component: lazyWithRetry(() => import('./reviews/IaafPage')),
+    },
+    {
+      path: '/submitted/tors',
+      label: 'Terms of Reference',
+      icon: FileSignature,
+      permission: 'SBM_VIEW',
+      alsoPermissions: ['TOR_APPROVE'],
+      component: lazyWithRetry(() => import('./reviews/TorPage')),
+    },
+    {
+      path: '/submitted/renewals',
+      label: 'Renewal Work List',
+      icon: RefreshCcw,
+      permission: 'SBM_VIEW',
+      component: lazyWithRetry(() => import('./renewals/RenewalWorkListPage')),
+    },
+    {
+      path: '/submitted/proposals',
+      label: 'Renewal Proposals',
+      icon: FileSignature,
+      permission: 'SBM_PROPOSAL',
+      component: lazyWithRetry(() => import('./proposals/ProposalsPage')),
+    },
+    {
+      path: '/submitted/letters',
+      label: 'Letters & Print Batches',
+      icon: Mails,
+      permission: 'SBM_LETTER_SEND',
+      component: lazyWithRetry(() => import('./letters/LettersPage')),
+    },
+    {
+      path: '/submitted/fees',
+      label: 'Handling Fees',
+      icon: BadgeDollarSign,
+      permission: 'SBM_HANDLING_FEE',
+      component: lazyWithRetry(() => import('./fees/HandlingFeesPage')),
+    },
+    {
+      path: '/submitted/no-touch',
+      label: 'No Touch Billing',
+      icon: ReceiptText,
+      permission: 'SBM_HANDLING_FEE',
+      component: lazyWithRetry(() => import('./fees/NoTouchPage')),
+    },
+    {
+      path: '/submitted/setup',
+      label: 'Submitted Policies Setup',
+      icon: Settings2,
+      permission: 'SBM_RULE_MAINTAIN',
+      alsoPermissions: ['SBM_RULE_APPROVE'],
+      component: lazyWithRetry(() => import('./setup/SetupPage')),
+    },
+    {
+      path: '/submitted/policies/:id',
+      label: 'Submitted Policy',
+      icon: FileText,
+      permission: 'SBM_VIEW',
+      component: lazyWithRetry(() => import('./record/PolicyPage')),
+      hidden: true,
+    },
+    {
+      path: '/submitted/iaaf/:id',
+      label: 'Reviews & IAAF',
+      icon: ClipboardCheck,
+      permission: 'SBM_VIEW',
+      component: lazyWithRetry(() => import('./reviews/IaafRedirect')),
+      hidden: true,
+    },
+    {
+      path: '/submitted/tor/:id',
+      label: 'Terms of Reference',
+      icon: FileSignature,
+      permission: 'SBM_VIEW',
+      alsoPermissions: ['TOR_APPROVE'],
+      component: lazyWithRetry(() => import('./reviews/TorRedirect')),
+      hidden: true,
+    },
+  ],
+};
+
+/** Icon of the approval inbox entries of IAAF and TOR. */
+export const SUBMITTED_APPROVAL_ICON = ShieldCheck;

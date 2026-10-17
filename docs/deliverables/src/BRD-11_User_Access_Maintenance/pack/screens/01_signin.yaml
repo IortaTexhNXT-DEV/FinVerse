@@ -1,0 +1,204 @@
+# Screen specifications of BRD-11 User Access Maintenance: sign-in, password, session and the user's own profile.
+# Schema: docs/deliverables/src/signoff/README.md. Field rows:
+#   section | label | type | length / format | mandatory | source / master | default | editable in | validation | message
+# Action rows:
+#   button | who | enabled when | what happens | resulting status | notification
+area: Sign-in, password and session
+screens:
+  - id: SCR-UA-01
+    title: Login
+    route: /login
+    public: true
+    menu: "Before sign-in"
+    purpose: >-
+      The sign-in page of BIBS, on the BDO Insure portal layout. The user enters the user ID and password; BIBS
+      checks the account and the password, counts failed attempts and locks the account at the third, and opens the
+      home page with the menu of the user's group profiles. A user whose password was set by an administrator or has
+      expired changes it first (SCR-UA-03).
+    entry:
+      - The BIBS address in the browser of a BDO-issued device
+      - Every page when the session has ended (inactivity, end of the session, Log Out)
+      - Reset password › Back to Login
+    shots:
+      - {state: empty, caption: "Login page"}
+      - {state: error, fill: login_wrong, submit: "^sign in$", caption: "Login refused with a wrong password"}
+      - {state: locked, fill: login_locked, submit: "^sign in$", caption: "Login refused for a locked account"}
+    fields:
+      - "Sign-in | User ID | Text | BIBS user ID (for example a013000196); with directory sign-in, the Windows ID | Y | User master | Blank | Before sign-in | Required by the browser; the account must exist, be active and not locked | Invalid user name or password"
+      - "Sign-in | Password | Password | Masked | Y | - | Blank | Before sign-in | Required by the browser; checked against the stored password (or by the directory) | Invalid user name or password"
+      - "Sign-in | Forgot password? | Link | Shown only when the password reset setting is off (self-service reset of local accounts); not shown as delivered, as BDOI's rules apply | - | Password reset setting | Not shown | Before sign-in | - | -"
+    actions:
+      - "Login | Every user | User ID and password entered | Checks the account and the password. Success: opens the home page with the menu of the user's active group profiles and records the sign-in; a password set by an administrator or expired opens Change Your Password first. Failure: counts the failed attempt; the third consecutive failure locks the account and ends its open sessions | Signed in, or refused | -"
+      - "Forgot password? | Every user | The password reset setting is off | Opens Forgot Password (SCR-UA-02) | - | -"
+    rules:
+      - "The account locks after 3 consecutive failed sign-ins (parameter LOGIN_MAX_FAILED_ATTEMPTS, all users); only the System Administrator unlocks it (Users › Unlock), or a reactivation request with Also unlock the account (FR-UA-001)."
+      - "The message never says whether the user ID or the password was wrong; a deactivated user is refused with the same message and the attempt counts (FR-UA-001)."
+      - "Every successful and failed sign-in is written to the audit trail with the user and the time (FR-UA-001, FR-UA-064)."
+      - "More than 20 sign-in attempts within a minute from one computer are refused until the minute ends: Too many sign-in attempts. Wait a minute and try again. (FR-UA-001)."
+      - "The menu shows only the screens of the user's active group profiles; a deactivated group profile grants nothing (FR-UA-001, FR-UA-042)."
+      - "As delivered, BDOI's password reset rules apply: the page has no Forgot password? link, and a forgotten password of a local account is reset by another System Administrator; with single sign-on the password is kept by the Enterprise SSO platform. The setting Password reset rules (Annex M) brings back the self-service link for local accounts (FR-UA-005)."
+      - "Outside production the page shows the name of the environment above the sign-in card (for example SIT ENVIRONMENT, UAT ENVIRONMENT), and under it the notice on authorised use (FR-UA-001)."
+      - "In directory mode the password is checked by the BDO directory and never stored in BIBS; until BDO supplies the directory interface that mode refuses every sign-in (FR-UA-003)."
+    outcome: The user is signed in with exactly the menus of the assigned group profiles, or refused with a message that does not reveal which credential was wrong.
+    frs: [FR-UA-001, FR-UA-003]
+    tests: [LOGIN]
+
+  - id: SCR-UA-02
+    title: Forgot Password and Set a New Password
+    route: /reset-password
+    public: true
+    menu: "Before sign-in: Login › Forgot password?, and the e-mailed link"
+    purpose: >-
+      Self-service reset of a forgotten password (local sign-in), offered only when the password reset setting is off;
+      as delivered BDOI's rules apply and another System Administrator resets the password. On Forgot Password the user enters the user ID;
+      BIBS e-mails a single-use link, valid for 30 minutes, to the address registered for the user. The link opens Set
+      a New Password, where the user chooses the new password under the password rules.
+    entry:
+      - Login › Forgot password?
+      - "The link in the e-mail BIBS: reset your password"
+    shots:
+      - {state: request, path: /login, fill: forgot_user, caption: "Forgot Password with the user ID entered (password reset setting off)"}
+      - {state: sent, path: /login, fill: forgot_user, submit: "^send reset link$", caption: "Confirmation on the Login page after the request"}
+      - {state: new_password, open: reset_link, caption: "Set a New Password opened from the e-mailed link"}
+    fields:
+      - "Forgot Password | User ID | Text | BIBS user ID | Y | User master | Blank | Before sign-in | Required | -"
+      - "Set a New Password | New password | Password | At least 10 characters with an upper-case letter, a lower-case letter, a digit and a symbol | Y | - | Blank | While the link is valid | Checked as the user types; not one of the last 10 passwords | You used this password recently. Choose another one"
+      - "Set a New Password | Confirm new password | Password | Same as New password | Y | - | Blank | While the link is valid | Both new passwords must match | Both new passwords must match"
+      - "Set a New Password | Still needed | Checklist | At least 10 characters; An upper-case letter; A lower-case letter; A digit; A symbol | - | Password rules | - | Read only | Shown until every rule is met | -"
+    actions:
+      - "Send Reset Link | Every user | User ID entered | Withdraws the older links of the user and e-mails a new single-use link to the registered address; the same confirmation is shown for every user ID, so the page never reveals whether a user exists | - | E-mail BIBS: reset your password"
+      - "Back to Login | Every user | Always | Returns to the Login page | - | -"
+      - "Set Password | Holder of a valid link | New password meets the rules and is confirmed | Sets the password, marks the link used and confirms: Your password was changed. Sign in with the new password. | Password changed | -"
+    rules:
+      - "A link works once and expires 30 minutes after it was sent; an older link of the same user stops working when a new one is requested (FR-UA-005)."
+      - "The link is sent only to an active user with an e-mail address, in local sign-in mode; a reset link does not unlock a locked account (FR-UA-005)."
+      - "The new password follows the password rules: at least 10 characters with upper and lower case, a digit and a symbol, and none of the last 10 passwords (parameter PASSWORD_HISTORY_COUNT) (FR-UA-005)."
+    outcome: A user who forgot the password sets a new one without the help desk, through a link that only the owner of the registered mailbox receives.
+    frs: [FR-UA-005]
+    tests: [LOGIN]
+
+  - id: SCR-UA-03
+    title: Change Your Password (forced change)
+    route: /
+    everyone: true
+    menu: "Shown after Login, before the home page"
+    purpose: >-
+      Shown after sign-in, instead of the home page, while the password must be changed: after the account was created
+      or the password reset by an administrator, and when the password is older than the maximum age. The user
+      chooses a new password or signs out.
+    entry:
+      - Login, for a user whose password was set by an administrator or has expired
+    shots:
+      - {state: reset, caption: "Change Your Password after a password set by an administrator"}
+    fields:
+      - "Change Your Password | [Reason] | Text | Your password was set by an administrator. Choose your own password to continue. / Your password is older than 90 days and has expired. Choose a new password to continue. | - | Password status | - | Read only | - | -"
+      - "Change Your Password | Current password | Password | Masked | Y | - | Blank | Always | Must be the current password | Current password is incorrect"
+      - "Change Your Password | New password | Password | At least 10 characters with an upper-case letter, a lower-case letter, a digit and a symbol | Y | - | Blank | Always | Rules checked as the user types; not one of the last 10 passwords | You used this password recently. Choose another one"
+      - "Change Your Password | Confirm new password | Password | Same as New password | Y | - | Blank | Always | Both new passwords must match | Both new passwords must match"
+      - "Change Your Password | [Password rules] | Text | It must differ from your last 10 passwords; it can be changed once within a day; it expires after 90 days. | - | Parameters PASSWORD_HISTORY_COUNT, PASSWORD_MIN_AGE_DAYS, PASSWORD_MAX_AGE_DAYS | - | Read only | - | -"
+    actions:
+      - "Change Password | The signed-in user | Current password entered and the new password meets the rules | Saves the new password and opens the home page | Password changed | -"
+      - "Sign Out | The signed-in user | Always | Ends the session and returns to the Login page | Signed out | -"
+    rules:
+      - "A password set by someone else (enrolment, administrator reset) must be changed at the next sign-in (FR-UA-005)."
+      - "A password older than PASSWORD_MAX_AGE_DAYS (90 as delivered) must be changed before work continues; a password never changed since the release does not expire until changed once (FR-UA-005)."
+      - "The minimum age (PASSWORD_MIN_AGE_DAYS, one day) does not apply to a forced change (FR-UA-005)."
+    outcome: No user works with a password that an administrator knows or that has expired.
+    frs: [FR-UA-005]
+    tests: [LOGIN]
+
+  - id: SCR-UA-04
+    title: Inactivity and Session-end Warnings
+    route: /
+    everyone: true
+    menu: "Dialog over any screen"
+    purpose: >-
+      The two warnings of the session guard, shown over any screen: the inactivity warning, 15 minutes before the
+      sign-out after 30 minutes without activity, in BDOI's wording with the buttons Stay Logged In and Log Out; and
+      the warning before the fixed end of the session, 30 minutes before BIBS signs the user out whatever the
+      activity. After the inactivity sign-out the user sees the page Session Timed Out (SCR-UA-21).
+    entry:
+      - Any screen after 15 minutes without activity
+      - Any screen 30 minutes before the fixed end of the session
+    shots:
+      - {state: idle, caption: "Your session is about to expire: BDOI's inactivity warning with Stay Logged In and Log Out"}
+    fields:
+      - "Your session is about to expire | [Warning text] | Text | You have been inactive for 15 minutes. For your security, your session is about to expire. Would you like to stay logged in or log out? | - | Parameters SESSION_IDLE_WARNING_MINUTES, SESSION_TIMEOUT_MINUTES | - | Read only | - | -"
+      - "Your session is about to expire | [Countdown] | Text | Your session ends in n seconds. | - | Parameter SESSION_TIMEOUT_MINUTES | - | Read only | - | -"
+      - "Your session will end soon | [Session end] | Text | For your security the system signs you out in n minute(s), at dd-MMM-yyyy HH:mm, whatever your activity. | - | Parameter SESSION_EXPIRY_WARNING_MINUTES | - | Read only | - | -"
+    actions:
+      - "Stay Logged In | The signed-in user | Inactivity warning shown | Closes the warning and restarts the inactivity timer in every tab | Signed in | -"
+      - "Log Out | The signed-in user | Inactivity warning shown | Ends the session (with single sign-on, also at the Enterprise SSO platform) and returns to the Login page | Signed out | -"
+      - "I Understand | The signed-in user | Session-end warning shown | Closes the warning; the session still ends at the time shown | Signed in | -"
+    rules:
+      - "After 15 minutes without activity the inactivity warning is shown; after 30 minutes the user is signed out and the page Session Timed Out opens: Your session timed out. Please log in again to continue (parameters SESSION_IDLE_WARNING_MINUTES, SESSION_TIMEOUT_MINUTES) (FR-UA-002)."
+      - "The wording and the buttons follow BDOI's FRS as delivered; the setting Inactivity warning wording (Annex M) brings back the earlier wording with Stay Signed In and Sign Out Now, and the setting Session timed-out page a message on the Login page instead of the page (FR-UA-002)."
+      - "The warning and the inactivity sign-out are written to the audit trail with the user and the time (FR-UA-002, FR-UA-064)."
+      - "Activity in any browser tab keeps every tab signed in (FR-UA-002)."
+      - "Every sign-out is kept in the session log with its reason: log-out, inactivity, end of the session, ended by an administrator or account locked (FR-UA-004)."
+    outcome: An unattended screen is closed automatically, and the user is warned in time to keep working.
+    frs: [FR-UA-002, FR-UA-004]
+    tests: [SESSION]
+
+  - id: SCR-UA-21
+    title: Session Timed Out
+    route: /session-timed-out
+    public: true
+    menu: "After the inactivity sign-out"
+    purpose: >-
+      The page shown after the session ended for inactivity: BDOI's message "Your session timed out. Please log in
+      again to continue" with the Log In button, which opens the Login page (with single sign-on, through the sign-out
+      page of the Enterprise SSO platform, so that the sign-in is asked again).
+    entry:
+      - Any screen, 30 minutes without activity (the inactivity warning was not answered)
+    shots:
+      - {state: page, caption: "Session Timed Out with the Log In button"}
+    fields:
+      - "Session Timed Out | [Message] | Text | Your session timed out. Please log in again to continue | - | - | - | Read only | - | -"
+    actions:
+      - "Log In | The user whose session timed out | Always | Opens the Login page; with single sign-on, signs the user out at the Enterprise SSO platform first | Signed out | -"
+    rules:
+      - "Shown as delivered (setting Session timed-out page on, BDOI's FRS); with the setting off the Login page opens with the message You were signed out after 30 minutes of inactivity (FR-UA-002)."
+      - "The sign-out is kept in the session log with the reason Idle Timeout and written to the audit trail (FR-UA-002, FR-UA-004)."
+    outcome: The user knows why the session ended and signs in again in one step.
+    frs: [FR-UA-002, FR-UA-004]
+    tests: [SESSION]
+
+  - id: SCR-UA-05
+    title: My Profile
+    route: /profile
+    purpose: >-
+      The signed-in user's own page: account details, contact details the user maintains, the group profiles and
+      permissions held, the password with its rules and dates, and the recent sign-in sessions.
+    entry:
+      - User menu in the page header › My Profile
+      - The notice Your password expires soon
+    shots:
+      - {state: view, user: requestor, caption: "My Profile of the Requestor"}
+    fields:
+      - "Details | User name | Text | User ID | - | User master | - | Read only | - | -"
+      - "Details | Full name | Text | - | - | User master | - | Read only (changed through a Modify user request) | - | -"
+      - "Details | Windows ID | Text | - | - | User master | - | Read only | - | -"
+      - "Details | Home branch | Text | Code – name | - | Branches | - | Read only | - | -"
+      - "Details | Authorization limit | Amount | PHP, two decimals; Unlimited when blank | - | User master | - | Read only | - | -"
+      - "Details | Last sign-in | Date and time | dd-MMM-yyyy HH:mm | - | Session log | - | Read only | - | -"
+      - "Details | Last sign-out | Date and time | dd-MMM-yyyy HH:mm | - | Session log | - | Read only | - | -"
+      - "Details | Automatic sign-out | Text | After 30 minutes of inactivity | - | Parameter SESSION_TIMEOUT_MINUTES | - | Read only | - | -"
+      - "Contact details | E-mail address | E-mail | Valid e-mail address | Y | User master | Current address | Always | A valid address | Enter your e-mail address"
+      - "Contact details | Mobile number | Telephone | Digits with an optional +, spaces, brackets and dashes, 7 to 25 characters | N | User master | Current number | Always | Digits only, for example +63 917 123 4567 | Enter the mobile number with digits only, for example +63 917 123 4567"
+      - "Roles and permissions | [Group profiles] / [Permissions by area] | Tags; collapsible tables | The names of the group profiles held; the permissions in words, one collapsible group per business area with its count, each a table of Permission and What it allows | - | Role grants | - | Read only | - | -"
+      - "Change password | Current password | Password | Masked | Y | - | Blank | Local sign-in | Must be the current password | Current password is incorrect"
+      - "Change password | New password | Password | At least 10 characters with upper and lower case, a digit and a symbol | Y | - | Blank | Local sign-in | Rules checked as the user types; history and minimum age checked on save | You changed your password less than a day ago"
+      - "Change password | Confirm new password | Password | Same as New password | Y | - | Blank | Local sign-in | Both new passwords must match | Both new passwords must match"
+      - "Recent sessions | Signed in / Last activity / Ended / Status | Columns | Date and time; status Open, Logout, Idle Timeout, Expired, Admin Ended, Locked | - | Session log | - | Read only | - | -"
+    actions:
+      - "Save Contact Details | The signed-in user | Address or number changed | Saves the e-mail address and mobile number; each changed value is written to the access change log without a request | - | -"
+      - "Change Password | The signed-in user (local sign-in) | Current password entered and the new password meets the rules | Saves the new password; the dates under the card are updated | - | -"
+    rules:
+      - "Users update their own e-mail address and mobile number without a request; every other attribute changes only through an approved access request (FR-UA-005, FR-UA-012)."
+      - "With directory sign-in the password card reads: You sign in with your organisation's network password. Change it through your organisation's directory, not here. (FR-UA-003, FR-UA-005)."
+      - "A password cannot be changed twice within PASSWORD_MIN_AGE_DAYS (one day as delivered) and must differ from the last PASSWORD_HISTORY_COUNT passwords (8) (FR-UA-005)."
+      - "The recent sessions show how each session ended; a session the user does not recognise is reported to the System Administrator (FR-UA-004)."
+    outcome: Each user sees exactly which access is held, keeps the contact details current and changes the password under the password rules.
+    frs: [FR-UA-004, FR-UA-005]
+    tests: [PROFILE]

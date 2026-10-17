@@ -1,0 +1,290 @@
+# Screen specifications of BRD-5 Accounting (FRBS): the journals of the general ledger, the account inquiry and the
+# party statement, the chart of accounts and its upload, the monthly revaluation rate and the cost-centre rules.
+area: General ledger, chart of accounts and rates
+screens:
+  - id: SCR-AC-01
+    title: Journals
+    route: /gl/journals
+    purpose: >-
+      The journal vouchers of the company: search by status, batch number, value dates, inputter and assignment;
+      follow the approval status of each voucher; assign the submitted vouchers to the user who will post them and
+      post several vouchers at once. The GL Team Lead and the Section Head work the vouchers "Assigned to me".
+    entry:
+      - Journal › back arrow
+    shots:
+      - {state: list, user: gltl, caption: "Journals of the GL Team Lead: vouchers with value date, type, inputter, assignee, authorizer, amount and status"}
+      - {state: assign, user: gltl, fill: assign_journal, caption: "Assign journal(s): the submitted voucher assigned to the user who will post it"}
+      - {state: post, user: glhead, fill: post_selected, caption: "Post selected journals: the count, the total debit and the vouchers that are not pending"}
+    fields:
+      - "Filters | Status | Drop-down | All, Draft, Pending approval, Posted, Rejected, Cancelled, Reversed | N | Journal statuses | All | - | - | -"
+      - "Filters | Batch no. | Text | Batch number or its start | N | Journals | Blank | - | Contains | -"
+      - "Filters | From / To | Date | dd-MMM-yyyy, value date | N | - | Blank | - | To on or after From | -"
+      - "Filters | Inputter | Text | User ID of the maker | N | Users | Blank | - | Equal | -"
+      - "Filters | Assignment | Drop-down | All entries or Assigned to me | N | Fixed list | All entries | - | - | -"
+      - "List | Batch No. | Column | Batch number of the voucher | - | Journals | - | Read only | - | No journal matches these filters"
+      - "List | Value Date | Column | dd-MMM-yyyy | - | Journals | - | Read only | - | -"
+      - "List | Type | Column | Manual journal, Adjustment, Accrual, Reversal or the journal of a business event | - | Journals | - | Read only | - | -"
+      - "List | Narration | Column | Narration of the voucher | - | Journals | - | Read only | - | -"
+      - "List | Inputter / Assigned To / Authorizer | Column | Names of the maker, the assignee and the user who posted it | - | Users | - | Read only | - | -"
+      - "List | Amount | Column | Total debit, two decimals | - | Journals | - | Read only | - | -"
+      - "List | Status | Column | Draft, Pending Approval, Posted, Rejected, Cancelled, Reversed | - | Journals | - | Read only | - | -"
+      - "Assign journal(s) dialog | Assign to | Drop-down | The users who may post journals, or No one (clear the assignment) | N | Users with the journal authorize permission | No one | Pending approval | Not the submitter of the voucher | A journal is never assigned to its submitter"
+      - "Post selected journals dialog | Journals to post, Total debit, Selected but not pending | Display | Counts and the total of the selected pending vouchers | - | Selection | - | Read only | - | -"
+    actions:
+      - "New Journal | GL Officer, GL Team Lead (journal create) | Always | Opens New Journal | - | -"
+      - "Assign (n) | GL Team Lead, GL Section Head (journal assign) | Vouchers selected | Assigns the selected vouchers to the user chosen, or clears the assignment | Pending Approval | -"
+      - "Post Selected (n) | GL Team Lead, GL Section Head (journal authorize) | Pending vouchers selected | Posts each selected voucher on its own after the confirmation; the vouchers that cannot be posted are listed under Not posted with the reason | Posted | -"
+      - "[Row] | Every user who reads journals | Always | Opens the journal | - | -"
+    rules:
+      - "A voucher is never posted by the user who submitted it, and never assigned to its submitter (FR-AC-031, FR-AC-036)."
+      - "Posting several vouchers at once posts each on its own; a voucher refused by a check stays pending with its reason (FR-AC-036)."
+      - "The vouchers of the business events (vouchers, receipts, remittances, corrections, accruals) are listed with their source; only manual vouchers are edited (FR-AC-030)."
+    outcome: The GL team finds the vouchers waiting, assigns them and posts them, one or several at a time.
+    frs: [FR-AC-030, FR-AC-031, FR-AC-033, FR-AC-036]
+    tests: [JOURNALS]
+
+  - id: SCR-AC-02
+    title: New Journal and Edit Journal
+    route: /gl/journals/new
+    also: [/gl/journals/:id/edit]
+    purpose: >-
+      The manual voucher of the GL team: the voucher header (journal type, branch, value date, currency, the
+      reversal date of an accrual, reference and narration) and its Dr / Cr lines with the account (by code or short
+      code), the cost centre and the line of business. The voucher is saved as a draft or submitted for posting after
+      the confirmation of its totals.
+    entry:
+      - Journals › New Journal
+      - Journal › Edit (a draft or returned voucher of the maker)
+    shots:
+      - {state: filled, user: glofficer, fill: accrual_journal, caption: "New Journal Voucher: an accrual with its reversal date and two balanced lines"}
+      - {state: confirm, user: glofficer, fill: accrual_journal, click: "^save & submit$", caption: "Submit journal for posting: the value date, the reversal date, the lines and the totals to confirm"}
+      - {state: error, user: glofficer, fill: unbalanced_journal, caption: "An unbalanced voucher: the difference under the lines and the voucher not submitted"}
+    fields:
+      - "Voucher header | Journal type | Drop-down | Manual journal, Adjustment or Accrual | Y | Fixed list | Manual journal | Draft, Rejected | - | -"
+      - "Voucher header | Branch | Drop-down | Branches of the company | Y | Branches | Branch of the user | Draft, Rejected | - | -"
+      - "Voucher header | Value date | Date | dd-MMM-yyyy, in an open period | Y | - | Today | Draft, Rejected | Period open | The period of the value date is not open"
+      - "Voucher header | Currency | Drop-down | Currency of the voucher | Y | Currencies | Base currency | Draft, Rejected | - | -"
+      - "Voucher header | Reverse on | Date | dd-MMM-yyyy; accruals only, after the value date | Cond.: accrual | - | Blank | Draft, Rejected | After the value date | The reversal date must be after the value date"
+      - "Voucher header | Reference | Text | Up to 50 characters | N | - | Blank | Draft, Rejected | - | -"
+      - "Voucher header | Narration | Text | Up to 500 characters | Y | - | Blank | Draft, Rejected | - | Enter the narration"
+      - "Lines | Account | Text with list | Account code or short code; the name shows under it | Y | Postable accounts of the chart | Blank | Draft, Rejected | Active, postable, manual posting allowed, not frozen | The account does not allow manual posting"
+      - "Lines | Dr / Cr / Amount | Drop-down, number | Debit or Credit; amount above zero, two decimals | Y | - | Debit | Draft, Rejected | Above zero | Amounts must be greater than zero"
+      - "Lines | Cost centre / Line of business | Drop-down | Mandatory for the accounts that require them | Cond.: account | Cost centres, lines of business | Blank | Draft, Rejected | Present when the account requires it | Cost centre is required for this account"
+      - "Lines | Reference / Narration | Text | Line reference and narration | N | - | Blank | Draft, Rejected | - | -"
+      - "Lines | [Balance] | Display | Balanced, or Difference with the amount | - | Lines | - | Read only | Total debit equals total credit | Difference <amount>"
+    actions:
+      - "Add Debit / Add Credit / [Remove] | Maker | Draft or returned voucher | Adds a debit or a credit line, or removes a line | - | -"
+      - "Save Draft | Maker (journal create) | Always | Saves the voucher as a draft | Draft | -"
+      - "[Save & Submit] | Maker (journal create) | The voucher balances | Opens Submit journal for posting with the totals; Submit sends it for posting | Pending Approval | -"
+      - "Cancel | Maker | Always | Leaves the form without saving | - | -"
+    rules:
+      - "A voucher posts only when the debits equal the credits; amounts are above zero with two decimals (FR-AC-034)."
+      - "An account is entered by its code or its short code; frozen accounts and accounts closed to manual posting are refused (FR-AC-014, FR-AC-034)."
+      - "An accrual carries its reversal date; on that date the posted voucher is reversed automatically in the GL (FR-AC-033)."
+      - "The cost centre is mandatory for the accounts that require it; the cost-centre rules propose it for the vouchers of the business events (FR-AC-054)."
+      - "A posting that makes a block account negative is refused; a warn account shows the warning to the maker and the checker (FR-AC-034)."
+    outcome: The voucher is saved, or submitted for posting by another user.
+    frs: [FR-AC-014, FR-AC-032, FR-AC-033, FR-AC-034, FR-AC-035, FR-AC-037]
+    tests: [NEWJ, EDITJ]
+
+  - id: SCR-AC-03
+    title: Journal
+    route: /gl/journals/:id
+    parent: /gl/journals
+    purpose: >-
+      One journal voucher: its type, value date, totals and source; the lines with account, cost centre, line of
+      business, currency, debit and credit; the audit of the input, submission, authorisation and posting with the
+      assignment and the automatic reversal date; and the actions the user may take on it now.
+    entry:
+      - Journals › open a row
+      - Correction Entry › the posted journal
+    shots:
+      - {state: posted, user: glhead, open_journal: posted, caption: "A posted journal: totals, source, lines and the audit"}
+      - {state: pending, user: glhead, open_journal: pending, caption: "A journal pending approval as the poster sees it, with Authorize & Post and Return to Maker"}
+      - {state: reverse, user: glhead, open_journal: posted, click: "^reverse$", caption: "Reverse journal: the reversal value date and the reason"}
+    fields:
+      - "Summary | Type / Value date / Total debit / credit / Source | Display | Journal type; dd-MMM-yyyy; two decimals; Manual entry or the business event with its reference | - | Journal | - | Read only | - | -"
+      - "Lines | # / Account / Cost Centre / LOB / Ccy / Debit / Credit / Narration | Column | One row per line, the account with its name | - | Journal lines | - | Read only | - | -"
+      - "Audit | Input by / Submitted by / Authorized by / Posted | Display | Names with date and time | - | Journal | - | Read only | - | -"
+      - "Audit | Assigned to / Automatic reversal on / Returned by | Display | Name of the assignee and of the assigner; reversal date; the reason of a return | - | Journal | - | Read only | - | -"
+      - "Return journal to its maker dialog | Reason / remarks | Text area | The reason of the return | Y | - | Blank | Pending approval | - | Enter the reason"
+      - "Reverse journal dialog | Reversal value date / Reason / remarks | Date, text area | dd-MMM-yyyy in an open period; the reason | Y | - | Today | Posted | Period open | Enter the reason"
+    actions:
+      - "Edit / Submit / Cancel Voucher | Maker | Draft or returned voucher | Edits, submits (with the confirmation of the totals) or cancels the voucher | Pending Approval or Cancelled | -"
+      - "Authorize & Post | GL Team Lead, GL Section Head (journal authorize) | Pending approval and the user is not the submitter | Posts the voucher after the confirmation | Posted | -"
+      - "Return to Maker | GL Team Lead, GL Section Head (journal authorize) | Pending approval | Returns the voucher with the reason | Rejected | -"
+      - "Reverse | GL Section Head (journal reverse) | Posted | Posts a linked reversal at the date given | Reversed | -"
+      - "Copy | Maker (journal create) | Always | Creates a new draft with the same lines at today's date | Draft | -"
+    rules:
+      - "A posted voucher is never changed; it is reversed by a linked voucher (FR-AC-037)."
+      - "The submitter may not post or return the own voucher (FR-AC-036)."
+      - "A returned voucher goes back to its maker with the remarks; the maker edits and submits it again (FR-AC-036)."
+    outcome: The voucher is posted, returned or reversed, with its audit.
+    frs: [FR-AC-030, FR-AC-031, FR-AC-035, FR-AC-036, FR-AC-037, FR-AS-024]
+    tests: [JOURNAL]
+
+  - id: SCR-AC-04
+    title: Account Inquiry
+    route: /gl/inquiry
+    purpose: >-
+      The statement of one GL account for a range of value dates: the opening balance, the total debits and credits,
+      the closing balance and every posted line with its batch, type, narration, reference and running balance.
+    entry:
+      - Journal › posted lines
+    shots:
+      - {state: statement, user: glofficer, fill: inquiry_cash, caption: "Account Inquiry: the statement of a bank account with the balances and the posted lines"}
+    fields:
+      - "Criteria | Account | Text with list | Account code or short code; the name shows under the field | Y | Chart of accounts | Blank | - | An account of the chart | Enter the account"
+      - "Criteria | From / To | Date | dd-MMM-yyyy | N | - | Start of the month / today | - | To on or after From | The end date is before the start date"
+      - "Balances | Opening balance / Total debits / Total credits / Closing balance | Total | Two decimals | - | General ledger | - | Read only | - | -"
+      - "Lines | Date / Batch / Type / Narration / Reference / Debit / Credit / Balance | Column | One row per posted line, oldest first | - | General ledger | - | Read only | - | No posting in the range"
+    actions:
+      - "[Criteria] | Every user who reads journals | An account entered | Shows the statement of the account | - | -"
+    rules:
+      - "Only posted lines are shown; the running balance starts from the opening balance of the range (FR-AC-030)."
+    outcome: The user sees the balance and the movements of an account.
+    frs: [FR-AC-030, FR-AC-014]
+    tests: [INQ]
+
+  - id: SCR-AC-05
+    title: Party Statement
+    route: /gl/party-statement
+    purpose: >-
+      The open items of a sub-ledger party (insurer, client, supplier, employee) with the receivable, payable and net
+      balance, the overdue amount and the ageing by due date as of a date.
+    shots:
+      - {state: statement, user: acsl, fill: party_insurer, caption: "Party Statement of an insurer: balances, ageing and the open items"}
+    fields:
+      - "Criteria | Find party (code or name) | Text with list | Two letters or more; the parties found by code or name | N | Business partners | Blank | - | - | -"
+      - "Criteria | Party code / As of | Text, date | Party code; dd-MMM-yyyy | Y / N | Business partners | Blank / today | - | - | -"
+      - "Balances | Receivable / Payable / unallocated / Net balance / Overdue | Total | Two decimals in the base currency | - | Sub-ledger | - | Read only | - | -"
+      - "Ageing | [Ageing buckets] | Total | Ageing by due date as of the date, in the base currency | - | Sub-ledger | - | Read only | - | -"
+      - "Open items | Doc Date / Type / Document / Due Date / Dr/Cr / Currency / Amount / Settled / Outstanding / Days Overdue / GL Batch / Status | Column | One row per sub-ledger item of the party | - | Sub-ledger | - | Read only | - | No open items"
+    actions:
+      - "[Criteria] | Every user who reads journals | A party chosen | Shows the statement of the party | - | -"
+    rules:
+      - "Every posting to a control account records its sub-ledger item for the party, so the party statement agrees with the GL (FR-AC-030)."
+    outcome: The user sees what a party owes or is owed and how old it is.
+    frs: [FR-AC-030]
+    tests: [INQ]
+
+  - id: SCR-AC-06
+    title: Chart of Accounts
+    route: /gl/accounts
+    purpose: >-
+      The chart of accounts of the company as a tree of main, sub and micro accounts: code and name, class, tier,
+      postable or heading, sub-ledger, statement line and status. The GL Team Lead adds and changes accounts, which
+      the Section Head authorises; frozen accounts refuse postings.
+    entry:
+      - Chart Upload › the accounts created
+    shots:
+      - {state: list, user: gltl, caption: "Chart of Accounts: the account tree with class, tier, sub-ledger, statement line and status"}
+      - {state: form, user: gltl, click: "^new account$", caption: "New GL account: code, name, short code, class, tier, parent, sub-ledger, negative balance and the posting controls"}
+    fields:
+      - "Toolbar | Search code, name or short code | Text | Part of the code, name or short code | N | Chart of accounts | Blank | - | Contains | -"
+      - "List | Account | Column | Code and name, indented by tier; headings in bold | - | Chart of accounts | - | Read only | - | -"
+      - "List | Class / Tier / Postable / Sub-ledger / Statement Line | Column | Asset, Liability, Equity, Income or Expense; Main, Sub or Micro; Yes or Heading | - | Chart of accounts | - | Read only | - | -"
+      - "List | Status | Column | Pending authorization, Active, Frozen, Inactive | - | Chart of accounts | - | Read only | - | -"
+      - "Account form | Account code / Account name | Text | Code proposed from the numbering scheme of the parent when left blank | Y | - | Blank | Pending authorization, Active | Unique code | -"
+      - "Account form | Short code | Text | Unique; typed instead of the code on journal lines | N | - | Blank | Pending authorization, Active | Unique | -"
+      - "Account form | Class / Tier / Parent account | Drop-down | Class; Main, Sub or Micro; the parent of a sub or micro account | Y / Y / Cond.: not main | Chart of accounts | - | Pending authorization | Parent of the same class | -"
+      - "Account form | Sub-ledger / Statement line | Drop-down | Sub-ledger of a control account; line of the financial statements | N | Fixed lists | Blank | Pending authorization, Active | - | -"
+      - "Account form | Negative balance | Drop-down | Allow, Warn the maker and checker, or Block the posting | Y | Fixed list | Allow | Pending authorization, Active | - | -"
+      - "Account form | Opened on / Allowed currencies | Date, text | dd-MMM-yyyy; comma separated, blank for all | Y / N | - | Today / Blank | Pending authorization | - | -"
+      - "Account form | Posting controls | Check boxes | Manual posting allowed, Control account (sub-ledger), Cost centre mandatory, Line of business mandatory, FX revaluation, Reconcilable (nominal), Inter-branch account | N | - | - | Pending authorization, Active | - | -"
+    actions:
+      - "New Account | GL Team Lead (master maintain) | Always | Opens the account form; saving sends the account for authorisation | Pending authorization | -"
+      - "[Row] | GL Team Lead (master maintain) | Always | Opens the account to change it | - | -"
+      - "Authorize | GL Section Head (master authorize) | Pending authorization and another user than the maker | Activates the account | Active | -"
+      - "Freeze / Unfreeze | GL Section Head (master authorize) | Active account | Refuses or allows postings again; a freeze needs a reason | Frozen or Active | -"
+    rules:
+      - "An account becomes active only when another user than its maker authorises it (FR-AC-011)."
+      - "A child account rolls up to its parent; a heading takes no posting (FR-AC-011, FR-AC-013)."
+      - "Each account has its negative-balance policy: allow, warn or block (FR-AC-034)."
+    outcome: The chart is kept by the GL team with four eyes on every change.
+    frs: [FR-AC-011, FR-AC-013, FR-AC-014, FR-AC-055]
+    tests: [COA]
+
+  - id: SCR-AC-07
+    title: Chart Upload
+    route: /gl/accounts/upload
+    purpose: >-
+      Loads parent and child accounts of the chart from the template in three steps (template, upload, review of
+      every row), keeps the history of the uploads, and sets the numbering scheme that proposes the codes of the child
+      accounts of a parent.
+    entry:
+      - Chart of Accounts › Chart Upload
+    shots:
+      - {state: upload, user: gltl, caption: "Chart Upload & Numbering: the template, the upload and the uploads before"}
+      - {state: numbering, user: gltl, tab: "Numbering Schemes", caption: "Numbering Schemes: the separator and the digits of the child accounts of each parent"}
+    fields:
+      - "Tabs | Upload Chart / Numbering Schemes / Upload History | Tab | - | - | - | Upload Chart | - | - | -"
+      - "1. Template | [Download Template] | Button | The chart template (Excel) | - | - | - | - | - | -"
+      - "2. Upload | Chart file | File | Excel or CSV of the template | Y | - | - | - | Every row checked before anything is saved | -"
+      - "3. Review | Accounts / Valid / Invalid / Created / failed | Total | Counts of the rows | - | Upload | - | Read only | - | -"
+      - "3. Review | Row / Status / Account Code / Account Name / Parent / Class / Level / Messages | Column | One row per account of the file, with its messages | - | Upload | - | Read only | - | -"
+      - "Numbering schemes | Parent Account / Separator / Digits / First Child / Status | Column | The rule that proposes the codes under a parent | - | Numbering schemes | - | Read only | - | -"
+      - "Numbering scheme form | Parent account / Separator / Digits / Proposes codes | Text, number, check box | Parent code; separator or none; number of digits of the child part | Y / N / Y / N | Chart of accounts | - | - | Digits above zero | -"
+      - "Upload History | Upload No. / File / Uploaded / By / Created / Rows / Status | Column | One row per upload | - | Uploads | - | Read only | - | -"
+    actions:
+      - "Download Template | GL Team Lead (chart upload) | Always | Downloads the template | - | -"
+      - "Upload | GL Team Lead (chart upload) | A file chosen | Reads and checks every row | Validated | -"
+      - "Create n Account(s) | GL Team Lead (chart upload) | Valid rows | Creates the valid accounts, pending authorisation | Pending authorization | -"
+      - "Discard Upload | GL Team Lead (chart upload) | Before the accounts are created | Discards the upload | Discarded | -"
+    rules:
+      - "Every row is checked before anything is saved; only the valid rows are created, each pending authorisation (FR-AC-012)."
+      - "A parent must exist in the chart or earlier in the file; a child's code follows the numbering scheme of its parent when left blank (FR-AC-012, FR-AC-013)."
+    outcome: The chart is loaded from the file and waits for authorisation.
+    frs: [FR-AC-012, FR-AC-013]
+    tests: [COAUP, NUMB]
+
+  - id: SCR-AC-08
+    title: Currencies & Rates
+    route: /setup/currencies
+    purpose: >-
+      The currencies of the company and their exchange rates; the card Monthly revaluation rates where the GL Section
+      Head enters the month-end rate of each foreign currency, used by the FX revaluation of the month and as the book
+      rate of the next month.
+    shots:
+      - {state: rates, user: glhead, caption: "Currencies & Exchange Rates with the card Monthly revaluation rates"}
+    fields:
+      - "Monthly revaluation rates | Month / Currency / Month-end rate | Drop-down, number | Month; foreign currency; rate with up to six decimals | Y | Currencies | Previous month | - | Above zero | Enter a rate above zero"
+      - "Monthly revaluation rates | Month End / Currency / Rate / Entered By | Column | The rates entered, newest first; the rate with six decimals | - | Exchange rates | - | Read only | - | -"
+      - "Maintain rate | Currency / Rate type / Effective date / Rate | Drop-down, date, number | Rate types Spot, Closing, Average, Budget, Book | Y | Currencies | - | - | Above zero | -"
+      - "Rates in force | Currency / Type / Effective / Rate / Maintained by | Column | The rates in force at the rate date | - | Exchange rates | - | Read only | - | -"
+    actions:
+      - "Save Rate | GL Section Head (revaluation rate maintain) | Month, currency and rate entered | Saves the month-end rate of the currency | - | -"
+      - "Save | Master maintain | Rate entered | Saves an exchange rate | - | -"
+    rules:
+      - "Only the GL Section Head enters the monthly revaluation rate; the rate of the month end is the closing rate of the FX revaluation and the book rate of the next month (FR-AC-010, FR-AC-043)."
+    outcome: The month-end rates are in place for the revaluation.
+    frs: [FR-AC-010]
+    tests: [RATES]
+
+  - id: SCR-AC-09
+    title: Cost-Centre Rules
+    route: /setup/cost-centre-rules
+    purpose: >-
+      The standard rules that give the journal lines of the business events their cost centre: by source module,
+      event type, GL account and party, in the order of their priority. A line of an account that requires a cost
+      centre and that no rule covers raises the alert Cost centre missing.
+    entry:
+      - Journal › cost centre of a line
+    shots:
+      - {state: list, user: gltl, caption: "Cost-Centre Rules: priority, the criteria, the cost centre and the status"}
+      - {state: form, user: gltl, click: "^add rule$", caption: "Add cost-centre rule: priority, criteria and the cost centre"}
+    fields:
+      - "List | Priority / Applies To / Cost Centre / Description / Status / Maintained | Column | Lower priority first; the criteria in words | - | Cost-centre rules | - | Read only | - | No rule yet"
+      - "Rule form | Priority | Number | Unique; lower number wins | Y | - | Next free | - | Unique | -"
+      - "Rule form | Source module / Event type / GL account / Party code | Text, drop-down | Each optional; blank matches any | N | Event types, chart, business partners | Blank | - | - | -"
+      - "Rule form | Cost centre | Drop-down | Active cost centres | Y | Cost centres | Blank | - | - | -"
+      - "Rule form | Description / Status | Text, drop-down | Active or Inactive | N / Y | - | Active | - | - | -"
+    actions:
+      - "Add Rule | GL Team Lead (master maintain), Comptrollership administrator (accounting rule manage) | Always | Opens the rule form | - | -"
+      - "[Row] | Same users | Always | Opens the rule to change it | - | -"
+    rules:
+      - "The first active rule whose criteria match the line, by priority, gives the cost centre; a cost centre keyed on the line is kept (FR-AC-054)."
+      - "A line of an account that requires a cost centre without one is refused and raises the alert Cost centre missing (FR-AC-054)."
+    outcome: Every journal line that needs a cost centre gets one.
+    frs: [FR-AC-054]
+    tests: [CCRULES]

@@ -1,0 +1,106 @@
+# Cross-BRD dependencies and interface contract of BRD-5 Accounting, Disbursement and ACSL.
+# direction: In = BRD-5 takes it from the other BRD or system; Out = BRD-5 hands it over.
+# Columns: id | party | direction | what | when / how | owner of the data | BRD-5 screens | FR
+# The technical detail of each interface is in the Technical Specification, reviewed by BDOI IT.
+contract:
+  - id: IC-01
+    party: Every BIBS module (New Business, Operations, Collections, Claims, Renewal)
+    direction: In
+    what: The business events that post to the ledger (bookings, receipts, remittances, adjustments, commission, vouchers, corrections) with their amounts by component
+    how: Each event posts through the accounting rules when it happens; the journal keeps the source reference
+    owner: The module of the event; the accounting rules by Comptrollership
+    screens: Journals, Journal, Account Inquiry, Party Statement
+    frs: [FR-AC-030]
+  - id: IC-02
+    party: BRD-2 Operations (Remittance)
+    direction: In
+    what: The remittance of an approved remittance batch to the insurer, with the CPC2 and the early-incentive service invoice, the deductions applied and the insurer's DTIP
+    how: A payment request is created in the Disbursement Workbench when the batch is approved; the voucher is routed to the approver
+    owner: Remittance (BRD-2)
+    screens: Disbursement Workbench, Disbursement Voucher
+    frs: [FR-DS-020, FR-DS-090, FR-DS-091]
+  - id: IC-03
+    party: BRD-2 Operations (Remittance, Cashiering, Adjustment)
+    direction: Out
+    what: The status of each payment request (voucher created, approved, paid, returned, cancelled) and the regularisation of a cancelled approved voucher (the remittance restored, the refund put back)
+    how: Reported to the source at each stage of the voucher and of its instrument
+    owner: Disbursement
+    screens: Disbursement Voucher
+    frs: [FR-DS-041, FR-DS-044, FR-DS-050]
+  - id: IC-04
+    party: BRD-2 Operations (Cashiering)
+    direction: Out
+    what: The validation of the refund of a cancelled policy and the reversal of a payment application asked by ACSL
+    how: A task in the Incoming Requests of Cashiering; the result comes back to the request or the case
+    owner: Cashiering
+    screens: Request (Validation), ACSL Case
+    frs: [FR-PQ-006, FR-AS-012]
+  - id: IC-05
+    party: BRD-2 Operations (Remittance Deductions)
+    direction: Out
+    what: The deduction of an AR insurer's refund from the next remittance of the insurer, confirmed by the ACSL Team Leader on the insurer's confirmation
+    how: Recorded by ACSL on Remittance Deductions; consumed by the remittance batches of the insurer
+    owner: ACSL
+    screens: Remittance Deductions (BRD-2 screen SCR-OP-33)
+    frs: [FR-AS-025]
+  - id: IC-06
+    party: BRD-2 Operations (invoice ledger)
+    direction: In
+    what: The invoices with their family (root invoice), components, payments and statuses, read by the SOA reconciliation, the cases and the corrections
+    how: Read live; a correction posted by ACSL also corrects the components of the invoice in the ledger
+    owner: Operations
+    screens: Insurer SOA, ACSL Case, Correction Entry
+    frs: [FR-AS-003, FR-AS-024, FR-AS-026, FR-DS-093]
+  - id: IC-07
+    party: BRD-1 New Business (clients)
+    direction: In / Out
+    what: The client of a refund and its CA / SA account; the account approved on a refund is written back to the client record
+    how: Read when the request is raised; written on approval without duplicates
+    owner: New Business (client record)
+    screens: New Refund Request, Request
+    frs: [FR-PQ-003, FR-PQ-016]
+  - id: IC-08
+    party: BRD-1 New Business (booking)
+    direction: In
+    what: The root invoice of each booking, endorsement and cancellation, and the service invoices of the early incentive
+    how: Carried by booking and the invoice ledger to every downstream document
+    owner: Processing (BRD-1)
+    screens: ACSL Case, Disbursement Workbench
+    frs: [FR-DS-091, FR-DS-093]
+  - id: IC-09
+    party: BRD-11 User Access Maintenance and BRD-1 (lists of values)
+    direction: In
+    what: The users, roles and permissions of the BRD-5 personas; the lists of values (payee classes, disbursement types, reasons, categories)
+    how: Maintained through approved access requests and the Lists of Values screen
+    owner: System Administrator, Business Administrator
+    screens: Every screen of this set
+    frs: [FR-AC-070, FR-AC-071, FR-AC-072]
+  - id: IC-10
+    party: BDO bank channels (TPD / ACA, branches, BDO Business Online Banking)
+    direction: Out / In
+    what: The DCTF, the ATD, MC / DD, credit ticket and TT forms and the checks; back from the bank the credited accounts, the negotiated checks and the online banking approvals
+    how: Files and forms produced by the end of day; the bank files are uploaded on Disbursement Uploads
+    owner: Disbursement; the bank
+    screens: Disbursement End of Day, Disbursement Uploads
+    frs: [FR-DS-053, FR-DS-061, FR-DS-062]
+  - id: IC-11
+    party: Insurers
+    direction: In
+    what: The statements of account of each insurer, and the BIR 2307 certificates on commission and incentives
+    how: Uploaded on Insurer SOA Reconciliation; recorded on Certificates Received
+    owner: The insurer; ACSL and Disbursement
+    screens: Insurer SOA Reconciliation, Certificates Received
+    frs: [FR-AS-002, FR-DS-057]
+  - id: IC-12
+    party: BDO Unibank (GARD) and the BIR
+    direction: Out
+    what: The GARD statements and schedules of the report pack; the BIR returns, alphalists and books of accounts
+    how: Produced on the Report Pack and BIR Forms & Books and sent by Comptrollership through the channels of BDO Unibank and the BIR
+    owner: Comptrollership
+    screens: Report Pack, Account Schedules, BIR Forms & Books
+    frs: [FR-AC-060, FR-AC-063]
+change_rule: >-
+  A change to anything in this contract is raised in the Change Management Register and assessed with the owners of
+  the other BRD: Disbursement pays what Operations, Marketing and Comptrollership request and reports the payment
+  back, and ACSL corrects the postings of every module, so a change of a disbursement type, a request status or an
+  accounting rule changes what the other BRDs send or receive and is signed by both owners as a delta.

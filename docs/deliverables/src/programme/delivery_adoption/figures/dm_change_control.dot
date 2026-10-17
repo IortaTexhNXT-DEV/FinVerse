@@ -1,0 +1,22 @@
+// Delivery Methodology: requirement change control (left column steps 1-4, right column steps 5-8).
+digraph dm_change_control {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=0.25, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fillcolor="@WHITE", fontname="Arial", fontsize=12,
+         fontcolor="@NEAR_BLACK", width=4.2, height=0.75, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", penwidth=1.2, arrowsize=0.7];
+  s1 [label=<<b>1 Request</b><br/>CR form; logged the same day>];
+  s2 [label=<<b>2 Impact analysis</b><br/>scope, BRDs, effort in man-days; 5 days>];
+  s3 [label=<<b>3 CCB review</b><br/>fortnightly; ad hoc for High>];
+  s4 [label=<<b>4 Approval</b><br/>decision owner and BIBS Product Owner;<br/>Program Manager above 25 man-days>];
+  s5 [label=<<b>5 Schedule</b><br/>drop or release; plan updated>];
+  s6 [label=<<b>6 Implement</b><br/>configuration, FRS revision, tests, guides>];
+  s7 [label=<<b>7 Verify</b><br/>SIT and the owner's check>];
+  s8 [label=<<b>8 Close</b><br/>release notes; register updated>, fillcolor="@BG_BLUE"];
+  rj [label=<Rejected or deferred at the CCB:<br/>the BRD text stands>, fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  { rank=same; s1; s5; } { rank=same; s2; s6; } { rank=same; s3; s7; } { rank=same; s4; s8; }
+  s1 -> s2 -> s3 -> s4;
+  s4 -> rj [style=invis];
+  s3 -> rj [style=dashed, color="@MUTED", constraint=false];
+  s5 -> s6 -> s7 -> s8;
+  s4 -> s5 [constraint=false, style=dashed];
+}

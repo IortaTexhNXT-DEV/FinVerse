@@ -1,0 +1,63 @@
+/* Employee Benefits screens: repeated groups of the New Programme form, the cycle summary. */
+.eb-group {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  margin: 0;
+}
+
+.eb-group legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.eb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.eb-checklist {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* Editable rows of the TOR, proposal plans and answers. */
+.eb-edit-table td {
+  padding: var(--space-1) var(--space-2);
+  vertical-align: top;
+}
+
+.eb-edit-table .input,
+.eb-edit-table .select {
+  min-width: 96px;
+}
+
+.eb-subtitle {
+  margin: var(--space-2) 0 0;
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+/* The comparative matrix: one column per proposal, the recommendation highlighted. */
+.eb-matrix th[scope='row'] {
+  min-width: 180px;
+  text-align: left;
+}
+
+.eb-matrix td {
+  vertical-align: top;
+}
+
+.eb-recommended {
+  background: var(--color-success-bg);
+}
+
+.eb-deviation {
+  background: var(--color-warning-bg);
+}

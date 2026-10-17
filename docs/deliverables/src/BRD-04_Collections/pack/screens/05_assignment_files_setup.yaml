@@ -1,0 +1,103 @@
+# Screen specifications of BRD-4 Collections: assignment rules and reassignment, the scheduled files and exports, and
+# the Collections set-up (parameters, disposition rules, Unit Heads).
+area: Assignment, files and set-up
+screens:
+  - id: SCR-CL-17
+    title: Assignments
+    route: /collections/assignments
+    purpose: >-
+      Who handles new accounts by default: the assignment rules tried in priority order by the nightly refresh, each
+      with its criteria and handler; and the reassignment of accounts by criteria after a preview, permanently or
+      temporarily until an end date.
+    entry:
+      - Finance › Collections › Assignments
+    shots:
+      - {state: list, user: clxtl, caption: "Assignments: the default assignment rules with their row menu, and Reassign by Criteria"}
+      - {state: preview, user: clxtl, fill: reassign_criteria, click: "^preview accounts$", caption: "Reassign by Criteria: the accounts of a handler found by the preview"}
+      - {state: new, user: clxtl, fill: new_assignment_rule, caption: "New Assignment Rule dialog"}
+    fields:
+      - "Default Assignment Rules | Priority / Rule / Criteria / Handler / Status | Column | Lower numbers are tried first; criteria in words; handler's name; Active or Inactive | - | Assignment rules | - | Read only | - | No assignment rule: new accounts go to their account officer"
+      - "Reassign by Criteria | Current Handler | Drop-down | Handlers by name, or any handler | N | Active collection handlers | Any handler | - | - | -"
+      - "Reassign by Criteria | Market Segment / Sales Unit / Client Code | Text | Code | N | Sales organisation, clients | Blank | - | Equal | -"
+      - "Reassign by Criteria | Outstanding From / Outstanding To / Aging From (days) / Aging To (days) | Number | Amounts; days | N | - | Blank | - | A range starts before it ends | A range must start before it ends"
+      - "Reassign by Criteria | Invoice No. / Assured / Handler / Outstanding | Column | The first 20 accounts found, with the total | - | Collection accounts | - | Read only | - | No account matches the selection"
+      - "New Assignment Rule dialog | Priority / Name / Handler | Number, text, drop-down | Lower numbers are tried first; up to 120 characters; handlers by name | Y | Active collection handlers | 100 | - | Name not blank; a handler chosen | Give the rule a name"
+      - "New Assignment Rule dialog | Market Segment / Sales Unit / Client Code / Outstanding From / Outstanding To / Aging From (days) / Aging To (days) | Text, number | Empty criteria match every account | N | - | Blank | - | A range starts before it ends | A range must start before it ends"
+    actions:
+      - "New Rule | Team leads and section heads (assignment permission) | Always | Opens the dialog | - | -"
+      - "Save Rule | Team leads and section heads (assignment permission) | The form is complete | Saves the rule | Active | -"
+      - "Change Rule (row menu) | Team leads and section heads (assignment permission) | Always | Opens the rule | - | -"
+      - "Activate / Deactivate (row menu) | Team leads and section heads (assignment permission) | Inactive / Active | Switches the rule on or off | Active / Inactive | -"
+      - "Preview Accounts | Team leads and section heads (assignment permission) | Always | Lists the open accounts of the criteria | - | -"
+      - "Reassign n Account(s) | Team leads and section heads (assignment permission) | At least one account found | Opens Reassign Accounts for the accounts found | - | Account reassigned (NT-03)"
+    rules:
+      - "New accounts go to the handler of the first active rule they meet, else to their account officer (FR-CL-020)."
+      - "The new handler must be an active collection handler; a temporary reassignment ends after today and the account returns to its handler on the end date (FR-CL-021)."
+      - "Every reassignment keeps its history on the account and notifies the handlers (FR-CL-021)."
+    outcome: The workload is spread over the handlers as the team lead decides.
+    frs: [FR-CL-020, FR-CL-021]
+    tests: [ASSIGN]
+
+  - id: SCR-CL-18
+    title: Collections Files
+    route: /collections/files
+    purpose: >-
+      The scheduled files and the exports of Collections, with the time from which each may be downloaded: the daily
+      Outstanding PR List and Full Production Report, the weekly DP PR for Reversal and PR 2307 for Reversal files per
+      unit and branch, the monthly ones of the previous month, and the exports of the users.
+    entry:
+      - Finance › Collections › Collections Files
+      - Collections Home › Files Ready This Week tile
+    shots:
+      - {state: list, user: clxuh, caption: "Collections Files: the daily, weekly and monthly files with their availability"}
+      - {state: generate, user: clxuh, click: "^generate files$", caption: "Generate Files dialog of the set-up users"}
+    fields:
+      - "Tabs | All Files / Daily / Weekly / Monthly / Exports | Tab | - | - | Frequency | All Files | - | - | -"
+      - "List | Report | Column | Outstanding PR List, Full Production Report, DP PR for Reversal or PR 2307 for Reversal, with the unit and branch | - | Scheduled files | - | Read only | - | No file published yet"
+      - "List | Period / Rows | Column | Period on two lines; number of rows | - | Scheduled files | - | Read only | - | -"
+      - "List | Published / Available From / Status | Column | Date and time with the user's name; At once or the date and time; Published or Failed | - | Scheduled files | - | Read only | - | -"
+      - "Generate Files dialog | Files / Business Date | Drop-down, date | Daily files; Weekly files (week ending that Friday); Monthly files (previous month) | Y | Fixed list | Daily files / today | - | - | -"
+    actions:
+      - "Download (row menu) | Users with the export permission | Available from its time | Downloads the file (Excel) | - | -"
+      - "Generate Files | Users with the Collections set-up permission | Always | Publishes the files of the business date again; a file already published for its period is kept | Published | Collections file ready (NT-06)"
+    rules:
+      - "A file cannot be downloaded before its availability time: daily at once, weekly on the Monday 08:00 after the week (Saturday to Friday), monthly on the first working day (FR-CL-080, FR-CL-081, FR-CL-082, FR-CL-083)."
+      - "A file that fails raises an alert to the administrators (FR-CL-083)."
+      - "Downloads need the export permission (FR-CL-084)."
+    outcome: The business takes the files it needs at the time agreed.
+    frs: [FR-CL-080, FR-CL-081, FR-CL-082, FR-CL-083, FR-CL-084]
+    tests: [FILES]
+
+  - id: SCR-CL-19
+    title: Collections Setup
+    route: /collections/setup
+    purpose: >-
+      The Collections parameters (minimal balance threshold, aging basis and brackets, export cap, edit-lock time,
+      invoice number format, promise grace days), the attributes of each disposition value (category, tagging owner,
+      Operations action, reserved roles, unapplied-payment attributes), the Unit Head of each sales unit and a refresh
+      of the worklist on demand.
+    entry:
+      - Finance › Collections › Collections Setup
+    shots:
+      - {state: record, user: clxuh, caption: "Collections Setup: the parameters and the disposition rules"}
+      - {state: change, user: clxuh, caption: "Change Parameter dialog of the minimal balance threshold"}
+    fields:
+      - "Parameters | Parameter / Value / Description / Changed By | Column | The parameter by name, its value, what it does and the name of the last user who changed it | - | System parameters | Seeded defaults | - | Within the range of the parameter | -"
+      - "Disposition Rules | PR Dispositions / Unapplied Payment Dispositions | Table | One table per list: the label of each disposition value with its code under it | - | Lists of values | - | Read only | - | -"
+      - "Disposition Rules | Category / Tagging Owner / Operations Action / Reserved To / Requires Invoice / Cashiering Action | Column | Category A, B or C; Marketing or Operations; the Operations action; the roles the value is reserved to (Every collector when none); Yes or No; the Cashiering action; Not set when blank | N | Disposition attributes | Seeded defaults | - | A value of the attribute | '<value>' is not a valid <attribute>"
+      - "Attribute dialog | [Attribute value] | Drop-down / check boxes | The labels of the attribute's values; the reserved roles as check boxes, none ticked for every collector | N | Disposition attributes | Current value | - | A value of the attribute | -"
+      - "Unit Heads | Unit / Name / Level / Parent / Unit Head | Column | Sales unit with its level and parent; the Unit Head's name or From the parent unit | - | Sales organisation | - | - | An active user | -"
+      - "Change Parameter dialog | [Parameter value] | Text or drop-down | The value with its hint; the aging basis as a drop-down (Booking date or Inception date) | Y | - | Current value | - | Within the range of the parameter | -"
+    actions:
+      - "Refresh Worklist Now | Users with the Collections set-up permission | Always | Runs the refresh of the worklist from the invoice ledger at once and shows its outcome | - | -"
+      - "[Parameter row] | Users with the Collections set-up permission | Always | Opens Change Parameter | - | -"
+      - "[Attribute value] | Users with the Collections set-up permission | Always | Opens the attribute of the disposition value | - | -"
+      - "Maintain LOV Values | Users who maintain lists of values | Always | Opens the Lists of Values screen to add or deactivate disposition values | - | -"
+      - "[Unit row] | Users with the Collections set-up permission | Always | Sets the Unit Head of the unit | - | -"
+    rules:
+      - "Every change is kept in the Collections audit log with the old and new value (FR-CL-003, FR-CL-012)."
+      - "Disposition values themselves are added and deactivated on the Lists of Values screen with maker-checker; their rules are kept here (FR-CL-030, FR-CL-072)."
+      - "The minimal balance threshold is 10.00 by default; the business changes it here without a change request (FR-CL-012)."
+    outcome: The business keeps the Collections rules without a change request.
+    frs: [FR-CL-003, FR-CL-012, FR-CL-030, FR-CL-072]
+    tests: [SETUP]

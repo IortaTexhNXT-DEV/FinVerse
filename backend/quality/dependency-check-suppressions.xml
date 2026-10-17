@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Suppressions of the dependency vulnerability gate (OWASP dependency-check, fails at CVSS >= 7).
+
+  Rule: a finding is fixed by upgrading the library (or its managed version in pom.xml). A suppression
+  is the exception and needs all of:
+    - <notes>: why the finding does not apply to BrokerVerse (e.g. the vulnerable function is not
+      used, or a false positive on the package name), who reviewed it and when;
+    - until="YYYY-MM-DDZ": an expiry date at most 6 months ahead; after it the finding fails the
+      build again and must be reviewed;
+    - the narrowest match: packageUrl of the exact artifact and the single cve.
+  Example layout:
+    <suppress until="2027-03-31Z">
+      <notes>Reason, reviewer, review date.</notes>
+      <packageUrl regex="true">^pkg:maven/group/artifact@1\.2\.3$</packageUrl>
+      <cve>CVE-0000-00000</cve>
+    </suppress>
+-->
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+</suppressions>

@@ -1,0 +1,182 @@
+# Screen specifications of BRD-6 Renewal: the Renewal Home, the Expiry List with the extraction, initiation, assignment
+# and transfer, and the renewal record with its tabs.
+area: Home, expiry list and the renewal record
+screens:
+  - id: SCR-RN-01
+    title: Renewal Home
+    route: /renewal
+    purpose: >-
+      The renewals of the user's scope at a glance: the renewals due in 30, 60, 90 and 140 days, the work queues that
+      need attention (at risk, urgent, returned, NRNS, insurer reply overdue, letters failed), the renewals by status
+      and by classification and the workload of the officers. Each tile and status opens the list behind it.
+    entry:
+      - Client & Policy › Renewal › Renewal Home
+    shots:
+      - {state: home, user: mkttl, caption: "Renewal Home of the Marketing Team Leader: due dates, work queues, renewals by status and classification, workload"}
+    fields:
+      - "Figures | Due in 30 days / Due in 60 days / Due in 90 days / Due in 140 days | Figure | Number of renewals expiring within the days | - | Renewals of the user's scope | - | Read only | - | -"
+      - "Work tiles | At risk / Urgent / Returned / NRNS / Insurer reply overdue / Letters failed | Tile | Title and live count; Needs attention when the queue needs action | - | Renewals of the user's scope | - | Read only | - | -"
+      - "By status | Status / Renewals | Column | Stage of the renewal and the number of renewals | - | Renewals | - | Read only | - | No renewals"
+      - "By classification | [Classification pill] / Renewals | Column | Clean, Review or Exception and the number of renewals | - | Renewals | - | Read only | - | No renewals"
+      - "Workload | Officer / Role / Open renewals | Column | Name of the officer; Marketing or Processing; number of open renewals | - | Assignments | - | Read only | - | No renewals assigned"
+    actions:
+      - "[Tile or status row] | Every Renewal user | Always | Opens the list and tab of those renewals (Expiry List, My Dispositions, Processing Worklist, Letters) | - | -"
+    rules:
+      - "The counts cover the renewals of the user's scope: the own unit for Marketing, the processing stages for Processing (FR-RN-100)."
+      - "A renewal is at risk when it is not disposed or not accepted within the escalation days of its segment before expiry (FR-RN-102)."
+    outcome: The user sees what is due and opens the work waiting.
+    frs: [FR-RN-100, FR-RN-102]
+    tests: [HOME]
+
+  - id: SCR-RN-02
+    title: Expiry List
+    route: /renewal/expiry
+    purpose: >-
+      The expiring accounts from extraction to disposition, by tab: extracted, unassigned, by disposition, exceptions,
+      transfers pending and all. Generate Expiry List reads the accounts expiring in a range; Initiate starts the
+      checks of the extracted renewals; Assign Disposition gives renewals to an Account Officer; Push sends the
+      dispositioned ones to the Team Leader; Transfer moves one renewal to another unit.
+    entry:
+      - Client & Policy › Renewal › Expiry List
+      - Renewal Home › At risk, Urgent or a status
+    shots:
+      - {state: list, user: mkttl, caption: "Expiry List of the Marketing Team Leader, tab Unassigned Disposition: classification, flags and the actions of the tab"}
+      - {state: generate, user: mkttl, fill: generate_range, caption: "Generate Expiry List dialog with the expiry range"}
+      - {state: filters, user: mkttl, click: "^filters$", caption: "The Filters panel: the expiry range and the multi-select criteria"}
+      - {state: assign, user: mkttl, fill: assign_officer, caption: "Assign Disposition dialog: the Account Officer of the unit and the reason of a re-assignment"}
+    fields:
+      - "Tabs | Unassigned Disposition / Extracted / For Renewal / For Quotation / For Proposal / Not for Renewal / Lost Business / Exceptions / Transfer Pending / All | Tab | - | - | Stage and disposition of the renewal | Unassigned Disposition | - | - | -"
+      - "Toolbar | Search Renewal Ref / Policy / PN / Client | Text | - | N | Renewals | Blank | - | Contains | -"
+      - "List | Renewal Reference | Column | RNW-yyyy-nnnnnn with the flag tags next to it | - | Renewals | - | Read only | - | No renewals to display"
+      - "List | Client | Column | Name of the client with the client code under it | - | Renewal | - | Read only | - | -"
+      - "List | Expiring Policy / Invoice | Column | Policy number with the invoice under it | - | Renewal | - | Read only | - | -"
+      - "List | Risk / Insurance Company | Column | Product name with the insurer name under it | - | Product catalogue, insurers | - | Read only | - | -"
+      - "List | Unit / Officer | Column | Name of the owner unit with the officer's name under it | - | Sales organisation, assignments | - | Read only | - | -"
+      - "List | Expiry | Column | dd-MMM-yyyy with the days left under it | - | Renewal | - | Read only | - | -"
+      - "List | Status / Classification | Column | Stage pill with the Clean, Review or Exception pill under it | - | Renewal | - | Read only | - | -"
+      - "List | Disposition | Column | Disposition with the remarks under it | - | Renewal | - | Read only | - | -"
+      - "List | Gross Premium / Outstanding | Column | Two decimals; the outstanding of the expiring invoice family and the claims count under it (hidden for LAMD and Contact Center) | - | Expiring invoice, checks | - | Read only | - | -"
+      - "Filters panel | Expiry From / Expiry To | Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
+      - "Filters panel | Unit Head, Business Origin, Account Type, Region, Department, Invoicing Branch, Risk Code, Segment, Account Officer, Insurance Company, Classification, Disposition, Status | Multi-select | Several values, or all except the values chosen | N | Values of the renewals | All | - | - | -"
+      - "Generate Expiry List dialog | Expiry From / Expiry To | Date | dd-MMM-yyyy; the end on or after the start | Y | - | Blank | - | Valid range | The end date must be on or after the start date"
+      - "Assign Disposition dialog | Account Officer | Drop-down | Name of the officer | Y | Officers of the Marketing units | Blank | Unassigned Disposition, For Disposition | Active officer of the unit of the renewal | Select the account officer"
+      - "Assign Disposition dialog | Reason (re-assignment) | Drop-down | Renewal transfer reason list | N | Renewal transfer reason | Blank | For Disposition | - | -"
+      - "Transfer dialog | Receiving Unit / Reason / Remarks | Drop-down, drop-down, text area | Name of the unit; renewal transfer reason; up to 200 characters | Y / N / Y | Marketing units, Renewal transfer reason | Blank | Unassigned Disposition, For Disposition | Another active unit | The receiving unit must be another unit"
+      - "Recent extractions | Run / Expiry range / By / Read / New / Urgent / Status / Started | Column | The last five runs: the range or Daily run, the user's name, the counts, the status and the start time | - | Extraction runs | - | Read only | - | No extraction yet"
+    actions:
+      - "Generate Expiry List | Marketing and Processing Team Leaders | Always | Opens the dialog; Generate reads the accounts expiring in the range and creates their renewals once | Extracted | -"
+      - "Initiate | Team Leaders (extract or assign permission) | Tab Extracted, renewals ticked | Starts the checks: each renewal gets its classification and the decision matrix proposes its disposition | Unassigned Disposition, For Processing or Letter Pending by the rules | -"
+      - "Assign Disposition | Marketing Team Leader | Renewals ticked | Opens the dialog; Assign and Push gives the renewals to the officer | For Disposition | Renewal assigned (NT-01)"
+      - "Push | Account Officers and Team Leaders (dispose permission) | Renewals ticked | Sends the dispositioned renewals to the Team Leader | Review in Progress | -"
+      - "Transfer | Marketing Team Leader | One renewal ticked | Opens the dialog; Submit and Push requests the transfer to the receiving unit | Transfer Pending | Renewal transfer requested (NT-02)"
+      - "Download | Users with the export permission | Always | Downloads the list as shown, with its filters, as a spreadsheet | - | -"
+      - "[Row] | Every Renewal user | Always | Opens the renewal | - | -"
+    rules:
+      - "An account is extracted once per policy year: a second extraction of the same range creates no duplicate (FR-RN-011, FR-RN-021)."
+      - "The daily extraction takes the policies at the lead days before expiry (140 by default); Generate Expiry List takes any range (FR-RN-010, FR-RN-011)."
+      - "Extraction does not start the renewal: the renewals are initiated explicitly, in bulk for the bulk segments and one by one for the others (FR-RN-015)."
+      - "Each filter accepts several values or all except the values chosen; the filters run on the whole list (FR-RN-012)."
+      - "A renewal is assigned to an officer of its own unit; a renewal on the loan-driven straight-through path needs no officer (FR-RN-030)."
+      - "A renewal has one open transfer request at a time, to another active unit (FR-RN-031)."
+    outcome: The expiring accounts are extracted, initiated and assigned for disposition.
+    frs: [FR-RN-010, FR-RN-011, FR-RN-012, FR-RN-013, FR-RN-014, FR-RN-015, FR-RN-030, FR-RN-031]
+    tests: [EXPIRY, EXPGEN, EXPFILTER]
+
+  - id: SCR-RN-03
+    title: Renewal
+    route: /renewal/candidates/:ref
+    parent: /renewal/expiry
+    purpose: >-
+      One renewal: the client, the ARN chip, the status, classification and disposition, the flags and key facts,
+      the blocking checks, the workflow header with the actions the user may take now, and the Details tab with the
+      expiring account, the client and officers, the amounts and the renewal itself.
+    entry:
+      - Expiry List, My Dispositions, TL Review, Processing Worklist, Letters or Follow-ups › open a row
+      - A Renewal notification
+    shots:
+      - {state: record, user: ao, open_renewal: review, caption: "A renewal in review: header, flags, workflow header and the Details tab"}
+    fields:
+      - "Header | [Client, ARN chip, status pill, classification pill, disposition tag, flags] | Reference chip, pills, tags | - | - | Renewal | - | Read only | - | -"
+      - "Facts | Client / Product / Insurer / Expiry / Gross premium / Unit | Display | Names; expiry dd-MMM-yyyy with the days left; amount with the currency | - | Renewal | - | Read only | - | -"
+      - "Blocking checks | [Amber notice with the failed checks] | Notice | One bullet per failed blocking check | - | Latest checks | - | Read only | - | -"
+      - "Workflow | [Renewal workflow header] | Stepper | The stages of the renewal with Current Stage, Since, Due and Assigned To and the history table | - | Renewal workflow | - | Read only | - | -"
+      - "Details tab: Expiring account | Source / ARN / Invoice / Policy No. / Cover No. / Product / Line / Insurance Company / Inception / Expiry / PN No. / Mortgaged / Legacy package | Display | Names of the product, line and insurer; dates dd-MMM-yyyy | - | Expiring account or migrated policy | - | Read only | - | -"
+      - "Details tab: Client and officers | Client / Assured / Segment / Business Origin / Account Type / Branch / Region / Department / Owner Unit / Unit Head / Account Officer / Processing Officer | Display | Names of the units and users | - | Client, sales organisation, assignments | - | Read only | - | -"
+      - "Details tab: Amounts | Currency / Basic Premium / Gross Premium / Sum Insured / Premium Rate / Commission Rate / Outstanding / Claims | Display | Two decimals; rates as keyed | - | Expiring invoice, checks | - | Read only | - | -"
+      - "Details tab: Renewal | Disposition / Reason / Proposed by the matrix / Renewal ARN / Quotation / Proposal / Renewed Invoice / Initiated / Closed | Display | Labels; the officer's name; dd-MMM-yyyy HH:mm | - | Renewal | - | Read only | - | -"
+    actions:
+      - "Details PDF | Users with the export permission | Always | Downloads the account details of the renewal as a PDF | - | -"
+      - "[Actions of the stage] | By stage and permission | The renewal is in the stage | Set Disposition, Push, Start Quotation / Proposal, Create Renewal Account, Record Insurer Response, Record Acceptance, Add Follow-up, Add Remark, Propose Package, Re-open (SCR-RN-07, SCR-RN-12, SCR-RN-14, SCR-RN-15, SCR-RN-19) | - | -"
+      - "Open Renewal Account | Every Renewal user | The renewal account exists | Opens the renewal account in New Business | - | -"
+    rules:
+      - "Every user sees the renewals of the scope of the role; LAMD and Contact Center users see the renewal without the premium amounts (FR-RN-002, FR-RN-041)."
+      - "A renewal locks on the Marketing side when its Renewal Advice is generated (FR-RN-080)."
+    outcome: The user sees the whole renewal and the actions possible now.
+    frs: [FR-RN-002, FR-RN-041, FR-RN-021, FR-RN-026]
+    tests: [RECORD, DETAILS]
+
+  - id: SCR-RN-04
+    title: "Renewal: Checks, Account History and Computations"
+    route: /renewal/candidates/:ref
+    parent: /renewal/expiry
+    purpose: >-
+      The tabs the officers read before the disposition and the processing: the results of the sanitation checks
+      with the classification history and the endorsements linked; the account history (prior renewals,
+      endorsements, payments and claims), whose viewing is recorded and required before the disposition; the
+      expiring and renewal terms side by side.
+    entry:
+      - Renewal › Checks, Account History or Computations tab
+    shots:
+      - {state: checks, user: ao, open_renewal: review, tab: Checks, caption: "Checks tab: the result of each check, the classification history and the endorsements"}
+      - {state: history, user: ao, open_renewal: review, tab: Account History, click: "^view account history$", caption: "Account History tab after View Account History: prior renewals, endorsements, payments and claims"}
+      - {state: computations, user: proc, open_renewal: processing, tab: Computations, caption: "Computations tab: the expiring terms and the renewal terms"}
+    fields:
+      - "Check results | Check / Result / Severity / Message | Column | Name of the check; Pass, Warning, Fail, Information or Not applicable; severity as on Renewal Setup; the finding | - | Latest check run | - | Read only | - | The checks have not run yet"
+      - "Classification history | When / From / To / Cause / Remarks / By | Column | dd-MMM-yyyy HH:mm; classification pills; Classification rules or Override; the user's name | - | Classification changes | - | Read only | - | No classification yet"
+      - "Endorsements linked | Reference / Source / Status / Linked | Column | The endorsements of the term of the expiring policy | - | Booking and Adjustment | - | Read only | - | No endorsements in the term"
+      - "Account History | View Account History | Button | Records that the officer read the history | - | - | - | - | - | -"
+      - "Account History | Prior renewals / Endorsements / Payments / Claims | Table | Renewal, Expiry, Expiring / Renewal ARN, Outcome; Invoice, Kind, Endorsement, Booked, Gross Premium; Invoice, Value date, Type, Component, OR No., Amount; the claims count | - | Booking, Operations ledger, Claims | - | Read only | - | No prior renewals"
+      - "Computations | Expiring / Renewal | Display | Currency, Net Premium, Charges, Gross Premium, Sum Insured, Commission Rate, Commission | - | Expiring invoice, renewal account | - | Read only | - | -"
+    actions:
+      - "View Account History | Every Renewal user | Always | Shows the history and records that it was viewed | - | -"
+    rules:
+      - "The disposition is refused until the officer has opened the account history of the renewal (FR-RN-042)."
+      - "A failed check never gives the Clean classification; the classification follows the active classification rules (FR-RN-020, FR-RN-022)."
+      - "A pending endorsement of the expiring policy fails its check until it is posted or cancelled (FR-RN-027)."
+      - "A difference between the renewal and the expiring terms beyond the tolerance is a financial impact (FR-RN-064)."
+    outcome: The officer gives the disposition knowing the history and the checks of the account.
+    frs: [FR-RN-020, FR-RN-022, FR-RN-027, FR-RN-042, FR-RN-064]
+    tests: [CHECKS, ACCHIST, COMP]
+
+  - id: SCR-RN-05
+    title: "Renewal: Insurer, Letters, Documents, Remarks and History"
+    route: /renewal/candidates/:ref
+    parent: /renewal/expiry
+    purpose: >-
+      The tabs that keep the record of the renewal: the insurer responses (append-only, the latest valid one drives
+      the renewal), the letters with their delivery and the acceptance, the documents of the renewal, the remarks and
+      the Contact Center follow-ups, and the history of dispositions, assignments and overrides.
+    entry:
+      - Renewal › Insurer, Letters, Documents, Remarks & Follow-ups or History tab
+    shots:
+      - {state: letters, user: ao2, open_renewal: ra_sent, tab: Letters, caption: "Letters tab: the Renewal Advice sent to the client"}
+      - {state: history, user: ao, open_renewal: review, tab: History, caption: "History tab: the dispositions, assignments and overrides of the renewal"}
+    fields:
+      - "Insurer responses | Received / Response / Insurer Ref / Revised Premium / Revised Sum Insured / Match / Used / Source / By | Column | dd-MMM-yyyy; Renew as is, Renew with revised terms or Declined; two decimals; Matched or the mismatch; Latest valid or Late; Manual or the upload; the user's name | - | Insurer responses | - | Read only | - | No response from the insurer"
+      - "Letters | Letter / Type / Status / Generated / Sent / Recipients | Column | Letter number; Renewal Advice with its notice, No Advice Letter, Not for Renewal Letter; status pill; dd-MMM-yyyy HH:mm; e-mail addresses or the failure | - | Letters | - | Read only | - | No letters"
+      - "Acceptance | Accepted on / Method / Reference / Financial impact acknowledged / By | Column | dd-MMM-yyyy; E-mail from the client, Signed Renewal Advice or Payment; Yes or No; the user's name | - | Acceptances | - | Read only | - | No acceptance recorded"
+      - "Documents | [Documents of the renewal] | Table | Type, file, uploaded by and when; Upload | - | Documents | - | - | - | -"
+      - "Remarks | When / By / Stage / Remark | Column | dd-MMM-yyyy HH:mm; the user's name; stage pill | - | Remarks | - | Read only | - | No remarks"
+      - "Follow-ups | When / Channel / Outcome / Remarks / Next action / By | Column | Labels of the follow-up channel and outcome; dd-MMM-yyyy | - | Follow-ups | - | Read only | - | No follow-ups"
+      - "History: Dispositions | When / Disposition / Reason / Source / Remarks / Current / By | Column | Labels; User, System check, Decision matrix, Upload, Insurer response or LAMD report | - | Dispositions | - | Read only | - | No dispositions"
+      - "History: Assignments | When / Role / Assigned to / Previous / By | Column | Account Officer or Processing Officer; users' names | - | Assignments | - | Read only | - | No assignments"
+      - "History: Overrides | When / Override / Change / Reason / Remarks / By | Column | What was overridden; the change in words (Review to Clean); the override reason | - | Overrides | - | Read only | - | No overrides"
+    actions:
+      - "Download PDF (row menu) | Every Renewal user | The letter has its PDF | Downloads the letter | - | -"
+    rules:
+      - "Every action on a renewal is recorded with the user and the time; no user can change the history (FR-RN-004)."
+      - "Insurer responses are kept; only the latest valid one drives the renewal (FR-RN-071)."
+      - "Every disposition is kept; a new one supersedes the previous one (FR-RN-043)."
+    outcome: The renewal keeps its full history for review and audit.
+    frs: [FR-RN-004, FR-RN-044, FR-RN-071, FR-RN-080, FR-RN-084]
+    tests: [INSTAB, LETTAB, REMARKS, HIST]

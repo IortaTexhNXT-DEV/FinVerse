@@ -1,0 +1,23 @@
+import vendorLogo from '@/assets/platform/iorta-technxt.png';
+import pack from '@theme-pack';
+
+/**
+ * Product and client branding from the theme pack of the deployment (src/theme/themePack.ts): the
+ * client sees its product under its own logo; the platform is iNXT BrokerVerse by iorta TechNXT.
+ */
+export const BRAND = {
+  product: pack.product,
+  productName: pack.productName,
+  client: pack.client,
+  clientShortName: pack.clientShortName,
+  groupName: pack.groupName,
+  /** Release of the system shown on About (country, system, major.minor, year). */
+  release: 'PH-BIBS-V1.0.2026',
+  platform: 'iNXT BrokerVerse',
+  vendor: 'iorta TechNXT',
+  clientLogo: pack.clientLogo,
+  vendorLogo,
+  legalName: pack.legalName,
+  signInTagline: pack.signInTagline,
+  signInHighlights: pack.signInHighlights,
+} as const;

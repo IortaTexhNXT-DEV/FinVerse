@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  iNXT BrokerVerse logging: Spring Boot's console logging (pattern from logging.pattern.console, levels
+  from logging.level.*), with log forging protection bound to the message itself: the conversion
+  words of the message (%m, %msg, %message) are replaced by CrlfSafeMessageConverter, which turns
+  CR, LF and the Unicode line separators into '_'. Declared before any appender, so every pattern
+  layout of this configuration (console, and any file appender added below) keeps the protection,
+  whatever pattern a deployment configures. Structured JSON logging escapes line breaks by format.
+-->
+<configuration>
+  <conversionRule conversionWord="m" converterClass="com.iortatechnxt.brokerverse.common.logging.CrlfSafeMessageConverter"/>
+  <conversionRule conversionWord="msg" converterClass="com.iortatechnxt.brokerverse.common.logging.CrlfSafeMessageConverter"/>
+  <conversionRule conversionWord="message" converterClass="com.iortatechnxt.brokerverse.common.logging.CrlfSafeMessageConverter"/>
+
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+</configuration>

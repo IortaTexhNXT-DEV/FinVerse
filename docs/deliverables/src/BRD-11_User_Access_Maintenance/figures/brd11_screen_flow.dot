@@ -1,0 +1,49 @@
+digraph flow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.2, ranksep=0.35, bgcolor="white", newrank=true, compound=true];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fontcolor="@NEAR_BLACK", margin="0.12,0.06"];
+  edge [color="@CTA_BLUE", fontname="Arial", fontsize=8, fontcolor="@MUTED", arrowsize=0.6];
+  subgraph "cluster_Sign-in, password and session" { label="Sign-in, password and session"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-UA-01" [label="Login\nSCR-UA-01"];
+    "SCR-UA-02" [label="Forgot Password and Set a New Password\nSCR-UA-02"];
+    "SCR-UA-03" [label="Change Your Password (forced change)\nSCR-UA-03"];
+    "SCR-UA-04" [label="Inactivity and Session-end Warnings\nSCR-UA-04"];
+    "SCR-UA-05" [label="My Profile\nSCR-UA-05"];
+  }
+  subgraph "cluster_User access requests" { label="User access requests"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-UA-06" [label="Access Requests\nSCR-UA-06"];
+    "SCR-UA-07" [label="New Request and Edit Request (user requests)\nSCR-UA-07"];
+    "SCR-UA-08" [label="Access Request record\nSCR-UA-08"];
+    "SCR-UA-09" [label="Bulk Request\nSCR-UA-09"];
+    "SCR-UA-10" [label="Bulk Request Batch\nSCR-UA-10"];
+  }
+  subgraph "cluster_Group profiles" { label="Group profiles"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-UA-11" [label="Group Profile Requests\nSCR-UA-11"];
+    "SCR-UA-12" [label="New Group Profile Request and Edit Request\nSCR-UA-12"];
+  }
+  subgraph "cluster_Access evidence and administration" { label="Access evidence and administration"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-UA-13" [label="User Access Matrix\nSCR-UA-13"];
+    "SCR-UA-14" [label="User Access Reports\nSCR-UA-14"];
+    "SCR-UA-15" [label="Users\nSCR-UA-15"];
+    "SCR-UA-16" [label="Roles & Permissions\nSCR-UA-16"];
+    "SCR-UA-17" [label="User access report (report runner)\nSCR-UA-17"];
+  }
+  "SCR-UA-01" -> "SCR-UA-02" [label="Forgot password?"];
+  "SCR-UA-02" -> "SCR-UA-01" [label="Back to Login"];
+  "SCR-UA-01" -> "SCR-UA-03" [label="password set by an administrator or expired"];
+  "SCR-UA-03" -> "SCR-UA-05" [label="Change Password"];
+  "SCR-UA-01" -> "SCR-UA-05" [label="Login"];
+  "SCR-UA-05" -> "SCR-UA-04" [label="idle or session end"];
+  "SCR-UA-06" -> "SCR-UA-07" [label="New Request"];
+  "SCR-UA-06" -> "SCR-UA-08" [label="open"];
+  "SCR-UA-07" -> "SCR-UA-08" [label="Save Draft or Submit"];
+  "SCR-UA-08" -> "SCR-UA-07" [label="Edit Request"];
+  "SCR-UA-11" -> "SCR-UA-12" [label="New Group Profile Request"];
+  "SCR-UA-11" -> "SCR-UA-08" [label="open"];
+  "SCR-UA-12" -> "SCR-UA-08" [label="Save Draft or Submit"];
+  "SCR-UA-09" -> "SCR-UA-10" [label="open"];
+  "SCR-UA-10" -> "SCR-UA-08" [label="a line"];
+  "SCR-UA-15" -> "SCR-UA-07" [label="Raise Request or a row"];
+  "SCR-UA-16" -> "SCR-UA-08" [label="a request to implement"];
+  "SCR-UA-14" -> "SCR-UA-17" [label="a report"];
+  "SCR-UA-13" -> "SCR-UA-16" [label="the same grants"];
+}

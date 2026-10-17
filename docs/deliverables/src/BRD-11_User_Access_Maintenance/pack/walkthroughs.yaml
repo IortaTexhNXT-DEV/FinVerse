@@ -1,0 +1,79 @@
+# End-to-end walkthroughs of BRD-11 User Access Maintenance, shown step by step with screenshots of the seed profile.
+# Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and the
+# screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
+# The walkthroughs follow the UIDM-ISC / Microsoft Entra ID model of the BRD-11 FRS v1.6 and the storyboards SB-1 to
+# SB-5 of the BPS v1.6: users are created, changed and deactivated by UIDM-ISC over SCIM 2.0 (in SIT and UAT through
+# the Enterprise SSO simulator of Identity Sync, which feeds the same intake as the SCIM interface); BIBS keeps the
+# group-profile definitions under maker-checker, the refused events, the daily reconciliation and the evidence.
+# The walkthroughs run in order: B, C and D use the user created in A.
+walkthroughs:
+  - id: WT-A
+    title: A joiner from UIDM-ISC to the first sign-in with the menus of the persona
+    summary: >-
+      Marketing hires an account officer. The access request is raised and approved in UIDM-ISC, which creates the
+      identity in Microsoft Entra ID and sends the joiner to BIBS over SCIM with its request number, then the group
+      profile Marketing Account Officer. BIBS creates the user Active with that profile. The new user signs in through
+      Microsoft Entra ID and sees exactly the sidebar of the Marketing Account Officer (FRUM.001, FRUM.002, FRUM.004).
+    data: "Seed data: new joiner BDO\\inavarro, user ID a013000196, Isabel Navarro (fictitious), e-mail isabel.navarro@uat.brokerverse.cloud, Retail Marketing, Makati, UIDM request UIDM-2026-005196; User Access Administrator uamadmin"
+    steps:
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "Opens Identity Sync › Simulator, adds the Enterprise SSO account BDO\\inavarro (user ID a013000196, Isabel Navarro, e-mail, unit, location, UIDM request UIDM-2026-005196) and chooses Send joiner on its row", "Toast: Applied: user a013000196 created; the account is listed Active", Joiner applied, wt-a-01]
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "Chooses Send group profiles on the row of BDO\\inavarro with the code MKT_AO and the UIDM request UIDM-2026-005196, and clicks Send", "Toast: Applied: group profiles of a013000196 set to MKT_AO", Group profile applied, wt-a-02]
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "Opens the Events tab", "The joiner and the group-profile event of BDO\\inavarro, both Applied, with the UIDM request number", Events reviewed, wt-a-03]
+      - [UAM_ADMINISTRATOR, SCR-UA-15, "Opens Users, searches a013000196 and opens the Group Profiles tab of the user", "Isabel Navarro is Active; Marketing Account Officer is held with the source UIDM-ISC, the date and the request number", User created, wt-a-04]
+      - [MKT_AO, SCR-UA-01, "The new user opens BIBS and clicks Sign in with Microsoft Entra ID; the simulator of the test environment stands in for Entra ID", "The home page opens with only the menus of the Marketing Account Officer", Signed in, wt-a-05]
+      - [UAM_ADMINISTRATOR, SCR-UA-15, "Opens the Sessions tab of a013000196", "One open session of the user with its sign-in time", First session recorded, wt-a-06]
+    downstream:
+      - "Every BIBS module opens its screens to the new user according to the Marketing Account Officer profile; nothing else is shown or accepted."
+      - "The user appears in the User Access Report and in the Group Profile Membership of Marketing Account Officer, with the UIDM request number."
+      - "A mover or leaver of the user is sent by UIDM-ISC the same way; a leaver ends every session at once."
+
+  - id: WT-B
+    title: A group-profile change under maker-checker, implemented by the System Administrator
+    summary: >-
+      Account officers need one more permission. The Group Profile Maker proposes the change of the Marketing Account
+      Officer profile with the reason; the maker cannot decide it. The Group Profile Checker approves it with a
+      remark, the System Administrator implements it and the Auditor reads the history of the profile (FRUM.005,
+      FRUM.006).
+    data: "Seed data: group profile MKT_AO; maker requestor, checker uamapprover, System Administrator admin, Auditor uamauditor; the permission added is the first permission of the Marketing Team Leader that the account officer lacks"
+    steps:
+      - [UAM_REQUESTOR, SCR-UA-16, "Opens Group Profiles › Marketing Account Officer and clicks Propose Change, ticks one permission, enters the reason and clicks Submit for Approval", "Toast: AR-yyyy-nnnnnn sent for approval; the Pending Change tab shows the change Pending with the maker and no decision button for the maker: Another user with the approval right decides your change", Pending approval, wt-b-01]
+      - [UAM_APPROVER, SCR-UA-16, "Opens the Pending Change tab, clicks Approve, enters the remark and confirms", "Toast: AR-yyyy-nnnnnn: For Implementation", Approved, wt-b-03]
+      - [SYSADMIN, SCR-UA-16, "Opens the Pending Change tab of the profile, clicks Implement and confirms", "Toast: AR-yyyy-nnnnnn: Implemented; the permission is in the profile", Implemented, wt-b-04]
+      - [UAM_AUDITOR, SCR-UA-16, "Opens the History tab of the profile", "The change with its number, maker, checker, date and status", Evidence of the change, wt-b-05]
+    downstream:
+      - "Every member of the profile receives the permission at once; the change is in the User Group Profile Report and the Access Matrix."
+      - "A High or Admin profile, or a change outside office hours, needs a second approval before implementation."
+
+  - id: WT-C
+    title: A refused event and the daily reconciliation with UIDM-ISC
+    summary: >-
+      UIDM-ISC sends a group profile that does not exist in BIBS: BIBS refuses the event and alerts the User Access
+      Administrator, who dismisses it with a remark once UIDM-ISC has corrected the request. Later the directory
+      account of the user is made inactive in UIDM-ISC without a leaver reaching BIBS: the reconciliation finds the
+      difference; the leaver is sent and the mismatch is resolved with a remark. Nothing is corrected in BIBS by hand
+      (FRUM.014).
+    data: "Seed data: user a013000196 of walkthrough A; UIDM requests UIDM-2026-005262 (refused) and UIDM-2026-005270 (leaver); User Access Administrator uamadmin"
+    steps:
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "On Identity Sync › Simulator, sends the group profiles MKT_AO and MKT_SUPERVISOR for BDO\\inavarro with UIDM-2026-005262", "Toast: Refused, naming the group profile MKT_SUPERVISOR that BIBS does not hold", Event refused, wt-c-01]
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "Opens the Refused tab", "The refused event of BDO\\inavarro with its reason, to review", Refused event found, wt-c-02]
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "Chooses Dismiss on the event, enters the remark that UIDM-ISC corrected the request and confirms", "Toast: Event dismissed; the Refused tab no longer lists it", Event dismissed, wt-c-03]
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "After the account of BDO\\inavarro is made inactive in the directory, opens Reconciliation and clicks Run Now", "A mismatch Status differs for a013000196, open", Mismatch found, wt-c-04]
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "Sends the leaver of BDO\\inavarro from the Simulator, then chooses Resolve on the mismatch with the remark and confirms", "Toast: Mismatch resolved; the user a013000196 is Inactive and its sessions are ended", Mismatch resolved, wt-c-05]
+      - [UAM_ADMINISTRATOR, SCR-UA-20, "Opens the Status tab", "Connection with UIDM-ISC: last call, last successful event, errors, refused events to review and mismatches to resolve", Status reviewed, wt-c-06]
+    downstream:
+      - "Every refused event, dismissal, mismatch and resolution is in the User Access Audit Log with its remark."
+      - "The deactivated user can no longer sign in; the history keeps the UIDM request numbers."
+
+  - id: WT-D
+    title: The evidence of access and the certification extract
+    summary: >-
+      The Auditor prepares the quarterly access certification: takes the certification extract, which is logged with
+      its rows and SHA-256 while Information Security is told, then reads the audit log and the access matrix
+      (FRUM.007, FRUM.008). Certification decisions are taken in UIDM-ISC.
+    data: "Seed data: the delivered profiles and grants and the users of walkthroughs A to C; Auditor uamauditor"
+    steps:
+      - [UAM_AUDITOR, SCR-UA-14, "Opens Reports & Certification, clicks Extract XLSX and confirms Take Extract", "Toast: the file saved; Information Security is told; Extracts taken lists the file with its rows and SHA-256", Extract taken, wt-d-01]
+      - [UAM_AUDITOR, SCR-UA-22, "Opens Audit Log", "The user access events of the day with who, when and the from and to values", Audit log reviewed, wt-d-02]
+      - [UAM_AUDITOR, SCR-UA-13, "Opens Access Matrix", "Each group profile against the permissions it grants, exportable", Matrix reviewed, wt-d-03]
+    downstream:
+      - "Information Security signs the role matrix and the separation-of-duties rules on the basis of these reports; the extract log proves each certification run."

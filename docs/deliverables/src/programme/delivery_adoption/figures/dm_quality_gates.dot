@@ -1,0 +1,19 @@
+// Delivery Methodology: quality gates of every change (left column, then right column).
+digraph dm_quality_gates {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=0.25, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fillcolor="@WHITE", fontname="Arial", fontsize=12,
+         fontcolor="@NEAR_BLACK", width=4.2, height=0.75, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", penwidth=1.2, arrowsize=0.7];
+  c  [label=<<b>1 Change</b><br/>linked to an FR, a CR or an incident>];
+  r  [label=<<b>2 Peer code review</b><br/>a second developer approves>];
+  s  [label=<<b>3 Static analysis</b><br/>formatting, coding standard, code smells,<br/>architecture rules, duplication>];
+  t  [label=<<b>4 Tests and coverage</b><br/>module and integration tests;<br/>80 % lines, 65 % branches>];
+  sec[label=<<b>5 Security scans</b><br/>code, dependencies (CVSS 7+ fails),<br/>container images, secrets; SBOM>];
+  m  [label=<<b>6 Accepted into the mainline</b>>, fillcolor="@BG_BLUE"];
+  rel[label=<<b>7 Release</b><br/>release notes, deployment to SIT,<br/>regression by QA>, fillcolor="@YELLOW", color="@NEAR_BLACK"];
+  f  [label=<A failed gate sends the change<br/>back to the developer>, fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  { rank=same; c; sec; } { rank=same; r; m; } { rank=same; s; rel; } { rank=same; t; f; }
+  c -> r -> s -> t;
+  sec -> m -> rel;
+  t -> sec [constraint=false, style=dashed];
+}

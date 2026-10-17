@@ -1,0 +1,29 @@
+// BRD-1: workflow NB_QUOTATION (V751, V830), package quotation. FRS section 5.2; BRNB.020-022, 041-045.
+digraph nb_quotation {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.35, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=15, fontcolor="@NEAR_BLACK", width=2.4, height=0.5, margin="0.08,0.03"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=12.5, fontcolor="@TEXT"];
+
+  DRAFT          [label="DRAFT\nMarketing AO"];
+  FOR_REVIEW     [label="FOR_REVIEW\nApprover (not the maker)"];
+  APPROVED       [label="APPROVED\nMarketing"];
+  SENT_TO_CLIENT [label="SENT_TO_CLIENT\nMarketing"];
+  ACCEPTED       [label="ACCEPTED\nMarketing"];
+  CONVERTED      [label="CONVERTED\n(accounts created)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  NOT_PROCEEDED  [label="NOT_PROCEEDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  VOIDED         [label="VOIDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> FOR_REVIEW [label=" Submit for review"];
+  FOR_REVIEW -> APPROVED [label=" Approve"];
+  FOR_REVIEW -> DRAFT [label=" Return to maker (reason)", style=dashed, constraint=false];
+  APPROVED -> SENT_TO_CLIENT [label=" Send to client (protected)"];
+  SENT_TO_CLIENT -> ACCEPTED [label=" Record acceptance"];
+  ACCEPTED -> CONVERTED [label=" Create accounts"];
+  SENT_TO_CLIENT -> NOT_PROCEEDED [label=" Client declined", style=dotted];
+  APPROVED -> DRAFT [label=" Revise (new version)\n (version n+1)", style=dashed, constraint=false];
+  FOR_REVIEW -> VOIDED [label=" Void (reason)", style=dotted];
+
+  { rank=same; FOR_REVIEW; VOIDED; }
+  { rank=same; ACCEPTED; NOT_PROCEEDED; }
+}

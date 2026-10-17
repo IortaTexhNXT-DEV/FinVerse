@@ -1,0 +1,51 @@
+// BRD-10 Sanction Screening and Risk Profiling: to-be screening process by actor (FRS section 2.2; BRD p.8, SNSRP-101-903).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: three rows of four steps; the fill colour of a step is its actor (legend at the bottom).
+digraph sc_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=1.9, height=0.8, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  // Actors: Compliance = @BG_BLUE, System = @DIRTY_WHITE, Investigator = @WHITE, Unit Head / AML Committee = @AMBER_BG
+  s1  [label=<<b>1. Configure</b><br/><font point-size="9">Compliance Officer, Checker<br/>SNSRP-101-109</font>>, fillcolor="@BG_BLUE"];
+  s2  [label=<<b>2. List intake</b><br/><font point-size="9">System; manual entries by CO<br/>SNSRP-201-204</font>>, fillcolor="@DIRTY_WHITE"];
+  s3  [label=<<b>3. Name matching</b><br/><font point-size="9">System; four triggers<br/>SNSRP-301, 602</font>>, fillcolor="@DIRTY_WHITE"];
+  s4  [label=<<b>4. Risk tagging</b><br/><font point-size="9">System; override by Investigator<br/>SNSRP-302, 304</font>>, fillcolor="@DIRTY_WHITE"];
+  s5  [label=<<b>5. Case creation</b><br/><font point-size="9">System; assignment matrix<br/>SNSRP-303, 106</font>>, fillcolor="@DIRTY_WHITE"];
+  s6  [label=<<b>6. Investigation</b><br/><font point-size="9">Investigator; template, KYC<br/>SNSRP-501, 502, 601</font>>, fillcolor="@WHITE"];
+  s7  [label=<<b>7. Validation, routing</b><br/><font point-size="9">System; approval matrix<br/>SNSRP-701, 103</font>>, fillcolor="@DIRTY_WHITE"];
+  s8  [label=<<b>8. Unit Head approval</b><br/><font point-size="9">Approver<br/>SNSRP-702</font>>, fillcolor="@AMBER_BG"];
+  s9  [label=<<b>9. BU escalation review</b><br/><font point-size="9">Compliance Officer<br/>SNSRP-703</font>>, fillcolor="@BG_BLUE"];
+  s10 [label=<<b>10. AML Committee</b><br/><font point-size="9">Committee members vote<br/>SNSRP-704</font>>, fillcolor="@AMBER_BG"];
+  s11 [label=<<b>11. STR preparation</b><br/><font point-size="9">Compliance Officer<br/>SNSRP-705</font>>, fillcolor="@BG_BLUE"];
+  s12 [label=<<b>12. STR extraction</b><br/><font point-size="9">AMLC format; STR folder<br/>SNSRP-706</font>>, fillcolor="@BG_BLUE"];
+  amlc [label=<<b>AMLC portal</b><br/><font point-size="9">filing stays manual<br/>(p.8 "Via Portal")</font>>, fillcolor="@WHITE", color="@MUTED", style="rounded,dashed,filled"];
+
+  { rank=same; s1; s2; s3; s4; }
+  { rank=same; s5; s6; s7; s8; }
+  { rank=same; s9; s10; s11; s12; }
+
+  s1 -> s2 -> s3 -> s4;
+  s1 -> s5 -> s9 [style=invis, weight=10];
+  s2 -> s6 -> s10 [style=invis, weight=10];
+  s3 -> s7 -> s11 [style=invis, weight=10];
+  s4 -> s8 -> s12 [style=invis, weight=10];
+  s4 -> s5 [constraint=false];
+  s5 -> s6 -> s7 -> s8;
+  s8 -> s9 [constraint=false];
+  s9 -> s10 -> s11 -> s12;
+  s12 -> amlc [style=dashed, color="@MUTED"];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">Compliance</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">System</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="9">Investigator</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="9">Unit Head / AML Committee</font></td>
+      </tr>
+    </table>>];
+  s10 -> legend [style=invis];
+}

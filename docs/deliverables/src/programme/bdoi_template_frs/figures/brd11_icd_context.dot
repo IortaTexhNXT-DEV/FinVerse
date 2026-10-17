@@ -1,0 +1,21 @@
+// Context of the user access interfaces (User Access Interface Specification, Section 2)
+digraph context {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.8, ranksep=0.7, pad=0.2];
+  node  [shape=box, style="rounded,filled", fontname="Arial", fontsize=15, fillcolor="#E5F5FF", color="#004EA8",
+         penwidth=1.2, margin="0.18,0.10"];
+  edge  [fontname="Arial", fontsize=13, color="#004EA8"];
+
+  users  [label="BDOI users\n(requester, approver,\ncertifier, BIBS user)", fillcolor="#FFFFFF"];
+  uidm   [label="UIDM-ISC\nidentity governance"];
+  entra  [label="Microsoft Entra ID\n(EIAM)"];
+  gw     [label="BDOI API gateway\n(token, quota, TLS)", fillcolor="#FFF4D6", color="#B58100"];
+  bibs   [label="BIBS\nSCIM service: Users, Groups\nOpenID Connect client\nevent log, access change log, audit", fillcolor="#004EA8", fontcolor="#FFFFFF"];
+
+  users -> uidm  [label="requests, approvals,\ncertification"];
+  uidm  -> entra [label="account and\napp assignment"];
+  uidm  -> gw    [label="SCIM calls\n+ client credentials", penwidth=1.6];
+  gw    -> bibs  [label="SCIM calls\n+ gateway JWT", penwidth=1.6];
+  users -> entra [label="sign-in", style=dashed];
+  entra -> bibs  [label="OpenID Connect\nID token", style=dashed];
+  bibs  -> uidm  [label="daily reconciliation\n(directory read)", style=dotted, constraint=false];
+}

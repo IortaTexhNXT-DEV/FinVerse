@@ -1,0 +1,2481 @@
+---
+# Source of the Functional Requirements Specification for BRD-3 Product Maintenance.
+# Build: python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-03_Product_Maintenance/FRS_BRD03_PRODUCT_MAINTENANCE.md
+title: Product Maintenance
+subtitle: BRD-3 Product Maintenance (Package) and Workshop Addendum
+doc_type: Functional Requirements Specification
+doc_code: FRS
+brd: BRD-03
+name: Product Maintenance
+doc_id: BIBS-FRS-BRD-03
+version: "2.1"
+date: 8 October 2026
+status: Issued for BDOI business sign-off
+header_title: FRS BRD-3 Product Maintenance
+control:
+  - version: "0.9"
+    date: 18 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Solution Architect
+    approver: ""
+    change: Internal draft from the BRD-3 baseline
+  - version: "1.0"
+    date: 25 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Product Owner (pending)
+    change: First issue for BDOI review; aligned with the screens and the cross-BRD decisions
+  - version: "2.0"
+    date: 27 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Business sign-off pack: proposed business rules and clarifications for confirmation (chapter 22), navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, uploads, configuration inputs the business provides, cross-BRD contract, sign-off and change control (chapters 12-21). Issued 27-Sep-2026. Chapters 1-11 otherwise unchanged; FR, BRD and test IDs kept"
+  - version: "2.1"
+    date: 8 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Re-based on the Product Maintenance BRD v1.0 and Addendum v1.1 (no newer version received) and the Drop 0 decisions; user-story view and storyboard index added. FR-PM-001 sign-in follows BRD-11 (single sign-on through EIAM); the packages in force at go-live set up through package requests (FR-PM-050 R3, FR-PM-051 R4) as the proposed position; automatic drafting of package renewal requests proposed; clarifications CLR-PM-21 to CLR-PM-24 and the Drop 0 question of every clarification (PM-Q01 to PM-Q58)"
+distribution:
+  - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: Marketing Business Services and System Support (MBS), role: Business owner, organisation: BDOI, purpose: Review of all FRs}
+  - {name: Technical Support Unit (TSU), role: Business user, organisation: BDOI, purpose: Review of the negotiation and validation steps}
+  - {name: "Retail, Corporate and Commercial Marketing", role: Business user, organisation: BDOI, purpose: Review of the request and approval steps}
+  - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
+---
+
+# Introduction
+
+## Purpose
+
+This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the Product Maintenance business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
+
+BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to deliver, test and prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
+
+## Scope
+
+The scope is the maintenance of **package products**: pre-arranged insurance programmes whose terms, rates and conditions BDOI negotiates with one or more insurers and then offers to clients through Marketing. It covers the whole package lifecycle, from the Package Request Form to release, advisory, expiry and renewal, and the product master data that quotations, accounts and booking read.
+
+<!-- table: widths=4,9,4 caption="Scope of this FRS" -->
+| Area | In scope | Source |
+|---|---|---|
+| Access and audit | Log-in, role-to-action matrix, document protection, audit trail | BRPM.001, 002, 020, 024; PMADD05 |
+| Product structure | Hierarchy (line, cover type, subtype, coverage / peril), clause library, product-specific field rules, shared templates, insurer-specific terms | BRPM.003-005; PMADD01, PMADD02 |
+| Package request | Request form, Marketing approval, TSU TL review, TSU Head approval, work lists | BRPM.008, 009, 011, 021 |
+| Negotiation | Quotation slip, insurer responses and exception outcomes, revision rounds, comparative master and client views, Marketing review | BRPM.010, 012-014; PMADD03, PMADD04 |
+| Sign-off and set-up | Requirements pack, ManCom sign-off, MBS set-up, post-set-up validation, release, advisories, retirement | BRPM.015, 016; PMADD06 |
+| Versions and rate schemes | Package versions, latest approved scheme for new business, rate-scheme exceptions, archive of expired packages | BRPM.006, 007 |
+| Expiry and renewal | Expiry monitor, alerts, renewal requests | BRPM.017 |
+| Monitoring | Product Maintenance home, package reports, notifications | BRPM.018, 019, 022 |
+| Incentive criteria | Criteria (for example CPC2) on the products matrix | PMADD07, PMADD08 |
+
+**Out of scope for this phase:**
+
+- Maintenance of non-package products. The BRD revision log of 27-Oct-2025 (p.11) moved it to an addendum, and the April 2026 addendum does not add it (PQ19).
+- Renewal of client policies (accounts). This is BRD-6 Renewal. BRD-3 covers the renewal of the *package* only.
+- Computation and payout of incentives. PMADD07 and PMADD08 cover the criteria only (Q33).
+- Transport of product master changes to other BDOI systems until BDOI names them (PQ16, section 7). BIBS records every change for that transport.
+
+## References
+
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Product Maintenance (Package) BRD, pages 10-35 of the BRD-3 pack | v1.0, 24-Nov-2025; approved Nov-2025 to Jan-2026 |
+| R2 | Product Maintenance Addendum (Workshop), pages 1-9 of the BRD-3 pack | v1.1, 10-Apr-2026; signed 12 to 17-Apr-2026 |
+| R3 | Earlier signed version of the main BRD (BRQID numbering), pages 36-61; used only to trace changes | 16-Nov-2025 |
+| R4 | BDOI Product Maintenance (BRD-3) requirements baseline | current |
+| R6 | Cross-BRD decisions and answered questions | current |
+| R7 | BDO UX guidelines (brand, screen patterns) | current |
+| R8 | BRD-1 New Business requirements baseline (shared platform capabilities) | current |
+| R9 | FRS BRD-11 User Access Maintenance (sign-in, single sign-on through EIAM, session and lock-out of every BIBS user) | v2.1, 8-Oct-2026 |
+| R10 | Drop 0 questions to BDOI, BRD-03 Product Maintenance (PM-Q01 to PM-Q58) | October 2026 |
+
+Page references in this document ("p.18") are pages of the BRD-3 PDF (R1, R2).
+
+## Definitions and acronyms
+
+```glossary
+AO: Account Officer (Marketing)
+BRD: Business Requirements Document
+BRPM: Requirement ID prefix of the main Product Maintenance BRD (BRPM.001-BRPM.024; there is no BRPM.023)
+PMADD: Requirement ID prefix of the Product Maintenance Addendum (PMADD01-PMADD08)
+Comparative master: The one current comparative table of a package request, compiled from the insurer responses of the latest round (BRPM.014)
+Client view: A comparative output derived from the current master with selected fields and insurers, for a client presentation (PMADD03)
+CPC2: An incentive criterion named in PMADD08 as an example; its definition is not in the BRD (PQ04)
+FR: Functional requirement of this document (FR-PM-nnn)
+LOB: Line of business; in BIBS the product line (for example Motor, Fire)
+LOV: List of values maintained by the System Administrator
+ManCom: Management Committee, which signs off package requirements (BRPM.015)
+MBS: Marketing Business Services and System Support; sets up packages in the system
+Package: A catalogue product flagged as packaged, with pre-negotiated terms, rates and insurers; generic for a segment or client-specific
+Package version: One effective-dated set of package terms (rate scheme, coverages, insurers, dates); changed only through a new version
+PKR: Prefix of package request numbers (PKR-yyyy-n)
+PQS: Prefix of package quotation slip numbers (PQS-yyyy-n)
+PQnn: Open question on BRD-3 raised by the project team (section 10.3)
+QS: Quotation Slip sent to insurers
+Rate scheme: The package rate, minimum premium, commission and TSI limit of a package version
+SLA: Service level agreement; here the target hours of a workflow stage
+TH: Team Head
+TL: Team Lead
+TSI: Total sum insured
+TSU: Technical Support Unit
+UAT: User acceptance testing
+UH: Unit Head (Marketing)
+```
+
+## How to read the functional requirements
+
+Each FR in section 4 has the same parts:
+
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
+- **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
+- **Business rules**. *Configurable* rules are maintained by the System Administrator or the business owner in BIBS (parameter, list of values or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
+- **Validations and messages**: the check, the message the user sees and its code. The code is the one BIBS returns for a business rule. A "-" marks a screen or platform check (for example a blank mandatory field); its message follows the same wording but has no business code.
+- **Screens and fields**: label, type, whether mandatory ("Cond." = mandatory when the condition in the Validation column applies), the source list and the validation.
+- **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-3 test plan.
+
+> [!NOTE]
+> Values marked "default" (SLA hours, notice days, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system. Where the proposed rule or screen differs from the BRD, or needs a decision of BDOI, chapter 22 lists it for confirmation.
+
+# Business context and process overview
+
+## Business context
+
+BDOI sets up package products today through e-mail, Excel comparative tables, manual sign-off and spreadsheets for expiry monitoring (p.12-13). The BRD asks for one maintenance module in which MBS / Admin and TSU manage package products without IT, with automatic audit, enforced approvals, secure document sharing and monitoring of expiring packages (p.12).
+
+<!-- table: widths=1,8,8 caption="Current and envisioned process (BRD p.12-13)" -->
+| # | Current process (before) | Envisioned process in BIBS (after) |
+|---|---|---|
+| 1 | Marketing requests placements by e-mail using a TSU request form | Marketing logs the Package Request Form in BIBS; the system numbers it (PKR-yyyy-n) and tracks it |
+| 2 | TSU prepares and e-mails quotation slips to insurers | TSU prepares the QS in BIBS; it is approved and e-mailed per insurer, protected and logged |
+| 3 | Insurers reply by e-mail with signed slips or approved terms | TSU keys in each response with its outcome; every change is kept |
+| 4 | Comparative tables are compiled in Excel and shared by e-mail | BIBS compiles one comparative master per package and derives client views from it |
+| 5 | Sign-off and advisories are manual | ManCom signs off in BIBS; the advisory is drafted on release and sent with its documents |
+| 6 | Shared documents have no password protection | Documents leave BIBS password protected; the password goes in a separate e-mail |
+| 7 | Package expiry is monitored in spreadsheets or calendars | A daily job raises expiry alerts and can draft the renewal request |
+| 8 | Changes, approvals and documents are tracked in e-mail threads and files | Every action is in the request history and the audit trail |
+
+## Process overview
+
+The table lists the steps of the package lifecycle, and Figure 1 shows them by actor. Each step is a stage of the BIBS workflow PM_PACKAGE_REQUEST (section 5).
+
+<!-- table: widths=0.8,4,3.4,6.8,2.6 caption="Process steps" -->
+| # | Step | Owner | What happens in BIBS | BRD |
+|---|---|---|---|---|
+| 1 | Package Request Form | Marketing AO or TSU | Enters client or programme, line, cover type, requested terms and target insurers; submits | BRPM.008 |
+| 2 | Marketing approval | Marketing TL, TH or UH | Approves or returns; never the maker | BRPM.008, 021 |
+| 3 | TSU review and approval | TSU TL, then TSU TH | TL recommends with a written recommendation; TH approves; a round 1 opens | BRPM.009 |
+| 4 | Negotiation | TSU Officer / TL | QS approved and sent per insurer; responses and outcomes keyed in; further rounds as needed | BRPM.010, 012, 013; PMADD04 |
+| 5 | Comparative tables | TSU | One current master per request; client views derived from it | BRPM.014; PMADD03 |
+| 6 | Marketing review | Marketing | Client-specific packages only: accept terms or request changes | BRPM.013 |
+| 7 | Requirements pack | TSU | Scheme rate, dates, computation basis, insurers, signed package slip | BRPM.015 |
+| 8 | ManCom sign-off | ManCom | Signs off or returns; the quotation slips lock | BRPM.015 |
+| 9 | Package set-up | MBS | Creates the draft package version from the signed-off terms, or returns the pack as incomplete | BRPM.015 |
+| 10 | Validation and release | TSU Head or Business Administrator | Confirms the checklist and releases the version, or returns it | PMADD06 |
+| 11 | Advisory | TSU / Operations | Advisory drafted on release; sent only with the signed package slip and ManCom sign-off | BRPM.016 |
+| 12 | Monitoring and renewal | TSU Officer, MBS | Expiry alerts; a renewal request pre-filled from the current version | BRPM.017, 006 |
+
+![Package lifecycle by actor (BRPM.008-017, PMADD03/04/06)](figures/brd03_process_flow.dot)
+
+## Request types
+
+A package request has one of six types (list PKG_REQUEST_TYPE). The type decides whether negotiation takes place and what the MBS step does.
+
+<!-- table: widths=2.4,4,3.6,7 caption="Request types" -->
+| Type | Label | Negotiation | Result |
+|---|---|---|---|
+| NEW | New package | Always | A new packaged product and its version 1 |
+| AMEND | Amend package terms | Always | A new version of an existing package |
+| UPDATE | Update package details | Chosen on the form | A new version of an existing package |
+| RENEW | Renew package | Chosen on the form | A new version with the next term dates |
+| REACTIVATE | Reactivate expired package | Chosen on the form | A new version of an expired package; the product becomes active again |
+| RETIRE | Retire package | Never | The product is retired; no version is released (the BRD "deletion", BRPM.011) |
+
+# Personas and roles
+
+## Personas
+
+<!-- table: widths=3.2,3.3,8.1,3 caption="Personas and BIBS roles" -->
+| Persona | BIBS role | Responsibilities in Product Maintenance | BRD |
+|---|---|---|---|
+| Marketing AO | MKT_AO | Creates and submits package requests; views packages | BRPM.008 |
+| Marketing TL / TH / UH | MKT_TL | Approves package requests; reviews terms of client-specific packages; views reports | BRPM.008, 013, 021 |
+| TSU Officer | TSU | Creates requests; prepares quotation slips; keys in insurer responses; prepares requirements and advisories; monitors expiry | BRPM.010-013, 016, 017 |
+| TSU Team Lead | TSU_TL | Reviews and recommends requests; approves quotation slips (or a co-officer); negotiates | BRPM.009, 012 |
+| TSU Team Head / Head | TSU_HEAD | Approves requests; releases terms to Marketing; validates package versions | BRPM.009, 013; PMADD06 |
+| MBS | MBS | Sets up package versions; maintains incentive criteria and product masters; views archived packages | BRPM.015; PMADD07, 08 |
+| ManCom | MANCOM | Signs off package requirements | BRPM.015 |
+| Business Administrator | BUSINESS_ADMIN | Validates package versions; authorises product masters, incentive criteria and rate exceptions | PMADD05, 06 |
+| System Administrator | SYSADMIN | Maintains parameters, lists of values and roles (section 9); read access to Product Maintenance | PMADD05 |
+| Auditor | AUDITOR | Read access to packages, archive and reports | BRPM.024 |
+
+The addendum states that user roles "will be further defined in succeeding documentations" (p.4, footnote 2). The roles above are the project's proposal until BDOI confirms the matrix (PQ17, OQ48).
+
+## Permissions
+
+<!-- table: widths=4.6,2.6,9.6 caption="Product Maintenance permissions and action classes (PMADD05)" -->
+| Permission | Action class | Allows |
+|---|---|---|
+| PRODUCT_VIEW | VIEW | Open the Product Maintenance screens and the catalogue (read only) |
+| PRODUCT_ARCHIVE_VIEW | VIEW | See expired and retired packages and their history (BRPM.006) |
+| PKG_REPORT_VIEW | VIEW | Package reports and the Product Maintenance home |
+| PKG_REQUEST | CREATE / AMEND | Create, edit and submit package requests; Marketing review of terms |
+| PKG_REQUEST_APPROVE | APPROVE | Marketing approval of a package request |
+| PKG_TSU_RECOMMEND | APPROVE | TSU TL review and recommendation |
+| PKG_TSU_APPROVE | APPROVE | TSU TH approval; release of terms to Marketing |
+| PKG_NEGOTIATE | CREATE / AMEND | Quotation slips, insurer responses, rounds, comparative outputs, requirements pack |
+| PKG_QS_APPROVE | APPROVE | Approval of a quotation slip (not by its preparer) |
+| PKG_MANCOM_SIGNOFF | APPROVE | ManCom sign-off |
+| PKG_ADVISORY | CREATE | Draft and send advisories |
+| PRODUCT_MAINTAIN | CREATE / AMEND | Package set-up (draft versions), coverages, clauses |
+| PRODUCT_VALIDATE | APPROVE | Validation and release of package versions (PMADD06) |
+| PRODUCT_AUTHORIZE | APPROVE | Authorisation of product masters, incentive criteria and rate-scheme exceptions |
+| INCENTIVE_CRITERIA_MAINTAIN | CREATE / AMEND | Incentive criteria (PMADD07, 08) |
+
+## Permissions matrix
+
+The table below is the proposed role-to-action matrix ("Y" = granted). The System Administrator maintains it through role-permission change requests (FR-PM-003). The User Access Matrix screen shows it by permission and by action class and exports it to Excel.
+
+<!-- table: widths=4.7,1.29,1.29,1.29,1.29,1.29,1.29,1.29,1.29,1.29,1.29 caption="Role-to-action matrix for Product Maintenance (proposal until PQ17 / OQ48)" size=8 -->
+| Permission | MKT AO | MKT TL | TSU | TSU TL | TSU Head | MBS | Man Com | Bus. Admin | NB Appr. | Auditor |
+|---|---|---|---|---|---|---|---|---|---|---|
+| PRODUCT_VIEW | Y | Y | Y | Y | Y | Y | Y | Y | Y | Y |
+| PRODUCT_ARCHIVE_VIEW | | | | | Y | Y | | Y | | Y |
+| PKG_REPORT_VIEW | | Y | | Y | Y | Y | | Y | | Y |
+| PKG_REQUEST | Y | Y | Y | | | | | | | |
+| PKG_REQUEST_APPROVE | | Y | | | | | | | | |
+| PKG_TSU_RECOMMEND | | | | Y | | | | | | |
+| PKG_TSU_APPROVE | | | | | Y | | | | | |
+| PKG_NEGOTIATE | | | Y | Y | | | | | | |
+| PKG_QS_APPROVE | | | | Y | | | | | | |
+| PKG_MANCOM_SIGNOFF | | | | | | | Y | | | |
+| PKG_ADVISORY | | | Y | Y | | | | | | |
+| PRODUCT_MAINTAIN | | | | | | Y | | | | |
+| PRODUCT_VALIDATE | | | | | Y | | | Y | | |
+| PRODUCT_AUTHORIZE | | | | | | | | Y | Y | |
+| INCENTIVE_CRITERIA_MAINTAIN | | | | | | Y | | | | |
+
+Segregation of duties is enforced by the system, whatever the role grants: a request is never approved by its maker, the TSU Head approval is never given by the recommender, a quotation slip is never approved by its preparer, ManCom never signs off requirements it submitted, and a package version is never validated by its maker or submitter.
+
+# Functional requirements
+
+## Access, security and audit
+
+```fr
+id: FR-PM-001
+title: Log in to BIBS
+brd: [BRPM.001 (p.15)]
+actor: MBS, TSU, Marketing
+priority: Must have
+screens: Login
+description: Users of MBS, TSU and Marketing sign in as every BIBS user does under BRD-11 User Access Maintenance - with the BDO account through EIAM (single sign-on) once it is switched on, otherwise with the BIBS user ID and password. Product Maintenance adds no screen and no sign-in rule of its own (CLR-PM-23).
+preconditions:
+  - The user has an active BIBS account with at least one Product Maintenance role.
+main_flow:
+  - The user signs in on the Login screen (Sign in with the BDO identity provider, or user ID and password in local sign-in).
+  - BIBS checks the credentials and the account status.
+  - BIBS opens the home page with the menu of the user's roles (Product Maintenance section).
+alternate_flows:
+  - Wrong credentials. BIBS refuses the log-in and counts the failed attempt.
+  - Locked account. After the number of failed attempts set in LOGIN_MAX_FAILED_ATTEMPTS (3) the account locks; the System Administrator unlocks it.
+  - Repeated attempts. Too many log-in attempts from one address in a short time are refused for a while, before the password is checked.
+  - Idle session. The session ends after the configured idle time; the user logs in again.
+rules:
+  - [R1, "Log-in, lock-out and session rules follow the session policy of BRD-11 (FR-UA-001, 002; BRNB.040 of BRD-1).", Configurable, Session policy (System Administrator)]
+  - [R2, "Directory sign-in follows BRD-11 - single sign-on through EIAM on Microsoft Entra ID with OpenID Connect or SAML 2.0, switched on by configuration (FR-UA-003); the lock-out after three attempts applies to local sign-in (CLR-PM-23).", Configurable, "Sign-in mode AUTH_MODE (BRD-11)"]
+validations:
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account locked (the same message as a wrong password; the lock shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
+notifications:
+  - "None."
+audit:
+  - Every successful and failed log-in is recorded with user, time and source address.
+acceptance:
+  - A user with valid credentials and a Product Maintenance role logs in and sees the Product Maintenance menu section.
+  - A user with wrong credentials is refused and no session is created.
+  - The account locks after three failed attempts (LOGIN_MAX_FAILED_ATTEMPTS).
+```
+
+```fr
+id: FR-PM-002
+title: Restrict each action to authorised roles
+brd: [BRPM.002 (p.15), PMADD05 (p.5)]
+actor: System
+priority: Must have
+screens: All Product Maintenance screens; User Access Matrix
+description:
+  - Every Product Maintenance screen, button and action requires a permission (section 3.2). Permissions carry an action class (VIEW, CREATE, AMEND, APPROVE), so the matrix answers the addendum's question "who may create, amend, approve or only view" per area.
+  - Menus show only the screens that the user's roles allow. Buttons for actions the user may not perform are hidden.
+preconditions:
+  - "The user is logged in."
+main_flow:
+  - The user opens a screen or starts an action.
+  - BIBS checks the user's permissions for that screen or action.
+  - BIBS shows the screen or performs the action.
+alternate_flows:
+  - No permission. The screen is not in the menu; a direct link shows "You do not have access to this screen. Contact your administrator if you need it." A direct request is refused and logged.
+  - Segregation of duties. An action refused by a four-eyes rule (for example approving one's own request) is refused with its message even when the role has the permission.
+rules:
+  - [R1, "Each permission has an action class: VIEW, CREATE, AMEND or APPROVE.", Configurable, Role-permission change request (FR-PM-003)]
+  - [R2, Roles are granted permissions as in section 3.3 until BDOI confirms the matrix (PQ17 / OQ48)., Configurable, Role-permission change request]
+  - [R3, "Four-eyes rules (maker never approves) cannot be switched off.", Fixed, "-"]
+validations:
+  - [Action without permission, You are not permitted to perform this action, ACCESS_DENIED]
+fields_screen: User Access Matrix
+fields:
+  - [View, Toggle, "Yes", By Permission / By Action, "-"]
+  - [Area, List, "No", "Permission areas (for example Product Maintenance, Package Request, Incentives)", "-"]
+notifications:
+  - "None."
+audit:
+  - Refused requests are logged with the user and time.
+  - The Excel export of the matrix is audited.
+acceptance:
+  - A Marketing AO sees Product Maintenance Home, Package Requests and the catalogue screens, and does not see the Validation Queue or TSU Workbench.
+  - A direct approval request by a user without the approval permission is refused and logged.
+  - The User Access Matrix shows, for each role, which Product Maintenance areas it may view, create, amend and approve, and exports both views to Excel.
+```
+
+```fr
+id: FR-PM-003
+title: Change role permissions through an approved request
+brd: [PMADD05 (p.5)]
+actor: Business Administrator (requester), access approver, System Administrator
+priority: Must have
+screens: Access Requests; User Access Matrix
+description: Changes to the permissions of a role are requested, approved by someone other than the requester and then applied. This meets PMADD05 AC2 (changes auditable and traceable) and AC3 (Admin maintains roles and permissions). BRD-11 User Access Maintenance confirmed that group-profile changes are approved before the System Administrator implements them (PQ17, R6).
+preconditions:
+  - "The requester has the access-request permission."
+main_flow:
+  - The requester opens Access Requests and chooses the type "Modify role permissions".
+  - The requester selects the role, the permissions to add and to remove, and writes the justification.
+  - The approver reviews and approves the request.
+  - BIBS applies the change to the role as it is at approval and records the effective change.
+alternate_flows:
+  - The approver rejects the request with a reason; the role does not change.
+  - Emergency change. The direct role edit of the System Administrator stays available only through the audited emergency parameter UAM_DIRECT_ROLE_EDIT (BRD-11).
+rules:
+  - [R1, The approver is never the requester., Fixed, "-"]
+  - [R2, "The change applied is the difference between the role at approval and the request, so concurrent changes are not lost.", Fixed, "-"]
+validations:
+  - [No permission added or removed, Select at least one permission to add or remove, "-"]
+  - [Approver is the requester, An access request is approved by someone other than the requester, ACCESS_FOUR_EYES]
+fields_screen: Access Request (Modify role permissions)
+fields:
+  - [Role, List, "Yes", Roles, Active role]
+  - [Permissions to add, Multi-select, "No", Permissions, Not already granted]
+  - [Permissions to remove, Multi-select, "No", Permissions of the role, Granted to the role]
+  - [Justification, Text, "Yes", "-", Up to 1000 characters]
+notifications:
+  - The approvers are notified when the request is submitted; the requester when it is decided.
+audit:
+  - Request, decision and the applied change are recorded with users and times.
+acceptance:
+  - A role change requested by the Business Administrator takes effect only after another user approves it.
+  - The history of the role shows who requested, approved and applied each change.
+```
+
+```fr
+id: FR-PM-004
+title: Protect documents that leave BIBS
+brd: [BRPM.020 (p.29-30)]
+actor: System
+priority: Must have
+screens: Package Request page (E-mails, Documents tabs)
+description: The quotation slips to insurers, comparative outputs, package slip and advisories are e-mailed as password-protected PDF (AES) or protected XLSX, with the password in a separate e-mail. Inside BIBS, package documents open only for users with PRODUCT_VIEW or the Product Maintenance permissions of the request.
+preconditions:
+  - "A document is generated or attached on a package request."
+main_flow:
+  - A user sends a document from a package request (QS, comparative, advisory).
+  - BIBS protects the file and sends it; it sends the password in a second e-mail.
+  - BIBS logs both e-mails in the request's E-mails tab.
+alternate_flows:
+  - Delivery failure. The e-mail shows the failed status in the E-mails tab; the user resends it.
+rules:
+  - [R1, "Every Product Maintenance document e-mailed outside BIBS is protected; protection cannot be switched off per e-mail.", Fixed, "-"]
+  - [R2, "The password convention is the one BDOI confirms under Q07; until then BIBS generates a password per e-mail.", Configurable, "Messaging settings (on hold, Q07 / PQ21)"]
+validations:
+  - [User without permission opens a document, You are not permitted to perform this action, ACCESS_DENIED]
+notifications:
+  - "The recipient receives the protected document and, separately, its password."
+audit:
+  - Each e-mail is logged with recipient, time, subject, attachment name and SHA-256 hash of the attachment.
+acceptance:
+  - A QS e-mailed to an insurer arrives as a protected PDF, and the password arrives in a separate e-mail.
+  - A user without Product Maintenance permissions cannot open the request's documents.
+```
+
+```fr
+id: FR-PM-005
+title: Keep a complete audit trail and history
+brd: [BRPM.024 (p.31-32)]
+actor: System; any user with PRODUCT_VIEW (read)
+priority: Must have
+screens: Package Request page (History tab); Product page (History); Package Version page
+description: BIBS records every creation, edit, approval, return, sending and generation for package requests, package versions, masters and incentive criteria. Users review the complete trail of a request or document on its History tab.
+preconditions:
+  - "None."
+main_flow:
+  - A user performs an action on a request, version or master.
+  - BIBS writes an audit row (who, when, what, before and after values where applicable) together with the change; one is never kept without the other.
+  - The History tab shows the workflow history and the audit rows in time order.
+rules:
+  - [R1, "Audit entries can only be added; no user, including the System Administrator, can change or delete them.", Fixed, "-"]
+  - [R2, "Retention follows the BRD-1 rule (5 years online, 15 years archive) until BDOI states a Product Maintenance retention (PQ18).", Configurable, Retention parameters]
+validations: []
+notifications:
+  - "None."
+audit:
+  - "This FR is the audit."
+acceptance:
+  - For a released package, the History tab lists every step from submission to release with user and time.
+  - A changed insurer response shows its earlier values in the response history.
+  - No screen or direct request allows audit rows to be edited or deleted.
+```
+
+## Product structure and master data
+
+```fr
+id: FR-PM-010
+title: Maintain the product hierarchy
+brd: [PMADD01 (p.4)]
+actor: MBS (maintain), Business Administrator (authorise)
+priority: Must have
+screens: Products; Product page; Coverages & Clauses
+description:
+  - BIBS holds one product hierarchy for all packages. Level 1 is the product line (LOB, for example Motor, Fire). Level 2 is the cover type, with an optional subtype under it (depth at most 2). Level 3 is the product (risk code). Level 4 is the coverage / peril of the line, used in each package version.
+  - A packaged product cannot be saved without its cover type, and a package version cannot be submitted without at least one basic coverage. New risk codes must follow the naming convention of their line when BDOI has stated it.
+preconditions:
+  - "The user has PRODUCT_MAINTAIN."
+main_flow:
+  - MBS creates or edits a line, cover type or subtype, coverage or product.
+  - BIBS checks the hierarchy and the naming convention.
+  - The record is saved as pending authorisation.
+  - A PRODUCT_AUTHORIZE holder other than the maker authorises it; it becomes usable.
+alternate_flows:
+  - The authoriser rejects the record with a reason; it stays unusable and the maker can correct it.
+  - A subtype is created under a subtype. BIBS refuses it (depth at most 2).
+rules:
+  - [R1, "Hierarchy levels: line > cover type > subtype (optional) > product; coverages / perils per line.", Fixed, "-"]
+  - [R2, "A packaged product needs a cover type.", Fixed, "-"]
+  - [R3, "Risk codes follow the pattern of their line (for example ^MTR\\d{2}$) when the line has one.", Configurable, "Product line, Code Pattern (values PQ02)"]
+  - [R4, "Coverage kinds: Section, Coverage, Peril, Extension.", Configurable, LOV COVERAGE_KIND]
+  - [R5, "Every hierarchy record is maker-checker.", Fixed, "-"]
+validations:
+  - [Packaged product without cover type, A package needs its cover type (PMADD01), PACKAGE_HIERARCHY_INCOMPLETE]
+  - [Risk code does not match the line pattern, "Risk code <code> does not follow the naming convention of <line>", PRODUCT_CODE_PATTERN]
+fields_screen: Coverage (Coverages & Clauses)
+fields:
+  - [Product line, List, "Yes", Product lines, Active line]
+  - [Code, Text, "Yes", "-", "Unique within the line; letters, digits, hyphen"]
+  - [Name, Text, "Yes", "-", Up to 120 characters]
+  - [Kind, List, "Yes", LOV COVERAGE_KIND, "-"]
+  - [Basic coverage, Check box, "No", "-", "-"]
+  - [Display order, Number, "No", "-", Whole number]
+notifications:
+  - "The authorisers see pending records in My Approvals."
+audit:
+  - "Create, edit, authorise, reject and deactivate are audited with before and after values."
+acceptance:
+  - A packaged product without a cover type cannot be saved.
+  - A risk code that does not follow its line's pattern is refused with PRODUCT_CODE_PATTERN.
+  - A new coverage is usable in package versions only after another user authorises it.
+```
+
+```fr
+id: FR-PM-011
+title: Maintain the clause library
+brd: [PMADD02 (p.4)]
+actor: MBS / TSU with PRODUCT_MAINTAIN; Business Administrator (authorise)
+priority: Must have
+screens: Coverages & Clauses (Clauses)
+description: Warranties, clauses, exclusions and deductible wordings are held once in a clause library with their wording and effective dates. Package versions refer to clauses by code for each insurer and coverage (FR-PM-014).
+preconditions:
+  - "The user has PRODUCT_MAINTAIN."
+main_flow:
+  - The user adds a clause with its kind, line (or all lines), title, wording and effective dates.
+  - The clause is saved as pending authorisation.
+  - Another user with PRODUCT_AUTHORIZE authorises it.
+rules:
+  - [R1, "Clause kinds: Warranty, Clause, Exclusion, Deductible wording.", Configurable, LOV CLAUSE_KIND]
+  - [R2, "A clause is never deleted; it is end-dated or deactivated.", Fixed, "-"]
+validations:
+  - [Wording blank, Enter the wording, "-"]
+  - [Effective to before effective from, The end date must be on or after the start date, "-"]
+fields_screen: Clause
+fields:
+  - [Code, Text, "Yes", "-", Unique]
+  - [Kind, List, "Yes", LOV CLAUSE_KIND, "-"]
+  - [Product line, List, "No", Product lines, Blank = all lines]
+  - [Title, Text, "Yes", "-", Up to 200 characters]
+  - [Effective from, Date, "Yes", "-", "-"]
+  - [Effective to, Date, "No", "-", On or after effective from]
+  - [Wording, Long text, "Yes", "-", "-"]
+notifications:
+  - "Pending clauses appear in My Approvals."
+audit:
+  - "All changes audited with before and after values."
+acceptance:
+  - A clause is selectable in insurer terms only after authorisation and within its effective dates.
+  - An end-dated clause stays readable on the versions that used it.
+```
+
+```fr
+id: FR-PM-012
+title: Capture and validate product-specific fields
+brd: [BRPM.003 (p.16), BRPM.004 (p.16)]
+actor: MBS (rules); System (checks)
+priority: "BRPM.003: not stated in the BRD; BRPM.004: Must have"
+screens: Product page (Field Rules & Documents tab)
+description:
+  - MBS maintains, per line or per product, which fields a quotation or account must capture (presence) and how their values are checked (list, range, pattern). BIBS applies the rules of the product's type when a quotation or account is submitted, so each product line gets its own validation without IT.
+preconditions:
+  - "The user has PRODUCT_MAINTAIN."
+main_flow:
+  - MBS adds a field rule with its scope (all products, line or product), target (account or item), field and check type.
+  - The rule is authorised by another user.
+  - When a quotation or account of that product is submitted, BIBS checks all rules in scope and lists every violation against its field.
+alternate_flows:
+  - A pattern that cannot be evaluated safely (back-references, look-around) is refused when the rule is saved.
+rules:
+  - [R1, "Check types: Presence, List (LOV), Range (minimum / maximum), Pattern.", Configurable, Field rules]
+  - [R2, "The most specific scope applies in addition to the wider ones (product + line + all).", Fixed, "-"]
+  - [R3, "Patterns are evaluated in linear time; unsafe patterns are refused.", Fixed, "-"]
+validations:
+  - [Mandatory field blank on submission, "<Field> is required for <product>", "-"]
+  - [Value outside the range or list, "<Field> must be between <min> and <max> / <Field> is not a valid value", "-"]
+  - [Invalid pattern entered on a line rule, The risk-code pattern is not a valid regular expression, CODE_PATTERN_INVALID]
+fields_screen: Field rule
+fields:
+  - [Scope, List, "Yes", All / Line / Product, "-"]
+  - [Line or product, List, Conditional, Product lines / products, Required for Line or Product scope]
+  - [Target, List, "Yes", Account / Item, "-"]
+  - [Field, List, "Yes", Field catalogue, "-"]
+  - [Check type, List, "Yes", Presence / List / Range / Pattern, "-"]
+  - [List type, List, Conditional, LOV types, Required for List]
+  - [Minimum / Maximum, Number, Conditional, "-", "Required for Range; minimum <= maximum"]
+  - [Pattern, Text, Conditional, "-", Required for Pattern; safe expression]
+notifications:
+  - "None."
+audit:
+  - "Rule changes audited; violations are returned to the user and not stored."
+acceptance:
+  - A Motor product rule "plate number required" stops submission of a Motor account without a plate number and names the field.
+  - A range rule refuses a value outside the range and accepts the limits.
+  - MBS adds a field rule for a line that has none, and the rule applies to the next account of that line.
+```
+
+```fr
+id: FR-PM-013
+title: Use shared document templates with product-specific fields
+brd: [BRPM.005 (p.16-17)]
+actor: System; MBS (templates)
+priority: Must have
+screens: Package Request page (form.pdf, QS, comparative, package slip, advisory downloads)
+description: Product Maintenance documents are generated from versioned templates with placeholders. The templates include line-specific sections, so one template serves Motor, Fire, CGL, Equipment Floater, Marine Cargo and other lines. Each generated document records the template version used.
+preconditions:
+  - "The templates PKG_REQUEST_FORM, PKG_QUOTATION_SLIP, PKG_COMPARATIVE, PKG_SLIP, PKG_ADVISORY and PKG_RENEWAL_ADVISORY exist."
+main_flow:
+  - A user generates a document from a package request.
+  - BIBS merges the request, terms and insurer data into the current template version.
+  - BIBS stores the document with the template version and makes it available for download or sending.
+rules:
+  - [R1, "Template layouts are drafts until BDOI provides its layouts (Q03).", Configurable, Document templates]
+  - [R2, "A document is always generated from stored values, so a regenerated file shows the same content.", Fixed, "-"]
+validations:
+  - [No active template of the type, The template <code> is not available, "-"]
+notifications:
+  - "None."
+audit:
+  - "Document generation is audited with template code and version."
+acceptance:
+  - A QS for a Motor package shows the Motor coverages and deductibles; a QS for a Fire package shows the Fire coverages.
+  - Each generated document shows the template version in its record.
+```
+
+```fr
+id: FR-PM-014
+title: Maintain insurer-specific package terms
+brd: [PMADD02 (p.4)]
+actor: MBS (on a draft version); TSU (through negotiated terms)
+priority: Must have
+screens: Package Version (Insurers, Insurer Terms sections); Product page (Versions)
+description:
+  - Each package version lists its insurers with role (Lead, Participant or Panel), share (co-insurance), rate and minimum premium. For each insurer and coverage, the version holds whether the coverage is included, the limit, sub-limit, deductible (amount, percent or wording) and the clauses that apply.
+  - Terms are maintained on a draft version only. They reach new business after validation and release (FR-PM-043), so a change never alters a package already on sale.
+preconditions:
+  - "A draft version exists (from the MBS set-up or \"New Version\")."
+main_flow:
+  - MBS opens the draft version.
+  - MBS adds or edits insurers and the insurer x coverage terms.
+  - MBS saves; BIBS checks the shares and the completeness of the terms.
+  - MBS submits the version for validation (FR-PM-043).
+alternate_flows:
+  - An insurer without its own terms receives the package's included coverages when the version is set up from a request, so every panel insurer has a term per included coverage.
+rules:
+  - [R1, "Insurer roles: Lead, Participant, Panel.", Fixed, "-"]
+  - [R2, "When shares are used, they total 100%.", Fixed, "-"]
+  - [R3, "Every insurer has a term for every included coverage before submission.", Fixed, "-"]
+  - [R4, "Clauses come from the authorised clause library.", Fixed, "-"]
+  - [R5, "A new-business transaction with an insurer outside a package's panel is refused.", Fixed, "-"]
+validations:
+  - [Shares do not total 100, The co-insurance shares must add up to 100%, PACKAGE_SHARES_INVALID]
+  - [Insurer lacks a term for an included coverage, "Insurer <code> has no terms for coverage <coverage>", PACKAGE_INSURER_TERMS_MISSING]
+  - [Non-panel insurer on a quotation, "Insurer <code> is not on the panel of <package>", INSURER_NOT_ON_PACKAGE]
+  - [Direct edit of a versioned field on the product, "The rate, minimum premium, commission and TSI limit of package <code> change through a new version (Versions tab)", PRODUCT_FIELD_VERSIONED]
+fields_screen: Package Version, Insurer Terms
+fields:
+  - [Insurer, List, "Yes", Insurer master, Active insurer]
+  - [Role, List, "Yes", Lead / Participant / Panel, "-"]
+  - [Share %, Number, "No", "-", "0-100; total 100 when used"]
+  - [Rate %, Number, Conditional, "-", Required when no package rate]
+  - [Minimum premium, Amount, "No", "-", ">= 0"]
+  - [Coverage, List, "Yes", Coverages of the line, Authorised coverage]
+  - [Included, Check box, "Yes", "-", "-"]
+  - [Limit / Sub-limit, Amount, "No", "-", ">= 0"]
+  - [Deductible amount / % / wording, Amount / Number / Text, "No", "-", ">= 0"]
+  - [Clauses, Multi-select, "No", Clause library, Effective on the version date]
+notifications:
+  - "None until submission."
+audit:
+  - "Every change to insurers and terms on a draft is audited; released versions are read-only."
+acceptance:
+  - MBS maintains different deductibles for two insurers on the same coverage without IT.
+  - A version whose insurer has no term for an included coverage cannot be submitted.
+  - A quotation on the package with an insurer outside the panel is refused.
+```
+
+## Package request and approvals
+
+```fr
+id: FR-PM-020
+title: Create and submit a Package Request Form
+brd: [BRPM.008 (p.18-19), BRPM.011 (p.21)]
+actor: Marketing AO; TSU Officer
+priority: Must have
+screens: Package Requests; New Package Request; Edit Package Request
+description:
+  - The requester enters the request type and scope, the client (client-specific packages) or programme name, the product line, cover type or existing package, the reason, the requested terms (sections, coverages with limits and deductibles, requested rate and dates) and the target insurers, and attaches documents.
+  - For AMEND, UPDATE, RENEW and REACTIVATE requests, BIBS pre-fills the terms from the package's current version, so nothing is keyed in twice (BRPM.011 AC3-4).
+  - The request is saved as a draft with a number PKR-yyyy-n and submitted for Marketing approval when complete.
+preconditions:
+  - "The user has PKG_REQUEST."
+main_flow:
+  - The requester clicks **New Package Request**.
+  - The requester selects the request type and scope and completes the header fields.
+  - For a request on an existing package, BIBS loads the current terms of the package.
+  - The requester enters or changes the requested terms and target insurers, and attaches documents.
+  - The requester saves the draft. BIBS assigns the request number.
+  - The requester clicks **Submit for Approval**. BIBS checks completeness and moves the request to FOR_MKT_APPROVAL.
+alternate_flows:
+  - Incomplete request. BIBS lists what is missing and keeps the request in DRAFT.
+  - The requester voids a draft with a reason (list VOID_REASON); the request closes as VOIDED.
+  - A returned request (FR-PM-021 to FR-PM-023) comes back to DRAFT with the reason; the requester corrects and resubmits it.
+rules:
+  - [R1, "Request numbers are PKR-<yyyy>-<n>.", Configurable, Parameter PKG_REQUEST_PREFIX]
+  - [R2, "A NEW request names the cover type; other types name the existing package.", Fixed, "-"]
+  - [R3, "A client-specific request names the client; a generic programme does not need one (PQ14).", Fixed, "-"]
+  - [R4, "NEW and AMEND requests always negotiate; RETIRE never; UPDATE, RENEW and REACTIVATE choose on the form.", Fixed, "-"]
+  - [R5, "Before submission, a request other than RETIRE has requested terms, a package end date and, when negotiated, at least one target insurer.", Fixed, "-"]
+  - [R6, "The type of a saved request cannot change.", Fixed, "-"]
+validations:
+  - [Package or programme name blank, Enter the package or programme name, PKG_REQUEST_INCOMPLETE]
+  - [Line not selected, Select the product line, PKG_REQUEST_INCOMPLETE]
+  - [Reason not selected, Select the reason, PKG_REQUEST_INCOMPLETE]
+  - [NEW request without cover type, Select the cover type, PKG_REQUEST_INCOMPLETE]
+  - [Other type without package, "Select the package product of the <type> request", PKG_REQUEST_INCOMPLETE]
+  - [Client-specific without client, Select the client of the client-specific package (PQ14), PKG_REQUEST_INCOMPLETE]
+  - [End date not after start date, The package end date must be after its start date, PKG_DATES_INVALID]
+  - [Negative rate or amount, Rates and amounts cannot be negative, PKG_AMOUNT_NEGATIVE]
+  - [Missing items on submit, "Complete the request: <items>", PKG_REQUEST_INCOMPLETE]
+  - [Type changed on a saved request, The type of a request cannot change, PKG_TYPE_FIXED]
+fields_screen: New Package Request
+fields:
+  - [Request type, List, "Yes", LOV PKG_REQUEST_TYPE, Fixed after first save]
+  - [Scope, Option, "Yes", Generic programme / Client-specific package, "-"]
+  - [Package / programme name, Text, "Yes", "-", Up to 200 characters]
+  - [Client or prospect, Look-up, Conditional, Client master (CRM), Required for client-specific]
+  - [Product line, List, "Yes", Product lines, Active line]
+  - [Cover type / subtype, List, Conditional, Cover types of the line, Required for NEW]
+  - [Package product, List, Conditional, Packaged products of the line, Required except for NEW]
+  - [Market segments, Multi-select, "No", Market segments, "-"]
+  - [Reason, List, "Yes", LOV PKG_REQUEST_REASON, "-"]
+  - [Comment on the reason, Text, Conditional, "-", Required when the reason is Others]
+  - [Negotiation required, Check box, Conditional, "-", "Shown for UPDATE, RENEW and REACTIVATE"]
+  - [Requested terms, Sections, Conditional, Heading and details per section, Required on submission except RETIRE]
+  - [Coverages, Table, "No", Coverages of the line, "Code, included, limit, deductible per line"]
+  - [Requested rate % / Minimum premium / Commission % / Package TSI limit, Number / Amount, "No", "-", ">= 0"]
+  - [Effective from / Package start / Package end / Anniversary, Date, Conditional, "-", Package end required on submission; end after start]
+  - [Target insurers, Multi-select, Conditional, Insurer master, At least one when negotiated]
+  - [Documents, Attachment, "No", Document type PKG_REQUEST_FORM and others, Allowed file types and size of the platform]
+notifications:
+  - On submission, the holders of PKG_REQUEST_APPROVE are notified in BIBS (stage entry).
+audit:
+  - "Create, each save, submit and void are recorded in the request history."
+acceptance:
+  - A Marketing AO submits a complete NEW request; it receives a PKR number and moves to FOR_MKT_APPROVAL.
+  - Submission with missing mandatory fields is refused and each missing item is named.
+  - An AMEND request opens with the current version's terms pre-filled.
+  - A client-specific request without a client cannot be saved.
+```
+
+```fr
+id: FR-PM-021
+title: Approve a package request (Marketing)
+brd: [BRPM.008 (p.18-19), BRPM.021 (p.30-31)]
+actor: Marketing TL, TH or UH
+priority: Must have
+screens: Package Requests (tab For Approval); Package Request page
+description: A Marketing approver reviews the submitted request and approves it, which sends it to the TSU TL, or returns it to the requester with a reason. The BRD allows the TL, TH or UH to approve; BIBS accepts any one of them (PQ08).
+preconditions:
+  - The request is in FOR_MKT_APPROVAL.
+  - The user has PKG_REQUEST_APPROVE and is not the maker or submitter.
+main_flow:
+  - The approver opens the request from the For Approval tab.
+  - The approver reviews the form, terms and documents.
+  - The approver clicks **Approve and send to TSU**, optionally with a comment.
+  - BIBS moves the request to FOR_TSU_REVIEW and notifies the TSU TL queue.
+alternate_flows:
+  - Return. The approver clicks **Return to Requester** and selects a reason (list RETURN_REASON); the request goes back to DRAFT.
+  - Void. The requester or approver voids the request with a reason; it closes as VOIDED.
+rules:
+  - [R1, "The approver is never the maker or submitter of the request.", Fixed, "-"]
+  - [R2, "One approval by TL, TH or UH is enough (a chain by segment or amount waits for PQ08).", Configurable, Workflow stage owner]
+  - [R3, "SLA 24 hours (default).", Configurable, Parameter PKG_SLA_MKT_APPROVAL]
+validations:
+  - [Approver is the maker, A package request is approved by someone other than its maker, PKG_FOUR_EYES]
+  - [Return without reason, "Select a reason for '<action>'", WORKFLOW_REASON_REQUIRED]
+notifications:
+  - The TSU TL queue on approval; the requester on return or void.
+  - SLA alert to the stage owners when the SLA passes.
+audit:
+  - "Approval, return and void recorded with user, time, comment and reason."
+acceptance:
+  - The requester cannot approve their own request.
+  - An approved request appears in the TSU Review tab.
+  - A returned request is back in DRAFT with the reason visible on the request.
+```
+
+```fr
+id: FR-PM-022
+title: Review and recommend a package request (TSU TL)
+brd: [BRPM.009 (p.19-20)]
+actor: TSU Team Lead
+priority: Must have
+screens: TSU Workbench; Package Request page
+description: The TSU TL checks the request for completeness, accuracy and compliance, may correct it, and writes a recommendation for the TSU Head. The recommendation is stored on the request and shown to the TSU Head.
+preconditions:
+  - "The request is in FOR_TSU_REVIEW; the user has PKG_TSU_RECOMMEND."
+main_flow:
+  - The TSU TL opens the request from the TSU Workbench.
+  - The TSU TL reviews the form and, where needed, edits it.
+  - The TSU TL clicks **Recommend for Approval** and writes the recommendation.
+  - BIBS stores the recommendation and moves the request to FOR_TSU_APPROVAL.
+alternate_flows:
+  - Return. The TSU TL returns the request to the requester with a reason; it goes back to DRAFT.
+rules:
+  - [R1, "A recommendation text is mandatory.", Fixed, "-"]
+  - [R2, "SLA 24 hours (default).", Configurable, Parameter PKG_SLA_TSU_REVIEW]
+validations:
+  - [Recommendation blank, Write the recommendation for the TSU Head, PKG_RECOMMENDATION_REQUIRED]
+fields_screen: Recommend dialog
+fields:
+  - [Recommendation, Long text, "Yes", "-", "Up to 4000 characters"]
+notifications:
+  - "TSU Head queue on recommendation; requester on return."
+audit:
+  - "Edit, recommendation and return recorded with user and time."
+acceptance:
+  - The request cannot reach the TSU Head without a recommendation.
+  - The TSU Head sees the recommendation text on the request.
+```
+
+```fr
+id: FR-PM-023
+title: Approve a package request (TSU Head)
+brd: [BRPM.009 (p.19-20)]
+actor: TSU Team Head / Head
+priority: Must have
+screens: TSU Workbench; Package Request page
+description: The TSU Head approves the recommended request. For a negotiated request, BIBS opens negotiation round 1 with the target insurers. For a request without negotiation (RETIRE, or UPDATE / RENEW / REACTIVATE without negotiation) the requested terms become the proposed terms and the request goes to ManCom.
+preconditions:
+  - "The request is in FOR_TSU_APPROVAL; the user has PKG_TSU_APPROVE and did not recommend the request."
+main_flow:
+  - The TSU Head reads the request and the TSU TL's recommendation.
+  - The TSU Head clicks **Approve**.
+  - BIBS moves the request to NEGOTIATION and opens round 1, or to FOR_MANCOM for a request without negotiation.
+alternate_flows:
+  - Return to the requester with a reason (DRAFT).
+rules:
+  - [R1, "The TSU Head approval is never given by the recommender.", Fixed, "-"]
+  - [R2, "The request cannot proceed without this approval (BRPM.009 AC4).", Fixed, "-"]
+  - [R3, "SLA 24 hours (default).", Configurable, Parameter PKG_SLA_TSU_APPROVAL]
+validations:
+  - [Approver is the recommender, The TSU Head approval is given by someone other than the recommender, PKG_FOUR_EYES]
+notifications:
+  - "TSU negotiation queue (or ManCom) on approval; requester on return."
+audit:
+  - "Approval and return recorded with user, time and comment."
+acceptance:
+  - The recommender cannot give the TSU Head approval.
+  - After approval of a NEW request, round 1 exists with the target insurers.
+  - A retirement request goes to ManCom sign-off without a negotiation round.
+```
+
+```fr
+id: FR-PM-024
+title: Receive, view and track package requests
+brd: [BRPM.011 (p.21)]
+actor: TSU; Marketing; MBS
+priority: Must have
+screens: Package Requests; TSU Workbench; Package Request page
+description:
+  - All requests are listed with request number, type, scope, client or programme, line, product, stage, days in stage and assignee. Tabs group them by stage (Drafts, For Approval, TSU Review, Negotiation, ManCom, With MBS, For Validation, Released, Closed). The TSU Workbench shows the TSU queues as tiles.
+  - The responsible users are notified when a request enters their stage. A TL or Head assigns requests to officers (bulk Assign), and an officer can claim a request.
+preconditions:
+  - "The user has PRODUCT_VIEW or PKG_REPORT_VIEW."
+main_flow:
+  - The user opens Package Requests and selects a tab.
+  - The user searches by request number or filters by type, or shows only their own requests.
+  - The user opens a request to view its details, terms, negotiation, documents and history.
+alternate_flows:
+  - A TL selects several requests and assigns them to an officer.
+rules:
+  - [R1, "Stage owners are notified on stage entry.", Fixed, "-"]
+  - [R2, "\"Deletion\" of a product is a retirement request; nothing is physically deleted.", Fixed, "-"]
+validations: []
+fields_screen: Package Requests (filters)
+fields:
+  - [Search Request No., Text, "No", "-", "-"]
+  - [Type, List, "No", LOV PKG_REQUEST_TYPE, "-"]
+  - [Mine only, Check box, "No", "-", "-"]
+notifications:
+  - "Stage-entry notification to the owners of the new stage."
+audit:
+  - "Assignment and claim recorded on the work case."
+acceptance:
+  - A request submitted by Marketing appears in the TSU Review tab with its type, client, line and reason.
+  - The TSU TL receives a notification when a request enters FOR_TSU_REVIEW.
+  - A request assigned to an officer shows the officer as assignee.
+```
+
+## Negotiation and comparative tables
+
+```fr
+id: FR-PM-030
+title: Prepare, approve and send the quotation slip
+brd: [BRPM.012 (p.22)]
+actor: TSU Officer (prepare); TSU TL or co-officer (approve)
+priority: Must have
+screens: Package Request page (Negotiation tab)
+description:
+  - The QS of each round is generated from the request, so the Marketing details flow into it; TSU edits the insurers and notes of the round. The preparer submits the QS, which gets a number PQS-yyyy-n and a reply due date. A TL or co-officer approves it, and BIBS then sends one protected e-mail per insurer and opens a pending response for each.
+  - The slips stay editable by TSU until the ManCom sign-off, when they lock.
+preconditions:
+  - "The request is in NEGOTIATION; a round is open."
+main_flow:
+  - The TSU Officer opens the round and selects the insurers.
+  - The officer submits the QS. BIBS numbers it and sets the reply due date.
+  - The TSU TL (or a co-officer) reviews the QS PDF and clicks **Approve and Send**.
+  - BIBS e-mails the protected QS to each insurer and shows the send status per insurer.
+alternate_flows:
+  - Resend. The officer resends the QS to one insurer from the round (for example after a bounce); the resend is logged.
+  - Locked. After the ManCom sign-off any edit or resend is refused.
+rules:
+  - [R1, "QS numbers are PQS-<yyyy>-<n>.", Configurable, Parameter PKG_QS_PREFIX]
+  - [R2, "Reply due date = send date + 5 days (default).", Configurable, Parameter PKG_QS_REPLY_DAYS]
+  - [R3, "The QS is approved by someone other than its preparer.", Fixed, "-"]
+  - [R4, "One protected e-mail per insurer; the password is sent separately.", Fixed, "-"]
+  - [R5, "Slips lock at the ManCom sign-off.", Fixed, "-"]
+validations:
+  - [No insurer selected, Select at least one insurer for the quotation slip, QS_NO_INSURER]
+  - [Approver is the preparer, The quotation slip is approved by a TL or a co-officer, QS_FOUR_EYES]
+  - [Edit after sign-off, The slips are locked since the ManCom sign-off, QS_LOCKED]
+  - [Round already sent, "Round <n> is already sent", QS_ALREADY_SENT]
+  - [Resend of a closed round, "Only the slip of an open, sent round can be resent", QS_NOT_RESENDABLE]
+fields_screen: Negotiation tab, round
+fields:
+  - [Insurers, Multi-select, "Yes", Insurer master, Active insurers]
+  - [What changes in this round, Long text, "No", "-", Shown on rounds 2 and later]
+  - [QS number, Display, "-", System, PQS-yyyy-n]
+  - [Reply due, Display, "-", System, Send date + PKG_QS_REPLY_DAYS]
+notifications:
+  - The QS approvers are notified when a QS is submitted.
+  - The preparer sees the per-insurer send confirmation (BRPM.012 AC5).
+audit:
+  - "Submit, approve, send, resend: user, time, recipient, subject and attachment hash."
+acceptance:
+  - The preparer cannot approve their own QS.
+  - An approved QS is e-mailed to each insurer of the round as a protected PDF, and the E-mails tab lists each send.
+  - The officer can view the sent history and resend to one insurer.
+  - After ManCom sign-off the QS cannot be edited or resent.
+```
+
+```fr
+id: FR-PM-031
+title: Record insurer responses and outcomes
+brd: [BRPM.013 (p.23), PMADD04 (p.5)]
+actor: TSU Officer / TL
+priority: Must have
+screens: Package Request page (Negotiation tab, response dialog)
+description: TSU keys in each insurer's reply per round, with the outcome, the offered rate and minimum premium, the terms per coverage (included, limit, deductible, clauses), conditions and warranties, validity and remarks, and attaches the insurer's reply. The outcome list contains the exception states the addendum asks for, so a decline or a counter-proposal is a recorded outcome and not an e-mail.
+preconditions:
+  - "The QS of the round has been sent to the insurer."
+main_flow:
+  - The officer opens the insurer's response in the round.
+  - The officer selects the outcome and enters the offered terms.
+  - The officer attaches the insurer's reply document.
+  - The officer saves. BIBS keeps the previous values in the response history.
+alternate_flows:
+  - No response by the due date. The officer records "No response".
+  - Correction. The officer edits a saved response; the history shows both values.
+rules:
+  - [R1, "Outcomes: Pending, Accepted as requested, Approved with changes, Counter-proposal, Declined, No response (list to confirm, PQ05).", Configurable, LOV PKG_RESPONSE_OUTCOME]
+  - [R2, "An offer (accepted, approved with changes, counter-proposal) needs a rate.", Fixed, "-"]
+  - [R3, "Every change to a response is kept in its history.", Fixed, "-"]
+validations:
+  - [Offer without rate, "Enter the rate offered by <insurer> (<outcome>)", PKG_RESPONSE_RATE_REQUIRED]
+  - [Negative rate or premium, Rates and amounts cannot be negative, PKG_AMOUNT_NEGATIVE]
+fields_screen: Insurer response
+fields:
+  - [Outcome, List, "Yes", LOV PKG_RESPONSE_OUTCOME, "-"]
+  - [Rate %, Number, Conditional, "-", Required for an offer; >= 0]
+  - [Minimum premium, Amount, "No", "-", ">= 0"]
+  - [Valid until, Date, "No", "-", "-"]
+  - [Coverage terms, Table, "No", Coverages of the request, "Included, limit, deductible, clauses per coverage"]
+  - [Conditions and warranties, Long text, "No", "-", "-"]
+  - [Remarks, Text, "No", "-", "-"]
+  - [Response document, Attachment, "No", Document type PKG_INSURER_RESPONSE, Platform file rules]
+notifications:
+  - "None; the round's status updates on the Negotiation tab and the dashboard."
+audit:
+  - "Each save creates a history row with the previous values, user and time."
+acceptance:
+  - TSU records "Approved with changes" with a rate and changed deductibles for one insurer and "Declined" for another.
+  - A counter-proposal without a rate is refused.
+  - The response history shows every earlier value with user and time.
+```
+
+```fr
+id: FR-PM-032
+title: Run further negotiation rounds
+brd: [PMADD04 (p.5), BRPM.010 (p.20)]
+actor: TSU Officer / TL
+priority: Must have
+screens: Package Request page (Negotiation tab)
+description: When terms need another round, TSU clicks **Revise Quotation Slip**. BIBS closes the sent round and opens round n+1, by default with the insurers that did not decline, and the new QS goes through the same approval and sending (FR-PM-030). All rounds and their responses stay on the request.
+preconditions:
+  - "The request is in NEGOTIATION and the latest round has been sent."
+main_flow:
+  - The officer clicks **Revise Quotation Slip** and states what changes in this round.
+  - BIBS closes the current round and opens the next one with the proposed insurers.
+  - The officer adjusts the insurers and submits the new QS.
+alternate_flows:
+  - Marketing requests changes to the terms (FR-PM-036). The request returns to NEGOTIATION with the round still open, and TSU revises or makes the terms final again.
+  - Not proceeded. TSU or the TSU Head closes the request with a reason from PKG_NOT_PROCEEDED_REASON (for example "Declined by the insurers").
+rules:
+  - [R1, "Round n+1 proposes the insurers of round n that did not decline.", Fixed, "-"]
+  - [R2, "There is no maximum number of rounds until BDOI states one (PQ05).", Configurable, "-"]
+  - [R3, "Not-proceeded reasons: declined by the insurers, terms not accepted, client withdrew, business decision, others.", Configurable, LOV PKG_NOT_PROCEEDED_REASON]
+validations:
+  - [Revise before the current QS is sent, "Send the slip of round <n> first", QS_NOT_SENT]
+  - [Not proceeded without reason, "Select a reason for '<action>'", WORKFLOW_REASON_REQUIRED]
+notifications:
+  - "QS approvers on each new QS; the requester when a request is not proceeded."
+audit:
+  - "Opening and closing of each round and the not-proceeded decision are recorded."
+acceptance:
+  - A request negotiated in two rounds shows both rounds, their QS numbers and the responses of each.
+  - Round 2 opens by default without the insurers that declined in round 1.
+  - A request closed as not proceeded shows the reason and cannot be reopened.
+```
+
+```fr
+id: FR-PM-033
+title: Make the negotiated terms final
+brd: [BRPM.010 (p.20)]
+actor: TSU Officer / TL
+priority: Must have
+screens: Package Request page (Negotiation tab, Terms Final dialog)
+description: When negotiation is complete, TSU chooses the insurer or insurers whose terms the package takes, with their roles and shares, and makes the terms final. BIBS refuses this while any insurer of the latest round has no outcome, so a package cannot be presented or encoded before negotiation is documented. The chosen terms become the proposed package terms and BIBS compiles the comparative master (FR-PM-034).
+preconditions:
+  - "The request is in NEGOTIATION."
+main_flow:
+  - The officer clicks **Terms Final**.
+  - The officer selects the chosen insurers and sets role and share for each.
+  - BIBS checks the round and the choice, stores the proposed terms and compiles the comparative master.
+  - The request moves to TERMS_REVIEW.
+rules:
+  - [R1, "Every insurer of the latest round has an outcome other than Pending.", Fixed, "-"]
+  - [R2, "Only insurers that offered terms can be chosen.", Fixed, "-"]
+  - [R3, "Shares, when used, total 100%.", Fixed, "-"]
+  - [R4, "SLA of NEGOTIATION 120 hours (default).", Configurable, Parameter PKG_SLA_NEGOTIATION]
+validations:
+  - [An insurer still pending, "Every insurer of round <n> needs an outcome before the terms are final (<insurers>)", NEGOTIATION_INCOMPLETE]
+  - [No insurer chosen, Choose the insurer(s) whose terms the package takes, NEGOTIATION_INCOMPLETE]
+  - [Chosen insurer did not offer, "<insurer> did not offer terms in this round", PKG_INSURER_NOT_OFFERED]
+  - [Shares do not total 100, The co-insurance shares must add up to 100%, PKG_SHARES_INVALID]
+fields_screen: Terms Final dialog
+fields:
+  - [Chosen insurer, Check box per insurer, "Yes", Insurers that offered terms, At least one]
+  - [Role, List, "Yes", Panel / Lead / Participant, "-"]
+  - [Share %, Number, "No", "-", Total 100 when used]
+notifications:
+  - "The TSU Head queue (TERMS_REVIEW)."
+audit:
+  - "Terms final recorded with the chosen insurers and the proposed terms."
+acceptance:
+  - Terms Final is refused while one insurer of the round is Pending.
+  - After Terms Final, the request shows the proposed terms and a current comparative master.
+```
+
+```fr
+id: FR-PM-034
+title: Compile one comparative master per package request
+brd: [BRPM.014 (p.24-25), BRPM.013 (p.23)]
+actor: System; TSU
+priority: Must have
+screens: Package Request page (Comparative tab)
+description: BIBS compiles all insurer responses of the latest round into one comparative table per request, showing outcome, rate, minimum premium, coverages, deductibles, conditions, validity and remarks per insurer. A new master supersedes the previous one, so there is only one current master; earlier masters stay as superseded outputs. Each output is stored as a PDF and XLSX attachment with its hash. Marketing sees it read-only.
+preconditions:
+  - "The quotation slip of the latest round has been sent."
+main_flow:
+  - BIBS compiles the master at Terms Final, or TSU clicks **Compile Master** during negotiation.
+  - BIBS marks the previous master as superseded and stores the new one with template version, user, time and SHA-256.
+  - Users with access view or download the master as PDF or Excel.
+rules:
+  - [R1, "One current MASTER per request.", Fixed, "-"]
+  - [R2, "An output is rendered from the values stored at generation, so a file downloaded later shows the same content.", Fixed, "-"]
+  - [R3, "Marketing has view-only access to comparative tables.", Fixed, "-"]
+validations:
+  - [Compile before the quotation slip of the round is sent, Send the quotation slip of round <n> first, COMPARATIVE_NO_TERMS]
+notifications:
+  - "None."
+audit:
+  - "Every generation is audited with the output id, hash and user."
+acceptance:
+  - A request with three responses has one current master listing the three insurers with their terms.
+  - After a second compilation the first master is marked superseded and is still downloadable.
+  - A Marketing user can open the master but has no Compile or Generate buttons.
+```
+
+```fr
+id: FR-PM-035
+title: Generate a client-tailored comparative view
+brd: [PMADD03 (p.4)]
+actor: TSU Officer / TL
+priority: Must have
+screens: Package Request page (Comparative tab, Generate Client View dialog)
+description: TSU generates a client view from the current master by choosing the fields and insurers to show, with a title. The view never edits values; it shows a selection of the master's stored content. Each client view keeps a link to its master.
+preconditions:
+  - "A current master exists."
+main_flow:
+  - The officer clicks **Generate Client View**.
+  - The officer enters the title and ticks the fields and insurers to include.
+  - BIBS generates the PDF and Excel files, stores them with the selection and links them to the master.
+rules:
+  - [R1, "Selectable fields: Outcome, Rate %, Minimum Premium, Coverages, Deductibles, Conditions / Warranties, Valid Until, Remarks (to confirm, PQ06).", Configurable, Field catalogue (PQ06)]
+  - [R2, "A client view is always derived from the current master.", Fixed, "-"]
+validations:
+  - [No current master, Compile the comparative master first, COMPARATIVE_NO_MASTER]
+  - [Title blank, Enter the title of the view, COMPARATIVE_TITLE_REQUIRED]
+  - [No insurer selected, Select at least one insurer of the master, COMPARATIVE_NO_INSURER]
+fields_screen: Generate Client View
+fields:
+  - [Title, Text, "Yes", "-", Up to 200 characters]
+  - [Fields, Check boxes, "Yes", Field catalogue, At least one]
+  - [Insurers, Check boxes, "Yes", Insurers of the master, At least one]
+notifications:
+  - "None."
+audit:
+  - "Generation audited with the selection, master id, template version and hash."
+acceptance:
+  - A client view that excludes one insurer and the Remarks field shows neither, and its values equal the master's.
+  - The view lists the master it was derived from.
+```
+
+```fr
+id: FR-PM-036
+title: Review negotiated terms (TSU Head and Marketing)
+brd: [BRPM.013 (p.23), BRPM.010 (p.20)]
+actor: TSU Head; Marketing (client-specific packages)
+priority: Must have
+screens: Package Request page
+description: The TSU Head reviews the proposed terms. For a client-specific package, the TSU Head releases them to Marketing, who reviews them before any client presentation and accepts them or requests changes. A generic programme has no client presentation, so the TSU Head sends it straight to requirements preparation.
+preconditions:
+  - "The request is in TERMS_REVIEW."
+main_flow:
+  - The TSU Head opens the request and reviews the proposed terms and the comparative master.
+  - For a client-specific package, the TSU Head clicks **Release Terms to Marketing** (FOR_MKT_REVIEW).
+  - Marketing reviews the terms and clicks **Accept Terms** (REQUIREMENTS_PREP).
+alternate_flows:
+  - Generic programme. The TSU Head clicks **Proceed to Requirements**; the request moves to REQUIREMENTS_PREP.
+  - Marketing clicks **Request Changes** with a reason; the request returns to NEGOTIATION.
+  - Marketing closes the request as not proceeded with a reason.
+rules:
+  - [R1, "Marketing review is mandatory for client-specific packages and not offered for generic programmes.", Fixed, "-"]
+  - [R2, "SLA of TERMS_REVIEW 24 hours and FOR_MKT_REVIEW 48 hours (defaults).", Configurable, Workflow stage SLA]
+validations:
+  - [Skip review on a client-specific package, Marketing reviews the terms of a client-specific package, PKG_SCOPE_CLIENT]
+  - [Release to Marketing of a generic programme, A generic programme goes straight to the requirements, PKG_SCOPE_GENERIC]
+  - [Request changes without reason, "Select a reason for '<action>'", WORKFLOW_REASON_REQUIRED]
+notifications:
+  - "Marketing on release of terms; TSU on acceptance or change request."
+audit:
+  - "Each decision recorded with user, time and reason."
+acceptance:
+  - A client-specific package cannot skip the Marketing review.
+  - Marketing's change request returns the request to NEGOTIATION with the reason shown.
+```
+
+## Sign-off, set-up and release
+
+```fr
+id: FR-PM-040
+title: Prepare and submit the requirements pack
+brd: [BRPM.015 (p.25-26)]
+actor: TSU Officer / TL
+priority: Must have
+screens: Package Request page (Requirements & Sign-off tab)
+description: TSU completes the product requirements that Marketing needs for its transactions, namely the scheme rate (or a rate per insurer), minimum premium, commission, package TSI limit, computation basis, effective date and package dates, the insurers, and the signed package slip. BIBS generates the unsigned package slip; TSU uploads the signed copy. Submission sends the pack to ManCom.
+preconditions:
+  - "The request is in REQUIREMENTS_PREP."
+main_flow:
+  - The officer opens the Requirements & Sign-off tab; the negotiated terms are shown.
+  - The officer completes the rate scheme, computation basis and dates.
+  - The officer downloads the package slip, obtains signatures and uploads it as PKG_SLIP_SIGNED.
+  - The officer clicks **Submit Requirements**. BIBS checks the pack and moves the request to FOR_MANCOM.
+alternate_flows:
+  - Incomplete pack. BIBS lists every missing item and keeps the request in REQUIREMENTS_PREP.
+rules:
+  - [R1, "The pack needs: effective date, package end date, scheme rate or a rate per insurer, computation basis, at least one insurer, a signed package slip.", Fixed, "-"]
+  - [R2, "SLA 48 hours (default).", Configurable, Workflow stage SLA]
+validations:
+  - [Pack incomplete, "Complete the requirements: <missing items>", REQUIREMENTS_INCOMPLETE]
+  - [End date not after effective date, The package end date must be after the effective date, PKG_DATES_INVALID]
+fields_screen: Requirements & Sign-off
+fields:
+  - [Scheme rate %, Number, Conditional, "-", Required unless every insurer has a rate]
+  - [Minimum premium, Amount, "No", "-", ">= 0"]
+  - [Commission %, Number, "No", "-", ">= 0"]
+  - [Package TSI limit, Amount, "No", "-", ">= 0"]
+  - [Computation basis, Long text, "Yes", "-", As agreed with the insurers]
+  - [Effective from, Date, "Yes", "-", "-"]
+  - [Package start / Package end, Date, "Yes (end)", "-", End after effective date]
+  - [Anniversary, Date, "No", "-", "-"]
+  - [Signed package slip, Attachment, "Yes", Document type PKG_SLIP_SIGNED, Platform file rules]
+notifications:
+  - "ManCom members on submission."
+audit:
+  - "Changes to the pack and the submission recorded."
+acceptance:
+  - Submission without a signed package slip is refused and names the missing slip.
+  - A complete pack moves the request to FOR_MANCOM and notifies ManCom.
+```
+
+```fr
+id: FR-PM-041
+title: Sign off package requirements (ManCom)
+brd: [BRPM.015 (p.25-26)]
+actor: ManCom member
+priority: Must have
+screens: Package Request page (Requirements & Sign-off tab)
+description: A ManCom member reviews the requirements pack and signs off in BIBS. The sign-off locks the quotation slips and forwards the request to MBS automatically. A physically signed sheet can be uploaded as MANCOM_SIGNOFF; without an upload, BIBS attaches a generated sign-off record. The sign-off reference is MC-<request number>.
+preconditions:
+  - "The request is in FOR_MANCOM; the user has PKG_MANCOM_SIGNOFF and did not submit the requirements."
+main_flow:
+  - The ManCom member opens the request and reviews the pack.
+  - The member optionally uploads the signed sign-off sheet.
+  - The member clicks **Sign off and send to MBS**.
+  - BIBS records the sign-off, locks the slips and moves the request to WITH_MBS.
+alternate_flows:
+  - Return. The member returns the pack to TSU with a reason (REQUIREMENTS_PREP); BIBS records a RETURNED sign-off.
+rules:
+  - [R1, "MBS cannot receive the requirements before the sign-off.", Fixed, "-"]
+  - [R2, "One member's sign-off completes the step (quorum PQ07).", Configurable, Workflow stage owner (PQ07)]
+  - [R3, "SLA 72 hours (default).", Configurable, Parameter PKG_SLA_MANCOM]
+validations:
+  - [Signer submitted the requirements, ManCom signs off requirements submitted by someone else, PKG_FOUR_EYES]
+  - [Return without reason, "Select a reason for '<action>'", WORKFLOW_REASON_REQUIRED]
+fields_screen: Sign-off dialog
+fields:
+  - [Comment, Text, "No", "-", "-"]
+  - [Signed sign-off sheet, Attachment, "No", Document type MANCOM_SIGNOFF, Platform file rules]
+notifications:
+  - "MBS on sign-off; TSU on return."
+audit:
+  - "Sign-off or return recorded with user, time, comment and document."
+acceptance:
+  - The requirements reach MBS only after the ManCom sign-off.
+  - After sign-off, the QS of every round can no longer be edited or resent.
+  - A request without an uploaded sheet carries a generated MANCOM_SIGNOFF document.
+```
+
+```fr
+id: FR-PM-042
+title: Set up the package (MBS)
+brd: [BRPM.015 (p.25-26)]
+actor: MBS
+priority: Must have
+screens: Package Request page (Set-up tab); Package Version
+description: MBS receives only signed-off requirements. MBS checks that they are complete and sets up the package, which creates a draft package version from the proposed terms (rate scheme, dates, coverages, insurers and insurer terms), with the request number and ManCom reference as its origin. For a NEW request MBS gives the risk code and name of the new product. MBS then completes and submits the version for validation (FR-PM-043).
+preconditions:
+  - "The request is in WITH_MBS; the user has PRODUCT_MAINTAIN."
+main_flow:
+  - MBS opens the request in the With MBS tab and reviews the pack.
+  - MBS clicks **Set Up Package Version**, enters the risk code and name (NEW) and a change summary.
+  - BIBS creates the draft version and links it on the Set-up tab; the request moves to FOR_VALIDATION.
+  - MBS opens the version, checks it and submits it for validation.
+alternate_flows:
+  - Incomplete requirements. MBS clicks **Return Incomplete** with a reason; the request returns to REQUIREMENTS_PREP.
+  - A version returned by the validator comes back to WITH_MBS; MBS corrects the same draft and sets it up again.
+  - A package already has a version being set up. BIBS refuses a second draft.
+rules:
+  - [R1, "One draft or for-validation version per product at a time.", Fixed, "-"]
+  - [R2, "A new product created by set-up stays pending until its first version is validated.", Fixed, "-"]
+  - [R3, "Computation uses the rating methods of the platform (property, motor, generic); a new formula needs development (PQ12).", Fixed, "-"]
+  - [R4, "SLA 48 hours (default).", Configurable, Parameter PKG_SLA_MBS_SETUP]
+validations:
+  - [Return without reason, "Select a reason for '<action>'", WORKFLOW_REASON_REQUIRED]
+  - [A version is already being set up, "Product <code> already has a version being set up", VERSION_IN_PROGRESS]
+  - [Risk code breaks the line's convention, "Risk code <code> does not follow the naming convention of <line>", PRODUCT_CODE_PATTERN]
+fields_screen: Set Up Package Version dialog
+fields:
+  - [Risk code of the new package, Text, Conditional, "-", Required for NEW; line pattern]
+  - [Product name, Text, Conditional, "-", Required for NEW]
+  - [Change summary, Text, "Yes", "-", Up to 500 characters]
+notifications:
+  - "Validators (PRODUCT_VALIDATE) when the version is submitted; TSU when requirements are returned."
+audit:
+  - "Set-up, return and the created version recorded with request number and ManCom reference."
+acceptance:
+  - MBS cannot set up a package before ManCom sign-off.
+  - Set-up creates a draft version whose terms equal the signed-off proposed terms.
+  - Incomplete requirements returned by MBS reach TSU with the reason.
+```
+
+```fr
+id: FR-PM-043
+title: Validate and release a package version
+brd: [PMADD06 (p.5), BRPM.015 (p.25-26)]
+actor: TSU Head or Business Administrator (PRODUCT_VALIDATE)
+priority: Must have
+screens: Validation Queue; Package Version (Validation Checklist)
+description:
+  - A package version is not ready until it is validated. MBS submits the draft; BIBS checks completeness. The validator, who is neither the maker nor the submitter, confirms the checklist, reviews a test premium computed on a sample item, and releases the version or returns it with a reason.
+  - On release the previous version ends the day before the new effective date, the product's commercial values are updated from the version, the request moves to RELEASED, Marketing is notified and the advisory is drafted (FR-PM-044).
+preconditions:
+  - "The version is FOR_VALIDATION."
+main_flow:
+  - The validator opens the version from the Validation Queue.
+  - The validator ticks each checklist item and reviews the test premium.
+  - The validator clicks **Validate and Release**.
+  - BIBS releases the version, records each check with its result and the figures compared, and publishes the release to Product Maintenance.
+  - The Validation card of the version shows the result (Passed), the validator, the date and time, the test premium, and one row per check (hierarchy, insurer terms, co-insurance shares, rates and minimum premiums, dates and package term, test premium) with Passed, Failed or Not Applicable and its details, for example 3 of 3 insurers have terms for 2 included coverages.
+alternate_flows:
+  - Return. The validator clicks **Return to MBS** with a reason; the version goes back to DRAFT and the request to WITH_MBS. The Validation card shows the result Returned, who returned it and when, the reason, and the checks as they stood, until MBS submits the version again.
+  - Submission refused. The draft is incomplete; BIBS names the missing item and it stays DRAFT.
+rules:
+  - [R1, "Checklist: hierarchy complete (cover type and basic coverage); every panel insurer has terms for each included coverage; rates and minimum premiums match the signed-off terms; dates and package term are correct; test premium reviewed (final list PQ09).", Configurable, Checklist (PQ09)]
+  - [R2, "The validator is never the maker or submitter of the version.", Fixed, "-"]
+  - [R3, "The effective date is today or later and after the latest released version.", Fixed, "-"]
+  - [R4, "Only RELEASED versions are sold.", Fixed, "-"]
+  - [R5, "SLA 24 hours (default).", Configurable, Workflow stage SLA]
+validations:
+  - [Hierarchy incomplete, A package needs its cover type (PMADD01), PACKAGE_HIERARCHY_INCOMPLETE]
+  - [Insurer terms missing, "Insurer <code> has no terms for coverage <coverage>", PACKAGE_INSURER_TERMS_MISSING]
+  - [No rate, Enter the package rate or a rate for every insurer, PACKAGE_RATE_MISSING]
+  - [No effective date, Enter the effective date, PACKAGE_DATES_INVALID]
+  - [Validator is maker or submitter, A package version is validated by someone other than its maker and submitter, MAKER_CHECKER_VIOLATION]
+  - [Checklist not complete, Validate and Release stays disabled until every item is ticked, "-"]
+fields_screen: Validation Checklist
+fields:
+  - [Checklist items, Check boxes, "Yes", Checklist, All ticked]
+  - [Return reason, Text, Conditional, "-", "Required for Return (message: Enter the reason of the return, REASON_REQUIRED)"]
+  - [Validation result, Facts and table, "-", Validation checkpoint, "Result, validator, date and time, test premium, return reason; # / Check / Result / Details per check"]
+notifications:
+  - "Marketing (quotation users) on release; MBS on return."
+audit:
+  - "Submission, validation with the confirmed checklist and the checks run, return with reason, validator and time; release recorded on the product history."
+acceptance:
+  - The MBS user who set up the version cannot validate it.
+  - A released version is used by new quotations from its effective date; before release it is not.
+  - A returned version is editable again and the request is back with MBS.
+```
+
+```fr
+id: FR-PM-044
+title: Draft and send package advisories
+brd: [BRPM.016 (p.26-27), BRPM.017 (p.27-28)]
+actor: TSU TL / TSU Officer / Operations (PKG_ADVISORY)
+priority: Must have
+screens: Package Request page (Advisories tab)
+description: On release BIBS drafts the advisory automatically, a new package advisory for a new or reactivated package, a renewal advisory for a renewal, a package update advisory otherwise, and a retirement advisory for a retired package. The user checks the recipients, subject and text and sends it. Sending is blocked until the supporting documents are on the request. Recipients receive an in-app notification, and e-mail addresses given on the advisory receive the protected advisory PDF.
+preconditions:
+  - "An advisory draft exists; the user has PKG_ADVISORY."
+main_flow:
+  - The user opens the Advisories tab; the draft shows its type, recipient groups and the document check.
+  - The user edits the subject, text, groups and optional e-mail addresses.
+  - The user clicks **Send**. BIBS stores the advisory PDF, notifies each group and e-mails the addresses.
+alternate_flows:
+  - Documents missing. BIBS blocks the send and names the missing documents.
+rules:
+  - [R1, "Required documents: signed package slip (PKG_SLIP_SIGNED) and ManCom sign-off (MANCOM_SIGNOFF); for a retirement only the ManCom sign-off.", Fixed, "-"]
+  - [R2, "Recipient groups: Marketing, TSU, MBS, Processing, Operations; default Marketing, TSU, MBS, Operations.", Configurable, LOV PKG_ADVISORY_GROUP; parameter PKG_ADVISORY_GROUPS]
+  - [R3, "Group to users: Marketing = quotation users, TSU = PKG_NEGOTIATE, MBS = PRODUCT_MAINTAIN, Processing = account processing, Operations = OPS_VIEW (PQ12).", Fixed, "-"]
+validations:
+  - [Documents missing, "Attach the supporting documents before sending: <documents>", ADVISORY_DOCUMENTS_MISSING]
+  - [Subject or text blank, Enter the subject and the text, "-"]
+fields_screen: Advisory
+fields:
+  - [Recipient groups, Multi-select, "Yes", LOV PKG_ADVISORY_GROUP, At least one]
+  - [E-mail to (optional), Text, "No", "-", Valid e-mail addresses]
+  - [Subject, Text, "Yes", "-", Up to 200 characters]
+  - [Text, Long text, "Yes", Template PKG_ADVISORY / PKG_RENEWAL_ADVISORY, "-"]
+notifications:
+  - "In-app notification to each group's users; protected e-mail to the given addresses."
+audit:
+  - "Draft, edit and send recorded; the sent advisory PDF is kept as PKG_ADVISORY."
+acceptance:
+  - An advisory cannot be sent while the signed package slip is missing.
+  - A sent advisory reaches the users of each selected group in BIBS and lists the supporting documents.
+  - The advisory PDF is stored on the request.
+```
+
+```fr
+id: FR-PM-045
+title: Retire a package
+brd: [BRPM.011 (p.21), BRPM.006 (p.17)]
+actor: Requester, approvers, ManCom, MBS
+priority: Must have
+screens: New Package Request (type RETIRE); Package Request page (Set-up tab)
+description: A package is removed from sale through a retirement request (request type Retire package), which follows the approvals and ManCom sign-off without negotiation. At the MBS step, MBS retires the product instead of setting up a version. The product and all its versions stay readable; nothing is deleted. Active incentive criteria on the product are flagged for review.
+preconditions:
+  - "A retirement request is at the stage With MBS for set-up."
+main_flow:
+  - MBS clicks **Retire Package**.
+  - BIBS sets the product to RETIRED, closes the request as RETIRED and drafts the retirement advisory.
+rules:
+  - [R1, "Only a retirement request retires a package; other types cannot.", Fixed, "-"]
+  - [R2, "A retired product cannot be sold to new business.", Fixed, "-"]
+validations:
+  - [Retire on another request type, Only a request to retire the package can retire it, PKG_REQUEST_TYPE_MISMATCH]
+  - [Set-up on a retirement request, A retirement request retires the package; it has no version to set up, PKG_REQUEST_TYPE_MISMATCH]
+  - [Quotation on a retired product, "Product <code> is RETIRED and cannot be sold", PRODUCT_NOT_SELLABLE]
+notifications:
+  - "Retirement advisory; incentive review alert INCENTIVE_PRODUCT_INACTIVE to the incentive maintainers."
+audit:
+  - "Retirement recorded on the request and product history."
+acceptance:
+  - After retirement, a new quotation on the product is refused.
+  - The retired product and its versions stay searchable for users with PRODUCT_ARCHIVE_VIEW.
+```
+
+## Versions and rate schemes
+
+```fr
+id: FR-PM-050
+title: Keep package terms as versions
+brd: [BRPM.007 (p.17-18)]
+actor: MBS; System
+priority: Must have
+screens: Product page (Versions tab); Package Version
+description: The commercial terms of a package (rate scheme, coverages, insurers, insurer terms, dates) are held in numbered versions with an effective date. A package is never edited in place. MBS creates a new draft version, which is validated and released while the current version keeps selling. The Versions tab shows the timeline and compares two versions.
+preconditions:
+  - "The product is packaged."
+main_flow:
+  - MBS opens the product and clicks **New Version**; BIBS copies the version in force, effective tomorrow.
+  - MBS edits the draft and submits it for validation (FR-PM-043).
+alternate_flows:
+  - A version created from a package request is set up through FR-PM-042.
+rules:
+  - [R1, "Version states: Draft, For validation, Released, Superseded, Expired (section 5.3).", Fixed, "-"]
+  - [R2, "One released version is in force per product; the previous one ends the day before the next takes effect.", Fixed, "-"]
+  - [R3, "The packages in force at go-live are set up one by one through package requests (type New package, or Update for an existing risk code) with their signed package slip and ManCom reference, and their versions are validated before the map freeze; no package version is loaded by the data migration (proposed position, CLR-PM-21; chapter 19, template CI-06). The SIT seed data hold packages with a version 1 effective 01-Jan-2020.", Fixed, "-"]
+validations:
+  - [Direct edit of a versioned field, "The rate, minimum premium, commission and TSI limit of package <code> change through a new version (Versions tab)", PRODUCT_FIELD_VERSIONED]
+  - [Second draft, "Product <code> already has a version being set up", VERSION_IN_PROGRESS]
+fields_screen: Package Version, Rate Scheme and Dates
+fields:
+  - [Package Rate %, Number, Conditional, "-", Required unless every insurer has a rate]
+  - [Minimum Premium, Amount, "Yes", "-", ">= 0"]
+  - [Commission %, Number, "Yes", "-", ">= 0"]
+  - [Package TSI Limit, Amount, "No", "-", ">= 0"]
+  - [Effective From, Date, "Yes", "-", Today or later; after the latest released version]
+  - [Package Start / Package End / Anniversary, Date, "No", "-", End after effective date]
+  - [Change Summary, Text, "No", "-", "-"]
+  - [ManCom Sign-off Reference, Text, "No", "-", "-"]
+  - [Computation Basis, Text, "No", "-", As agreed with the insurers]
+notifications:
+  - "None until submission."
+audit:
+  - "Each version keeps its maker, submitter, validator, dates, checklist and source request."
+acceptance:
+  - Changing the rate of a released package creates version n+1; version n stays in force until n+1 takes effect.
+  - The Versions tab shows every version with status and effective dates.
+```
+
+```fr
+id: FR-PM-051
+title: Price new business on the latest approved rate scheme
+brd: [BRPM.007 (p.17-18)]
+actor: System; Marketing (quotation user); Business Administrator (exception approval)
+priority: Must have
+screens: Quotation (rate scheme panel, Request Rate Exception); rate exception record; Premium Calculator; My Approvals
+description:
+  - A new-business quotation or account on a package is priced on the version in force on the transaction date, whatever the period start, so an outdated rate cannot be selected. The version number is stored on the quotation, the account and the invoice.
+  - An item rate different from the scheme (or panel insurer) rate, or the use of a version that is not current, needs an approved rate-scheme exception. Without it, submission is refused. Renewals and endorsements use the version of the original account (BRD-6 and BRD-1 contracts).
+preconditions:
+  - "The product is a package with a released version."
+main_flow:
+  - The user creates a quotation; BIBS prices it on the current version and shows "Priced on version n".
+  - The user submits the quotation; BIBS checks the scheme.
+  - The quotation, the accounts created from it and the invoice carry the version number.
+alternate_flows:
+  - Non-current rate. The user clicks **Request Rate Exception** with the reason. The approver (PRODUCT_AUTHORIZE, not the requester) opens the exception record from My Approvals, compares the requested rate or version with the scheme in force, and clicks **Approve** (optional comment) or **Reject** (reason required). The requester is notified of the decision. With the approved exception the quotation is submitted and the exception reference is stored.
+  - Version changed while the quotation was a draft. Submission is refused; the user reprices on the current version.
+rules:
+  - [R1, "New business uses the version in force on the transaction date.", Fixed, "-"]
+  - [R2, "A deviating item rate or a non-current version needs an approved exception, found by the transaction reference.", Fixed, "-"]
+  - [R3, "Exceptions expire after 30 days (default).", Fixed, "-"]
+  - [R4, "Whether a package version allows manual item rates is a flag of the version, off unless BDOI decides otherwise (PQ10, PM-Q31); the packages set up for go-live follow the same rule (CLR-PM-21).", Configurable, Version flag manual rate allowed (PQ10)]
+  - [R5, "Statutory rates (DST, VAT, premium tax, LGT) keep their own effective dates (PQ10).", Fixed, "-"]
+  - [R6, "An exception is approved or rejected by a holder of the approval permission other than its requester; a rejection needs its reason, and the decision stays on the exception.", Fixed, "-"]
+validations:
+  - [Deviating rate without exception, "Package <code> is priced on the current rate scheme: rate <n>% needs an approved rate exception", RATE_SCHEME_NOT_CURRENT]
+  - [Rejection without a reason, Enter the reason for the rejection, RATE_EXCEPTION_REASON_REQUIRED]
+  - [Decision by the requester, A rate exception is decided by someone other than its requester, MAKER_CHECKER_VIOLATION]
+  - [Exception already decided, Rate exception <reference> is already decided, RECORD_NOT_PENDING]
+  - [Product expired or retired, "Product <code> is <status> and cannot be sold", PRODUCT_NOT_SELLABLE]
+  - [No version in force, "Package <code> has no released version in force on <date>", PRODUCT_NOT_SELLABLE]
+fields_screen: Request Rate Exception; Approve and Reject on the exception record
+fields:
+  - [Requested rate or version, Number, "Yes", "-", Different from the current scheme]
+  - [Reason, Text, "Yes", "-", "-"]
+  - [Approval comment, Text, "No", "-", "Up to 1,000 characters"]
+  - [Rejection reason, Text, "Yes", "-", "Up to 1,000 characters"]
+notifications:
+  - "Authorisers of rate exceptions in My Approvals; requester on decision."
+audit:
+  - "Exception request and decision (approver, date and time, comment or reason); the version used by each transaction."
+acceptance:
+  - A quotation with a period start before the new version's effective date is priced on the new version.
+  - Submission with a manual rate different from the scheme is refused without an approved exception and accepted with one.
+  - The approver approves or rejects the exception on its record opened from My Approvals; the requester cannot decide it and a rejection needs its reason.
+  - The quotation, account and invoice show the version number that priced them.
+```
+
+```fr
+id: FR-PM-052
+title: Archive expired packages
+brd: [BRPM.006 (p.17)]
+actor: System; MBS / TSU Head / Business Administrator / Auditor (PRODUCT_ARCHIVE_VIEW)
+priority: Must have
+screens: Products (Expired and Retired filters); Product page
+description: When a package end date passes and no newer version is released, the daily job sets the version to EXPIRED and the product to EXPIRED. Expired and retired packages are never deleted. They remain searchable with all versions, terms, documents and communications, are tagged "Expired" or "Retired", and are visible only to users with PRODUCT_ARCHIVE_VIEW. An expired package returns to sale only through a REACTIVATE request.
+preconditions:
+  - "None."
+main_flow:
+  - The daily job PACKAGE_VERSION_LIFECYCLE expires packages whose end date passed.
+  - An authorised user filters the Products list by Expired and opens the package and its history.
+rules:
+  - [R1, "Products and versions are never physically deleted.", Fixed, "-"]
+  - [R2, "Expired and retired products are visible only with PRODUCT_ARCHIVE_VIEW.", Fixed, "-"]
+  - [R3, "Reactivation only through a REACTIVATE request that releases a new version.", Fixed, "-"]
+validations:
+  - [User without archive permission filters expired products, You are not permitted to perform this action, ACCESS_DENIED]
+notifications:
+  - "PKG_NEGOTIATE and PRODUCT_MAINTAIN holders when a package expires."
+audit:
+  - "Expiry recorded on the product and version history."
+acceptance:
+  - A package past its end date without a renewal is tagged Expired and cannot be sold.
+  - Its versions, documents and request history remain retrievable by authorised users.
+  - A Marketing AO does not see expired packages.
+```
+
+## Expiry and renewal
+
+```fr
+id: FR-PM-060
+title: Monitor package expiry and anniversary dates
+brd: [BRPM.017 (p.27-28)]
+actor: TSU Officer; MBS; System
+priority: Must have
+screens: Package Expiry (tabs Expiring, Renewal in Progress, Expired); Product Maintenance Home
+description: The Package Expiry screen lists released packages by end date, with days left, anniversary date and the open renewal request and its stage. The daily job PACKAGE_EXPIRY_MONITOR raises the alert PACKAGE_EXPIRING at the notice period and again at the reminder days, and can draft the renewal request automatically.
+preconditions:
+  - "The user has PKG_NEGOTIATE, PRODUCT_MAINTAIN or PKG_REPORT_VIEW."
+main_flow:
+  - The job runs daily (01:00 PHT) and raises PACKAGE_EXPIRING once per package, version and threshold.
+  - The TSU Officer opens Package Expiry, sets "Packages ending within (days)" and reviews the list.
+  - The officer exports the list with **Generate Expiry List** for a date range.
+rules:
+  - [R1, "First alert 60 days before the end date (default).", Configurable, Parameter PACKAGE_EXPIRY_NOTICE_DAYS]
+  - [R2, "Reminders at 30 and 7 days (default).", Configurable, Parameter PACKAGE_EXPIRY_REMINDER_DAYS]
+  - [R3, "Automatic drafting of renewal requests is a parameter, delivered off; the project team proposes to switch it on, so that BIBS drafts the renewal request from the current version at the first expiry alert and the TSU Officer completes and submits it (CLR-PM-22).", Configurable, Parameter PACKAGE_RENEWAL_AUTODRAFT]
+  - [R4, "Job time 01:00 PHT.", Configurable, Job schedule (System Administrator)]
+validations: []
+fields_screen: Package Expiry
+fields:
+  - [Packages ending within (days), Number, "Yes", "-", "1-365"]
+  - [Generate Expiry List (from / to), Date range, "Yes", "-", To after from]
+notifications:
+  - "PACKAGE_EXPIRING to PKG_NEGOTIATE and PRODUCT_MAINTAIN holders at each threshold."
+audit:
+  - "Job runs and alerts are logged."
+acceptance:
+  - A package ending in 45 days appears in the Expiring tab with 45 days left.
+  - The alert is raised once at 60, 30 and 7 days, never twice for the same threshold.
+  - With automatic drafting switched on, the first alert of a package also drafts its renewal request from the current version, and no second request is drafted while it is open.
+```
+
+```fr
+id: FR-PM-061
+title: Generate renewal requests
+brd: [BRPM.017 (p.27-28)]
+actor: TSU Officer
+priority: Must have
+screens: Package Expiry (bulk Generate Renewal Request); Package Request page
+description: The TSU Officer selects expiring packages and clicks **Generate Renewal Request**. BIBS drafts one renewal request (Renew package) per package, pre-filled from the current version, with the next term's dates (start = old end + 1 day, same length). The request follows the normal workflow; negotiation is optional. MBS accepts or returns the renewal documentation at the With MBS for set-up step, and the renewal advisory is FR-PM-044.
+preconditions:
+  - "The packages are released and have no open RENEW or REACTIVATE request."
+main_flow:
+  - The officer ticks the packages and clicks **Generate Renewal Request**.
+  - BIBS drafts the requests and shows their numbers.
+  - The officer edits the dates, terms and rates as needed and submits each request.
+rules:
+  - [R1, "One open renewal request per package.", Fixed, "-"]
+  - [R2, "Next term: start = previous end + 1 day, same length.", Fixed, "-"]
+validations:
+  - [No package selected, Select the packages to renew, PKG_RENEWAL_NONE]
+notifications:
+  - "As FR-PM-020 on submission."
+audit:
+  - "Draft creation recorded with the source package and version."
+acceptance:
+  - A generated renewal request has the terms of the current version and the next term's dates.
+  - A package with an open renewal request cannot get a second one.
+```
+
+## Monitoring, reports and notifications
+
+```fr
+id: FR-PM-070
+title: Product Maintenance home and dashboard
+brd: [BRPM.019 (p.29)]
+actor: Marketing, TSU, MBS, validators
+priority: Must have
+screens: Product Maintenance Home
+description: The home page shows tiles by stage with SLA status (red past SLA, amber near SLA), packages expiring in 30, 60 and 90 days, versions for validation, advisories pending and comparative outputs of the week. Each tile opens its filtered list, which can be exported to Excel. Counts follow the user's access.
+preconditions:
+  - "The user has PRODUCT_VIEW or PKG_REPORT_VIEW."
+main_flow:
+  - The user opens Product Maintenance Home.
+  - The user clicks a tile; the filtered list opens.
+  - The user exports the list.
+rules:
+  - [R1, "Amber from 80% of the stage SLA; red past the SLA.", Fixed, "-"]
+validations: []
+notifications:
+  - "None."
+audit:
+  - "Exports are audited."
+acceptance:
+  - A request past its stage SLA is counted in a red tile.
+  - Clicking "Expiring in 30 days" opens the Package Expiry list filtered to 30 days.
+```
+
+```fr
+id: FR-PM-071
+title: Package reports
+brd: [BRPM.018 (p.28-29), BRPM.017 (p.27-28), BRPM.006 (p.17)]
+actor: Marketing, TSU, MBS (PKG_REPORT_VIEW)
+priority: Must have
+screens: Reports (category New Business)
+description: Three reports cover package creation status, expiry and version history (layouts in section 6). The Package Status Update Report runs for one request or for all, with filters. Reports export to PDF, Excel, ODS and CSV, can be saved as variants, and every run is logged.
+preconditions:
+  - "The user has PKG_REPORT_VIEW."
+main_flow:
+  - The user selects the report and sets the parameters.
+  - BIBS runs the report and shows the result.
+  - The user exports it or saves the parameters as a variant.
+rules:
+  - [R1, "BRPM.018 is a package report distinct from the BRD-1 Placement Update Report (name and columns to confirm, PQ15).", Configurable, Report definition (PQ15)]
+validations:
+  - [Days not a whole number, "<Parameter> must be a whole number", "-"]
+notifications:
+  - "None."
+audit:
+  - "Each run and export logged with user, parameters and time."
+acceptance:
+  - The Package Status Update Report for one request number shows only that request.
+  - The report exports to PDF and Excel with the same rows.
+  - A user without PKG_REPORT_VIEW cannot run the reports.
+```
+
+```fr
+id: FR-PM-072
+title: Notify users and publish product master changes
+brd: [BRPM.022 (p.31)]
+actor: System
+priority: Must have
+screens: Notifications (bell); E-mails tab
+description: BIBS notifies users on every stage entry, return, SLA breach, release, expiry and advisory. Released and expired package versions are also handed to the product master feed, which is the point where other BDOI tracking and reporting systems will receive product changes. The feed's transport is on hold until BDOI names the systems (PQ16); today it logs each change.
+preconditions:
+  - "None."
+main_flow:
+  - An event occurs (stage change, release, expiry).
+  - BIBS notifies the users concerned in the app and, where set in their preferences, by e-mail.
+  - For release and expiry, BIBS passes the change to the product master feed.
+rules:
+  - [R1, "Users set their notification preferences (in-app / e-mail) per event type.", Configurable, Notification preferences]
+  - [R2, "Product master feed: no transport until PQ16 is answered.", Fixed, "-"]
+validations: []
+notifications:
+  - "This FR is the notification service."
+audit:
+  - "Notifications and feed calls are logged."
+acceptance:
+  - The TSU TL receives a notification when a request enters FOR_TSU_REVIEW.
+  - A release writes a product master feed log entry with product, version and effective date.
+```
+
+```fr
+id: FR-PM-073
+title: Enforce validations, approvals and SLAs
+brd: [BRPM.021 (p.30-31)]
+actor: System
+priority: Must have
+screens: Package Request page (workflow panel)
+description: Each stage has an owner permission and an SLA; each business action checks its data before the transition. A request or document cannot move, be sent or be finalised until its checks and approvals are complete (section 5). Pending actions appear in the owners' queues, and the SLA check alerts them when the SLA passes.
+preconditions:
+  - "None."
+main_flow:
+  - A user starts an action from the workflow panel.
+  - BIBS checks the permission, the four-eyes rule and the data of the action.
+  - BIBS performs the transition, records it and notifies the next owners.
+rules:
+  - [R1, "Only the transitions of section 5.2 are possible.", Fixed, "-"]
+  - [R2, "SLA hours per stage (defaults in section 5.1).", Configurable, Parameters PKG_SLA_*]
+validations:
+  - [Action not allowed in the stage, "'<action>' is not allowed while <reference> is in stage <stage name>", WORKFLOW_TRANSITION_NOT_ALLOWED]
+notifications:
+  - "Stage entry and SLA breach to the stage owners."
+audit:
+  - "Every transition with user, time, comment and reason."
+acceptance:
+  - A request cannot be sent to MBS without the ManCom sign-off, even by a direct request.
+  - A request past its stage SLA raises an SLA alert to the stage owners.
+```
+
+## Incentive criteria
+
+```fr
+id: FR-PM-080
+title: Maintain incentive criteria on the products matrix
+brd: [PMADD07 (p.5-6), PMADD08 (p.6-7)]
+actor: Incentive Maintenance user (MBS, INCENTIVE_CRITERIA_MAINTAIN); authoriser (PRODUCT_AUTHORIZE)
+priority: Must have
+screens: Incentive Criteria
+description:
+  - The Incentive Maintenance user defines criteria such as CPC2 with type, value basis, value, rule parameters, effective dates and the products they apply to, picked from the active products matrix (product, optional cover type, segment, channel and insurer). Each new or changed criterion is authorised by another user.
+  - An active criterion is not edited. An amendment creates a successor that takes effect when authorised, and the old row is end-dated then. Deactivation end-dates the criterion. History is kept.
+preconditions:
+  - "The user has INCENTIVE_CRITERIA_MAINTAIN."
+main_flow:
+  - The user clicks **New Criterion** and enters the attributes.
+  - The user picks the applicable products from the products matrix.
+  - The user saves; the criterion is pending authorisation.
+  - The authoriser authorises it; it becomes active from its effective date.
+alternate_flows:
+  - Amend an active criterion. BIBS creates a pending successor; on authorisation the old row is end-dated the day before.
+  - Deactivate. The user sets the end date; the criterion becomes inactive.
+rules:
+  - [R1, "Only active products (and active insurers) on the effective date can be selected.", Fixed, "-"]
+  - [R2, "No overlapping periods for the same code.", Fixed, "-"]
+  - [R3, "Incentive types to be supplied by BDOI (PQ04); today OTHERS and MIGRATED.", Configurable, LOV INCENTIVE_TYPE]
+  - [R4, "Maker-checker on every change.", Fixed, "-"]
+validations:
+  - [No product selected, Select at least one product of the products matrix, INCENTIVE_PRODUCTS_REQUIRED]
+  - [Product not active, "Product <code> is not an active product of the matrix", INCENTIVE_PRODUCT_NOT_ACTIVE]
+  - [Value missing, Enter the value of the incentive criterion, INCENTIVE_VALUE_REQUIRED]
+  - [Period overlaps, "Criterion <code> already covers part of this period", INCENTIVE_PERIOD_OVERLAP]
+  - [Rule parameter without a value, Enter a value for each parameter, INCENTIVE_RULE_PARAMS_INVALID]
+  - [Rule parameter value not a number, "<parameter> must be a number", INCENTIVE_RULE_PARAMS_INVALID]
+  - [Rule parameter below zero, "<parameter> cannot be negative", INCENTIVE_RULE_PARAMS_INVALID]
+  - [Parameter not of the incentive type, "<parameter> is not a parameter of this incentive type", INCENTIVE_RULE_PARAMS_INVALID]
+  - [Direct edit of an active row, An active criterion is changed by amending it (successor), INCENTIVE_ACTIVE_LOCKED]
+fields_screen: Incentive Criterion
+fields:
+  - [Code, Text, "Yes", "-", "For example CPC2; unique per period"]
+  - [Name, Text, "Yes", "-", Up to 120 characters]
+  - [Incentive type, List, "Yes", LOV INCENTIVE_TYPE, "-"]
+  - [Value basis, List, "Yes", Rate / Fixed amount / Rule, "-"]
+  - [Value, Number, Conditional, "-", Required for Rate and Fixed amount]
+  - [Effective from, Date, "Yes", "-", "-"]
+  - [Effective to, Date, "No", "-", On or after effective from]
+  - [Rule parameters, "Rows: parameter and value", "No", Rule parameters of the incentive type (Minimum Gross Premium), "Each parameter once, with a value as the parameter asks (an amount, zero or more)"]
+  - [Description, Text, "No", "-", "-"]
+  - [Products matrix, Picker, "Yes", "Active products; optional cover type, segment, channel, insurer", At least one]
+notifications:
+  - "Authorisers in My Approvals; the maintainer on decision."
+audit:
+  - "Create, amend, authorise, deactivate with before and after values; successors linked."
+acceptance:
+  - A criterion on an inactive product cannot be saved.
+  - An amended active criterion stays active until its successor is authorised, with no gap.
+  - The history shows every earlier version of the criterion.
+```
+
+```fr
+id: FR-PM-081
+title: Apply incentive criteria and review them when products end
+brd: [PMADD07 (p.5-6), PMADD08 (p.6-7)]
+actor: System; Incentive Maintenance user
+priority: Must have
+screens: Invoice (booking); Incentive Criteria
+description: At booking, BIBS matches the active criteria against the invoice facts (product, cover type, segment, channel, lead insurer, booking date) and stores the matched codes on the invoice; the BRD-1 incentive flag is set when at least one criterion matches. When a product expires or is retired, its active criteria are flagged with the alert INCENTIVE_PRODUCT_INACTIVE and never deleted. The former booking incentive rules were copied once into the criteria and are read-only.
+preconditions:
+  - "Active criteria exist."
+main_flow:
+  - An invoice is booked.
+  - BIBS finds the matching criteria and stores their codes on the invoice.
+rules:
+  - [R1, "Endorsements inherit the criteria codes and version of the original invoice.", Fixed, "-"]
+  - [R2, "Computation and payout of incentives are outside BRD-3 (Q33); Operations schemes reference the criteria codes (OQ39).", Fixed, "-"]
+validations:
+  - [Change to a former booking incentive rule, The booking incentive rules are read-only; use Incentive Criteria, INCENTIVE_RULES_FROZEN]
+notifications:
+  - "INCENTIVE_PRODUCT_INACTIVE to the incentive maintainers."
+audit:
+  - "Matched codes stored on the invoice."
+acceptance:
+  - An invoice on a product covered by CPC2 carries CPC2 and the incentive flag.
+  - Retiring the product raises INCENTIVE_PRODUCT_INACTIVE for CPC2.
+```
+
+# Workflow and status model
+
+## Stages
+
+Figure 2 shows the workflow PM_PACKAGE_REQUEST. Solid arrows are the main path, dashed arrows are returns and optional paths, and dotted arrows close a request.
+
+![Workflow PM_PACKAGE_REQUEST: stages and actions](figures/brd03_workflow.dot)
+
+<!-- table: widths=3.3,4.1,1.5,4.3,4.4 caption="Stages, owners and SLA" size=8 -->
+| Stage | Owner (permission) | SLA hours (default) | SLA parameter | Business actions |
+|---|---|---|---|---|
+| DRAFT | Requester (PKG_REQUEST) | - | - | Save, submit, void |
+| FOR_MKT_APPROVAL | Marketing TL / TH / UH (PKG_REQUEST_APPROVE) | 24 | PKG_SLA_MKT_APPROVAL | Approve, return, void |
+| FOR_TSU_REVIEW | TSU TL (PKG_TSU_RECOMMEND) | 24 | PKG_SLA_TSU_REVIEW | Edit, recommend, return, void |
+| FOR_TSU_APPROVAL | TSU TH (PKG_TSU_APPROVE) | 24 | PKG_SLA_TSU_APPROVAL | Approve, approve without negotiation, return, void |
+| NEGOTIATION | TSU (PKG_NEGOTIATE) | 120 | PKG_SLA_NEGOTIATION | QS, responses, revise QS, terms final, not proceeded |
+| TERMS_REVIEW | TSU TH (PKG_TSU_APPROVE) | 24 | stage setting | Release to Marketing or proceed to requirements |
+| FOR_MKT_REVIEW | Marketing (PKG_REQUEST) | 48 | stage setting | Accept terms, request changes, not proceeded |
+| REQUIREMENTS_PREP | TSU (PKG_NEGOTIATE) | 48 | stage setting | Complete and submit requirements |
+| FOR_MANCOM | ManCom (PKG_MANCOM_SIGNOFF) | 72 | PKG_SLA_MANCOM | Sign off, return |
+| WITH_MBS | MBS (PRODUCT_MAINTAIN) | 48 | PKG_SLA_MBS_SETUP | Set up, return incomplete, retire |
+| FOR_VALIDATION | Validator (PRODUCT_VALIDATE) | 24 | stage setting | Validate and release, return (on the version) |
+| RELEASED | - | terminal | - | Advisory drafted; Marketing notified |
+| RETIRED | - | terminal | - | Retirement advisory |
+| NOT_PROCEEDED | - | terminal | - | - |
+| VOIDED | - | terminal | - | - |
+
+## Transitions
+
+<!-- table: widths=3.5,3.6,3.5,3.6,3.4 caption="Transitions of PM_PACKAGE_REQUEST" size=8 -->
+| From | Action | To | Permission | Reason list |
+|---|---|---|---|---|
+| DRAFT | Submit for approval | FOR_MKT_APPROVAL | PKG_REQUEST | - |
+| FOR_MKT_APPROVAL | Approve and send to TSU | FOR_TSU_REVIEW | PKG_REQUEST_APPROVE | - |
+| FOR_TSU_REVIEW | Recommend for approval | FOR_TSU_APPROVAL | PKG_TSU_RECOMMEND | - |
+| FOR_TSU_APPROVAL | Approve for negotiation | NEGOTIATION | PKG_TSU_APPROVE | - |
+| FOR_TSU_APPROVAL | Approve without negotiation | FOR_MANCOM | PKG_TSU_APPROVE | - |
+| FOR_MKT_APPROVAL, FOR_TSU_REVIEW, FOR_TSU_APPROVAL | Return to requester | DRAFT | stage owner | RETURN_REASON |
+| DRAFT to FOR_TSU_APPROVAL | Void | VOIDED | requester or stage owner | VOID_REASON |
+| NEGOTIATION | Revise quotation slip (new round) | NEGOTIATION | PKG_NEGOTIATE | - |
+| NEGOTIATION | Terms final | TERMS_REVIEW | PKG_NEGOTIATE | - |
+| NEGOTIATION | Not proceeded | NOT_PROCEEDED | PKG_NEGOTIATE, PKG_TSU_APPROVE | PKG_NOT_PROCEEDED_REASON |
+| TERMS_REVIEW | Release terms to Marketing | FOR_MKT_REVIEW | PKG_TSU_APPROVE | - |
+| TERMS_REVIEW | Proceed to requirements (generic package) | REQUIREMENTS_PREP | PKG_TSU_APPROVE | - |
+| FOR_MKT_REVIEW | Accept terms | REQUIREMENTS_PREP | PKG_REQUEST | - |
+| FOR_MKT_REVIEW | Request changes | NEGOTIATION | PKG_REQUEST | RETURN_REASON |
+| FOR_MKT_REVIEW | Not proceeded | NOT_PROCEEDED | PKG_REQUEST | PKG_NOT_PROCEEDED_REASON |
+| REQUIREMENTS_PREP | Submit requirements for ManCom sign-off | FOR_MANCOM | PKG_NEGOTIATE | - |
+| FOR_MANCOM | Sign off and send to MBS | WITH_MBS | PKG_MANCOM_SIGNOFF | - |
+| FOR_MANCOM | Return to TSU | REQUIREMENTS_PREP | PKG_MANCOM_SIGNOFF | RETURN_REASON |
+| WITH_MBS | Set up package version | FOR_VALIDATION | PRODUCT_MAINTAIN | - |
+| WITH_MBS | Retire package | RETIRED | PRODUCT_MAINTAIN | - |
+| WITH_MBS | Return incomplete requirements to TSU | REQUIREMENTS_PREP | PRODUCT_MAINTAIN | RETURN_REASON |
+| FOR_VALIDATION | Package version released (automatic) | RELEASED | PRODUCT_VALIDATE | - |
+| FOR_VALIDATION | Package version returned to MBS (automatic) | WITH_MBS | PRODUCT_VALIDATE | - |
+
+## Package version states
+
+![Package version states (catalogue)](figures/brd03_version_states.dot){width=9}
+
+<!-- table: widths=3.2,6.6,7 caption="Version states" -->
+| State | Meaning | Used for |
+|---|---|---|
+| DRAFT | Being set up by MBS; editable | Nothing; not rated |
+| FOR_VALIDATION | Submitted; waiting for the validator | Nothing; not rated |
+| RELEASED | Validated and in force from its effective date | New business, renewals, endorsements |
+| SUPERSEDED | Ended by a newer released version | Renewals (RENEWAL purpose) and endorsements of accounts sold on it |
+| EXPIRED | Package end date passed with no newer version | Reference only; archived and searchable (BRPM.006) |
+
+## SLA and escalation
+
+- SLA hours are held per stage and start when the request enters the stage. The defaults in section 5.1 are placeholders until BDOI answers PQ08. A changed PKG_SLA_* parameter is copied into the stage by the daily job.
+- The SLA check marks a request amber from 80% of the stage SLA and red past it. Red requests raise an SLA alert to the stage owners and appear in the red tiles of the Product Maintenance home.
+- Escalation beyond the stage owners (for example to the unit head) is not in the BRD and is not proposed (chapter 22, CLR-PM-16).
+
+# Reports and documents
+
+## Reports
+
+<!-- table: widths=3.4,4.2,6,3 caption="Product Maintenance reports" -->
+| Code | Name | Purpose | BRD |
+|---|---|---|---|
+| PM-PKG-STATUS | Package Status Update Report | Status of package requests, one or all, with stage age, end date, rates and the last action | BRPM.018 |
+| PM-PKG-EXPIRY | Package Expiry Report | Released packages by end date with their renewal status | BRPM.017 |
+| PM-VERSION-HISTORY | Package Version History | Every version of the packaged products with validator, dates and change summary | BRPM.006, 007 |
+
+All three are in the report category New Business, need PKG_REPORT_VIEW, export to PDF, XLSX, ODS and CSV, and support saved variants.
+
+### Package Status Update Report (PM-PKG-STATUS)
+
+Parameters: Request No. (individual report); Status (all or one stage); Request Type; Line Code; Insurer Code; Package Ends Within (days). Layout: landscape, one row per request, sorted by request number, with the parameters printed in the report header.
+
+<!-- table: widths=3.6,3,10 caption="PM-PKG-STATUS columns" size=8.5 -->
+| Column | Format | Content |
+|---|---|---|
+| Request No. | Text | PKR-yyyy-n |
+| Type | Text | Request type |
+| Client / Programme | Text | Client name (client-specific) or "Generic" |
+| Package | Text | Package or programme name |
+| Product | Text | Risk code |
+| Version | Number | Resulting or base version |
+| Stage | Text | Current stage |
+| Days in Stage | Number | Days since stage entry |
+| Package End | Date | Proposed or current package end date |
+| Rate % | Percent | Scheme rate of the proposed terms |
+| Insurers | Text | Chosen or target insurers |
+| Last Action | Text | Last workflow action |
+| On / By | Date / Text | Date and user of the last action |
+
+### Package Expiry Report (PM-PKG-EXPIRY)
+
+Parameter: Ending Within (days), default 90. Layout: portrait, sorted by package end date.
+
+<!-- table: widths=3.6,3,10 caption="PM-PKG-EXPIRY columns" size=8.5 -->
+| Column | Format | Content |
+|---|---|---|
+| Product | Text | Risk code |
+| Package | Text | Product name |
+| Version | Number | Version in force |
+| Package End | Date | End date of the version |
+| Days Left | Number | Days from today to the end date |
+| Anniversary | Date | Anniversary date, if any |
+| Renewal Request | Text | Open RENEW / REACTIVATE request, or "None" |
+| Renewal Stage | Text | Stage of that request |
+
+### Package Version History (PM-VERSION-HISTORY)
+
+Parameter: Product Code (optional). Layout: landscape, grouped by product, versions in ascending order.
+
+<!-- table: widths=3.6,3,10 caption="PM-VERSION-HISTORY columns" size=8.5 -->
+| Column | Format | Content |
+|---|---|---|
+| Product | Text | Risk code |
+| Version | Number | Version number |
+| Status | Text | Version state |
+| Effective From / Effective To | Date | Period in force |
+| Package End | Date | Package end date |
+| Submitted By / Validated By / Validated On | Text / Date | Checkpoint users and date (PMADD06) |
+| Validation Result | Text | Passed or Returned, with the return reason |
+| Source Request | Text | PKR number that produced the version |
+| Change Summary | Text | Summary entered at set-up |
+
+## Documents
+
+Documents are generated from versioned templates (FR-PM-013). The layouts below are the proposed draft layouts; BDOI's own layouts replace them when provided (Q03).
+
+<!-- table: widths=3.6,3.4,10 caption="Product Maintenance documents" size=8.5 -->
+| Template | Output | Sections |
+|---|---|---|
+| PKG_REQUEST_FORM | PDF | Header (request no., type, scope, date, requester); client or programme; line, cover type, product; reason; requested terms by section; coverages table (coverage, included, limit, deductible); requested rate scheme and dates; target insurers; approvals with names and dates |
+| PKG_QUOTATION_SLIP | PDF, one per insurer | BDOI letterhead; QS no. and round; insurer; package and line; requested cover by section; coverages table; requested rate and minimum premium; period; reply due date; contact |
+| PKG_COMPARATIVE | PDF and XLSX; MASTER or CLIENT | Title; request and round; one column per insurer; rows per selected field (outcome, rate, minimum premium, coverages, deductibles, conditions, valid until, remarks); lowest rate marked; generated by, date, template version |
+| PKG_SLIP | PDF | Package name and code; insurers with role and share; rate scheme; coverages and insurer terms; clauses; package dates; signature blocks |
+| PKG_ADVISORY | PDF, e-mail and in-app | Advisory type; package and version; effective date; what changed; list of supporting documents; instructions to units |
+| PKG_RENEWAL_ADVISORY | PDF, e-mail and in-app | As PKG_ADVISORY, with the previous and new term dates |
+
+# Interfaces and integration
+
+Figure 4 shows the interfaces of Product Maintenance. Package requests talk to the catalogue only through its published services and events. The catalogue is read by new business, Operations and Renewal.
+
+![Interfaces of Product Maintenance (dashed = on hold)](figures/brd03_integration.dot)
+
+<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
+|---|---|---|---|---|
+| Client master (CRM) | In | Client look-up on client-specific requests | BRPM.008 | IN SCOPE |
+| Catalogue set-up | Out | Draft version from the proposed terms at MBS set-up; retirement | BRPM.015 | IN SCOPE |
+| Catalogue events | In | Version released, returned, product expired | PMADD06, BRPM.017 | IN SCOPE |
+| Outgoing e-mail | Out | Protected QS, comparative outputs and advisories; send log | BRPM.012, 016, 020 | IN SCOPE |
+| Notifications and alerts | Out | Stage entry, SLA, release, expiry, incentive review | BRPM.021, 022 | IN SCOPE |
+| New business (BRD-1) | Out | Scheme version and rating for quotations, accounts and invoices; incentive criteria codes | BRPM.007; PMADD07 | IN SCOPE |
+| Operations (BRD-2) | Out | Version for endorsement re-rating; criteria codes for commission schemes (OQ39) | BRPM.007 | IN SCOPE |
+| Renewal (BRD-6) | Out | Version of the expiring account for Renew As Is | BRPM.007 | IN SCOPE |
+| Other BDOI systems | Out | Product master changes; BIBS records each change for the transfer | BRPM.022 | ON HOLD |
+| Insurer portals | Out | Not requested; insurers are reached by e-mail | BRPM.012 | OUT |
+
+> [!PARKED] On hold until BDOI answers PQ16
+> BRPM.022 asks for data "synchronized with BDOI systems". The systems, format and timing are not in the BRD (PQ16). BIBS records every release and expiry in the product master log; the transfer to the systems BDOI names is added without a change to the package workflow.
+
+# Non-functional requirements
+
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.33)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | Marketing 485 max / 145 concurrent; MBS 5 / 5; TSU 13 / 13 | Within the BRD-1 sizing (150 concurrent + 20% a year); the Marketing figures equal BRD-1's (PQ18) |
+| Volumes | Not stated | Assumed tens of package requests a month; no special sizing |
+| Response time | Under 5 seconds for every role | Online p95 under 3 seconds; documents and e-mails generated asynchronously |
+| Peak | 15th and 30th of the month; 08:00-17:30 | Expiry monitor and version lifecycle run at 01:00 |
+| Availability | 99.9%; use 07:00-18:30; maintenance per bank standard | Same deployment as BRD-1 (window 07:00-22:00 governs, OQ44) |
+| Recovery | RTO 4 hours, RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) |
+| Devices | Same performance on mobile and desktop | Responsive screens |
+| Security | Authorised users only; protected documents | Role-based access, four-eyes rules, protected e-mails (FR-PM-002, 004) |
+| Audit | All actions logged | Audit trail and workflow history that no user can change (FR-PM-005) |
+| Retention | Not stated | BRD-1 rule (5 years online, 15 years archive); product versions never purged (PQ18) |
+
+# Configuration items owned by the System Administrator
+
+The items below are changed in BIBS without a release. Changes to parameters and lists are audited.
+
+## Parameters
+
+<!-- table: widths=6.2,2.4,8.0 caption="Product Maintenance parameters" size=8.5 -->
+| Parameter | Default | Meaning |
+|---|---|---|
+| PKG_REQUEST_PREFIX | PKR- | Prefix of package request numbers; the year is appended (PKR-yyyy-n) |
+| PKG_QS_PREFIX | PQS- | Prefix of quotation slip numbers (PQS-yyyy-n) |
+| PKG_QS_REPLY_DAYS | 5 | Days insurers have to reply to a QS (1-60) |
+| PACKAGE_EXPIRY_NOTICE_DAYS | 60 | Days before the package end date of the first expiry alert (1-365) |
+| PACKAGE_EXPIRY_REMINDER_DAYS | 30,7 | Days of the further expiry reminders |
+| PACKAGE_RENEWAL_AUTODRAFT | false | The expiry monitor drafts renewal requests at the notice period (proposed true, CLR-PM-22) |
+| PKG_ADVISORY_GROUPS | MARKETING, TSU, MBS, OPERATIONS | Default recipient groups of an advisory |
+| PKG_SLA_MKT_APPROVAL | 24 | SLA hours of the Marketing approval |
+| PKG_SLA_TSU_REVIEW | 24 | SLA hours of the TSU TL review |
+| PKG_SLA_TSU_APPROVAL | 24 | SLA hours of the TSU Head approval |
+| PKG_SLA_NEGOTIATION | 120 | SLA hours of the negotiation stage |
+| PKG_SLA_MANCOM | 72 | SLA hours of the ManCom sign-off |
+| PKG_SLA_MBS_SETUP | 48 | SLA hours of the MBS set-up |
+| Job schedule (package expiry) | 01:00 PHT daily | Time of PACKAGE_EXPIRY_MONITOR and PACKAGE_VERSION_LIFECYCLE |
+
+## Lists of values
+
+<!-- table: widths=5.4,11.2 caption="Lists of values" size=8.5 -->
+| List | Values delivered |
+|---|---|
+| PKG_REQUEST_TYPE | New package; Amend package terms; Update package details; Renew package; Retire package; Reactivate expired package |
+| PKG_REQUEST_REASON | Client requirement; New programme for a market segment; Market competitiveness; Change in insurer terms or rates; Loss experience; Regulatory change; Package expiry or anniversary; Others (see comment) |
+| PKG_RESPONSE_OUTCOME | Pending; Accepted as requested; Approved with changes; Counter-proposal; Declined; No response |
+| PKG_ADVISORY_GROUP | Marketing; Technical Support Unit; Marketing Business Services; Processing; Operations |
+| PKG_NOT_PROCEEDED_REASON | Declined by the insurers; Negotiated terms not accepted; Client withdrew the request; Business decision; Others (see comment) |
+| INCENTIVE_TYPE | Others (see description); Migrated (from the booking incentive rules). Types to be supplied by BDOI (PQ04) |
+| COVERAGE_KIND | Section; Coverage; Peril; Extension |
+| CLAUSE_KIND | Warranty; Clause; Exclusion; Deductible wording |
+| DOCUMENT_TYPE (Product Maintenance values) | PKG_REQUEST_FORM; PKG_QUOTATION_SLIP; PKG_INSURER_RESPONSE; PKG_COMPARATIVE; PKG_SLIP_SIGNED; MANCOM_SIGNOFF; PKG_ADVISORY |
+| RETURN_REASON, VOID_REASON | Shared platform lists |
+
+## Masters and rules maintained by the business
+
+<!-- table: widths=4.4,4.6,7.6 caption="Masters and rules" size=8.5 -->
+| Item | Maintained by (authorised by) | FR |
+|---|---|---|
+| Product lines, cover types and subtypes, code patterns | MBS (PRODUCT_AUTHORIZE) | FR-PM-010 |
+| Coverages / perils | MBS (PRODUCT_AUTHORIZE) | FR-PM-010 |
+| Clause library | MBS (PRODUCT_AUTHORIZE) | FR-PM-011 |
+| Field rules (presence, list, range, pattern) | MBS (PRODUCT_AUTHORIZE) | FR-PM-012 |
+| Document templates | System Administrator | FR-PM-013 |
+| Package versions and insurer terms | MBS (validated by PRODUCT_VALIDATE) | FR-PM-014, 043, 050 |
+| Rate-scheme exceptions | Requester (PRODUCT_AUTHORIZE) | FR-PM-051 |
+| Incentive criteria | Incentive Maintenance user (PRODUCT_AUTHORIZE) | FR-PM-080 |
+| Roles and permissions | Business Administrator via access request (approver) | FR-PM-003 |
+| Validation checklist | Change request until PQ09 is answered | FR-PM-043 |
+
+# Assumptions, dependencies and open questions
+
+## Assumptions
+
+<!-- table: widths=1.8,11,3.8 caption="Assumptions" size=8.5 -->
+| ID | Assumption | Related |
+|---|---|---|
+| A-PM-01 | The final main BRD (pp.10-35) and the addendum (pp.1-9) are the baseline; the earlier version (pp.36-61) is used only to trace changes | R1-R3 |
+| A-PM-02 | A package is a catalogue product flagged as packaged, generic for a segment or client-specific; each package has its own risk code | PQ01 |
+| A-PM-03 | Any one of Marketing TL, TH or UH approves a request | PQ08 |
+| A-PM-04 | One ManCom member's sign-off completes the ManCom step | PQ07 |
+| A-PM-05 | "Deletion" in BRPM.011 means retirement; records are never deleted | PQ13 |
+| A-PM-06 | Maintenance of non-package products is out of scope in this phase | PQ19 |
+| A-PM-07 | BRPM.023 does not exist in either BRD version; no requirement is missing | PQ20 |
+| A-PM-08 | Package request volume is low (tens a month) | PQ18 |
+
+## Dependencies
+
+<!-- table: widths=1.8,11,3.8 caption="Dependencies" size=8.5 -->
+| ID | Dependency | Needed for |
+|---|---|---|
+| D-PM-01 | BDOI provides the product matrix content: subtypes, coverages per line, naming convention | FR-PM-010 (Q01, Q02, PQ02) |
+| D-PM-02 | BDOI provides the document layouts and the password convention | FR-PM-004, 013 (Q03, Q07, PQ21) |
+| D-PM-03 | BDOI defines CPC2 and the other incentive criteria | FR-PM-080 (PQ04) |
+| D-PM-04 | BDOI names the systems that receive product master changes | FR-PM-072 (PQ16) |
+| D-PM-05 | BRD-6 Renewal passes the expiring account's version on Renew As Is | FR-PM-051 (PQ11) |
+| D-PM-06 | The e-mail relay of the BIBS environment is available for insurer e-mails | FR-PM-030, 044 |
+
+## Open questions
+
+<!-- table: widths=1.4,10.1,2.8,2.4 caption="Open questions on BRD-3 (status from the cross-BRD decisions, R6)" status=Status size=8.5 -->
+| ID | Question | Affects | Status |
+|---|---|---|---|
+| PQ02 | Subline / type / subtype values and coverage / peril list per line; naming convention for product codes | FR-PM-010 | OPEN |
+| PQ03 | Which attributes vary by insurer in a package; co-insurance shares | FR-PM-014 | OPEN |
+| PQ04 | Definition of CPC2 and other criteria; required attributes; who is the Incentive Maintenance user | FR-PM-080, 081 | OPEN |
+| PQ05 | Full list of negotiation outcomes; maximum rounds; apply PMADD03/04 to non-package PRFs | FR-PM-031, 032 | OPEN |
+| PQ06 | Fields of client views; client layout; who generates client outputs | FR-PM-035 | OPEN |
+| PQ07 | ManCom membership, quorum, in-system versus signed sheet, SLA | FR-PM-041 | OPEN |
+| PQ08 | Approval chain by segment or amount; QS co-officer; SLA of each stage | FR-PM-021, 030, 073 | OPEN |
+| PQ09 | Validator role (TSU Head, Business Administrator or either); checklist content | FR-PM-043 | OPEN |
+| PQ10 | Scope of a rate scheme (statutory rates?); approver of non-current rates; manual item rates on packages | FR-PM-051 | PARTIAL |
+| PQ11 | Meaning of package expiry / anniversary; notice period; automatic renewal drafts (PM-Q37, PM-Q38; CLR-PM-22) | FR-PM-060, 061 | PARTIAL |
+| PQ12 | Content of the requirements pack; formulas beyond the three rating methods; advisory recipients and channel | FR-PM-040, 042, 044 | OPEN |
+| PQ14 | Mandatory fields of the Package Request Form; client for generic programmes | FR-PM-020 | OPEN |
+| PQ15 | Name and columns of the BRPM.018 report | FR-PM-071 | OPEN |
+| PQ16 | Systems that receive product master changes; format and timing | FR-PM-072 | OPEN |
+| PQ17 | Final role-to-action matrix; approval of role changes | FR-PM-002, 003 | ANSWERED |
+| PQ18 | Volumes, growth, availability window and retention | Section 8 | OPEN |
+| PQ21 | Which documents leave BDOI and the password convention | FR-PM-004 | PARTIAL |
+
+PQ01, PQ13, PQ19 and PQ20 are covered by assumptions A-PM-02, A-PM-05, A-PM-06 and A-PM-07; BDOI confirms them with the sign-off of this document.
+
+
+# Traceability
+
+Every BRD-3 requirement is met by at least one FR; the appendix User-story view gives each requirement as a user story with its FRs, acceptance criteria and test cases. The screen column names the main screen; the test cases are listed by test condition (TC-PM-nnn.n), and the test plan workbook lists each case.
+
+<!-- table: widths=2.2,3.4,5.2,5.2 caption="BRD ID to FR, screen and test cases" size=8 -->
+| BRD ID | FR | Screen | Test cases |
+|---|---|---|---|
+| BRPM.001 | FR-PM-001 | Login | TC-PM-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRPM.002 | FR-PM-002 | All; User Access Matrix | TC-PM-002.1, 002.2, 002.3, 002.4 (6 cases) |
+| BRPM.003 | FR-PM-012 | Product page (Field Rules) | TC-PM-012.1, 012.3, 012.4 (4 cases) |
+| BRPM.004 | FR-PM-012 | Product page (Field Rules) | TC-PM-012.1, 012.2, 012.3 (3 cases) |
+| BRPM.005 | FR-PM-013 | Package Request page (downloads) | TC-PM-013.1, 013.2, 013.3 (3 cases) |
+| BRPM.006 | FR-PM-052, FR-PM-045, FR-PM-071 | Products (Expired / Retired) | TC-PM-045.1, 045.2, 045.3, 052.1, 052.2, 052.3, 071.1, 071.2, 071.3 (14 cases) |
+| BRPM.007 | FR-PM-050, FR-PM-051 | Package Version; Quotation; Premium Calculator | TC-PM-050.1, 050.2, 050.3, 050.4, 051.1, 051.2, 051.3, 051.4 (17 cases) |
+| BRPM.008 | FR-PM-020, FR-PM-021 | New Package Request; Package Requests | TC-PM-020.1, 020.2, 020.3, 020.4, 020.5, 021.1, 021.2, 021.3 (16 cases) |
+| BRPM.009 | FR-PM-022, FR-PM-023 | TSU Workbench; Package Request page | TC-PM-022.1, 022.2, 022.3, 023.1, 023.2, 023.3 (9 cases) |
+| BRPM.010 | FR-PM-032, FR-PM-033, FR-PM-036 | Package Request page (Negotiation) | TC-PM-032.1, 032.2, 032.3, 032.4, 033.1, 033.2, 033.3, 036.1, 036.2, 036.3 (16 cases) |
+| BRPM.011 | FR-PM-020, FR-PM-024, FR-PM-045 | Package Requests; TSU Workbench | TC-PM-020.1, 020.2, 020.3, 020.4, 020.5, 024.1, 024.2, 024.3, 024.4, 045.1, 045.2, 045.3 (22 cases) |
+| BRPM.012 | FR-PM-030 | Package Request page (Negotiation) | TC-PM-030.1, 030.2, 030.3, 030.4, 030.5 (7 cases) |
+| BRPM.013 | FR-PM-031, FR-PM-034, FR-PM-036 | Package Request page (Negotiation, Comparative) | TC-PM-031.1, 031.2, 031.3, 034.1, 034.2, 034.3, 034.4, 036.1, 036.2, 036.3 (17 cases) |
+| BRPM.014 | FR-PM-034 | Package Request page (Comparative) | TC-PM-034.1, 034.2, 034.3, 034.4 (5 cases) |
+| BRPM.015 | FR-PM-040, 041, 042, 043 | Requirements & Sign-off; Set-up; Validation Queue | TC-PM-040.1, 040.2, 040.3, 041.1, 041.2, 041.3, 041.4, 042.1, 042.2, 042.3, 042.4, 043.1, 043.2, 043.3, 043.4 (27 cases) |
+| BRPM.016 | FR-PM-044 | Package Request page (Advisories) | TC-PM-044.1, 044.2, 044.3, 044.4 (7 cases) |
+| BRPM.017 | FR-PM-060, FR-PM-061, FR-PM-044 | Package Expiry | TC-PM-044.1, 044.2, 044.3, 044.4, 060.1, 060.2, 060.3, 060.4, 061.1, 061.2, 061.3 (18 cases) |
+| BRPM.018 | FR-PM-071 | Reports | TC-PM-071.1, 071.2, 071.3 (5 cases) |
+| BRPM.019 | FR-PM-070 | Product Maintenance Home | TC-PM-070.1, 070.2, 070.3 (5 cases) |
+| BRPM.020 | FR-PM-004 | E-mails and Documents tabs | TC-PM-004.1, 004.2, 004.3 (4 cases) |
+| BRPM.021 | FR-PM-073, FR-PM-021 | Workflow panel | TC-PM-021.1, 021.2, 021.3, 073.1, 073.2, 073.3 (10 cases) |
+| BRPM.022 | FR-PM-072 | Notifications | TC-PM-072.1, 072.2 (4 cases) |
+| BRPM.024 | FR-PM-005 | History tabs | TC-PM-005.1, 005.2, 005.3 (3 cases) |
+| PMADD01 | FR-PM-010 | Products; Coverages & Clauses | TC-PM-010.1, 010.2, 010.3, 010.4 (7 cases) |
+| PMADD02 | FR-PM-011, FR-PM-014 | Package Version (Insurer Terms); Coverages & Clauses | TC-PM-011.1, 011.2, 011.3, 014.1, 014.2, 014.3, 014.4 (10 cases) |
+| PMADD03 | FR-PM-035 | Package Request page (Comparative) | TC-PM-035.1, 035.2, 035.3 (5 cases) |
+| PMADD04 | FR-PM-031, FR-PM-032 | Package Request page (Negotiation) | TC-PM-031.1, 031.2, 031.3, 032.1, 032.2, 032.3, 032.4 (11 cases) |
+| PMADD05 | FR-PM-002, FR-PM-003 | User Access Matrix; Access Requests | TC-PM-002.1, 002.2, 002.3, 002.4, 003.1, 003.2, 003.3, 003.4 (12 cases) |
+| PMADD06 | FR-PM-043 | Validation Queue; Package Version | TC-PM-043.1, 043.2, 043.3, 043.4 (9 cases) |
+| PMADD07 | FR-PM-080, FR-PM-081 | Incentive Criteria | TC-PM-080.1, 080.2, 080.3, 080.4, 081.1, 081.2, 081.3 (15 cases) |
+| PMADD08 | FR-PM-080, FR-PM-081 | Incentive Criteria | TC-PM-080.1, 080.2, 080.3, 080.4, 081.1, 081.2, 081.3 (15 cases) |
+
+<!-- landscape -->
+
+# Navigation
+
+This chapter shows how each Product Maintenance user reaches the screens. The sidebar shows a screen only when the user's role holds its permission (section 3.2), so each persona sees a different menu. The tables follow the proposed role grants.
+
+## Screens of Product Maintenance
+
+The 22 screens specified in chapter 13, with the menu path and the roles that can open them. A screen without its own menu entry (a record, a form, a tab of a record) is reached from the screen before it; its path ends with that screen. The package request record is specified in five parts (SCR-PM-04 to SCR-PM-08) because its tabs are worked by different teams.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screen-index
+```
+
+## Screen flow
+
+How the screens link: from a list to its record, from a record action to the next screen, and from the package request to the catalogue version and to New Business pricing. The walkthroughs of chapter 14 follow these links with real steps.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: flow
+```
+
+<!-- portrait -->
+
+## Menu by persona
+
+For each Product Maintenance persona, the SIT and UAT user of the seed data and the sidebar that user sees, section by section. The BRD column shows which BRD owns a section; entries of other BRDs are listed so the business unit sees the whole menu of its users.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: menus
+```
+
+## Common screen elements
+
+Elements that behave the same on every Product Maintenance screen are described once here and not repeated in the screen specifications.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: common
+```
+
+<!-- landscape -->
+
+# Screen specifications
+
+One specification per screen, grouped by area. Each gives:
+
+- **Purpose**, **who can open it** (personas and the permission), **navigation** (menu path and the other ways in) and the related **FRs**;
+- **screenshots** of the SIT environment with seed data; the numbered markers on the first screenshot match the **No.** column of the field table;
+- the **field table**: section of the screen, label as shown, type, length or format, mandatory (Y, N or the condition), source list or master, default, the statuses in which the field can be changed, the validation and the message shown when it fails, word for word;
+- the **actions table**: button, who sees it, when it is enabled, what happens, the resulting status and the notification sent;
+- the **business rules** of the screen with their FRs, the **expected outcome** and the **test cases** of the test plan that run on the screen.
+
+A message in angle brackets (`<risk code>`) is completed by the system with the value shown. "Workflow notice" means the in-app notification NT-01 of chapter 16.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screens
+```
+
+<!-- portrait -->
+
+# End-to-end walkthroughs
+
+Two walkthroughs follow a package through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only. They are the script of the SIT review sessions of the Start Here guide.
+
+## WT-A A new package from the request to its first New Business quotation
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-A
+```
+
+## WT-B Returns and refusals, and the messages the user sees
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-B
+```
+
+<!-- landscape -->
+
+# Messages catalogue
+
+Every message a Product Maintenance user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are quoted exactly as the screens show them.
+
+- **Validation**: shown on the screen while the user fills in a field or before the form is sent.
+- **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
+- **Warning**: the action is possible, but the user should check something first.
+- **Confirmation** and **Information**: the outcome of an action, or a hint on the screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: messages
+```
+
+# Notifications catalogue
+
+The in-app notifications, alerts and e-mails that Product Maintenance sends: what triggers each, who receives it and what it contains. Documents e-mailed outside BIBS are password protected; the password follows in a separate e-mail.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: notifications
+```
+
+<!-- portrait -->
+
+# Document outputs
+
+The documents Product Maintenance generates, each from a document template maintained on the Document Templates screen of the New Business set (SCR-NB-44), with the BDO Insure letterhead, the "Confidential" footer and page numbers. For each: the template, the format, the screen that produces it, the password protection, where every field comes from and the first page as generated from seed data. The templates delivered are draft layouts; BDOI's own layouts replace them as new template versions (configuration input CI-08).
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: documents
+```
+
+# Upload screens
+
+Product Maintenance has no bulk upload screen. Files are added to a package request in three places, each with the file type, size, content and malware checks of every upload and with the SHA-256 fingerprint kept for audit:
+
+<!-- table: widths=4.2,5.4,8 caption="Uploads of Product Maintenance" -->
+| Where | What is uploaded | Rules |
+|---|---|---|
+| Package Request record › Documents tab (and the form after the first save) | Supporting documents of the request; the signed package slip (type Package slip (signed)); the ManCom sign-off sheet (type ManCom sign-off) | The signed package slip is needed before the requirements go to ManCom and before an advisory is sent; the ManCom sign-off before an advisory is sent. Files can be named after the request number |
+| Negotiation tab › Terms of an insurer › Response document | The insurer's reply (PDF, e-mail or image), stored with the type Insurer package terms | One file per saved response; a file that cannot be read is refused with its message |
+| Advisories tab › Send Advisory | The advisory PDF is generated and stored by BIBS (type Package advisory) | No user upload |
+
+The product masters of go-live (lists of values, sales organisation, insurers, products, commission rates) and the package map are loaded by the data migration from the templates of chapter 19; the packages in force are not migrated but set up through package requests (CLR-PM-21). After go-live they are changed on the screens of chapter 13 under maker-checker.
+
+<!-- landscape -->
+
+# Configuration inputs the business provides
+
+Product Maintenance is a setup object of Drop 0: before New Business, Renewal and the data migration can use it, BDOI provides the product catalogue, the rate tables, the packages in force, the document templates and the lists of values. Products, insurers, commission rates, lists and the sales organisation of the legacy systems are loaded by the data migration; the packages themselves are not migrated but set up by TSU and MBS through package requests, and the package map (object R06) tells Renewal which BIBS package version renews each legacy package at sanitation (check PACKAGE_REMAP). Each input has a template in the workbook of configuration input templates of this set (06). The workbook opens on a Start here sheet that lists the templates in the order they are filled in (a template whose codes others use comes first), with who provides each, when it is due, how it is loaded, the rows entered, the mandatory cells still missing and a status. Each template sheet is self-contained: its purpose, owner, due date and the templates it depends on, then directly above each column its guide (mandatory or not, format, allowed values, what to enter), one fictitious example row to overwrite, and drop-downs with the allowed values and the codes of the templates filled in before. The allowed values are listed on the sheet Reference lists; questions per template and column are raised on the sheet Questions and comments. The sections below follow the same order.
+
+```pack
+plugin: pack/config_inputs.py
+source: pack/config_inputs.yaml
+render: summary
+```
+
+```pack
+plugin: pack/config_inputs.py
+source: pack/config_inputs.yaml
+render: templates
+```
+
+# Cross-BRD dependencies and interface contract
+
+Product Maintenance is the source of the products, package versions, rate schemes, rules and incentive criteria that the selling and servicing BRDs use, and it takes its clients, templates, users and go-live load from other BRDs. The contract below lists each exchange: the BRD or system, the direction, what is exchanged, when and how, and who owns the data. Chapter 7 describes the interfaces with the external systems.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: contract
+```
+
+<!-- portrait -->
+
+# Sign-off and change control
+
+## What is signed
+
+The business sign-off covers the release set BRD-03 Product Maintenance v2.0:
+
+<!-- table: widths=6,11.6 caption="Documents of the release set" -->
+| Document | Content |
+|---|---|
+| Start Here guide | The map of the set, who reads what, the steps and the dates |
+| Sign-off Pack Guide deck | Purpose, approach, the module at a glance, caveats, entry and exit criteria, change control |
+| This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-21) and the proposed rules for confirmation (chapter 22) |
+| Sign-off workbook v2.0 | The screens, fields, actions, rules, messages, notifications, menus and contract of this FRS, one row each, with the BU review columns |
+| Test plan v2.0 | The test cases traced to the FRs and to the screens of chapter 13 |
+| Configuration input templates | The templates of chapter 19 |
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: counts
+```
+
+## How the review is recorded
+
+Each business unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. The project team answers every Change requested row before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as specified.
+
+## What signing freezes
+
+Signing this release set freezes, for Product Maintenance:
+
+- the screens and their navigation (chapters 12 and 13), the fields with their order, labels, types, mandatory rules, lists and validations;
+- the actions with their conditions and resulting statuses, and the business rules;
+- the messages (chapter 15), the notifications (chapter 16) and the generated documents (chapter 17);
+- the configuration input templates (chapter 19) and the interface contract with the other BRDs (chapter 20).
+
+The content of the configuration (products, versions, rates, clauses, templates, list values, parameters such as the service level hours) is not frozen: the business maintains it in the system under maker-checker without a change request.
+
+## Change after sign-off
+
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it with its mandays, including its effect on the other BRDs through the interface contract of chapter 20, and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on), and the changed rows are reviewed again.
+
+## Proposed rules for confirmation
+
+Chapter 22 lists the proposed business rules and screen behaviour that differ from the BRD or need a decision of BDOI. BDOI records its decision on each item with its review; a decision that changes a screen, field, rule or message is applied in the next version of this set.
+
+<!-- pagebreak -->
+
+## Signatures
+
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the Product Maintenance functions, screens and messages it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 22. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+
+```signoff
+rows:
+  - {name: "", role: "Product Owner, Marketing Business System", organisation: BDOI}
+  - {name: "", role: "Head, Marketing Business Services and System Support", organisation: BDOI}
+  - {name: "", role: "Head, Technical Support Unit", organisation: BDOI}
+  - {name: "", role: "Head, Retail Marketing", organisation: BDOI}
+  - {name: "", role: "Head, Comptrollership", organisation: BDOI}
+  - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
+  - {name: "", role: Project Manager, organisation: iorta TechNXT}
+```
+
+<!-- pagebreak -->
+
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed screen or rule differs from the BRD text, or where BIBS needs a decision of BDOI to complete the rule. Each item names the proposed behaviour, the reason and the decision requested. BDOI records its decision with the review of this set (section 21.5); a decision that changes a screen, field, rule or message is applied in the next version of the set, and an answer that only sets a value (a list, a parameter, a template) is applied as configuration.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-PM-01 | Risk-code naming per line (BRPM.003, PMADD01; FR-PM-010) | Each product line can carry a risk-code pattern. BIBS refuses a new risk code that does not follow the pattern of its line. Until BDOI states the conventions, no pattern is set and every well-formed code is accepted. | The naming convention of each line is not in the BRD (PQ02). | State the naming convention of each line (PQ02, PM-Q49). |
+| CLR-PM-02 | Package documents (BRPM.005; FR-PM-013, 030) | Package documents are produced from versioned templates in draft layouts; BDOI's layouts are loaded as new template versions. The quotation slip is one document per round, e-mailed separately to each insurer. A package brochure is not among the generated documents. | BDOI's layouts are not yet provided (Q03); the BRD does not define a brochure. | Provide the layouts (Q03). Confirm one quotation slip per round sent separately to each insurer, and that no brochure is generated (PM-Q20, PM-Q55). |
+| CLR-PM-03 | Marketing approval (BRPM.008, 021; FR-PM-021) | One Marketing approval stage: any holder of the approval permission other than the maker approves. | The BRD names the TL, TH or UH without an order or a limit (PQ08). | Confirm one approval by any of the TL, TH or UH, or give the approval chain by segment or amount (PQ08, PM-Q13). |
+| CLR-PM-04 | Deletion of a package (BRPM.011; FR-PM-045) | A package is retired, not deleted. The product and its versions stay readable for the policies sold on them. | Records are kept for audit and for the accounts that use the package (A-PM-05, PQ13). | Confirm retirement in place of deletion (PM-Q16). |
+| CLR-PM-05 | ManCom sign-off (BRPM.015; FR-PM-041) | The sign-off of one ManCom member in BIBS completes the step. An uploaded signed sheet is linked to the request; without it BIBS generates a sign-off record. | ManCom membership and quorum are not in the BRD (PQ07). | Confirm that one member's sign-off completes the step, or give the quorum (PQ07, PM-Q26). |
+| CLR-PM-06 | Advisories (BRPM.016; FR-PM-044) | Each advisory is an in-app notice to the users of each recipient group, chosen by permission; the protected PDF is also e-mailed when addresses are entered. | The recipients and the channel are not in the BRD (PQ12). | Name the recipient units and confirm the channel (PQ12, PM-Q29). |
+| CLR-PM-07 | Expiry and incentive alerts (BRPM.017, PMADD08; FR-PM-060, 081) | The alerts are raised in the Alert inbox (System Administrator, Auditor) and sent to TSU and MBS as in-app notices. | The BRD names TSU and MBS as recipients but no channel. | Confirm in-app notices to TSU and MBS as the channel of these alerts (PM-Q29). |
+| CLR-PM-08 | Package Status Update Report (BRPM.018; FR-PM-071) | Report PM-PKG-STATUS with draft columns, separate from the BRD-1 Placement Update Report. | The report name and columns are not in the BRD (PQ15). | Give the report name and columns (PQ15, PM-Q44). |
+| CLR-PM-09 | Password of protected documents (BRPM.020; FR-PM-004) | A password is generated for each e-mail and sent in a separate e-mail. | BDOI's password convention is not yet given (Q07, PQ21). | Confirm the generated password or give the convention (Q07, PQ21, PM-Q47). |
+| CLR-PM-10 | Synchronisation with BDOI systems (BRPM.022; FR-PM-072) | BIBS records every release and expiry in the product master log. The transfer to the receiving systems starts when BDOI names them. | The receiving systems, the format and the timing are not in the BRD (PQ16). | Name the systems, the format and the timing (PQ16, PM-Q45). |
+| CLR-PM-11 | Client-tailored comparative (PMADD03; FR-PM-035) | TSU chooses from a fixed catalogue of eight fields: Outcome, Rate %, Minimum Premium, Coverages, Deductibles, Conditions / Warranties, Valid Until and Remarks. | The fields of the client views are not in the addendum (PQ06). | Confirm the eight fields or give the fields (PQ06, PM-Q23). |
+| CLR-PM-12 | Client view without a field selected (FR-PM-035) | BIBS requires a title and at least one insurer for a client view; the field selection is not checked, so a view can show the insurers without comparison fields. | The addendum does not say whether a view needs at least one field. | Confirm whether a client view must have at least one field (PM-Q23). |
+| CLR-PM-13 | Master comparative before responses (BRPM.014; FR-PM-034) | BIBS refuses the master until the quotation slip of the round is sent. After that, a round whose insurers are all Pending gives a master with Pending rows, which TSU can share as a status view. | The BRD does not say when the master can first be compiled. | Confirm that a master with Pending rows is acceptable (PM-Q24). |
+| CLR-PM-14 | Package remapping at migration (BRD-13 BRID 3.1; FR-PM-050) | Legacy packages are mapped to BIBS package versions in the package map (migration object R06), which the Renewal check PACKAGE_REMAP uses. Product Maintenance provides the package versions that the map names. | Renewals of migrated policies must use BIBS package versions (BDOI answers DMQ36-DMQ38 of 26-Sep-2026). | Confirm that Product Maintenance provides the versions and that the map is prepared with the data migration (PM-Q35). |
+| CLR-PM-15 | Bulk upload of product masters (FR-PM-010, 014) | No bulk upload screen in Product Maintenance. The go-live load runs through the data migration (objects R01, R03-R05, R07); later changes are made on the screens under maker-checker. | Package volumes after go-live are low (A-PM-08). | Confirm that no bulk upload of product masters is needed after go-live (PM-Q36). |
+| CLR-PM-16 | Escalation beyond the stage owners (BRPM.021; FR-PM-073) | A request past its SLA alerts the owners of its stage and shows in the red tiles of the home page. It is not escalated to a higher level. | The BRD does not ask for escalation beyond the stage owners. | Confirm that no escalation to the unit head is needed (PM-Q18). |
+| CLR-PM-17 | Main path of the package request stepper | The stepper shows the main path from Draft Request to Released, through the stages of the request in their order; a returned request shows the stage it went back to in amber, and a voided or not proceeded request ends in red. | One path keeps the stepper readable. | Confirm the stage list of the package request (PM-Q58). |
+| CLR-PM-18 | Scheme rate compared in a rate exception (FR-PM-051) | The Scheme Rate of the Rate Exceptions table and of the exception record is the package rate of the version in force that priced the quotation, not the panel insurer's rate. | An exception is approved against the package scheme. | Confirm the rate the requested rate is compared with (PM-Q32). |
+| CLR-PM-19 | Difference column format (FR-PM-051) | The difference is shown in percentage points with its sign and two decimals (for example -0.10). | A percentage of the rate would read as a second rate. | Confirm percentage points with the sign (PM-Q32). |
+| CLR-PM-20 | Full status labels | Stages and statuses show their full label (for example Requirements Preparation, Pending Authorization); a short form with the full label in the tooltip is used only above 21 characters. | The client asked for full labels where they fit (27-Sep-2026). | Confirm full labels and the short forms of the longer ones (PM-Q58). |
+| CLR-PM-21 | Packages in force at go-live (BRPM.007; FR-PM-050, 051; chapter 19, template CI-06) | Each package in force at go-live is set up in BIBS through a package request (type New package, or Update for an existing risk code) with its signed package slip and ManCom reference, set up by MBS and validated before the map freeze; no package version is loaded by the data migration. FR-PM-050 rule R3 and FR-PM-051 rule R4 of release set v2.0 read as if the packages were loaded as version 1 by the migration; chapter 19 and template CI-06 say they are set up by request; this set takes the request route as its proposed position. | Every package of BIBS then carries its approvals, slips and validation from day one, as the packages sold later do; the package map of the migration (CLR-PM-14) points to versions released this way. | Confirm the request route and the number of packages in force, so that TSU and MBS can plan the effort (PM-Q34, PM-Q56). |
+| CLR-PM-22 | Automatic drafting of package renewal requests (BRPM.017; FR-PM-060, 061) | Switch automatic drafting on: at the first expiry alert (60 days before the package end date) BIBS drafts the renewal request from the current version and the TSU Officer completes and submits it; reminders at 30 and 7 days. The parameter PACKAGE_RENEWAL_AUTODRAFT lets BDOI switch it off. | The envisioned process of the BRD has the renewal request drafted from the expiry monitor; the parameter is delivered off. | Confirm automatic drafting, and the meaning of the end and anniversary dates with the alert days (PQ11, PM-Q37, PM-Q38). |
+| CLR-PM-23 | Sign-in of Product Maintenance users (BRPM.001; FR-PM-001) | Product Maintenance users sign in, are locked out and are signed out as every BIBS user under BRD-11: single sign-on through EIAM on Microsoft Entra ID (OpenID Connect or SAML 2.0) once switched on, local sign-in until then; an approved change to the permissions of a Product Maintenance role waits for its implementation by the System Administrator, as for every group profile. | Release set v2.0 stated that directory sign-in was not part of this phase; BRD-11 v2.1 states single sign-on as part of BIBS. | Confirm that Product Maintenance follows BRD-11 for sign-in and for role changes (PM-Q11, PM-Q12). |
+| CLR-PM-24 | Incentive criteria and endorsements (PMADD07, 08; FR-PM-080, 081) | The incentive criteria keep no endorsement attribute; New Business evaluates the endorsements of an account when it sets the incentive indicator (New Business BRD of 13-May-2026, BRNB.107). | The New Business BRD of May 2026 makes the incentive indicator depend on the applicable endorsements. | Confirm that no endorsement attribute is needed on the incentive criteria (PM-Q42). |
+
+# Appendix: User-story view
+
+One row per requirement of the Product Maintenance BRD. The BRD writes its requirements as user stories; the stories below keep their meaning with the personas of this FRS. The acceptance criteria are the numbered criteria (AC) of each FR; the test cases are those of the test plan (file 04) that trace to the requirement.
+
+<!-- table: widths=2.4,6.6,2.6,2.6,3.6 caption="User-story view: one row per BRD requirement" size=7.5 -->
+| BRD ID | User story | FR | Acceptance criteria | Test cases |
+|---|---|---|---|---|
+| BRPM.001 (p.15) | As an MBS, TSU or Marketing user, I need to access and sign in to BIBS with my credentials, so that only users with valid credentials reach Product Maintenance. | FR-PM-001 | FR-PM-001 AC 1-3 | TC-PM-001.1-01 to 001.5-01 (7) |
+| BRPM.002 (p.15) | As the System Administrator, I need access restricted to authorised users, so that unauthorised attempts are denied and only the roles of Product Maintenance act on packages. | FR-PM-002 | FR-PM-002 AC 1-3 | TC-PM-002.1-01 to 002.4-02 (6) |
+| BRPM.003 (p.16) | As an MBS user, I need every mandatory, critical and product-specific field captured, stored and validated, so that each product is complete before it is used. | FR-PM-012 | FR-PM-012 AC 1-3 | TC-PM-012.1-02 to 012.4-02 (4) |
+| BRPM.004 (p.16) | As an MBS user, I need validation rules applied by product type, so that invalid data is refused for each product line. | FR-PM-012 | FR-PM-012 AC 1-3 | TC-PM-012.1-01 to 012.3-01 (3) |
+| BRPM.005 (p.16-17) | As a TSU Officer, I need shared document templates with dynamic fields for the data of each product, so that package documents are produced for every product line without rework. | FR-PM-013 | FR-PM-013 AC 1-2 | TC-PM-013.1-01 to 013.3-01 (3) |
+| BRPM.006 (p.17) | As an MBS user, I need expired packages archived and searchable, never deleted, so that their details are available for reference or reactivation. | FR-PM-045, FR-PM-052, FR-PM-071 | FR-PM-045 AC 1-2; FR-PM-052 AC 1-3; FR-PM-071 AC 1-3 | TC-PM-045.1-01 to 045.3-01 (5); TC-PM-052.1-01 to 052.3-01 (4); TC-PM-071.1-01 to 071.3-02 (5) |
+| BRPM.007 (p.17-18) | As a Marketing AO, I need new business priced automatically on the latest approved rate scheme, so that an outdated rate cannot be selected. | FR-PM-050, FR-PM-051 | FR-PM-050 AC 1-2; FR-PM-051 AC 1-4 | TC-PM-050.1-01 to 050.4-02 (7), TC-PM-SCR-12, TC-PM-MSG-10; TC-PM-051.1-01 to 051.1-02 (10), TC-PM-SCR-19, TC-PM-SCR-21, TC-PM-SCR-22, TC-PM-MSG-15, TC-PM-MSG-17, TC-PM-MSG-18 |
+| BRPM.008 (p.18-19) | As a Marketing AO, I need to submit a Package Request Form approved by the Marketing TL, TH or UH, so that TSU receives a complete and approved request. | FR-PM-020, FR-PM-021 | FR-PM-020 AC 1-4; FR-PM-021 AC 1-3 | TC-PM-020.1-01 to 020.5-04 (11), TC-PM-SCR-03, TC-PM-MSG-02; TC-PM-021.1-01 to 021.3-03 (5), TC-PM-SCR-04, TC-PM-MSG-03 |
+| BRPM.009 (p.19-20) | As the TSU Team Lead, I need to review package requests and recommend them for the approval of the TSU Head, so that no request proceeds without that approval. | FR-PM-022, FR-PM-023 | FR-PM-022 AC 1-2; FR-PM-023 AC 1-3 | TC-PM-022.1-01 to 022.3-02 (5); TC-PM-023.1-01 to 023.3-02 (4) |
+| BRPM.010 (p.20) | As a TSU Officer, I need to negotiate terms, rates and conditions with insurers and record the outcome, so that a package is not finalised before the negotiation is complete and documented. | FR-PM-032, FR-PM-033, FR-PM-036 | FR-PM-032 AC 1-3; FR-PM-033 AC 1-2; FR-PM-036 AC 1-2 | TC-PM-032.1-01 to 032.4-02 (5); TC-PM-033.1-01 to 033.3-01 (5); TC-PM-036.1-01 to 036.3-02 (6) |
+| BRPM.011 (p.21) | As a TSU Officer, I need to receive and view requests for package creation, amendment, update or deletion, pre-filled from Marketing's input, so that nothing is keyed in twice and the right users are told. | FR-PM-020, FR-PM-024, FR-PM-045 | FR-PM-020 AC 1-4; FR-PM-024 AC 1-3; FR-PM-045 AC 1-2 | TC-PM-020.1-01 to 020.5-04 (11), TC-PM-SCR-03, TC-PM-MSG-02; TC-PM-024.1-01 to 024.4-01 (6), TC-PM-SCR-02, TC-PM-SCR-09, TC-PM-MSG-01; TC-PM-045.1-01 to 045.3-01 (5) |
+| BRPM.012 (p.22) | As a TSU Officer, I need to prepare the quotation slip from the request and send it to the insurers after its approval, so that every insurer receives the agreed terms and the communication is kept. | FR-PM-030 | FR-PM-030 AC 1-4 | TC-PM-030.1-01 to 030.5-01 (7), TC-PM-SCR-05, TC-PM-MSG-04 |
+| BRPM.013 (p.23) | As a TSU Officer, I need to key in each insurer's terms and feedback and edit them later, so that the responses are reviewed and approved before they go to Marketing. | FR-PM-031, FR-PM-034, FR-PM-036 | FR-PM-031 AC 1-3; FR-PM-034 AC 1-3; FR-PM-036 AC 1-2 | TC-PM-031.1-01 to 031.3-01 (6); TC-PM-034.1-01 to 034.4-01 (5), TC-PM-SCR-06, TC-PM-MSG-05; TC-PM-036.1-01 to 036.3-02 (6) |
+| BRPM.014 (p.24-25) | As a TSU Officer, I need all insurers' feedback compiled automatically into one comparative table per package, so that the terms can be compared, exported and shared by authorised users. | FR-PM-034 | FR-PM-034 AC 1-3 | TC-PM-034.1-01 to 034.4-01 (5), TC-PM-SCR-06, TC-PM-MSG-05 |
+| BRPM.015 (p.25-26) | As an MBS user, I need to receive the product requirements from TSU only after the ManCom sign-off, so that packages are set up from complete and approved documentation. | FR-PM-040, FR-PM-041, FR-PM-042, FR-PM-043 | FR-PM-040 AC 1-2; FR-PM-041 AC 1-3; FR-PM-042 AC 1-3; FR-PM-043 AC 1-3 | TC-PM-040.1-01 to 040.3-02 (5), TC-PM-SCR-07, TC-PM-MSG-06; TC-PM-041.1-01 to 041.4-02 (6); TC-PM-042.1-01 to 042.4-02 (7), TC-PM-SCR-08, TC-PM-MSG-07; TC-PM-043.1-01 to 043.4-03 (9), TC-PM-SCR-13, TC-PM-SCR-14, TC-PM-MSG-11 |
+| BRPM.016 (p.26-27) | As a TSU Officer, I need the supporting documents (signed package slip, ManCom sign-off) at hand to create the package advisory, so that the units concerned are informed with complete documentation. | FR-PM-044 | FR-PM-044 AC 1-3 | TC-PM-044.1-01 to 044.1-02 (7) |
+| BRPM.017 (p.27-28) | As a TSU Officer, I need to monitor the expiry or anniversary date of each package and raise renewal requests pre-filled from the current terms, so that packages are renewed before they lapse. | FR-PM-044, FR-PM-060, FR-PM-061, FR-PM-071 | FR-PM-044 AC 1-3; FR-PM-060 AC 1-3; FR-PM-061 AC 1-2; FR-PM-071 AC 1-3 | TC-PM-044.1-01 to 044.1-02 (7); TC-PM-060.1-01 to 060.4-01 (7), TC-PM-SCR-10, TC-PM-MSG-08; TC-PM-061.1-01 to 061.1-02 (4); TC-PM-071.1-01 to 071.3-02 (5) |
+| BRPM.018 (p.28-29) | As a Marketing, TSU or MBS user, I need a package status report for one or all requests, so that the progress of package creation is visible and exportable. | FR-PM-071 | FR-PM-071 AC 1-3 | TC-PM-071.1-01 to 071.3-02 (5) |
+| BRPM.019 (p.29) | As a Marketing, TSU or MBS user, I need a dashboard of request status, reports and comparative tables, so that I track packages in real time. | FR-PM-070 | FR-PM-070 AC 1-2 | TC-PM-070.1-01 to 070.3-02 (5), TC-PM-SCR-01 |
+| BRPM.020 (p.29-30) | As a TSU Officer, I need every shared document protected, so that only authorised recipients can open it. | FR-PM-004 | FR-PM-004 AC 1-2 | TC-PM-004.1-01 to 004.3-01 (4) |
+| BRPM.021 (p.30-31) | As the TSU Team Lead, I need validation checks and approvals by the designated authorities enforced within the service levels, so that nothing is sent or finalised before every approval is complete. | FR-PM-021, FR-PM-073 | FR-PM-021 AC 1-3; FR-PM-073 AC 1-2 | TC-PM-021.1-01 to 021.3-03 (5), TC-PM-SCR-04, TC-PM-MSG-03; TC-PM-073.1-01 to 073.2-02 (5) |
+| BRPM.022 (p.31) | As a TSU Officer, I need users notified of status changes and the product data shared with the BDOI systems that use it, so that every unit works on current package data. | FR-PM-072 | FR-PM-072 AC 1-2 | TC-PM-072.1-01 to 072.1-03 (4) |
+| BRPM.024 (p.31-32) | As an Auditor, I need an audit trail of every action and change on requests and documents, so that each step can be reviewed. | FR-PM-005 | FR-PM-005 AC 1-3 | TC-PM-005.1-01 to 005.3-01 (3) |
+| PMADD01 (p.4) | As an MBS user, I want a standard, reusable product structure (line, subline, type, subtype, coverage and peril), so that products are consistent and scalable across packaged and non-packaged products. | FR-PM-010 | FR-PM-010 AC 1-3 | TC-PM-010.1-01 to 010.4-02 (7), TC-PM-SCR-11, TC-PM-SCR-15, TC-PM-MSG-09, TC-PM-MSG-12 |
+| PMADD02 (p.4) | As a TSU Officer, I want insurer-specific coverages, deductibles and warranties maintained without IT, so that insurer variability is supported in a controlled way. | FR-PM-011, FR-PM-014 | FR-PM-011 AC 1-2; FR-PM-014 AC 1-3 | TC-PM-011.1-01 to 011.3-02 (5); TC-PM-014.1-01 to 014.4-01 (5), TC-PM-SCR-17, TC-PM-SCR-18, TC-PM-MSG-14 |
+| PMADD03 (p.4) | As a TSU Officer, I want configurable comparative tables (an auditable master and client-tailored views), so that client outputs are produced without rework in Excel. | FR-PM-035 | FR-PM-035 AC 1-2 | TC-PM-035.1-01 to 035.3-03 (5) |
+| PMADD04 (p.5) | As a TSU Officer, I want explicit exception states and repeated negotiation rounds, so that revisions and declines are formal outcomes of the workflow. | FR-PM-031, FR-PM-032 | FR-PM-031 AC 1-3; FR-PM-032 AC 1-3 | TC-PM-031.1-01 to 031.3-01 (6); TC-PM-032.1-01 to 032.4-02 (5) |
+| PMADD05 (p.5) | As the System Administrator, I want a role-to-action matrix (create, amend, approve, view only), so that access is controlled and the audit risk reduced. | FR-PM-002, FR-PM-003 | FR-PM-002 AC 1-3; FR-PM-003 AC 1-2 | TC-PM-002.1-01 to 002.4-02 (6); TC-PM-003.1-01 to 003.4-01 (6) |
+| PMADD06 (p.5) | As the TSU Head or Business Administrator, I want an explicit validation checkpoint after set-up, so that an incorrect configuration does not reach New Business. | FR-PM-043 | FR-PM-043 AC 1-3 | TC-PM-043.1-01 to 043.4-03 (9), TC-PM-SCR-13, TC-PM-SCR-14, TC-PM-MSG-11 |
+| PMADD07 (p.5-6) | As an MBS user, I want to define and maintain incentive criteria on eligible products of the product matrix only, so that incentives apply only to valid product combinations. | FR-PM-080, FR-PM-081 | FR-PM-080 AC 1-3; FR-PM-081 AC 1-2 | TC-PM-080.1-01 to 080.4-01 (11), TC-PM-SCR-16, TC-PM-MSG-13; TC-PM-081.1-01 to 081.3-01 (4) |
+| PMADD08 (p.6-7) | As an MBS user, I want a maintenance facility for incentive criteria (for example CPC2) with effective dates, so that the criteria are applied as configured. | FR-PM-080, FR-PM-081 | FR-PM-080 AC 1-3; FR-PM-081 AC 1-2 | TC-PM-080.1-01 to 080.4-01 (11), TC-PM-SCR-16, TC-PM-MSG-13; TC-PM-081.1-01 to 081.3-01 (4) |
+
+# Appendix: Storyboard index
+
+One row per step of the end-to-end walkthroughs (chapter End-to-end walkthroughs). Frame WT-A.3 is step 3 of walkthrough WT-A; the screenshot is the figure of the step in this FRS and the UX deck slide is the first slide of the step in the UX Screen Deck (file 07).
+
+<!-- table: widths=1.3,2.2,2.5,4.0,4.0,1.9,2.2,1.3 caption="Storyboard index: one row per step" size=7 -->
+| Frame | Persona | Screen | Action | What the user sees / outcome | Screenshot | FR | UX deck slide |
+|---|---|---|---|---|---|---|---|
+| WT-A.1 | MBS | SCR-PM-15 Coverages & Clauses | Opens Coverages & Clauses › Clause Library, clicks New Clause, enters the code FLEET_REPAIR, kind, line Motor, title, effective date and wording, and clicks Save for Authorization | Toast: Clause FLEET_REPAIR saved – pending authorization; the row shows Pending Authorization (Clause pending authorisation) | Figure 61 | FR-PM-010, FR-PM-011 | 88 |
+| WT-A.2 | Business Administrator | SCR-PM-15 Coverages & Clauses | Opens the Clause Library and clicks Authorize on FLEET_REPAIR | Toast: FLEET_REPAIR authorized; the status is Active (Clause active) | Figure 62 | FR-PM-010, FR-PM-011 | 89 |
+| WT-A.3 | Marketing AO | SCR-PM-03 New Package Request and Edit Package Request | Opens Package Requests › New Package Request, chooses New package and Generic programme, enters Motor Fleet Plus, line Motor, cover type Comprehensive, reason New programme for a market segment, the segments, the requested coverages, rate 1.20%, minimum premium and package dates, ticks Mabuhay General Insurance Corp. and Luzon Assurance Co., and clicks Submit for Approval | Toast: PKR-yyyy-nnnnnn submitted for Marketing approval; the request opens in For Marketing approval (For Marketing approval) | Figure 63 | FR-PM-020, FR-PM-010, FR-PM-045 | 90 |
+| WT-A.4 | Marketing TL / TH / UH | SCR-PM-04 Package Request record | Opens the request from the For Approval tab and clicks Approve and send to TSU | The stage becomes For TSU review; the history lists the approval (For TSU review) | Figure 64 | FR-PM-021, FR-PM-022, FR-PM-023, FR-PM-024, FR-PM-005, FR-PM-073 | 91 |
+| WT-A.5 | TSU Team Lead | SCR-PM-04 Package Request record | Clicks Recommend for approval, writes the recommendation and clicks Recommend | The TSU recommendation shows on the Details tab; the stage becomes For TSU Head approval (For TSU Head approval) | Figure 65 | FR-PM-021, FR-PM-022, FR-PM-023, FR-PM-024, FR-PM-005, FR-PM-073 | 92 |
+| WT-A.6 | TSU Team Head / Head | SCR-PM-04 Package Request record | Reads the recommendation and clicks Approve for negotiation | The stage becomes Insurer negotiation; round 1 is opened with the two target insurers (Insurer negotiation) | Figure 66 | FR-PM-021, FR-PM-022, FR-PM-023, FR-PM-024, FR-PM-005, FR-PM-073 | 93 |
+| WT-A.7 | TSU Officer | SCR-PM-05 Package Request record: Negotiation tab | Opens the Negotiation tab, adds a note to the insurers and clicks Submit for Approval | Toast: PQS-yyyy-nnnnnn submitted for approval; round 1 shows For approval (Slip for approval) | Figure 67 | FR-PM-030, FR-PM-031, FR-PM-032, FR-PM-033, FR-PM-004 | 94 |
+| WT-A.8 | TSU Team Lead | SCR-PM-05 Package Request record: Negotiation tab | Clicks Approve and Send on round 1 | Toast: PQS-yyyy-nnnnnn sent to 2 insurer(s); both responses show Pending; the E-mails tab lists the slip and password e-mails (Slip sent) | Figure 68 | FR-PM-030, FR-PM-031, FR-PM-032, FR-PM-033, FR-PM-004 | 95 |
+| WT-A.9 | TSU Officer | SCR-PM-05 Package Request record: Negotiation tab | Clicks Key In for each insurer, enters the outcome, rate, minimum premium and deductibles, attaches the insurer's reply and clicks Save Terms | Toast: Terms of <insurer> saved; the responses show Approved with changes and Counter-proposal with their rates (Responses recorded) | Figure 69 | FR-PM-030, FR-PM-031, FR-PM-032, FR-PM-033, FR-PM-004 | 96 |
+| WT-A.10 | TSU Officer | SCR-PM-05 Package Request record: Negotiation tab | Clicks Terms final, ticks the offer of Mabuhay General Insurance Corp. and clicks Make Terms Final | The stage becomes Negotiated terms review; the chosen insurer shows in the header (Terms final) | Figure 70 | FR-PM-030, FR-PM-031, FR-PM-032, FR-PM-033, FR-PM-004 | 97 |
+| WT-A.11 | TSU Officer | SCR-PM-06 Package Request record: Comparative tab | Opens the Comparative tab | The round 1 comparison with the Lowest rate tag and the current audit master in Stored outputs (Comparative master stored) | Figure 71 | FR-PM-034, FR-PM-035 | 98 |
+| WT-A.12 | TSU Team Head / Head | SCR-PM-04 Package Request record | Clicks Proceed to requirements (generic package) | The stage becomes Requirements preparation (Requirements preparation) | Figure 72 | FR-PM-021, FR-PM-022, FR-PM-023, FR-PM-024, FR-PM-005, FR-PM-073 | 99 |
+| WT-A.13 | TSU Officer | SCR-PM-07 Package Request record: Requirements & Sign-off tab | Enters the computation basis, clicks Save Requirements, downloads the Package Slip, uploads the signed slip on the Documents tab as Package slip (signed), and clicks Submit requirements for ManCom sign-off | The checklist reads The requirements pack is complete.; the stage becomes For ManCom sign-off (For ManCom sign-off) | Figure 73 | FR-PM-040, FR-PM-041, FR-PM-036 | 100 |
+| WT-A.14 | ManCom | SCR-PM-07 Package Request record: Requirements & Sign-off tab | Reviews the proposed terms and clicks Sign off and send to MBS | ManCom decisions lists MC-PKR-yyyy-nnnnnn Signed; the slips show Locked; the stage becomes With MBS for set-up (Signed off) | Figure 74 | FR-PM-040, FR-PM-041, FR-PM-036 | 101 |
+| WT-A.15 | MBS | SCR-PM-08 Package Request record: Set-up and Advisories tabs | Clicks Set up package version, enters the risk code MTR30 and the product name, and clicks Set Up Version | Toast: Version 1 set up; the Set-up tab shows MTR30 version 1; the stage becomes Package version for validation (Draft version 1) | Figure 75 | FR-PM-042, FR-PM-043, FR-PM-044, FR-PM-045 | 102 |
+| WT-A.16 | MBS | SCR-PM-13 Package Version | Clicks Open Version Editor, adds the clause FLEET_REPAIR on the insurer terms, saves and clicks Submit for Validation | Toast: Version 1 submitted for validation; the version shows For validation (For validation) | Figure 76 | FR-PM-043, FR-PM-050, FR-PM-014, FR-PM-011, FR-PM-042 | 103 |
+| WT-A.17 | TSU Team Head / Head | SCR-PM-13 Package Version | Opens the version from the Validation Queue, ticks the five checklist items and clicks Validate and Release | Toast: Version 1 released; the Validation card shows the result Passed, the validator, the date, the test premium and the checks with their figures (Released) | Figure 77 | FR-PM-043, FR-PM-050, FR-PM-014, FR-PM-011, FR-PM-042 | 104 |
+| WT-A.18 | Business Administrator | SCR-PM-18 Insurer record | Opens Insurers › Mabuhay General Insurance Corp., clicks Add rate, chooses MTR30, 15% from today and clicks Save for Authorization | Toast: Commission rate saved – pending authorization (Commission rate pending) | Figure 78 | FR-PM-014 | 106 |
+| WT-A.19 | New Business Approver | SCR-PM-18 Insurer record | Opens the insurer and clicks Authorize on the new commission rate | The rate for MTR30 shows Active (Commission rate active) | Figure 79 | FR-PM-014 | 107 |
+| WT-A.20 | TSU Officer | SCR-PM-08 Package Request record: Set-up and Advisories tabs | Opens the Advisories tab of the released request, checks that both supporting documents are Attached and clicks Send Advisory | Toast: Advisory sent; the advisory shows Sent with the date; Marketing users receive the notice (Advisory sent) | Figure 80 | FR-PM-042, FR-PM-043, FR-PM-044, FR-PM-045 | 108 |
+| WT-A.21 | Marketing AO | SCR-PM-21 Premium Calculator | Opens Premium Calculator, chooses MTR30 and Mabuhay General Insurance Corp., enters a vehicle value and clicks Calculate | Priced on package version 1 (effective <date>, scheme rate 1.2%) with every charge and the commission (Priced on version 1) | Figure 81 | FR-PM-051, FR-PM-052 | 109 |
+| WT-A.22 | Marketing AO | SCR-PM-22 Quotation: package rate scheme and rate exception | Creates a New Business quotation of MTR30 for the seed client with an item rate of 1.10%, opens it and clicks Request Rate Exception with the reason | The rate scheme panel shows the exception pending approval (Exception requested) | Figure 82 | FR-PM-051 | 110 |
+| WT-A.23 | New Business Approver | SCR-PM-22 Quotation: package rate scheme and rate exception | Opens My Approvals, clicks the rate exception of the quotation, compares the requested rate with the scheme in force on the exception record, clicks Approve, writes the comment and confirms | Toast: Rate exception RSE-yyyy-nnnnnn approved; the record shows Approved with the approver, the date and the comment; the Account Officer receives the notice (Exception approved) | Figure 83 | FR-PM-051 | 111 |
+| WT-A.24 | Marketing AO | SCR-PM-22 Quotation: package rate scheme and rate exception | Opens the quotation again after the approval | The Rate Exceptions table lists the exception Approved; the quotation can be submitted for review (Quotation ready for review) | Figure 84 | FR-PM-051 | 112 |
+| WT-B.1 | Marketing AO | SCR-PM-03 New Package Request and Edit Package Request | Opens New Package Request and clicks Save Draft without the name, line and reason | Under the fields: Enter the package or programme name; Select the product line; Select the reason. Nothing is saved (Form corrected) | Figure 85 | FR-PM-020, FR-PM-010, FR-PM-045 | 116 |
+| WT-B.2 | Marketing AO | SCR-PM-03 New Package Request and Edit Package Request | Completes the header only and clicks Submit for Approval | The hint Before submitting, complete the requested terms (coverages or sections); at least one target insurer; the package end date, and the refusal Complete the request: ... with its reference (Request stays a draft) | Figure 86 | FR-PM-020, FR-PM-010, FR-PM-045 | 117 |
+| WT-B.3 | Marketing TL / TH / UH | SCR-PM-04 Package Request record | Creates and submits a request himself, then clicks Approve and send to TSU on it | A package request is approved by someone other than its maker (Another Marketing approver is needed) | Figure 87 | FR-PM-021, FR-PM-022, FR-PM-023, FR-PM-024, FR-PM-005, FR-PM-073 | 118 |
+| WT-B.4 | TSU Team Lead | SCR-PM-04 Package Request record | Opens PKR-2026-900002 and clicks Return to requester, chooses the reason and writes what is missing | The stage becomes Draft request; the requester receives the workflow notice with the comment (Returned to the requester) | Figure 88 | FR-PM-021, FR-PM-022, FR-PM-023, FR-PM-024, FR-PM-005, FR-PM-073 | 119 |
+| WT-B.5 | TSU Team Lead | SCR-PM-05 Package Request record: Negotiation tab | Prepares and submits a slip himself, then clicks Approve and Send on it | The quotation slip is approved by a TL or a co-officer (Another approver is needed) | Figure 89 | FR-PM-030, FR-PM-031, FR-PM-032, FR-PM-033, FR-PM-004 | 120 |
+| WT-B.6 | TSU Officer | SCR-PM-05 Package Request record: Negotiation tab | Opens PKR-2026-900003 and clicks Terms final while Luzon Assurance is still pending in round 2 | Every insurer of round 2 needs an outcome before the terms are final (1 pending) (Outcome to be keyed in first) | Figure 90 | FR-PM-030, FR-PM-031, FR-PM-032, FR-PM-033, FR-PM-004 | 121 |
+| WT-B.7 | ManCom | SCR-PM-04 Package Request record | Opens PKR-2026-900004 and clicks Return to TSU with the reason | The stage becomes Requirements preparation; ManCom decisions lists the return (Returned to TSU) | Figure 91 | FR-PM-021, FR-PM-022, FR-PM-023, FR-PM-024, FR-PM-005, FR-PM-073 | 122 |
+| WT-B.8 | TSU Officer | SCR-PM-07 Package Request record: Requirements & Sign-off tab | Clicks Submit requirements for ManCom sign-off before uploading the signed package slip | The checklist lists the missing signed package slip; the refusal Complete the requirements: ... (Signed slip to be uploaded) | Figure 92 | FR-PM-040, FR-PM-041, FR-PM-036 | 123 |
+| WT-B.9 | MBS | SCR-PM-08 Package Request record: Set-up and Advisories tabs | Opens PKR-2026-900005 and clicks Return incomplete requirements to TSU with the reason | The stage becomes Requirements preparation (Returned to TSU) | Figure 93 | FR-PM-042, FR-PM-043, FR-PM-044, FR-PM-045 | 124 |
+| WT-B.10 | MBS | SCR-PM-13 Package Version | Opens MTR12 version 2, clears the minimum premium and sets an effective date before today, then clicks Submit for Validation | Toast Correct the highlighted fields; under the fields Enter the minimum premium and The effective date cannot be before today (Version stays a draft) | Figure 94 | FR-PM-043, FR-PM-050, FR-PM-014, FR-PM-011, FR-PM-042 | 125 |
+| WT-B.11 | TSU Team Head / Head | SCR-PM-13 Package Version | Opens the submitted MTR12 version 2 and clicks Return to MBS with the reason | Toast: Version 2 returned to MBS (Returned to MBS) | Figure 95 | FR-PM-043, FR-PM-050, FR-PM-014, FR-PM-011, FR-PM-042 | 127 |
+| WT-B.12 | MBS | SCR-PM-13 Package Version | Opens MTR12 version 2 | The banner Returned by the validator: <reason> above the tabs; the draft can be corrected and submitted again (Draft to correct) | Figure 96 | FR-PM-043, FR-PM-050, FR-PM-014, FR-PM-011, FR-PM-042 | 129 |
+
+# Appendix: Screen standards
+
+The Product Maintenance screens follow the screen standards of BIBS. They are listed here, in the same words in every FRS, so that BDOI can agree the look of the screens once and check the screenshots against it; they are not repeated in each screen specification.
+
+<!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
+| Area | Standard |
+|---|---|
+| Record pages | Back arrow and breadcrumb, title, then the record header: name, reference chips, status pill, tags (for example a client tag such as BDO employee) and the key facts. Page actions on the right in one order: secondary, primary, and the destructive action last and apart. |
+| Workflow header (step bar) | Every record with a workflow shows a stepper under the record header: the stages of the main path in their order, passed stages ticked in blue, the current stage highlighted, the stages ahead in grey with their number. A returned or on-hold stage shows in amber after the stage it came from; a rejected, cancelled or voided record shows that stage in red and the path ends there; the last stage turns green when it is reached. Under the stepper one row gives Current Stage, Since, Due (with the Overdue pill) and Assigned To, with the actions of the stage on the right. The history is a table (Stage, From Stage, Action, By, Date and Time, Remarks, Duration in Stage), newest first. |
+| Messages (notice standard) | One standard for errors, warnings, information and success: a white notice with a thin bar and an icon in the colour of its kind (red, amber, blue, green), a bold short title, then the business message with one bullet per missing item. No codes, internal references or technical terms in what the user reads. Field errors appear under the field; a long form lists its errors at the top with a link to the first field. Only an unexpected system error offers Retry and a reference for support behind Details. Special instructions are one short information notice. |
+| Tables, not highlight boxes | Records and lists of records are rows of a titled table (for example the Rate Exceptions of a quotation: Exception No., Requested Rate, Scheme Rate, Difference, Valid Until, Requested By, Decided By, Status); key data is a label and value grid. A coloured box carries a short message only, never a record. |
+| Tables | Header row in BDO blue that stays in view; rows alternate white and Background Blue, with a light hover and a stronger blue for the selected row; a list scrolls inside its card, the card as high as its rows and never higher than the window; text left, amounts right, dates in one format; one value per cell with at most one muted line under it; a dash for an empty value; the kind of a mixed list of records in a Type column; a due date on one line, in red with the warning icon once past due; ages and durations in words (for example 3 days); "Showing x to y of n results" with page numbers. |
+| Status labels | Statuses are outlined pills (a border and text in the colour of the state group on a light tint) of one size and never wrap. The full label is shown (for example Returned to Marketing, Pending Authorization); an agreed short form, with the full label in the tooltip, only for a label longer than 21 characters. |
+| Labels and names | List values are shown by their label, never by their code; products by name with the code as a second line; insurers by name; users by their names, never by their user ID. |
+| Dates, amounts and rates | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time). Amounts with two decimals and thousand separators, negatives in brackets, the currency in the column header or before the amount. Rates as percentages with two to four decimals, as keyed. |
+| Period cell | A period (period of cover, package term, statement period) is shown in lists on two lines, the start date and "to" the end date, each date kept whole; an open end reads "to open". In a sentence or a label and value grid it is one line: "20-Oct-2026 to 20-Oct-2027". |
+| Forms | Labels above the fields, fields of one height on one line, required fields marked, the error under the field, and the actions in one place (Cancel, then the main action). Format hints only; other guidance is in the tooltip of the label. |
+| Uploads | Download Template next to the upload; a drop zone with the accepted types and maximum size; every row checked before anything is saved; Rows Read, Valid and Rejected with the rows; valid rows are processed and the rejected rows are returned in the error file (the template layout with an Error column and the wrong cells highlighted); Upload Corrected File keeps the link to the first upload; a file uploaded before is refused. |
+| Confirmations and reasons | Every approve, authorise, post, release, cancel, void or deactivate asks for confirmation in a dialog that names the record and the effect. Every reject, return, cancel and void needs a reason (from its list where there is one) before it can be confirmed. Destructive actions are confirmed with the red button. The reason is kept in the history and sent with the notification. |
+| Notifications | The bell shows the unread count and opens the panel grouped by day (Today, Yesterday, then the date), each notice with its title, one-line summary, record reference and time; Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
+| Documents | Generated documents carry the BDO Insure letterhead, the document name and reference, and a business footer with "Confidential" and page x of y. |
+| Maker-checker | Save for Authorization on every product master; Pending Authorization until a second user authorises it; Deactivate instead of delete. |
+
+The project team checks each screen against these standards before UAT and records the result in the screen readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request. The presentation choices that BDOI is asked to confirm are items of the clarifications chapter.

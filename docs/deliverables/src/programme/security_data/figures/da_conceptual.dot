@@ -1,0 +1,45 @@
+// Data Architecture: conceptual model of BIBS (main business entities and their relationships, by domain).
+digraph da_conceptual {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.5, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fillcolor="@WHITE", margin="0.10,0.05"];
+  edge  [color="@CTA_BLUE", arrowsize=0.6, penwidth=1.0, fontname="Arial", fontsize=8, fontcolor="@NEAR_BLACK", dir=both, arrowtail=none, arrowhead=crow];
+
+  subgraph cluster_md { label=<<b>Master and reference data</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    org  [label=<<b>Company / Branch</b><br/><font point-size="8">D03 Organisation</font>>, fillcolor="@BG_BLUE"];
+    usr  [label=<<b>User / Role</b><br/><font point-size="8">D01 Security</font>>, fillcolor="@BG_BLUE"];
+    cli  [label=<<b>Client</b> (party)<br/><font point-size="8">D04 Client and Party</font>>, fillcolor="@BG_BLUE"];
+    ins  [label=<<b>Insurer</b><br/><font point-size="8">D05 Catalogue</font>>, fillcolor="@BG_BLUE"];
+    prd  [label=<<b>Product / Package</b><br/><font point-size="8">D05 Catalogue</font>>, fillcolor="@BG_BLUE"];
+    coa  [label=<<b>GL account / Cost centre</b><br/><font point-size="8">D09 Finance</font>>, fillcolor="@BG_BLUE"];
+  }
+  subgraph cluster_tx { label=<<b>Broking transactions</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    quo  [label=<<b>Quotation / Proposal</b><br/><font point-size="8">D06 New Business</font>>];
+    acc  [label=<<b>Account</b> (risk items)<br/><font point-size="8">D06 New Business</font>>];
+    plc  [label=<<b>Placement / Policy</b><br/><font point-size="8">D06 New Business</font>>];
+    inv  [label=<<b>Invoice</b> (booked)<br/><font point-size="8">D06, D07 invoice ledger</font>>];
+    rnw  [label=<<b>Renewal candidate</b><br/><font point-size="8">D11 Renewal</font>>];
+    end_ [label=<<b>Endorsement / Adjustment</b><br/><font point-size="8">D07 Operations</font>>];
+    clm  [label=<<b>Claim</b> (broking)<br/><font point-size="8">D12 Claims Broking</font>>];
+    ebp  [label=<<b>EB programme</b><br/><font point-size="8">D13 Employee Benefits</font>>];
+    sbm  [label=<<b>Submitted policy</b><br/><font point-size="8">D16</font>>];
+  }
+  subgraph cluster_money { label=<<b>Money and accounting</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    rcp  [label=<<b>Receipt / Payment</b><br/><font point-size="8">D07 Cashiering</font>>];
+    rem  [label=<<b>Remittance</b> to insurer<br/><font point-size="8">D07</font>>];
+    com  [label=<<b>Commission receivable</b><br/><font point-size="8">D07</font>>];
+    dv   [label=<<b>Disbursement voucher</b><br/><font point-size="8">D10</font>>];
+    jnl  [label=<<b>Journal / Ledger entry</b><br/><font point-size="8">D09 (immutable)</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    oi   [label=<<b>Open item</b><br/><font point-size="8">D09 sub-ledger</font>>];
+  }
+  subgraph cluster_ctl { label=<<b>Control and compliance</b>>; style="rounded,dashed"; color="@MUTED"; fontcolor="@HEADER_BLUE"; fontsize=11;
+    scr  [label=<<b>Screening case / STR</b><br/><font point-size="8">D15</font>>, fillcolor="@AMBER_BG"];
+    clx  [label=<<b>Collection item</b><br/><font point-size="8">D08</font>>];
+    aud  [label=<<b>Audit trail</b><br/><font point-size="8">D02 (insert-only)</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    doc  [label=<<b>Document</b> (stored file)<br/><font point-size="8">D02, S3</font>>];
+  }
+  {rank=same; org; usr; ins; prd; coa}
+  org -> cli [label="owns"]; cli -> quo; prd -> quo; quo -> acc; cli -> acc; acc -> plc; ins -> plc;
+  plc -> inv; inv -> end_; acc -> rnw; plc -> clm; cli -> ebp; ebp -> inv [style=dashed]; sbm -> rnw [style=dashed];
+  inv -> rcp [label="applied"]; inv -> rem; inv -> com; rem -> dv; inv -> jnl [label="events"]; rcp -> jnl; dv -> jnl; coa -> jnl;
+  jnl -> oi; inv -> clx; cli -> scr; usr -> aud; inv -> doc [style=dashed];
+}

@@ -1,0 +1,108 @@
+import { useQuery } from '@tanstack/react-query';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api, toQuery } from '@/api/client';
+import type { Insurer } from '@/api/catalog';
+import type { RecordOriginKind } from '@/api/types';
+import { useAuth } from '@/auth/authContext';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { DataTable } from '@/components/ui/DataTable';
+import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { OriginBadge } from '@/components/ui/OriginBadge';
+import { OriginFilter } from '@/components/ui/OriginFilter';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { useCompanyId } from '@/context/workspaceContext';
+import { formatDate, today } from '@/utils/format';
+import { InsurerEditorModal } from './InsurerEditorModal';
+import { RecordActions } from './RecordActions';
+import { placementChannelLabel } from './insurerForm';
+
+function accreditation(i: Insurer) {
+  const expired = i.accreditedUntil !== undefined && i.accreditedUntil < today();
+  return (
+    <span className={expired ? 'field-error' : undefined}>
+      {formatDate(i.accreditedUntil)}
+      {expired && ' (expired)'}
+    </span>
+  );
+}
+
+/** Insurer panel (BRNB.005-006): accredited insurers, their placement channel and contacts. */
+export default function InsurersPage() {
+  const companyId = useCompanyId();
+  const navigate = useNavigate();
+  const { can } = useAuth();
+  const [creating, setCreating] = useState(false);
+  const [origin, setOrigin] = useState<RecordOriginKind>();
+  const insurers = useQuery({
+    queryKey: ['catalog', 'insurers', companyId, origin],
+    queryFn: () => api.get<Insurer[]>(`/catalog/insurers${toQuery({ companyId, origin })}`),
+  });
+  return (
+    <div className="stack">
+      <PageHeader
+        section="Product Maintenance"
+        title="Insurers"
+        description="The insurer panel: accreditation, placement channel and e-mails, branches."
+        actions={
+          can('MASTER_MAINTAIN') && (
+            <Button variant="accent" icon={<Plus size={16} />} onClick={() => setCreating(true)}>
+              New Insurer
+            </Button>
+          )
+        }
+      />
+      <ErrorAlert error={insurers.error} />
+      <Card>
+        <OriginFilter value={origin} onChange={setOrigin} />
+      </Card>
+      <Card flush>
+        <DataTable<Insurer>
+          loading={insurers.isLoading}
+          rows={insurers.data ?? []}
+          rowKey={(i) => i.id}
+          onRowClick={(i) => void navigate(`/catalog/insurers/${i.id}`)}
+          emptyMessage="No insurer on the panel yet."
+          columns={[
+            {
+              key: 'c',
+              header: 'Code',
+              render: (i) => (
+                <>
+                  <strong>{i.partyCode}</strong> <OriginBadge record={i} />
+                </>
+              ),
+            },
+            { key: 'n', header: 'Name', render: (i) => i.name },
+            { key: 'a', header: 'Accredited Until', render: accreditation },
+            {
+              key: 'p',
+              header: 'Placement',
+              render: (i) => placementChannelLabel(i.placementChannel),
+            },
+            { key: 'e', header: 'Placement e-mails', render: (i) => i.placementEmails.join(', ') },
+            { key: 'd', header: 'Credit Days', numeric: true, render: (i) => i.defaultCreditDays },
+            { key: 's', header: 'Status', render: (i) => <StatusBadge status={i.recordStatus} /> },
+            {
+              key: 'x',
+              header: <span className="visually-hidden">Actions</span>,
+              width: '64px',
+              render: (i) => (
+                <RecordActions
+                  kind="INSURER"
+                  record={i}
+                  label={i.name}
+                  refresh={[['catalog', 'insurers']]}
+                />
+              ),
+            },
+          ]}
+        />
+      </Card>
+      {creating && <InsurerEditorModal companyId={companyId} onClose={() => setCreating(false)} />}
+    </div>
+  );
+}

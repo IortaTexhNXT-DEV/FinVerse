@@ -61,7 +61,7 @@ public class MasterChangeLog {
     return history(entityType, entityId);
   }
 
-  private static boolean visible(UserDataScope scope, Optional<Owner> owner) {
+  static boolean visible(UserDataScope scope, Optional<Owner> owner) {
     if (owner.isEmpty()) {
       return false;
     }
@@ -113,7 +113,7 @@ public class MasterChangeLog {
     return jdbc.query(HISTORY, (rs, row) -> entry(rs), entityType, entityId, MAX_ROWS);
   }
 
-  private static Entry entry(ResultSet rs) throws SQLException {
+  static Entry entry(ResultSet rs) throws SQLException {
     return new Entry(
         rs.getLong("id"),
         rs.getString("entity_type"),

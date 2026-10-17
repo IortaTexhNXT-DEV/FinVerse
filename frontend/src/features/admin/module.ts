@@ -4,6 +4,7 @@ import {
   Cable,
   DatabaseZap,
   FileLock,
+  FileClock,
   FolderSync,
   History,
   LayoutDashboard,
@@ -25,6 +26,14 @@ export const adminModule: FeatureModule = {
       icon: History,
       permission: 'AUDIT_VIEW',
       component: lazyWithRetry(() => import('./AuditTrailPage')),
+    },
+    {
+      path: '/admin/master-change-log',
+      label: 'Master Data Change Log',
+      icon: FileClock,
+      permission: 'AUDIT_VIEW',
+      alsoPermissions: ['MASTER_VIEW'],
+      component: lazyWithRetry(() => import('./MasterChangeLogPage')),
     },
     {
       path: '/admin/parameters',

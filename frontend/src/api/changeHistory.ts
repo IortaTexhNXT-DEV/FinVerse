@@ -1,4 +1,5 @@
 import { api, toQuery } from './client';
+import type { DownloadedFile } from './client';
 
 /** One field change of a master record (G05 change log). */
 export interface FieldChange {
@@ -18,7 +19,21 @@ export interface FieldChange {
 }
 
 /** Field-level change history of master records (insurers, products, clients and other masters). */
+/** Filters of the programme-wide Master Data Change Log. */
+export interface ChangeLogFilters {
+  entityType?: string;
+  from?: string;
+  to?: string;
+  maker?: string;
+  checker?: string;
+}
+
 export const changeHistoryApi = {
   history: (entityType: string, entityId: number) =>
     api.get<FieldChange[]>(`/change-history${toQuery({ entityType, entityId })}`),
+  log: (filters: ChangeLogFilters) =>
+    api.get<FieldChange[]>(`/change-history/log${toQuery({ ...filters })}`),
+  types: () => api.get<string[]>('/change-history/log/types'),
+  exportLog: (filters: ChangeLogFilters): Promise<DownloadedFile> =>
+    api.getFile(`/change-history/log/export${toQuery({ ...filters })}`),
 };

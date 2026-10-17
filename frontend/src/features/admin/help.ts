@@ -17,6 +17,17 @@ export const ADMIN_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Master Data Change Log',
+      path: '/admin/master-change-log',
+      summary:
+        'Every field change of the master records of the programme - insurers, products, clients and the other masters - with the value before and after, the maker and the checker, filtered by record type, date range, maker and checker.',
+      workflow: ['Set the filters and select Export to Excel for the same rows in a workbook.'],
+      controls: [
+        'Only the records of the companies and branches of your data access are listed.',
+        'The log is written with the change itself and cannot be edited.',
+      ],
+    },
+    {
       name: 'System Parameters',
       path: '/admin/parameters',
       summary:

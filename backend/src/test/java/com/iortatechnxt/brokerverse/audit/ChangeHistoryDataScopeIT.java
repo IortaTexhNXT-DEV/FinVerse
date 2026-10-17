@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.audit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile.InsurerDetails;
 import com.iortatechnxt.brokerverse.catalog.domain.PlacementChannel;
@@ -135,5 +136,27 @@ class ChangeHistoryDataScopeIT {
     String user = reader(null);
     api.doGet(user, url(insurerA)).andExpect(status().isOk());
     api.doGet(user, url(insurerB)).andExpect(status().isOk());
+  }
+
+  @Test
+  void theChangeLogKeepsTheRecordsOfTheScopeAndExportsThem() throws Exception {
+    String user = reader(UserDataScope.of(List.of(CompanyScope.allBranchesOf(companyA))));
+    String url = "/api/v1/change-history/log?entityType=InsurerProfile&maker=badmin";
+    JsonNode rows = api.read(api.doGet(user, url).andExpect(status().isOk()));
+    assertThat(rows.findValuesAsText("entityId"))
+        .contains(String.valueOf(insurerA))
+        .doesNotContain(String.valueOf(insurerB));
+    JsonNode all = api.read(api.doGet(reader(null), url).andExpect(status().isOk()));
+    assertThat(all.findValuesAsText("entityId"))
+        .contains(String.valueOf(insurerA), String.valueOf(insurerB));
+    byte[] file =
+        api.download(user, url.replace("/log?", "/log/export?"))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    assertThat(file).startsWith((byte) 'P', (byte) 'K');
+    assertThat(api.read(api.doGet(user, "/api/v1/change-history/log/types")).toString())
+        .contains("InsurerProfile");
   }
 }

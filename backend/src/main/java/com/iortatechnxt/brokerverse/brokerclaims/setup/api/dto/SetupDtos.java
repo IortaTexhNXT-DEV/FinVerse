@@ -74,8 +74,16 @@ public final class SetupDtos {
    * @param unitCode unit
    * @param team team
    * @param active whether active
+   * @param teamLead supervising Team Lead, may be blank
+   * @param teamHead supervising Team Head, may be blank
    */
-  public record HandlerRequest(String username, String unitCode, String team, boolean active) {}
+  public record HandlerRequest(
+      String username,
+      String unitCode,
+      String team,
+      boolean active,
+      String teamLead,
+      String teamHead) {}
 
   /**
    * A handler of the register.
@@ -85,9 +93,17 @@ public final class SetupDtos {
    * @param unitCode unit
    * @param team team
    * @param active whether active
+   * @param teamLead supervising Team Lead
+   * @param teamHead supervising Team Head
    */
   public record HandlerResponse(
-      Long id, String username, String unitCode, String team, boolean active) {
+      Long id,
+      String username,
+      String unitCode,
+      String team,
+      boolean active,
+      String teamLead,
+      String teamHead) {
 
     /**
      * Maps a handler.
@@ -97,7 +113,13 @@ public final class SetupDtos {
      */
     public static HandlerResponse from(ClaimHandler h) {
       return new HandlerResponse(
-          h.getId(), h.getUsername(), h.getUnitCode(), h.getTeam(), h.isActive());
+          h.getId(),
+          h.getUsername(),
+          h.getUnitCode(),
+          h.getTeam(),
+          h.isActive(),
+          h.getTeamLead(),
+          h.getTeamHead());
     }
   }
 

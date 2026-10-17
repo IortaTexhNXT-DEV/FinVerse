@@ -36,6 +36,9 @@ public class ClaimLocation extends BaseEntity {
   @Column(length = 500)
   private String description;
 
+  @Column(length = 80)
+  private String barangay;
+
   protected ClaimLocation() {}
 
   /**
@@ -62,6 +65,19 @@ public class ClaimLocation extends BaseEntity {
    */
   public void describe(String newDescription) {
     this.description = newDescription;
+  }
+
+  /**
+   * Sets the barangay of the location (FRCLM.017.01).
+   *
+   * @param newBarangay barangay, may be null
+   */
+  public void inBarangay(String newBarangay) {
+    this.barangay = newBarangay;
+  }
+
+  public String getBarangay() {
+    return barangay;
   }
 
   public Long getClaimId() {

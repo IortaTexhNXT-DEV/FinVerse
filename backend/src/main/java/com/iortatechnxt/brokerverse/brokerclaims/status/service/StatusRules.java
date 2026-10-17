@@ -140,6 +140,17 @@ public class StatusRules {
   }
 
   /**
+   * Status type of a status (FRS BRD-07 FRCLM.003.02): NEW_PLA, FOLLOW_UP, SETTLEMENT,
+   * SETTLEMENT_PAID or SETTLEMENT_LOA ({@code BCL_STATUS_TYPE}).
+   *
+   * @param statusCode status
+   * @return type, FOLLOW_UP when none is set
+   */
+  public String statusType(String statusCode) {
+    return attribute(ClaimCodes.LOV_STATUS, statusCode, "status_type").orElse("FOLLOW_UP");
+  }
+
+  /**
    * Label of a status.
    *
    * @param statusCode status, may be null

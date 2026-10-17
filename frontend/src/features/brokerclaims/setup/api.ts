@@ -50,6 +50,10 @@ export interface Handler {
   unitCode: string;
   team?: string;
   active: boolean;
+  /** Supervising Team Lead (FRCLM.002.06). */
+  teamLead?: string;
+  /** Supervising Team Head (FRCLM.002.06). */
+  teamHead?: string;
 }
 
 export interface ClaimsList {

@@ -109,8 +109,22 @@ public class ClaimLocationService {
    * @return the location
    */
   public ClaimLocation describe(Claim claim, int itemNo, String description) {
+    return describe(claim, itemNo, description, require(claim, itemNo).getBarangay());
+  }
+
+  /**
+   * Changes the damage description and the barangay of a location (FRCLM.017.01).
+   *
+   * @param claim open claim
+   * @param itemNo item number
+   * @param description description
+   * @param barangay barangay, may be blank
+   * @return the location
+   */
+  public ClaimLocation describe(Claim claim, int itemNo, String description, String barangay) {
     ClaimLocation location = require(claim, itemNo);
     location.describe(blankToNull(description));
+    location.inBarangay(blankToNull(barangay));
     audit.record(
         ClaimCodes.ENTITY_TYPE,
         claim.getClaimNo(),

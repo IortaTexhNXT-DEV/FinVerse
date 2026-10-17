@@ -1,6 +1,7 @@
 import { CellStack } from '@/components/ui/CellStack';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { UserRoundCog, X } from 'lucide-react';
+import { FileSpreadsheet, FileText, UserRoundCog, X } from 'lucide-react';
+import { useFileDownload } from '@/components/broking/useFileDownload';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
@@ -20,7 +21,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { countOf, formatDate, formatDays } from '@/utils/format';
 import { CLAIMS_SECTION } from '../ClaimsPlaceholder';
 import { claimsHomeApi } from '../home/api';
-import type { WorklistQuery, WorklistRow, WorklistTab } from '../home/api';
+import type { WorklistQuery, WorklistRow, WorklistSort, WorklistTab } from '../home/api';
 import { ReassignDialog } from './ReassignDialog';
 import { WORKLIST_TABS, filterText, queryFromSearch } from './worklistLogic';
 import { UserName } from '@/components/ui/UserName';
@@ -47,6 +48,17 @@ const COLUMNS: Column<WorklistRow>[] = [
     ),
   },
   { key: 'loss', header: 'Date of Loss', render: (r) => formatDate(r.dates.lossDate) },
+  { key: 'plate', header: 'Plate No.', render: (r) => r.followUps?.plateNo ?? '' },
+  {
+    key: 'followups',
+    header: 'Follow-ups (Last / Since)',
+    render: (r) => (
+      <CellStack
+        main={`${String(r.followUps?.count ?? 0)} · ${formatDate(r.followUps?.lastDate)}`}
+        sub={`${formatDays(r.followUps?.daysSinceLast ?? 0)} since last`}
+      />
+    ),
+  },
   {
     key: 'age',
     header: 'Aging (Stage / Overall)',
@@ -76,6 +88,13 @@ const COLUMNS: Column<WorklistRow>[] = [
   },
 ];
 
+const SORTS: { value: WorklistSort; label: string }[] = [
+  { value: 'NEWEST', label: 'Newest reported' },
+  { value: 'OVERALL_AGE', label: 'Overall aging (oldest first)' },
+  { value: 'STAGE_AGE', label: 'Aging in current status' },
+  { value: 'SINCE_FOLLOW_UP', label: 'Aging since last follow-up' },
+];
+
 /**
  * Claims worklist (BRCLM.034/043, FR-CM-055): the tabs My Claims, Open, Temporarily Closed, Closed
  * and Follow-ups Due, search by claim number, insurer claim number, ARN, policy number or assured,
@@ -92,6 +111,7 @@ export default function WorklistPage() {
   const [page, setPage] = useState(0);
   const [reassigning, setReassigning] = useState(false);
   const selection = useRowSelection();
+  const download = useFileDownload();
   const rows = useQuery({
     queryKey: ['broker-claims', 'worklist', companyId, query, page],
     queryFn: () => claimsHomeApi.worklist(companyId, query, page),
@@ -127,15 +147,53 @@ export default function WorklistPage() {
         title="Claims Worklist"
         description="Every claim you may see, by tab."
       />
-      <ErrorAlert error={rows.error} />
+      <ErrorAlert error={rows.error ?? download.error} />
       <Card flush>
         <Tabs
           tabs={WORKLIST_TABS}
           active={query.tab}
           onChange={(t: WorklistTab) => change({ ...query, tab: t })}
         />
+        <div className="row" style={{ padding: '8px 16px', gap: 8, flexWrap: 'wrap' }}>
+          <label htmlFor="worklist-sort">Sort by</label>
+          <select
+            id="worklist-sort"
+            className="select"
+            style={{ width: 'auto' }}
+            value={query.sort ?? 'NEWEST'}
+            onChange={(e) => change({ ...query, sort: e.target.value as WorklistSort })}
+          >
+            {SORTS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<FileSpreadsheet size={14} />}
+            busy={download.isPending}
+            onClick={() =>
+              download.mutate(() => claimsHomeApi.exportWorklist(companyId, query, 'EXCEL'))
+            }
+          >
+            Export Excel
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<FileText size={14} />}
+            busy={download.isPending}
+            onClick={() =>
+              download.mutate(() => claimsHomeApi.exportWorklist(companyId, query, 'PDF'))
+            }
+          >
+            Export PDF
+          </Button>
+        </div>
         <WorklistToolbar
-          placeholder="Search Claim No., Insurer Claim No., ARN, Policy No. or Assured"
+          placeholder="Search Claim No., Insurer Claim No., ARN, Policy No., Assured or Plate No."
           onSearch={(text) => change({ ...query, q: text === '' ? undefined : text })}
           extra={
             filter !== undefined && (

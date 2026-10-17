@@ -144,6 +144,17 @@ export interface Claim {
   totalReserve: number;
   createdBy: string;
   createdAt: string;
+  /** Plate number, preferred repair shop, return to the Account Officer. */
+  extras?: ClaimExtras;
+}
+
+/** Details of the BRD scope of the FRS BRD-07 Claims v1.0. */
+export interface ClaimExtras {
+  plateNo?: string;
+  preferredShopCode?: string;
+  returnedToAoAt?: string;
+  returnedToAoBy?: string;
+  returnedToAoNote?: string;
 }
 
 const CLAIMS = '/broker-claims';

@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
+import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -58,6 +59,12 @@ public class BclReportSql {
   /** Account officer. */
   public static final String OFFICER = "accountOfficer";
 
+  /** Claim type filter (FRS BRD-07 FRCLM.011 to 017 filter set). */
+  public static final String CLAIM_TYPE = "claimTypeCode";
+
+  /** Claim status filter. */
+  public static final String STATUS = "statusCode";
+
   /** Common filters on a claim aliased {@code c}. */
   static final String FILTERS =
       sql(
@@ -70,7 +77,19 @@ public class BclReportSql {
               + " and (cast(:lineCode as varchar) is null or c.line_code = :lineCode)"
               + " and (cast(:salesTeam as varchar) is null or c.sales_team = :salesTeam)"
               + " and (cast(:accountOfficer as varchar) is null"
-              + " or lower(c.account_officer) = lower(:accountOfficer))");
+              + " or lower(c.account_officer) = lower(:accountOfficer))"
+              + " and (cast(:claimTypeCode as varchar) is null or c.claim_type = :claimTypeCode)"
+              + " and (cast(:statusCode as varchar) is null or c.status_code = :statusCode)"
+              + " and (cast(:salesDepartment as varchar) is null"
+              + " or c.sales_department = :salesDepartment)"
+              + " and (cast(:productCode as varchar) is null or c.product_code = :productCode)"
+              + " and (cast(:catastropheFilter as varchar) is null"
+              + " or c.catastrophe_code = :catastropheFilter)"
+              + " and (cast(:policyNo as varchar) is null or c.policy_no = :policyNo)"
+              + " and (cast(:assured as varchar) is null"
+              + " or upper(c.assured_name) like '%' || upper(:assured) || '%')"
+              + " and (cast(:amountFrom as numeric) is null or c.claim_amount >= :amountFrom)"
+              + " and (cast(:amountTo as numeric) is null or c.claim_amount <= :amountTo)");
 
   /** Insurer names of a claim (the insurer lines, else the lead insurer). */
   static final String INSURERS =
@@ -126,6 +145,7 @@ public class BclReportSql {
   private final NamedParameterJdbcTemplate jdbc;
   private final SystemParameterService parameters;
   private final Clock clock;
+  private final ClaimReportPresentation presentation;
 
   /**
    * Creates the helper.
@@ -133,12 +153,28 @@ public class BclReportSql {
    * @param jdbc named-parameter JDBC
    * @param parameters business parameters
    * @param clock clock
+   * @param presentation heading and detailed or summary presentation
    */
   public BclReportSql(
-      NamedParameterJdbcTemplate jdbc, SystemParameterService parameters, Clock clock) {
+      NamedParameterJdbcTemplate jdbc,
+      SystemParameterService parameters,
+      Clock clock,
+      ClaimReportPresentation presentation) {
+    this.presentation = presentation;
     this.jdbc = jdbc;
     this.parameters = parameters;
     this.clock = clock;
+  }
+
+  /**
+   * The heading of the Claims unit and the presentation chosen in the parameters.
+   *
+   * @param p parameters of the run
+   * @param result report as defined
+   * @return report as presented
+   */
+  ReportResult present(ReportParameters p, ReportResult result) {
+    return presentation.present(p, result);
   }
 
   /**
@@ -156,6 +192,29 @@ public class BclReportSql {
     specs.add(ParameterSpec.optional(LINE, "Product line", ParameterType.TEXT));
     specs.add(ParameterSpec.optional(TEAM, "Marketing team", ParameterType.TEXT));
     specs.add(ParameterSpec.optional(OFFICER, "Account officer", ParameterType.TEXT));
+    specs.add(ParameterSpec.optional(CLAIM_TYPE, "Claim type", ParameterType.TEXT));
+    specs.add(ParameterSpec.optional(STATUS, "Claim status", ParameterType.TEXT));
+    specs.add(ParameterSpec.optional("salesDepartment", "Department", ParameterType.TEXT));
+    specs.add(ParameterSpec.optional("productCode", "Risk code", ParameterType.TEXT));
+    specs.add(ParameterSpec.optional("catastropheFilter", "Catastrophe code", ParameterType.TEXT));
+    specs.add(ParameterSpec.optional("policyNo", "Policy number", ParameterType.TEXT));
+    specs.add(ParameterSpec.optional("assured", "Assured (part of the name)", ParameterType.TEXT));
+    specs.add(ParameterSpec.optional("amountFrom", "Claim amount from", ParameterType.NUMBER));
+    specs.add(ParameterSpec.optional("amountTo", "Claim amount to", ParameterType.NUMBER));
+    specs.add(
+        ParameterSpec.optional(ClaimReportPresentation.TITLE, "Report title", ParameterType.TEXT));
+    specs.add(
+        ParameterSpec.select(
+            ClaimReportPresentation.PRESENTATION,
+            "Presentation",
+            List.of(ClaimReportPresentation.DETAILED, ClaimReportPresentation.SUMMARY),
+            ClaimReportPresentation.DETAILED));
+    specs.add(
+        ParameterSpec.select(
+            ClaimReportPresentation.GROUP_BY,
+            "Group / summarise by",
+            ClaimReportPresentation.GROUPS,
+            ClaimReportPresentation.NONE));
     return specs;
   }
 

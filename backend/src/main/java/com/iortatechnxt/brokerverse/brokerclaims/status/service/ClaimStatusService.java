@@ -44,6 +44,7 @@ public class ClaimStatusService {
   private final LovService lovs;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final DocumentChecklist checklist;
 
   /**
    * Creates the service.
@@ -55,6 +56,7 @@ public class ClaimStatusService {
    * @param lovs lists of values
    * @param currentUser current user
    * @param clock clock
+   * @param checklist required documents of a claim filed with complete documents
    */
   public ClaimStatusService(
       ClaimLookup lookup,
@@ -63,7 +65,9 @@ public class ClaimStatusService {
       StatusTransitions transitions,
       LovService lovs,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      DocumentChecklist checklist) {
+    this.checklist = checklist;
     this.lookup = lookup;
     this.rules = rules;
     this.matrix = matrix;
@@ -130,7 +134,13 @@ public class ClaimStatusService {
     boolean leftNew = claim.getProgress().getPhase() != ClaimPhase.NEW;
     return lovs.activeValues(ClaimCodes.LOV_STATUS, today()).stream()
         .filter(v -> allowed.contains(v.getCode()) && rules.hasPhase(v.getCode()))
-        .map(v -> new StatusOption(v.getCode(), v.getLabel(), rules.phaseOf(v.getCode())))
+        .map(
+            v ->
+                new StatusOption(
+                    v.getCode(),
+                    v.getLabel(),
+                    rules.phaseOf(v.getCode()),
+                    rules.statusType(v.getCode())))
         .filter(o -> !(leftNew && o.phase() == ClaimPhase.NEW))
         .filter(o -> !o.code().equals(claim.getProgress().getStatusCode()))
         .toList();
@@ -145,6 +155,9 @@ public class ClaimStatusService {
     ClaimProgress progress = claim.getProgress();
     ClaimPhase current = progress.getPhase();
     requireForward(claim, phase);
+    if (checkMatrix && ClaimCodes.STATUS_COMPLETE_DOCS.equals(statusCode)) {
+      checklist.requireComplete(claim);
+    }
     if (checkMatrix && !CurrentUser.SYSTEM.equals(currentUser.username())) {
       matrix.requireAllowed(currentUser.username(), statusCode, status.getLabel());
     }
@@ -184,6 +197,7 @@ public class ClaimStatusService {
    * @param code status code
    * @param label label
    * @param phase phase the claim moves to
+   * @param statusType status type (FRCLM.003.02)
    */
-  public record StatusOption(String code, String label, ClaimPhase phase) {}
+  public record StatusOption(String code, String label, ClaimPhase phase, String statusType) {}
 }

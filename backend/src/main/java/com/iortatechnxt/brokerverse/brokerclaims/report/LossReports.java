@@ -129,31 +129,33 @@ public final class LossReports {
       Map<String, Object> args = BclReportSql.args(p);
       args.put(ARN, null);
       args.put(POLICY_YEAR, null);
-      return TabularReportBuilder.of(p)
-          .columns(
-              ReportColumn.text("assured_name", "Insured"),
-              ReportColumn.text("claimant_name", "Claimant"),
-              ReportColumn.text("policy_no", "Policy No."),
-              ReportColumn.text("claim_no", "Claim Number"),
-              ReportColumn.date("loss_date", "Date of Loss"),
-              ReportColumn.text("loss_nature_label", "Nature of Loss"),
-              ReportColumn.text("claim_type_label", "Type of Loss"),
-              ReportColumn.amountNoTotal("deductible", "Deductible"),
-              ReportColumn.text("insurer_name", "Insurer Name"),
-              ReportColumn.text("insurer_claim_no", "Insurer Claim No."),
-              ReportColumn.text("currency", "Currency"),
-              ReportColumn.amount("paid", "Amount of Loss Paid"),
-              ReportColumn.amount("outstanding", "Amount of Loss O/S"),
-              ReportColumn.amount("total", "Total Loss"),
-              ReportColumn.text("status_label", "Status"))
-          .groupBy("client", "Client")
-          .groupBy("cover", "Cover (ARN / Policy Year)")
-          .rows(sql.rows(EXPERIENCE_SQL, args))
-          .presorted()
-          .note(
-              "Paid = settled amount; O/S = insurer reserve less paid while open, never below"
-                  + " zero.")
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(
+                  ReportColumn.text("assured_name", "Insured"),
+                  ReportColumn.text("claimant_name", "Claimant"),
+                  ReportColumn.text("policy_no", "Policy No."),
+                  ReportColumn.text("claim_no", "Claim Number"),
+                  ReportColumn.date("loss_date", "Date of Loss"),
+                  ReportColumn.text("loss_nature_label", "Nature of Loss"),
+                  ReportColumn.text("claim_type_label", "Type of Loss"),
+                  ReportColumn.amountNoTotal("deductible", "Deductible"),
+                  ReportColumn.text("insurer_name", "Insurer Name"),
+                  ReportColumn.text("insurer_claim_no", "Insurer Claim No."),
+                  ReportColumn.text("currency", "Currency"),
+                  ReportColumn.amount("paid", "Amount of Loss Paid"),
+                  ReportColumn.amount("outstanding", "Amount of Loss O/S"),
+                  ReportColumn.amount("total", "Total Loss"),
+                  ReportColumn.text("status_label", "Status"))
+              .groupBy("client", "Client")
+              .groupBy("cover", "Cover (ARN / Policy Year)")
+              .rows(sql.rows(EXPERIENCE_SQL, args))
+              .presorted()
+              .note(
+                  "Paid = settled amount; O/S = insurer reserve less paid while open, never below"
+                      + " zero.")
+              .build());
     }
   }
 
@@ -205,27 +207,29 @@ public final class LossReports {
         out.put("ratio", ratio((BigDecimal) row.get(LOSSES), (BigDecimal) row.get(PREMIUM)));
         rows.add(out);
       }
-      return TabularReportBuilder.of(p)
-          .columns(
-              ReportColumn.text("client_code", "Client"),
-              ReportColumn.text("assured_name", "Insured"),
-              ReportColumn.text(ARN, "Account (ARN)"),
-              new ReportColumn(POLICY_YEAR, "Policy Year", ColumnType.NUMBER, false),
-              ReportColumn.text("line_code", "Product Line"),
-              ReportColumn.text("lead_insurer_code", "Insurer"),
-              ReportColumn.text("currency", "Currency"),
-              ReportColumn.count("claims", "Claims"),
-              ReportColumn.amount(PREMIUM, "Premium"),
-              ReportColumn.amount("paid", "Losses Paid"),
-              ReportColumn.amount("outstanding", "Losses O/S"),
-              ReportColumn.amount(LOSSES, "Total Losses"),
-              ReportColumn.percent("ratio", "Loss Ratio %"))
-          .groupBy(GROUP_KEY, groupLabel(grouping))
-          .rows(rows)
-          .note(
-              "Premium = signed gross premium of the ledger invoices of the cover and policy year"
-                  + " (originals, endorsements, cancellations).")
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(
+                  ReportColumn.text("client_code", "Client"),
+                  ReportColumn.text("assured_name", "Insured"),
+                  ReportColumn.text(ARN, "Account (ARN)"),
+                  new ReportColumn(POLICY_YEAR, "Policy Year", ColumnType.NUMBER, false),
+                  ReportColumn.text("line_code", "Product Line"),
+                  ReportColumn.text("lead_insurer_code", "Insurer"),
+                  ReportColumn.text("currency", "Currency"),
+                  ReportColumn.count("claims", "Claims"),
+                  ReportColumn.amount(PREMIUM, "Premium"),
+                  ReportColumn.amount("paid", "Losses Paid"),
+                  ReportColumn.amount("outstanding", "Losses O/S"),
+                  ReportColumn.amount(LOSSES, "Total Losses"),
+                  ReportColumn.percent("ratio", "Loss Ratio %"))
+              .groupBy(GROUP_KEY, groupLabel(grouping))
+              .rows(rows)
+              .note(
+                  "Premium = signed gross premium of the ledger invoices of the cover and policy year"
+                      + " (originals, endorsements, cancellations).")
+              .build());
     }
 
     private static String groupKey(String grouping, Map<String, Object> row) {

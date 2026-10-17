@@ -113,6 +113,25 @@ public class LossAdviceService {
   }
 
   /**
+   * The advice of one insurer of the claim as the PDF it would send, without sending or storing it
+   * (FRS BRD-07 FRCLM.008.08).
+   *
+   * @param claim claim
+   * @param insurerCode insurer of the claim
+   * @return PDF bytes
+   */
+  @Transactional(readOnly = true)
+  public byte[] preview(Claim claim, String insurerCode) {
+    List<InsurerClaim> all = lines.ofClaim(claim.getId());
+    if (!insurerCodes(all).contains(insurerCode)) {
+      throw new BusinessRuleException(
+          "BCL_LOSS_ADVICE_INSURER", insurerCode + " is not an insurer of the claim");
+    }
+    InsurerProfile insurer = insurers.requireInsurer(claim.getCompanyId(), insurerCode);
+    return document.pdf(claim, document.compose(claim, insurer, all, BusinessClock.today(clock)));
+  }
+
+  /**
    * E-mails the advice to the chosen insurers, one e-mail each, and stores each generated advice as
    * a claims report (R2).
    *

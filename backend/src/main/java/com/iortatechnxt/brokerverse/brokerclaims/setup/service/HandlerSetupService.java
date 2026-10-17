@@ -88,6 +88,21 @@ public class HandlerSetupService {
    * @return the handler
    */
   public ClaimHandler save(String username, String unitCode, String team, boolean active) {
+    return save(username, unitCode, team, new Supervisors(null, null), active);
+  }
+
+  /**
+   * Registers a handler or changes its unit, team, supervisors and active flag (FRCLM.002.06).
+   *
+   * @param username user
+   * @param unitCode unit ({@code BCL_UNIT})
+   * @param team team, may be blank
+   * @param supervisors Team Lead and Team Head, claims users or blank
+   * @param active whether the handler is active
+   * @return the handler
+   */
+  public ClaimHandler save(
+      String username, String unitCode, String team, Supervisors supervisors, boolean active) {
     requireFilled(username, "BCL_HANDLER_REQUIRED", "Select the claims user");
     requireFilled(unitCode, "BCL_UNIT_REQUIRED", "Select the claims unit");
     lovs.requireValid(ClaimCodes.LOV_UNIT, unitCode, ClaimAgeing.today(clock));
@@ -101,13 +116,47 @@ public class HandlerSetupService {
             .findByUsernameIgnoreCase(user)
             .orElseGet(() -> handlers.save(new ClaimHandler(user, unitCode, teamName)));
     handler.update(unitCode, teamName, active);
+    String lead = supervisor(supervisors.teamLead(), user);
+    String head = supervisor(supervisors.teamHead(), user);
+    handler.supervisedBy(lead, head);
     audit.record(
         ENTITY,
         user,
         AuditAction.UPDATE,
-        "Unit " + unitCode + ", team " + teamName + (active ? ", active" : ", inactive"));
+        "Unit "
+            + unitCode
+            + ", team "
+            + teamName
+            + ", Team Lead "
+            + lead
+            + ", Team Head "
+            + head
+            + (active ? ", active" : ", inactive"));
     return handler;
   }
+
+  private String supervisor(String username, String handler) {
+    if (username == null || username.isBlank()) {
+      return null;
+    }
+    String user = username.strip();
+    if (CurrentUser.sameUser(user, handler)) {
+      throw new BusinessRuleException(
+          "BCL_SUPERVISOR_INVALID", "A handler cannot supervise himself");
+    }
+    if (claimsUsers().stream().noneMatch(u -> CurrentUser.sameUser(u, user))) {
+      throw new BusinessRuleException("BCL_SUPERVISOR_INVALID", user + " is not a claims user");
+    }
+    return user;
+  }
+
+  /**
+   * The supervising Team Lead and Team Head of a handler.
+   *
+   * @param teamLead Team Lead, may be blank
+   * @param teamHead Team Head, may be blank
+   */
+  public record Supervisors(String teamLead, String teamHead) {}
 
   private static void requireFilled(String value, String code, String message) {
     if (value == null || value.isBlank()) {

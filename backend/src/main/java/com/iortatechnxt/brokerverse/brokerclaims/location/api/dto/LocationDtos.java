@@ -75,6 +75,7 @@ public final class LocationDtos {
    * @param locationKey normalised location key
    * @param description damage at the location
    * @param references insurer references valid today
+   * @param barangay barangay
    */
   public record ClaimLocationResponse(
       int itemNo,
@@ -83,7 +84,8 @@ public final class LocationDtos {
       String province,
       String locationKey,
       String description,
-      List<LocationRefResponse> references) {
+      List<LocationRefResponse> references,
+      String barangay) {
 
     /**
      * Maps a location with its references.
@@ -103,7 +105,8 @@ public final class LocationDtos {
           refs.stream()
               .filter(r -> r.getAccountItemNo() == l.getAccountItemNo())
               .map(LocationRefResponse::from)
-              .toList());
+              .toList(),
+          l.getBarangay());
     }
   }
 
@@ -136,8 +139,10 @@ public final class LocationDtos {
    * A damage description.
    *
    * @param description description
+   * @param barangay barangay of the location
    */
-  public record DescribeRequest(@Size(max = 500) String description) {}
+  public record DescribeRequest(
+      @Size(max = 500) String description, @Size(max = 80) String barangay) {}
 
   /**
    * A reference to record.

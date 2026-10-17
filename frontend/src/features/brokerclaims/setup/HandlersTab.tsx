@@ -16,13 +16,15 @@ type HandlerForm = Omit<Handler, 'id'>;
 
 function handlerForm(initial: Handler | undefined): HandlerForm {
   if (initial === undefined) {
-    return { username: '', unitCode: '', team: '', active: true };
+    return { username: '', unitCode: '', team: '', active: true, teamLead: '', teamHead: '' };
   }
   return {
     username: initial.username,
     unitCode: initial.unitCode,
     team: initial.team ?? '',
     active: initial.active,
+    teamLead: initial.teamLead ?? '',
+    teamHead: initial.teamHead ?? '',
   };
 }
 
@@ -119,6 +121,27 @@ function HandlerDialog({
             />
           )}
         </Field>
+        {(['teamLead', 'teamHead'] as const).map((key) => (
+          <Field key={key} label={key === 'teamLead' ? 'Team Lead' : 'Team Head'}>
+            {(id) => (
+              <select
+                id={id}
+                className="select"
+                value={form[key] ?? ''}
+                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+              >
+                <option value="">None</option>
+                {(users.data ?? [])
+                  .filter((u) => u !== form.username)
+                  .map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+              </select>
+            )}
+          </Field>
+        ))}
         <label className="checkbox">
           <input
             type="checkbox"
@@ -133,8 +156,8 @@ function HandlerDialog({
 }
 
 /**
- * Claims handler register (BRCLM.012, NFR p.37): the unit and team of each claims user; the unit
- * drives the status access matrix. A user outside the register sets no status.
+ * Claims handler register (BRCLM.012, NFR p.37): the unit, team, supervising Team Lead and Team
+ * Head (FRCLM.002.06) of each claims user; the unit drives the status access matrix. A user outside the register sets no status.
  */
 export function HandlersTab() {
   const toast = useToast();
@@ -173,6 +196,8 @@ export function HandlersTab() {
           { key: 'user', header: 'User', render: (h) => <strong>{h.username}</strong> },
           { key: 'unit', header: 'Unit', render: (h) => h.unitCode },
           { key: 'team', header: 'Team', render: (h) => h.team ?? '' },
+          { key: 'lead', header: 'Team Lead', render: (h) => h.teamLead ?? '' },
+          { key: 'head', header: 'Team Head', render: (h) => h.teamHead ?? '' },
           {
             key: 'active',
             header: 'Status',

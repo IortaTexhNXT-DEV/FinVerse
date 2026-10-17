@@ -23,10 +23,20 @@ export interface BucketCount {
   claims: number;
 }
 
+/** Outstanding claims and those aged more than 30, 60 and 90 days on a date (FRCLM.001.01). */
+export interface TrendPoint {
+  asOf: string;
+  outstanding: number;
+  over30: number;
+  over60: number;
+  over90: number;
+}
+
 export interface ClaimsHome {
   tiles: HomeTile[];
   byStatus: StatusCount[];
   ageing: BucketCount[];
+  trend?: TrendPoint[];
 }
 
 export type WorklistTab = 'MINE' | 'OPEN' | 'TEMP_CLOSED' | 'CLOSED' | 'FOLLOW_UPS_DUE' | 'ALL';
@@ -63,13 +73,24 @@ export interface WorklistRow {
   premiumStatus?: string;
   currency: string;
   claimAmount?: number;
+  /** Follow-up count, last follow-up, plate number and account officer (FRCLM.009.01). */
+  followUps?: {
+    count: number;
+    lastDate?: string;
+    daysSinceLast: number;
+    plateNo?: string;
+    accountOfficer?: string;
+  };
 }
+
+export type WorklistSort = 'NEWEST' | 'OVERALL_AGE' | 'STAGE_AGE' | 'SINCE_FOLLOW_UP';
 
 export interface WorklistQuery {
   tab: WorklistTab;
   flag?: WorklistFlag;
   status?: string;
   q?: string;
+  sort?: WorklistSort;
 }
 
 export interface Assignee {
@@ -110,6 +131,8 @@ export const claimsHomeApi = {
     api.get<PageResponse<WorklistRow>>(
       `/broker-claims/worklist${toQuery({ companyId, ...query, page, size: 20 })}`,
     ),
+  exportWorklist: (companyId: number, query: WorklistQuery, format: 'EXCEL' | 'PDF') =>
+    api.getFile(`/broker-claims/worklist/export${toQuery({ companyId, ...query, format })}`),
   assignees: () => api.get<Assignee[]>('/broker-claims/assignees'),
   reassign: (companyId: number, claimIds: number[], handler: string, comment?: string) =>
     api.post<{ moved: number }>(`/broker-claims/reassign${toQuery({ companyId })}`, {

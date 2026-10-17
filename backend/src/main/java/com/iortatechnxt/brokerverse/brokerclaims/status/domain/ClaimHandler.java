@@ -8,7 +8,8 @@ import jakarta.persistence.Table;
 /**
  * A claims handler of the register (BRCLM.012, NFR p.37; CLAIMS_BROKING_DESIGN 5.3): the unit of
  * the user drives the status access matrix and the default assignment, the team is shown on the
- * reports. Maintained by the Unit Head on Claims Setup.
+ * reports, and the supervising Team Lead and Team Head are kept with the handler (FRCLM.002.06).
+ * Maintained by the Unit Head on Claims Setup.
  */
 @Entity
 @Table(name = "bcl_handler")
@@ -22,6 +23,12 @@ public class ClaimHandler extends BaseEntity {
 
   @Column(length = 60)
   private String team;
+
+  @Column(name = "team_lead", length = 50)
+  private String teamLead;
+
+  @Column(name = "team_head", length = 50)
+  private String teamHead;
 
   @Column(nullable = false)
   private boolean active;
@@ -61,6 +68,25 @@ public class ClaimHandler extends BaseEntity {
 
   public String getUnitCode() {
     return unitCode;
+  }
+
+  /**
+   * Sets the supervising Team Lead and Team Head of the handler (FRS BRD-07 FRCLM.002.06).
+   *
+   * @param lead Team Lead user, may be null
+   * @param head Team Head user, may be null
+   */
+  public void supervisedBy(String lead, String head) {
+    this.teamLead = lead;
+    this.teamHead = head;
+  }
+
+  public String getTeamLead() {
+    return teamLead;
+  }
+
+  public String getTeamHead() {
+    return teamHead;
   }
 
   public String getTeam() {

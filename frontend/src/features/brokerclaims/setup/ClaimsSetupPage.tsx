@@ -6,16 +6,18 @@ import { CLAIMS_SECTION } from '../ClaimsPlaceholder';
 import { SETTLEMENT_LIST, STATUS_LIST } from './api';
 import { AttributesTab } from './AttributesTab';
 import { HandlersTab } from './HandlersTab';
+import { ChecklistSetupTab } from '../handling/ChecklistSetupTab';
 import { ListsTab } from './ListsTab';
 import { MatrixTab } from './MatrixTab';
 
-type SetupTab = 'statuses' | 'settlements' | 'matrix' | 'handlers' | 'lists';
+type SetupTab = 'statuses' | 'settlements' | 'matrix' | 'handlers' | 'checklist' | 'lists';
 
 const TABS: readonly { id: SetupTab; label: string }[] = [
   { id: 'statuses', label: 'Status Attributes' },
   { id: 'settlements', label: 'Settlement Types' },
   { id: 'matrix', label: 'Status Access Matrix' },
   { id: 'handlers', label: 'Claims Handler Register' },
+  { id: 'checklist', label: 'Document Checklist' },
   { id: 'lists', label: 'Claims Lists' },
 ];
 
@@ -29,6 +31,8 @@ function TabContent({ tab }: Readonly<{ tab: SetupTab }>) {
       return <MatrixTab />;
     case 'handlers':
       return <HandlersTab />;
+    case 'checklist':
+      return <ChecklistSetupTab />;
     default:
       return <ListsTab />;
   }

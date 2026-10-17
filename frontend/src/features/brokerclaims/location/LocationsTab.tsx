@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { MapPinPlus, Trash2 } from 'lucide-react';
+import { MapPinPlus, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
@@ -9,7 +9,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { coverApi } from '../cover/api';
 import type { Claim } from '../record/api';
-import { DialogFooter } from '../record/FormParts';
+import { DialogFooter, InputField, TextAreaField } from '../record/FormParts';
 import type { ClaimLocation, LocationPick } from './api';
 import { locationApi } from './api';
 import { LocationPicker } from './LocationPicker';
@@ -66,6 +66,53 @@ function AddLocationsDialog({
   );
 }
 
+/** Damage and barangay of a linked location (FRCLM.017.01). */
+function DescribeDialog({
+  location,
+  busy,
+  error,
+  onClose,
+  onSave,
+}: Readonly<{
+  location: ClaimLocation;
+  busy: boolean;
+  error: unknown;
+  onClose: () => void;
+  onSave: (description: string, barangay: string) => void;
+}>) {
+  const [description, setDescription] = useState(location.description ?? '');
+  const [barangay, setBarangay] = useState(location.barangay ?? '');
+  return (
+    <Modal
+      title={`Location ${String(location.itemNo)}`}
+      open
+      onClose={onClose}
+      footer={
+        <DialogFooter
+          label="Save Location"
+          busy={busy}
+          onClose={onClose}
+          onConfirm={() => onSave(description, barangay)}
+        />
+      }
+    >
+      <div className="stack">
+        <ErrorAlert error={error} />
+        <p className="muted">
+          {[location.address, location.city, location.province].filter(Boolean).join(', ')}
+        </p>
+        <InputField label="Barangay" maxLength={80} value={barangay} onChange={setBarangay} />
+        <TextAreaField
+          label="Damage"
+          maxLength={500}
+          value={description}
+          onChange={setDescription}
+        />
+      </div>
+    </Modal>
+  );
+}
+
 /**
  * Locations tab of a claim (BRCLM.037/042; FR-CM-020/023): the insured locations of the cover
  * linked to the claim with their address and the reference of each insurer valid today; links and
@@ -77,6 +124,7 @@ export function LocationsTab({ claim, companyId }: Readonly<{ claim: Claim; comp
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<ClaimLocation>();
+  const [describing, setDescribing] = useState<ClaimLocation>();
   const key = ['broker-claims', 'locations', claim.id];
   const locations = useQuery({
     queryKey: key,
@@ -91,6 +139,15 @@ export function LocationsTab({ claim, companyId }: Readonly<{ claim: Claim; comp
     onSuccess: async () => {
       toast.success('Location removed');
       setRemoving(undefined);
+      await refresh();
+    },
+  });
+  const describe = useMutation({
+    mutationFn: (v: { itemNo: number; description: string; barangay: string }) =>
+      locationApi.describe(companyId, claim.id, v.itemNo, v.description, v.barangay),
+    onSuccess: async () => {
+      toast.success('Location saved');
+      setDescribing(undefined);
       await refresh();
     },
   });
@@ -124,6 +181,7 @@ export function LocationsTab({ claim, companyId }: Readonly<{ claim: Claim; comp
             header: 'City / Province',
             render: (l) => [l.city, l.province].filter(Boolean).join(', '),
           },
+          { key: 'b', header: 'Barangay', render: (l) => l.barangay ?? '' },
           { key: 'd', header: 'Damage', render: (l) => l.description ?? '' },
           {
             key: 'r',
@@ -138,13 +196,22 @@ export function LocationsTab({ claim, companyId }: Readonly<{ claim: Claim; comp
             header: '',
             render: (l) =>
               editable ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  aria-label={`Remove location ${l.itemNo}`}
-                  icon={<Trash2 size={14} />}
-                  onClick={() => setRemoving(l)}
-                />
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`Edit location ${String(l.itemNo)}`}
+                    icon={<Pencil size={14} />}
+                    onClick={() => setDescribing(l)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`Remove location ${String(l.itemNo)}`}
+                    icon={<Trash2 size={14} />}
+                    onClick={() => setRemoving(l)}
+                  />
+                </>
               ) : null,
           },
         ]}
@@ -160,6 +227,17 @@ export function LocationsTab({ claim, companyId }: Readonly<{ claim: Claim; comp
             setAdding(false);
             void refresh();
           }}
+        />
+      )}
+      {describing !== undefined && (
+        <DescribeDialog
+          location={describing}
+          busy={describe.isPending}
+          error={describe.error}
+          onClose={() => setDescribing(undefined)}
+          onSave={(description, barangay) =>
+            describe.mutate({ itemNo: describing.itemNo, description, barangay })
+          }
         />
       )}
       {removing !== undefined && (

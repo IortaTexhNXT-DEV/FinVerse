@@ -32,6 +32,12 @@ public final class ClaimCodes {
   /** Claim statuses; attributes in {@code bcl_lov_attribute}. */
   public static final String LOV_STATUS = "BCL_CLAIM_STATUS";
 
+  /** Status of a claim filed with complete documents (FRCLM.006.02). */
+  public static final String STATUS_COMPLETE_DOCS = "NEW_COMPLETE_DOCS";
+
+  /** Follow-up types ({@code BCL_FOLLOW_UP_TYPE}, FRCLM.007.03). */
+  public static final String LOV_FOLLOW_UP_TYPE = "BCL_FOLLOW_UP_TYPE";
+
   /** Requested types of settlement; attributes in {@code bcl_lov_attribute}. */
   public static final String LOV_SETTLEMENT_TYPE = "BCL_SETTLEMENT_TYPE";
 

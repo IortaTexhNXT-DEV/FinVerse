@@ -92,19 +92,21 @@ public final class WorkReports {
     public ReportResult generate(ReportParameters p) {
       sql.asOf(p);
       Map<String, Object> args = BclReportSql.args(p);
-      return TabularReportBuilder.of(p)
-          .columns(
-              ReportColumn.text("kind", "Pending Action"),
-              ReportColumn.text("claim_no", "Claim Number"),
-              ReportColumn.text("assured_name", "Assured's Name"),
-              ReportColumn.text("status", "Claim Status"),
-              ReportColumn.date("due_date", "Due Date"),
-              new ReportColumn("days_overdue", "Days Overdue", ColumnType.NUMBER, false),
-              ReportColumn.text("action", "Action / Remarks"))
-          .groupBy("person", "Handler")
-          .rows(sql.rows(PENDING_SQL, args))
-          .presorted()
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(
+                  ReportColumn.text("kind", "Pending Action"),
+                  ReportColumn.text("claim_no", "Claim Number"),
+                  ReportColumn.text("assured_name", "Assured's Name"),
+                  ReportColumn.text("status", "Claim Status"),
+                  ReportColumn.date("due_date", "Due Date"),
+                  new ReportColumn("days_overdue", "Days Overdue", ColumnType.NUMBER, false),
+                  ReportColumn.text("action", "Action / Remarks"))
+              .groupBy("person", "Handler")
+              .rows(sql.rows(PENDING_SQL, args))
+              .presorted()
+              .build());
     }
   }
 
@@ -134,23 +136,25 @@ public final class WorkReports {
 
     @Override
     public ReportResult generate(ReportParameters p) {
-      return TabularReportBuilder.of(p)
-          .columns(
-              ReportColumn.text("insurer_name", "Insurer"),
-              ReportColumn.text("insurer_claim_no", "Insurer Claim No."),
-              ReportColumn.percent("share_pct", "Share"),
-              ReportColumn.date("reported_to_insurer_on", "Reported to Insurer"),
-              ReportColumn.text("currency", "Currency"),
-              ReportColumn.amount("reserve_amount", "Insurer Reserve"),
-              ReportColumn.amount("settled_amount", "Settled Amount"),
-              ReportColumn.text("adjuster", "Adjuster"),
-              ReportColumn.text("assured_name", "Assured's Name"),
-              ReportColumn.text("policy_no", "Policy No."),
-              ReportColumn.text("status", "Claim Status"))
-          .groupBy("claim_no", "Broker Claim")
-          .rows(sql.rows(INSURER_CLAIMS_SQL, BclReportSql.args(p)))
-          .presorted()
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(
+                  ReportColumn.text("insurer_name", "Insurer"),
+                  ReportColumn.text("insurer_claim_no", "Insurer Claim No."),
+                  ReportColumn.percent("share_pct", "Share"),
+                  ReportColumn.date("reported_to_insurer_on", "Reported to Insurer"),
+                  ReportColumn.text("currency", "Currency"),
+                  ReportColumn.amount("reserve_amount", "Insurer Reserve"),
+                  ReportColumn.amount("settled_amount", "Settled Amount"),
+                  ReportColumn.text("adjuster", "Adjuster"),
+                  ReportColumn.text("assured_name", "Assured's Name"),
+                  ReportColumn.text("policy_no", "Policy No."),
+                  ReportColumn.text("status", "Claim Status"))
+              .groupBy("claim_no", "Broker Claim")
+              .rows(sql.rows(INSURER_CLAIMS_SQL, BclReportSql.args(p)))
+              .presorted()
+              .build());
     }
   }
 }

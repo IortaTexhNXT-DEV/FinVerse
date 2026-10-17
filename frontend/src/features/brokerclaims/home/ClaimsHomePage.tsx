@@ -18,7 +18,7 @@ import { claimsHomeApi } from './api';
 import type { BucketCount, StatusCount } from './api';
 import { bucketShares } from './homeLogic';
 import './home.css';
-import { countOf } from '@/utils/format';
+import { countOf, formatDate } from '@/utils/format';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
 /** Outstanding claims per ageing bucket (BRCLM.025/026; BCL_AGEING_BUCKETS). */
@@ -134,6 +134,27 @@ export default function ClaimsHomePage() {
             </Card>
             <AgeingChart buckets={home.data.ageing} />
           </div>
+          {home.data.trend && home.data.trend.length > 0 && (
+            <Card title="Ageing Trend" flush>
+              <DataTable
+                caption="Outstanding claims at each month end and today"
+                rows={home.data.trend}
+                rowKey={(t) => t.asOf}
+                columns={[
+                  { key: 'asOf', header: 'As of', render: (t) => formatDate(t.asOf) },
+                  {
+                    key: 'out',
+                    header: 'Outstanding',
+                    numeric: true,
+                    render: (t) => t.outstanding,
+                  },
+                  { key: 'o30', header: '> 30 days', numeric: true, render: (t) => t.over30 },
+                  { key: 'o60', header: '> 60 days', numeric: true, render: (t) => t.over60 },
+                  { key: 'o90', header: '> 90 days', numeric: true, render: (t) => t.over90 },
+                ]}
+              />
+            </Card>
+          )}
         </>
       )}
     </div>

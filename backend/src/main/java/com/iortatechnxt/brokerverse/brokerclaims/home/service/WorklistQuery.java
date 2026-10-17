@@ -58,7 +58,7 @@ public class WorklistQuery {
           + " and lower(a.value) = 'true')))"
           + " and (cast(:status as varchar) is null or c.status_code = :status)"
           + " and (cast(:q as varchar) is null or c.claim_no ilike :like or c.arn ilike :like"
-          + " or c.policy_no ilike :like or c.assured_name ilike :like"
+          + " or c.policy_no ilike :like or c.assured_name ilike :like or c.plate_no ilike :like"
           + " or exists (select 1 from bcl_insurer_claim x where x.claim_id = c.id"
           + " and x.insurer_claim_no ilike :like))";
 
@@ -67,11 +67,19 @@ public class WorklistQuery {
           + " c.claimant_name, c.handler, c.unit_code, c.status_code,"
           + " coalesce(s.label, c.status_code) as status_label, c.phase, c.closure_kind,"
           + " c.status_since, c.reported_date, c.loss_date, c.closed_on, c.next_follow_up_date,"
-          + " c.next_action_plan, c.premium_status, c.currency, c.claim_amount,"
+          + " c.next_action_plan, c.premium_status, c.currency, c.claim_amount, c.plate_no,"
+          + " c.account_officer,"
+          + " (select count(*) from bcl_follow_up f where f.claim_id = c.id) as follow_up_count,"
+          + " (select max(f.followed_up_on) from bcl_follow_up f where f.claim_id = c.id)"
+          + " as last_follow_up,"
           + " (select string_agg(x.insurer_claim_no, ', ' order by x.id) from bcl_insurer_claim x"
           + " where x.claim_id = c.id and x.insurer_claim_no is not null) as insurer_claim_nos"
           + WHERE
           + " order by case when :tab = 'FOLLOW_UPS_DUE' then c.next_follow_up_date end nulls last,"
+          + " case when :sort = 'OVERALL_AGE' then c.reported_date end,"
+          + " case when :sort = 'STAGE_AGE' then c.status_since end,"
+          + " case when :sort = 'SINCE_FOLLOW_UP' then coalesce((select max(f.followed_up_on)"
+          + " from bcl_follow_up f where f.claim_id = c.id), c.reported_date) end,"
           + " c.reported_date desc, c.id desc limit :size offset :offset";
 
   private final NamedParameterJdbcTemplate jdbc;
@@ -113,6 +121,7 @@ public class WorklistQuery {
     String q = blankToNull(criteria.text());
     args.put("q", q);
     args.put("like", q == null ? "" : "%" + escape(q) + "%");
+    args.put("sort", criteria.sort() == null ? Sort.NEWEST.name() : criteria.sort().name());
     args.put("size", size);
     args.put("offset", (long) page * size);
     List<WorklistRow> rows = jdbc.query(SELECT, args, (rs, n) -> row(rs, today));
@@ -127,6 +136,8 @@ public class WorklistQuery {
     Instant since = instant(rs.getTimestamp("status_since"));
     LocalDate followUp = date(rs.getDate("next_follow_up_date"));
     String phase = rs.getString("phase");
+    LocalDate lastFollowUp = date(rs.getDate("last_follow_up"));
+    LocalDate followedSince = lastFollowUp == null ? reported : lastFollowUp;
     return new WorklistRow(
         rs.getLong("id"),
         rs.getString("claim_no"),
@@ -154,7 +165,15 @@ public class WorklistQuery {
         rs.getString("next_action_plan"),
         rs.getString("premium_status"),
         rs.getString("currency"),
-        rs.getBigDecimal("claim_amount"));
+        rs.getBigDecimal("claim_amount"),
+        new WorklistRow.FollowUps(
+            rs.getInt("follow_up_count"),
+            lastFollowUp,
+            followedSince == null
+                ? 0
+                : (int) java.time.temporal.ChronoUnit.DAYS.between(followedSince, today),
+            rs.getString("plate_no"),
+            rs.getString("account_officer")));
   }
 
   private static String blankToNull(String text) {
@@ -209,8 +228,34 @@ public class WorklistQuery {
    * @param flag home tile filter, may be null
    * @param statusCode status, may be null
    * @param text search text, may be null
+   * @param sort order of the rows, newest reported first when null
    */
-  public record WorklistCriteria(Tab tab, Flag flag, String statusCode, String text) {}
+  public record WorklistCriteria(Tab tab, Flag flag, String statusCode, String text, Sort sort) {
+
+    /**
+     * Criteria in the default order.
+     *
+     * @param tab tab
+     * @param flag home tile filter, may be null
+     * @param statusCode status, may be null
+     * @param text search text, may be null
+     */
+    public WorklistCriteria(Tab tab, Flag flag, String statusCode, String text) {
+      this(tab, flag, statusCode, text, Sort.NEWEST);
+    }
+  }
+
+  /** Orders of the worklist (FRCLM.009.01). */
+  public enum Sort {
+    /** Newest reported first. */
+    NEWEST,
+    /** Oldest overall age first. */
+    OVERALL_AGE,
+    /** Longest in the current status first. */
+    STAGE_AGE,
+    /** Longest since the last follow-up first. */
+    SINCE_FOLLOW_UP
+  }
 
   /**
    * A row of the worklist.
@@ -224,6 +269,7 @@ public class WorklistQuery {
    * @param premiumStatus premium check
    * @param currency currency
    * @param claimAmount claim amount
+   * @param followUps follow-up count, last follow-up, plate number and account officer
    */
   public record WorklistRow(
       Long id,
@@ -234,7 +280,20 @@ public class WorklistQuery {
       String nextActionPlan,
       String premiumStatus,
       String currency,
-      BigDecimal claimAmount) {
+      BigDecimal claimAmount,
+      FollowUps followUps) {
+
+    /**
+     * Follow-ups of a row (FRCLM.009.01).
+     *
+     * @param count follow-ups recorded
+     * @param lastDate date of the last follow-up
+     * @param daysSinceLast days since the last follow-up, else since reported
+     * @param plateNo plate number
+     * @param accountOfficer account officer of the cover
+     */
+    public record FollowUps(
+        int count, LocalDate lastDate, int daysSinceLast, String plateNo, String accountOfficer) {}
 
     /**
      * Cover of a row.

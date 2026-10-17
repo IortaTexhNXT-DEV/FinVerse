@@ -238,6 +238,7 @@ datasets:
   # ---------- Claims and employee benefits rules ---------------------------------------------------
   - {code: BCL_LOV_ATTRIBUTE, name: Attributes of the claims lists, group: CLAIMS_BENEFITS, module: brokerclaims, table: bcl_lov_attribute, key: [type_code, code, attribute]}
   - {code: BCL_STATUS_ACCESS, name: Claim status access, group: CLAIMS_BENEFITS, module: brokerclaims, table: bcl_status_access, key: [status_code, role_code, unit_code]}
+  - {code: BCL_DOCUMENT_REQUIREMENT, name: Claim document checklist, group: CLAIMS_BENEFITS, module: brokerclaims, table: bcl_document_requirement, key: [claim_type, document_type]}
   - {code: BCL_HANDLER, name: Claim handlers, group: USERS, module: brokerclaims, table: bcl_handler, key: [username], users: true}
   - {code: EB_REQUIRED_DOCUMENT, name: Required documents of employee benefits, group: CLAIMS_BENEFITS, module: eb, table: eb_required_document, key: [company_id, process_type, benefit_line, document_type]}
   - {code: EB_THRESHOLD_RULE, name: Approval thresholds of employee benefits, group: CLAIMS_BENEFITS, module: eb, table: eb_threshold_rule, key: [company_id, benefit_line, measure, approval_level, effective_from]}
@@ -342,7 +343,7 @@ excluded:
      acsl_glsl_run, acsl_recon_result, acsl_recon_run, acsl_soa_line, acsl_soa_upload,
      adj_min_balance_item, adj_posting_batch, adj_posting_batch_line, adj_request,
      adj_request_component, adj_request_journal, adj_request_share, alt_alert, bcl_claim,
-     bcl_claim_location, bcl_diary_entry, bcl_insurer_claim, bcl_insurer_update, bcl_location_ref,
+     bcl_claim_location, bcl_diary_entry, bcl_follow_up, bcl_insurer_claim, bcl_insurer_update, bcl_location_ref,
      bcl_reserve_change, bkg_batch_row, bkg_batch_run, bkg_endorsement, bkg_invoice,
      bkg_invoice_journal, bkg_invoice_open_item, bkg_invoice_share, bkg_queue, bkg_service_invoice,
      brs_match, brs_match_book, brs_reconciliation, brs_statement, brs_statement_line,

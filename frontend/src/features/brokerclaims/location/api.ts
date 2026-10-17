@@ -27,6 +27,8 @@ export interface ClaimLocation {
   locationKey?: string;
   description?: string;
   references: LocationRef[];
+  /** Barangay of the location (FRCLM.017.01). */
+  barangay?: string;
 }
 
 export interface LocationPick {
@@ -51,9 +53,16 @@ export const locationApi = {
     api.get<ClaimLocation[]>(`${base(claimId)}${toQuery({ companyId })}`),
   link: (companyId: number, claimId: number, locations: LocationPick[]) =>
     api.post<ClaimLocation[]>(`${base(claimId)}${toQuery({ companyId })}`, { locations }),
-  describe: (companyId: number, claimId: number, itemNo: number, description: string) =>
+  describe: (
+    companyId: number,
+    claimId: number,
+    itemNo: number,
+    description: string,
+    barangay?: string,
+  ) =>
     api.put<ClaimLocation[]>(`${base(claimId)}/${itemNo}${toQuery({ companyId })}`, {
       description,
+      barangay,
     }),
   remove: (companyId: number, claimId: number, itemNo: number) =>
     api.delete(`${base(claimId)}/${itemNo}${toQuery({ companyId })}`),

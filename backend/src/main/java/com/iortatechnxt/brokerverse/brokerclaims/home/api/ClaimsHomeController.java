@@ -3,12 +3,17 @@ package com.iortatechnxt.brokerverse.brokerclaims.home.api;
 import com.iortatechnxt.brokerverse.brokerclaims.home.service.ClaimAssignmentService;
 import com.iortatechnxt.brokerverse.brokerclaims.home.service.ClaimAssignmentService.Assignee;
 import com.iortatechnxt.brokerverse.brokerclaims.home.service.ClaimsHomeService;
+import com.iortatechnxt.brokerverse.brokerclaims.home.service.WorklistExport;
 import com.iortatechnxt.brokerverse.brokerclaims.home.service.WorklistQuery;
 import com.iortatechnxt.brokerverse.brokerclaims.home.service.WorklistQuery.WorklistRow;
 import com.iortatechnxt.brokerverse.brokerclaims.service.ClaimExperienceQueryService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +36,7 @@ public class ClaimsHomeController {
   private final WorklistQuery worklist;
   private final ClaimAssignmentService assignments;
   private final ClaimExperienceQueryService experience;
+  private final WorklistExport export;
 
   /**
    * Creates the controller.
@@ -39,12 +45,15 @@ public class ClaimsHomeController {
    * @param worklist worklist
    * @param assignments reassignment
    * @param experience loss experience
+   * @param export worklist export
    */
   public ClaimsHomeController(
       ClaimsHomeService home,
       WorklistQuery worklist,
       ClaimAssignmentService assignments,
-      ClaimExperienceQueryService experience) {
+      ClaimExperienceQueryService experience,
+      WorklistExport export) {
+    this.export = export;
     this.home = home;
     this.worklist = worklist;
     this.assignments = assignments;
@@ -67,10 +76,7 @@ public class ClaimsHomeController {
    * A page of the worklist.
    *
    * @param companyId company
-   * @param tab tab
-   * @param flag home tile filter
-   * @param status status
-   * @param q search text
+   * @param filter tab, home tile filter, status, search text and order
    * @param page page
    * @param size page size (at most 200)
    * @return claims
@@ -79,17 +85,74 @@ public class ClaimsHomeController {
   @PreAuthorize("hasAuthority('BCL_VIEW')")
   public PageResponse<WorklistRow> worklist(
       @RequestParam Long companyId,
-      @RequestParam(defaultValue = "OPEN") WorklistQuery.Tab tab,
-      @RequestParam(required = false) WorklistQuery.Flag flag,
-      @RequestParam(required = false) String status,
-      @RequestParam(required = false) String q,
+      WorklistFilter filter,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size) {
     return worklist.search(
-        companyId,
-        new WorklistQuery.WorklistCriteria(tab, flag, status, q),
-        Math.max(0, page),
-        Math.clamp(size, 1, MAX_PAGE));
+        companyId, filter.criteria(), Math.max(0, page), Math.clamp(size, 1, MAX_PAGE));
+  }
+
+  /**
+   * The worklist as shown, exported to Excel or PDF (FRCLM.009.08).
+   *
+   * @param companyId company
+   * @param filter tab, home tile filter, status, search text and order of the screen
+   * @param format EXCEL or PDF
+   * @return file
+   */
+  @GetMapping("/worklist/export")
+  @PreAuthorize("hasAuthority('BCL_VIEW')")
+  public ResponseEntity<byte[]> exportWorklist(
+      @RequestParam Long companyId,
+      WorklistFilter filter,
+      @RequestParam(defaultValue = "EXCEL") ExportFormat format) {
+    WorklistQuery.WorklistCriteria criteria = filter.criteria();
+    boolean excel = format == ExportFormat.EXCEL;
+    byte[] content = excel ? export.excel(companyId, criteria) : export.pdf(companyId, criteria);
+    return ResponseEntity.ok()
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.attachment()
+                .filename("Claims_Worklist." + (excel ? "xlsx" : "pdf"))
+                .build()
+                .toString())
+        .contentType(
+            excel ? MediaType.parseMediaType(WorklistExport.XLSX) : MediaType.APPLICATION_PDF)
+        .body(content);
+  }
+
+  /** Export format of the worklist. */
+  public enum ExportFormat {
+    /** Excel workbook. */
+    EXCEL,
+    /** PDF. */
+    PDF
+  }
+
+  /**
+   * Query parameters of the worklist.
+   *
+   * @param tab tab, OPEN when absent
+   * @param flag home tile filter
+   * @param status status
+   * @param q search text
+   * @param sort order, newest reported first when absent
+   */
+  public record WorklistFilter(
+      WorklistQuery.Tab tab,
+      WorklistQuery.Flag flag,
+      String status,
+      String q,
+      WorklistQuery.Sort sort) {
+
+    WorklistQuery.WorklistCriteria criteria() {
+      return new WorklistQuery.WorklistCriteria(
+          tab == null ? WorklistQuery.Tab.OPEN : tab,
+          flag,
+          status,
+          q,
+          sort == null ? WorklistQuery.Sort.NEWEST : sort);
+    }
   }
 
   /**

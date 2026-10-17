@@ -50,6 +50,8 @@ public class Claim extends BaseEntity {
 
   @Embedded private ClaimProgress progress;
 
+  @Embedded private ClaimExtras extras = new ClaimExtras();
+
   protected Claim() {}
 
   /**
@@ -134,6 +136,18 @@ public class Claim extends BaseEntity {
 
   public ClaimProgress getProgress() {
     return progress;
+  }
+
+  /**
+   * Plate number, preferred repair shop and the return to the Account Officer.
+   *
+   * @return the extra details, never null
+   */
+  public ClaimExtras getExtras() {
+    if (extras == null) {
+      extras = new ClaimExtras();
+    }
+    return extras;
   }
 
   /**

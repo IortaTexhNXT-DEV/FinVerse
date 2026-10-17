@@ -93,15 +93,17 @@ public final class AgeingReports {
       rows.sort(
           Comparator.<Map<String, Object>>comparingInt(r -> order.indexOf((String) r.get(BUCKET)))
               .thenComparing(r -> String.valueOf(r.get(INSURER))));
-      return TabularReportBuilder.of(p)
-          .columns(ageingColumns())
-          .groupBy(BUCKET, "Age Bracket")
-          .groupBy(INSURER, "Insurer")
-          .rows(rows)
-          .presorted()
-          .note(
-              "Brackets from parameter BCL_AGEING_BUCKETS; temporarily closed claims keep ageing.")
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(ageingColumns())
+              .groupBy(BUCKET, "Age Bracket")
+              .groupBy(INSURER, "Insurer")
+              .rows(rows)
+              .presorted()
+              .note(
+                  "Brackets from parameter BCL_AGEING_BUCKETS; temporarily closed claims keep ageing.")
+              .build());
     }
   }
 
@@ -147,13 +149,15 @@ public final class AgeingReports {
       columns.add(ClaimColumns.CLAIMS);
       columns.addAll(ClaimColumns.outstanding());
       columns.add(ReportColumn.text("earlier", "Days in Earlier Statuses"));
-      return TabularReportBuilder.of(p)
-          .columns(columns)
-          .groupBy("status", "Claim Status")
-          .groupBy(INSURER, "Insurer")
-          .rows(rows)
-          .note("Age this stage = days since the current status was set.")
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(columns)
+              .groupBy("status", "Claim Status")
+              .groupBy(INSURER, "Insurer")
+              .rows(rows)
+              .note("Age this stage = days since the current status was set.")
+              .build());
     }
   }
 }

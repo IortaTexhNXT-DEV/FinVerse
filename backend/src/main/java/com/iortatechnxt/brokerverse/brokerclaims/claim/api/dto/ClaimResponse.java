@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.brokerclaims.claim.service.ClaimViewService.
 import com.iortatechnxt.brokerverse.brokerclaims.cover.api.dto.CoverDtos.PremiumDto;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimCodes;
+import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimExtras;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimPremiumStatus;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.ClaimProgress;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.CoverSnapshot;
@@ -35,6 +36,7 @@ import java.util.Map;
  * @param totalReserve sum of the insurer reserves
  * @param createdBy recorded by
  * @param createdAt recorded at
+ * @param extras plate number, preferred repair shop, return to the Account Officer
  */
 public record ClaimResponse(
     Long id,
@@ -53,7 +55,8 @@ public record ClaimResponse(
     int insurerCount,
     BigDecimal totalReserve,
     String createdBy,
-    Instant createdAt) {
+    Instant createdAt,
+    Extras extras) {
 
   /**
    * Maps a claim view.
@@ -88,7 +91,40 @@ public record ClaimResponse(
         v.insurerCount(),
         v.totalReserve(),
         c.getCreatedBy(),
-        c.getCreatedAt());
+        c.getCreatedAt(),
+        Extras.from(c.getExtras()));
+  }
+
+  /**
+   * Details of the BRD scope of the FRS BRD-07 Claims v1.0.
+   *
+   * @param plateNo plate number
+   * @param preferredShopCode preferred repair shop
+   * @param returnedToAoAt when the claim was returned to the Account Officer
+   * @param returnedToAoBy who returned it
+   * @param returnedToAoNote note to the Account Officer
+   */
+  public record Extras(
+      String plateNo,
+      String preferredShopCode,
+      Instant returnedToAoAt,
+      String returnedToAoBy,
+      String returnedToAoNote) {
+
+    /**
+     * Maps the details.
+     *
+     * @param e details
+     * @return DTO
+     */
+    public static Extras from(ClaimExtras e) {
+      return new Extras(
+          e.getPlateNo(),
+          e.getPreferredShopCode(),
+          e.getReturnedToAoAt(),
+          e.getReturnedToAoBy(),
+          e.getReturnedToAoNote());
+    }
   }
 
   private static boolean isNewer(CoverSnapshot cover, int latest) {

@@ -80,12 +80,14 @@ public final class ClaimListReports {
     @Override
     public ReportResult generate(ReportParameters p) {
       LocalDate asOf = sql.asOf(p);
-      return TabularReportBuilder.of(p)
-          .columns(ClaimColumns.outstanding())
-          .rows(sql.claimRows(OUTSTANDING_SQL, BclReportSql.args(p), asOf))
-          .presorted()
-          .note(TEMP_NOTE)
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(ClaimColumns.outstanding())
+              .rows(sql.claimRows(OUTSTANDING_SQL, BclReportSql.args(p), asOf))
+              .presorted()
+              .note(TEMP_NOTE)
+              .build());
     }
   }
 
@@ -122,12 +124,14 @@ public final class ClaimListReports {
       Map<String, Object> args = BclReportSql.args(p);
       int days = args.get(DAYS) instanceof Integer d ? d : sql.pastDueDays();
       args.put(DAYS, days);
-      return TabularReportBuilder.of(p)
-          .columns(ClaimColumns.outstanding())
-          .rows(sql.claimRows(PAST_DUE_SQL, args, asOf))
-          .presorted()
-          .note("Claims outstanding for more than " + days + " days on the as-of date.")
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(ClaimColumns.outstanding())
+              .rows(sql.claimRows(PAST_DUE_SQL, args, asOf))
+              .presorted()
+              .note("Claims outstanding for more than " + days + " days on the as-of date.")
+              .build());
     }
   }
 
@@ -159,12 +163,14 @@ public final class ClaimListReports {
     public ReportResult generate(ReportParameters p) {
       Map<String, Object> args = BclReportSql.args(p);
       LocalDate to = (LocalDate) args.get("settledTo");
-      return TabularReportBuilder.of(p)
-          .columns(ClaimColumns.settled())
-          .rows(sql.claimRows(SETTLED_SQL, args, to))
-          .presorted()
-          .note("Settled outcome = settlement type attribute outcome SETTLED.")
-          .build();
+      return sql.present(
+          p,
+          TabularReportBuilder.of(p)
+              .columns(ClaimColumns.settled())
+              .rows(sql.claimRows(SETTLED_SQL, args, to))
+              .presorted()
+              .note("Settled outcome = settlement type attribute outcome SETTLED.")
+              .build());
     }
   }
 }

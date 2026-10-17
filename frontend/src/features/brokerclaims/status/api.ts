@@ -37,6 +37,8 @@ export interface StatusOption {
   code: string;
   label: string;
   phase: ClaimPhase;
+  /** New PLA, Follow Up, Settlement, Settlement - Paid or Settlement - LOA Issued. */
+  statusType?: string;
 }
 
 export interface Stamp {

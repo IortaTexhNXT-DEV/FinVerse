@@ -222,7 +222,12 @@ public class ClaimsSetupController {
   @PutMapping("/handlers")
   public HandlerResponse saveHandler(@RequestBody HandlerRequest request) {
     return HandlerResponse.from(
-        handlers.save(request.username(), request.unitCode(), request.team(), request.active()));
+        handlers.save(
+            request.username(),
+            request.unitCode(),
+            request.team(),
+            new HandlerSetupService.Supervisors(request.teamLead(), request.teamHead()),
+            request.active()));
   }
 
   /**

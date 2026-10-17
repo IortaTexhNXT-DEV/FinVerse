@@ -58,6 +58,20 @@ public class ClaimsHomeService {
           + " from bcl_claim c where c.company_id = :companyId and c.phase <> 'CLOSED'"
           + " group by 1";
 
+  /**
+   * Outstanding claims on a date (reported on or before it, not closed on it) by age band
+   * (FRCLM.001.01 ageing trend).
+   */
+  private static final String TREND =
+      "select count(*) as outstanding,"
+          + " count(*) filter (where cast(:asOf as date) - c.reported_date > 30) as over30,"
+          + " count(*) filter (where cast(:asOf as date) - c.reported_date > 60) as over60,"
+          + " count(*) filter (where cast(:asOf as date) - c.reported_date > 90) as over90"
+          + " from bcl_claim c where c.company_id = :companyId and c.reported_date <= :asOf"
+          + " and (c.closed_on is null or c.closed_on > :asOf)";
+
+  private static final int TREND_MONTHS = 6;
+
   private final NamedParameterJdbcTemplate jdbc;
   private final SystemParameterService parameters;
   private final CurrentUser currentUser;
@@ -103,7 +117,37 @@ public class ClaimsHomeService {
                     rs.getString("status_code"),
                     rs.getString("status_label"),
                     rs.getLong("claims")));
-    return new Home(tiles, byStatus, ageing(args));
+    return new Home(tiles, byStatus, ageing(args), trend(companyId, today));
+  }
+
+  /**
+   * The ageing trend: the outstanding claims and those aged more than 30, 60 and 90 days at the end
+   * of each of the last months and today (Philippine business dates).
+   *
+   * @param companyId company
+   * @param today business date
+   * @return points, oldest first
+   */
+  List<TrendPoint> trend(Long companyId, LocalDate today) {
+    List<LocalDate> dates = new ArrayList<>();
+    for (int m = TREND_MONTHS - 1; m >= 1; m--) {
+      LocalDate monthEnd = today.minusMonths(m).withDayOfMonth(1).plusMonths(1).minusDays(1);
+      dates.add(monthEnd);
+    }
+    dates.add(today);
+    List<TrendPoint> points = new ArrayList<>();
+    for (LocalDate asOf : dates) {
+      Map<String, Object> row =
+          jdbc.queryForMap(TREND, Map.of("companyId", companyId, "asOf", asOf));
+      points.add(
+          new TrendPoint(
+              asOf,
+              count(row, "outstanding"),
+              count(row, "over30"),
+              count(row, "over60"),
+              count(row, "over90")));
+    }
+    return points;
   }
 
   private static List<Tile> tiles(Map<String, Object> c) {
@@ -183,8 +227,25 @@ public class ClaimsHomeService {
    * @param tiles work tiles
    * @param byStatus open claims by phase and status
    * @param ageing outstanding claims by ageing bucket
+   * @param trend ageing trend at the last month ends and today
    */
-  public record Home(List<Tile> tiles, List<StatusCount> byStatus, List<BucketCount> ageing) {}
+  public record Home(
+      List<Tile> tiles,
+      List<StatusCount> byStatus,
+      List<BucketCount> ageing,
+      List<TrendPoint> trend) {}
+
+  /**
+   * A point of the ageing trend.
+   *
+   * @param asOf date
+   * @param outstanding outstanding claims
+   * @param over30 aged more than 30 days
+   * @param over60 aged more than 60 days
+   * @param over90 aged more than 90 days
+   */
+  public record TrendPoint(
+      LocalDate asOf, long outstanding, long over30, long over60, long over90) {}
 
   /**
    * A work tile.

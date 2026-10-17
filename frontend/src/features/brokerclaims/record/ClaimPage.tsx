@@ -23,13 +23,25 @@ import { CLAIM_ENTITY, claimApi } from './api';
 import { ClaimActions } from './ClaimActions';
 import { ClaimSummary } from './ClaimSummary';
 import { DetailsTab } from './DetailsTab';
+import { DocumentChecklistCard } from '../handling/DocumentChecklistCard';
+import { FollowUpsTab } from '../handling/FollowUpsTab';
+import { HandlingCard } from '../handling/HandlingCard';
 import { Notice } from '@/components/ui/Notice';
 import { LoadingPanel } from '@/components/ui/LoadingPanel';
 
-type TabId = 'details' | 'locations' | 'insurers' | 'reserve' | 'diary' | 'documents' | 'history';
+type TabId =
+  | 'details'
+  | 'followups'
+  | 'locations'
+  | 'insurers'
+  | 'reserve'
+  | 'diary'
+  | 'documents'
+  | 'history';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'details', label: 'Details' },
+  { id: 'followups', label: 'Follow-ups' },
   { id: 'locations', label: 'Locations' },
   { id: 'insurers', label: 'Insurers & Updates' },
   { id: 'reserve', label: 'Reserve & Settlement' },
@@ -71,6 +83,13 @@ function ClaimTabs({ claim, companyId }: Readonly<{ claim: Claim; companyId: num
       <div className="stack">
         <Tabs tabs={TABS} active={tab} onChange={setTab} />
         {tab === 'details' && <DetailsTab claim={claim} companyId={companyId} />}
+        {tab === 'followups' && (
+          <FollowUpsTab
+            claimId={claim.id}
+            companyId={companyId}
+            open={claim.progress.phase !== 'CLOSED'}
+          />
+        )}
         {tab === 'locations' && <LocationsTab claim={claim} companyId={companyId} />}
         {tab === 'insurers' && <InsurersTab claim={claim} companyId={companyId} />}
         {tab === 'reserve' && <ReserveTab claim={claim} companyId={companyId} />}
@@ -78,6 +97,7 @@ function ClaimTabs({ claim, companyId }: Readonly<{ claim: Claim; companyId: num
         {tab === 'history' && <HistoryTab claimId={claim.id} companyId={companyId} />}
         {tab === 'documents' && (
           <div className="stack">
+            <DocumentChecklistCard claimId={claim.id} companyId={companyId} />
             <Attachments
               entityType={CLAIM_ENTITY}
               entityId={claim.id}
@@ -126,6 +146,7 @@ export default function ClaimPage() {
           <ClaimSummary claim={c} />
           <ClaimStatusPanel claimId={c.id} companyId={companyId} />
           <PremiumNotes claim={c} />
+          <HandlingCard claim={c} companyId={companyId} />
           <WorkflowPanel
             entityType={CLAIM_ENTITY}
             entityId={c.id}

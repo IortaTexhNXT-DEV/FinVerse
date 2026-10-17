@@ -13,7 +13,11 @@ import com.iortatechnxt.brokerverse.brokerclaims.insurer.service.LossAdviceServi
 import com.iortatechnxt.brokerverse.common.security.OwnedRecord;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -101,6 +105,30 @@ public class InsurerUpdateController {
     return advice.drafts(claims.require(companyId, claimId)).stream()
         .map(AdviceDraftResponse::from)
         .toList();
+  }
+
+  /**
+   * The loss advice of one insurer as PDF, for review before sending (FRCLM.008.08).
+   *
+   * @param claimId claim
+   * @param companyId company
+   * @param insurerCode insurer of the claim
+   * @return PDF shown in the browser
+   */
+  @GetMapping("/loss-advice/preview")
+  @PreAuthorize(RECORD)
+  public ResponseEntity<byte[]> preview(
+      @PathVariable Long claimId, @RequestParam Long companyId, @RequestParam String insurerCode) {
+    Claim claim = claims.require(companyId, claimId);
+    return ResponseEntity.ok()
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.inline()
+                .filename(claim.getClaimNo() + "_LOSS_ADVICE_PREVIEW.pdf")
+                .build()
+                .toString())
+        .contentType(MediaType.APPLICATION_PDF)
+        .body(advice.preview(claim, insurerCode.strip()));
   }
 
   /**

@@ -22,5 +22,11 @@ public enum ClaimField {
   /** Claims authorization code (BRCLM.001, CL1-A). */
   AUTHORIZATION,
   /** Claims handler (reassignment, NFR p.37). */
-  HANDLER
+  HANDLER,
+  /** Plate number and preferred repair shop (FRCLM.008.02, 007.02). */
+  MOTOR,
+  /** Claim of an unpaid policy returned to the Account Officer (FRCLM.008.04). */
+  RETURNED_TO_AO,
+  /** Follow-up recorded with its action taken and next plan (FRCLM.009.04). */
+  FOLLOW_UP_RECORDED
 }

@@ -1,11 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Eye } from 'lucide-react';
+import { useFileDownload } from '@/components/broking/useFileDownload';
+import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { DialogFooter } from '../record/FormParts';
 import type { AdviceDraft, AdviceRecipient } from './api';
 import { insurerApi } from './api';
+import { handlingApi } from '../handling/api';
 import { addresses, adviceErrors } from './insurerLogic';
 
 function DraftRow({
@@ -14,12 +18,14 @@ function DraftRow({
   to,
   onToggle,
   onTo,
+  onPreview,
 }: Readonly<{
   draft: AdviceDraft;
   checked: boolean;
   to: string;
   onToggle: () => void;
   onTo: (value: string) => void;
+  onPreview?: () => void;
 }>) {
   return (
     <div className="stack">
@@ -34,6 +40,13 @@ function DraftRow({
       </label>
       {checked && (
         <>
+          {onPreview && (
+            <div>
+              <Button size="sm" variant="secondary" icon={<Eye size={14} />} onClick={onPreview}>
+                Preview PDF
+              </Button>
+            </div>
+          )}
           <input
             aria-label={`Recipients of ${draft.insurerCode}`}
             className="input"
@@ -79,6 +92,7 @@ export function LossAdviceDialog({
       onSent();
     },
   });
+  const preview = useFileDownload();
   const list = drafts.data ?? [];
   const toggle = (d: AdviceDraft) => {
     if (selected.includes(d.insurerCode)) {
@@ -112,7 +126,7 @@ export function LossAdviceDialog({
       }
     >
       <div className="stack">
-        <ErrorAlert error={drafts.error ?? send.error} />
+        <ErrorAlert error={drafts.error ?? send.error ?? preview.error} />
         {errors.map((e) => (
           <div key={e} className="field-error" role="alert">
             {e}
@@ -129,6 +143,9 @@ export function LossAdviceDialog({
             to={to[d.insurerCode] ?? ''}
             onToggle={() => toggle(d)}
             onTo={(value) => setTo({ ...to, [d.insurerCode]: value })}
+            onPreview={() =>
+              preview.mutate(() => handlingApi.advicePreview(companyId, claimId, d.insurerCode))
+            }
           />
         ))}
       </div>

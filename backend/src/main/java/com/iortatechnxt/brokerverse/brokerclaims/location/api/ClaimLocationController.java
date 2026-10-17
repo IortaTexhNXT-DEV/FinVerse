@@ -110,7 +110,7 @@ public class ClaimLocationController {
       @RequestParam Long companyId,
       @Valid @RequestBody DescribeRequest request) {
     Claim claim = claims.requireOpen(companyId, claimId);
-    locations.describe(claim, itemNo, request.description());
+    locations.describe(claim, itemNo, request.description(), request.barangay());
     return responses(claim);
   }
 

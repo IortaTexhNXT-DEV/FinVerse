@@ -8,7 +8,7 @@
 BRD-00:
   J1.1: {refs: [BRD-11/WT-A], checks: [[/access/identity-sync, null, [Events, Refused, Reconciliation, Simulator]], [/access/users, null, []]], user: uamadmin}
   J1.2: {refs: [BRD-03/WT-A], checks: [[/product-maintenance/tsu, null, []]]}
-  J1.3: {checks: [[/broking-setup/lists, null, []], [/catalog/insurers/:id, /catalog/insurers, [Profile, Branches, Commission rates]]]}
+  J1.3: {checks: [[/broking-setup/lists, null, []], [/catalog/insurers/:id, /catalog/insurers, [Profile, Branches & Commissions]]]}
   J2.1: {refs: [BRD-01/WT-A.1-4], checks: [[/crm/clients/new, null, [Save as Prospect]], [/screening, null, []]]}
   J2.2: {refs: [BRD-01/WT-A.5-8], checks: [[/quotations, null, []]]}
   J2.3: {refs: [BRD-01/WT-B], checks: [[/proposals/tsu, null, []]]}
@@ -49,15 +49,17 @@ BRD-07:
 
 BRD-08:
   P1.1: {checks: [[/crm/clients, null, []], [/eb/programmes/new, null, []], [/eb/programmes, null, []]]}
-  P1.2: {blocked: "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"}
-  P1.3: {blocked: "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"}
-  P1.4: {blocked: "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"}
+  P1.2: {blocked: "Portal users come with the partner portal, outside Drop 2 (gap G02; hosting, sign-in and one-time code under EBQ13)"}
+  # P1.3, P3.1 and P3.3: the Drop 2 process of FRS BRD-8 assumption A-EB-06 (until the portal goes live the AO records
+  # what the client HR user and the insurer send by e-mail); P1.2 and P1.4 have no Drop 2 counterpart (gap G02).
+  P1.3: {user: ebao, checks: [[/eb/programmes/:id, /eb/programmes, [Documents, Cycle]]]}
+  P1.4: {blocked: "The review queue of portal uploads comes with the partner portal, outside Drop 2 (gap G02); the AO's own uploads take effect at once"}
   P2.1: {checks: [[/eb/programmes/:id, /eb/programmes, [Documents]]]}
   P2.2: {checks: [[/eb/programmes/:id, /eb/programmes, [Franchise]]]}
   P2.3: {checks: [[/eb/programmes/:id, /eb/programmes, [TOR]]]}
-  P3.1: {blocked: "The insurer submits its proposal through the portal, outside Drop 2; the officer keys the proposal in BIBS instead"}
+  P3.1: {user: ebao, checks: [[/eb/programmes/:id, /eb/programmes, [Proposals]]]}
   P3.2: {checks: [[/eb/programmes/:id, /eb/programmes, [Comparative]]]}
-  P3.3: {blocked: "The client confirms the comparative through the portal, outside Drop 2; the confirmation is recorded by the officer"}
+  P3.3: {user: ebao, checks: [[/eb/programmes/:id, /eb/programmes, [Confirmation]]]}
   P3.4: {checks: [[/eb/programmes/:id, /eb/programmes, []]]}
   P4.1: {checks: [[/my-work, null, []]]}
   P4.2: {checks: [[/accounts/:id, /accounts, []], [/booking, null, []]]}
@@ -112,7 +114,7 @@ BRD-10:
 
 BRD-12:
   P1.1: {checks: [[/submitted/intake, null, []]]}
-  P1.2: {checks: [[/submitted/masterlist, null, [New Policy]], [/submitted/policies/:id, /submitted/masterlist, []]], gap: SBM-MANUAL}
+  P1.2: {checks: [[/submitted/masterlist, null, [New Policy]], [/submitted/policies/:id, /submitted/masterlist, [Edit, Tag Renewable]]]}
   P1.3: {checks: [[/submitted/intake, null, [Migration]], [/reports/SBM-MIGRATION-ERRORS, null, [Run Report]]]}
   P1.4: {checks: [[/submitted/intake, null, [Upload Loan File]]]}
   P1.5: {checks: [[/submitted/runs, null, []]]}
@@ -166,8 +168,11 @@ BRD-13:
   UF-D.2: {checks: [[/legacy-inquiry, null, []]]}
   UF-D.3: {checks: [[/legacy-inquiry, null, []]]}
   UF-D.4: {checks: [[/legacy-inquiry/access-log, null, []]]}
-  FR-DM-125.1: {blocked: "Compiled outside BIBS from the Excel trackers of the legacy renewal advices"}
-  FR-DM-125.2: {blocked: "Checked outside BIBS against the Excel trackers before the file goes to the Migration Operator"}
+  # FR-DM-125.1 and .2: the file is compiled and checked against the Excel trackers outside BIBS by design (FR-DM-125
+  # main flow; the trackers are not migrated, DMQ38); on the platform the maker takes the load template of layout P03
+  # and the checker reads its columns and rules.
+  FR-DM-125.1: {checks: [[/migration/layouts, null, [P03]]]}
+  FR-DM-125.2: {checks: [[/migration/layouts, null, [P03]]]}
   FR-DM-125.3: {checks: [[/migration/extracts, null, []], [/migration/batches, null, []]]}
   FR-DM-125.4: {checks: [[/migration/batches, null, [Resubmissions]]]}
   FR-DM-125.5: {checks: [[/migration/batches, null, [Resubmissions]]]}

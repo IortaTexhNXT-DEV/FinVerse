@@ -208,11 +208,34 @@ requirements:
       clients load through the bulk client upload with the duplicate check.
 
 # What the platform lacks for the steps of an open gap (step_checks.yaml, gap).
-step_gaps:
-  SBM-MANUAL: A policy cannot yet be created or edited by hand on the screens (open gap G11)
+step_gaps: {}
 
 # Walkthrough steps checked by hand after the run: "BRD step" -> result, observed, evidence.
-step_notes: {}
+step_notes:
+  BRD-00 J1.3:
+    evidence: Screens opened by the persona's sign-in and checked for the step's actions; the recipe looked for the
+      Commission rates section on the first tab of the insurer page, which since the full insurer page (G08) sits on
+      the Branches & Commissions tab. Recipe corrected in v1.5.
+  BRD-08 P1.3:
+    evidence: Screens opened by the Marketing AO's sign-in and checked for the step's actions; in Drop 2 the AO
+      uploads the master list and utilization report received from the client HR user by e-mail and records the
+      feedback (FRS BRD-8 assumption A-EB-06; the portal is outside Drop 2, gap G02). Recipe corrected in v1.5.
+  BRD-08 P3.1:
+    evidence: Screens opened by the Marketing AO's sign-in and checked for the step's actions; in Drop 2 the AO records
+      the proposal received from the insurer by e-mail (Record Proposal) and validates it (FRS BRD-8 assumption
+      A-EB-06; the portal is outside Drop 2, gap G02). Recipe corrected in v1.5.
+  BRD-08 P3.3:
+    evidence: Screens opened by the Marketing AO's sign-in and checked for the step's actions; in Drop 2 the AO records
+      the client's decision received by e-mail (Record Confirmation) (FRS BRD-8 assumption A-EB-06; the portal is
+      outside Drop 2, gap G02). Recipe corrected in v1.5.
+  BRD-13 FR-DM-125.1:
+    evidence: Screens opened by the persona's sign-in and checked for the step's actions; the maker takes the load
+      template of layout P03 from Layouts and compiles it from the Excel trackers outside BIBS, as FR-DM-125 lays
+      down (the trackers are not migrated, DMQ38). Recipe corrected in v1.5 (was Blocked).
+  BRD-13 FR-DM-125.2:
+    evidence: Screens opened by the persona's sign-in and checked for the step's actions; the checker reads the
+      columns and rules of layout P03 and compares the file with the trackers outside BIBS before releasing it to the
+      Migration Operator, as FR-DM-125 lays down. Recipe corrected in v1.5 (was Blocked).
 
 fixes:
   - id: F01

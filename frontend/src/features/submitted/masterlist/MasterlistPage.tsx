@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { PlayCircle, UserPlus } from 'lucide-react';
+import { PlayCircle, Plus, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { submittedApi } from '@/api/submitted';
 import type { MasterlistFilters, MasterlistTab, PolicyRow } from '@/api/submitted';
@@ -22,6 +22,7 @@ import { useTabParam } from '@/components/ui/useTabParam';
 import { useCompanyId } from '@/context/workspaceContext';
 import { SBM_LOV, MASTERLIST_TABS, SUBMITTED_SECTION } from '../common/submittedCodes';
 import { UserSelect } from '../common/UserSelect';
+import { PolicyFormDialog } from '../record/PolicyFormDialog';
 import { policyColumns } from './policyColumns';
 
 function AssignDialog({ ids, onClose }: Readonly<{ ids: number[]; onClose: () => void }>) {
@@ -66,7 +67,8 @@ function AssignDialog({ ids, onClose }: Readonly<{ ids: number[]; onClose: () =>
 
 /**
  * Masterlist (FR-SP-010 to 033): the submitted policies by tab with search and filters; a Team
- * Leader assigns the handlers and a handler runs the processing of the records selected.
+ * Leader assigns the handlers and a handler runs the processing of the records selected; a
+ * Marketing user creates a policy by hand (New Policy, FR-SP-003).
  */
 export default function MasterlistPage() {
   const companyId = useCompanyId();
@@ -80,6 +82,7 @@ export default function MasterlistPage() {
   const [filters, setFilters] = useState<MasterlistFilters>({});
   const [page, setPage] = useState(0);
   const [assigning, setAssigning] = useState(false);
+  const [creating, setCreating] = useState(false);
   const selection = useRowSelection();
   const query = { ...filters, tab };
   const list = useQuery({
@@ -108,6 +111,13 @@ export default function MasterlistPage() {
         section={SUBMITTED_SECTION}
         title="Masterlist"
         description="Every submitted policy with its classification, bucket and renewal status."
+        actions={
+          can('SBM_MAINTAIN') && (
+            <Button icon={<Plus size={16} />} onClick={() => setCreating(true)}>
+              New Policy
+            </Button>
+          )
+        }
       />
       <Tabs
         tabs={MASTERLIST_TABS.map((t) => ({ ...t, count: counts.data?.[t.id] }))}
@@ -183,6 +193,7 @@ export default function MasterlistPage() {
         />
       </Card>
       {assigning && <AssignDialog ids={ids} onClose={() => setAssigning(false)} />}
+      {creating && <PolicyFormDialog onClose={() => setCreating(false)} />}
     </div>
   );
 }

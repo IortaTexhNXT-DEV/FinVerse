@@ -751,15 +751,22 @@
   "user": "badmin",
   "checks": [],
   "status": "blocked",
-  "note": "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"
+  "note": "Portal users come with the partner portal, outside Drop 2 (gap G02; hosting, sign-in and one-time code under EBQ13)"
  },
  {
   "brd": "BRD-08",
   "step": "P1.3",
-  "user": "No",
-  "checks": [],
-  "status": "blocked",
-  "note": "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb/programmes/:id",
+    "url": "/eb/programmes/4",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
  },
  {
   "brd": "BRD-08",
@@ -767,7 +774,7 @@
   "user": "ebao",
   "checks": [],
   "status": "blocked",
-  "note": "The insurer and client portal is outside Drop 2 (Employee Benefits without the portal feature)"
+  "note": "The review queue of portal uploads comes with the partner portal, outside Drop 2 (gap G02); the AO's own uploads take effect at once"
  },
  {
   "brd": "BRD-08",
@@ -817,10 +824,17 @@
  {
   "brd": "BRD-08",
   "step": "P3.1",
-  "user": "No",
-  "checks": [],
-  "status": "blocked",
-  "note": "The insurer submits its proposal through the portal, outside Drop 2; the officer keys the proposal in BIBS instead"
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb/programmes/:id",
+    "url": "/eb/programmes/4",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
  },
  {
   "brd": "BRD-08",
@@ -840,10 +854,17 @@
  {
   "brd": "BRD-08",
   "step": "P3.3",
-  "user": "No",
-  "checks": [],
-  "status": "blocked",
-  "note": "The client confirms the comparative through the portal, outside Drop 2; the confirmation is recorded by the officer"
+  "user": "ebao",
+  "checks": [
+   {
+    "screen": "/eb/programmes/:id",
+    "url": "/eb/programmes/4",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
  },
  {
   "brd": "BRD-08",
@@ -1727,11 +1748,9 @@
    {
     "screen": "/submitted/masterlist",
     "url": "/submitted/masterlist",
-    "ok": false,
+    "ok": true,
     "problem": null,
-    "missing": [
-     "New Policy"
-    ]
+    "missing": []
    },
    {
     "screen": "/submitted/policies/:id",
@@ -1741,7 +1760,7 @@
     "missing": []
    }
   ],
-  "status": "fail"
+  "status": "pass"
  },
  {
   "brd": "BRD-12",
@@ -2596,17 +2615,31 @@
   "brd": "BRD-13",
   "step": "FR-DM-125.1",
   "user": "rnwmaker",
-  "checks": [],
-  "status": "blocked",
-  "note": "Compiled outside BIBS from the Excel trackers of the legacy renewal advices"
+  "checks": [
+   {
+    "screen": "/migration/layouts",
+    "url": "/migration/layouts",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
  },
  {
   "brd": "BRD-13",
   "step": "FR-DM-125.2",
   "user": "rnwchecker",
-  "checks": [],
-  "status": "blocked",
-  "note": "Checked outside BIBS against the Excel trackers before the file goes to the Migration Operator"
+  "checks": [
+   {
+    "screen": "/migration/layouts",
+    "url": "/migration/layouts",
+    "ok": true,
+    "problem": null,
+    "missing": []
+   }
+  ],
+  "status": "pass"
  },
  {
   "brd": "BRD-13",

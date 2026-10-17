@@ -26,6 +26,7 @@ import { DetailsTab, HistoryTab } from './DetailsTab';
 import { RenewalTab, LettersTab } from './RenewalTab';
 import { ReviewTab } from './ReviewTab';
 import { RuleResultsTab } from './RuleResultsTab';
+import { PolicyFormDialog } from './PolicyFormDialog';
 import { TorTab } from './TorTab';
 
 const ENTITY = 'SubmittedPolicy';
@@ -141,6 +142,7 @@ function BusinessActions({
 function TagActions({ detail, onDone }: Readonly<{ detail: PolicyDetail; onDone: () => void }>) {
   const toast = useToast();
   const [open, setOpen] = useState<'RENEWABLE' | 'NON_RENEWABLE' | null>(null);
+  const [editing, setEditing] = useState(false);
   const tag = useMutation({
     mutationFn: ({ to, reason }: { to: string; reason?: string }) =>
       submittedApi.tag(detail.row.id, to, reason ?? null),
@@ -152,6 +154,10 @@ function TagActions({ detail, onDone }: Readonly<{ detail: PolicyDetail; onDone:
   });
   return (
     <>
+      <Button variant="secondary" onClick={() => setEditing(true)}>
+        Edit
+      </Button>
+      {editing && <PolicyFormDialog detail={detail} onClose={() => setEditing(false)} />}
       {detail.row.renewalTag !== 'RENEWABLE' && (
         <Button variant="secondary" onClick={() => setOpen('RENEWABLE')}>
           Tag Renewable

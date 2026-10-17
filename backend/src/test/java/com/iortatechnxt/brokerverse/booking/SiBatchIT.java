@@ -144,7 +144,7 @@ class SiBatchIT {
   @Test
   void aFailedBatchIsRetried() {
     LocalDate date = uniqueDate();
-    issue("INS-MGIC", date, "100.00");
+    ServiceInvoice si = issue("INS-MGIC", date, "100.00");
     SiBatch batch =
         as.run("proc", () -> batches.generate(date)).stream()
             .filter(x -> "INS-MGIC".equals(x.getInsurerCode()))
@@ -158,7 +158,11 @@ class SiBatchIT {
     assertThat(batches.list(fx.company(), date, date))
         .extracting(SiBatch::getId)
         .contains(batch.getId());
-    assertThat(batches.items(batch.getId())).hasSize(1);
+    // The run also takes earlier service invoices of the insurer still in no batch (lookback).
+    assertThat(batches.items(batch.getId()))
+        .extracting(ServiceInvoice::getId)
+        .contains(si.getId())
+        .hasSize(batch.getItemCount());
   }
 
   @Test

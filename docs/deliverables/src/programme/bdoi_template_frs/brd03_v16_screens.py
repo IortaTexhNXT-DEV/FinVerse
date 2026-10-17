@@ -1,6 +1,6 @@
 """Screens of Product Maintenance in BIBS (UX Design v1.4, BRD-03): purpose, access, requirements, rules and
 states, fields (field, type, mandatory, format and source, validation and message) and actions (action, who,
-available when, what happens, resulting status). Read by build_brd03_v15.py and brd03_pack.py.
+available when, what happens, resulting status). Read by build_brd03_v16.py and brd03_pack.py.
 """
 
 SCREENS = [{'id': 'SCR-PM-01',
@@ -1789,10 +1789,10 @@ SCREENS = [{'id': 'SCR-PM-01',
   'name': 'Insurer Record',
   'purpose': 'One insurer, in tabs: its profile (partner code, accreditation, placement channel and e-mails, credit '
              'days, maker and authoriser), contact persons, payment terms and remittance details, bank accounts, '
-             'the products linked, its branches with the local government tax rate and its commission rates, and '
-             'the field-level change history.',
+             'the products linked, its ledger accounts (read-only), its branches with the local government tax rate '
+             'and its commission rates, and the field-level change history.',
   'access': 'Insurers › a row',
-  'frpm': 'FRPM.003.02, FRPM.023.01',
+  'frpm': 'FRPM.003.02, FRPM.023.01, FRPM.023.02, FRPM.021.03',
   'rules': ["The commission rate in force on the account's period start applies; without an insurer rate, the "
             'product default applies (FRPM.003.02).',
             "A package version's own insurer rate and minimum premium win over the insurer's general terms for that "
@@ -1824,6 +1824,13 @@ SCREENS = [{'id': 'SCR-PM-01',
               '-',
               'Package versions naming the insurer and product commission rates',
               'No product is linked to this insurer.'),
+             ('Ledger Accounts: Account / Name / Class / Sub-ledger / Entries / Debit / Credit / Balance / Last entry; '
+              'Sub-ledger open items: Document type / Direction / Currency / Status / Items / Amount / Settled / '
+              'Outstanding',
+              'Column',
+              '-',
+              'Read-only; general ledger entries and sub-ledger open items of the insurer as party',
+              'No ledger entry posted for this insurer.'),
              ('Change History: Field / Old value / New value / Maker / Changed / Checker / Authorized',
               'Column',
               '-',

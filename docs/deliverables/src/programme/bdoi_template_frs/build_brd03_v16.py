@@ -1,12 +1,12 @@
-"""Product Maintenance document set v1.5 (BRD-03) in BDOI's template: FRS, BPS, UXD, RNO and the Interface
+"""Product Maintenance document set v1.6 (BRD-03) in BDOI's template: FRS, BPS, UXD, RNO and the Interface
 Specification v1.0.
 
-    python docs/deliverables/src/programme/bdoi_template_frs/build_brd03_v15.py [--no-pdf] [--only FRS,BPS,UXD,RNO,ICD]
+    python docs/deliverables/src/programme/bdoi_template_frs/build_brd03_v16.py [--no-pdf] [--only FRS,BPS,UXD,RNO,ICD]
 
 Each document starts from BDOI's FRS template (template D051, templates/bdoi_d051_frs_template.docx) through
 pack_common.PackDoc: cover, document details, headers and footers, styles, revision log and table of contents are
-kept; the body is written from brd03_v15_content.py (FRS, ICD), brd03_v15_pages.py (process, storyboards, outputs)
-and brd03_v15_screens.py (screens). The screenshots are in figures/brd03_v14_screens (flows/brd03/shots_v14.sh),
+kept; the body is written from brd03_v16_content.py (FRS, ICD), brd03_v16_pages.py (process, storyboards, outputs)
+and brd03_v16_screens.py (screens). The screenshots are in figures/brd03_v14_screens (flows/brd03/shots_v14.sh),
 one full page each.
 
 Outputs in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/ (PDFs not kept in git).
@@ -30,9 +30,9 @@ from PIL import Image
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parents[4] / "tools" / "deliverables"))
-import brd03_v15_content as C  # noqa: E402
-import brd03_v15_pages as P  # noqa: E402
-import brd03_v15_screens as S  # noqa: E402
+import brd03_v16_content as C  # noqa: E402
+import brd03_v16_pages as P  # noqa: E402
+import brd03_v16_screens as S  # noqa: E402
 import pack_common as pc  # noqa: E402
 from build_brd11_interface_spec import _run  # noqa: E402
 from colour_code import COLOURS, LABELS  # noqa: E402

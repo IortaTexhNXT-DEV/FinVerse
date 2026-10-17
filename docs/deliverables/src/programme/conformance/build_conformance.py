@@ -361,10 +361,10 @@ BDOI_SRC = ROOT / "docs/deliverables/src/programme/bdoi_template_frs"
 
 
 def bdoi_baselines(assess: dict) -> dict[str, dict]:
-    """The requirements of the re-baselined BDOI-template FRS (BRD-02 v3.4, BRD-03 v1.4, BRD-06 v1.3, BRD-11 v1.6):
+    """The requirements of the re-baselined BDOI-template FRS (BRD-02 v3.4, BRD-03 v1.6, BRD-06 v1.3, BRD-11 v1.6):
     {brd: {"frs": label, "groups": [{id, title, status, items: [(id, text, colour, label)]}]}}."""
     sys.path.insert(0, str(BDOI_SRC))
-    import brd03_v15_content as b03  # noqa: E402
+    import brd03_v16_content as b03  # noqa: E402
     import brd11_v15_content as b11  # noqa: E402
 
     def from_py(rows):
@@ -377,7 +377,7 @@ def bdoi_baselines(assess: dict) -> dict[str, dict]:
                  "items": [(r["id"], r["text"], r["colour"], r["label"]) for r in g["reqs"]]} for g in rows]
 
     out = {"BRD-02": {"frs": "FRS v3.4", "groups": from_yaml("brd02_v34_requirements.yaml")},
-           "BRD-03": {"frs": "FRS v1.4", "groups": from_py(b03.FRUM)},
+           "BRD-03": {"frs": "FRS v1.6", "groups": from_py(b03.FRUM)},
            "BRD-06": {"frs": "FRS v1.3", "groups": from_yaml("brd06_v13_requirements.yaml")},
            "BRD-11": {"frs": "FRS v1.6", "groups": from_py(b11.FRUM)}}
     return {k: v for k, v in out.items() if k in (assess.get("bdoi_baselines") or out)}

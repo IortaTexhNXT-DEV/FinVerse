@@ -8,8 +8,8 @@ doc_code: TestPlan
 brd: BRD-09
 name: Customer Servicing Facility Summary
 doc_id: BIBS-TP-BRD-09
-version: "1.1"
-date: 08 October 2026
+version: "1.2"
+date: 17 October 2026
 status: Issued for BDOI review
 header_title: Test Plan BRD-9 Customer Servicing Facility
 h1_page_break: false
@@ -32,6 +32,12 @@ control:
     reviewer: iorta TechNXT Business Analysis
     approver: BDOI Product Owner (pending)
     change: "Re-based on FRS BRD-9 v1.1 (Customer Servicing Facility_Case Management): cases of the Case Management FRs FR-CSF-050 to FR-CSF-061, scenarios SC-CSF-09 to SC-CSF-12, data sets TD-CSF-11 to TD-CSF-14 and the Fulfilment Unit persona added; BRD page references moved by 17 pages."
+  - version: "1.2"
+    date: 17 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Product Owner (pending)
+    change: Aligned with FRS BRD-9 v1.2 (case management delivered; Case Routing on Broking Setup), with the Excel workbook of the same version
 distribution:
   - {name: "Product Owner, Customer Servicing Facility", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Alternative Distribution Head, role: Approver, organisation: BDOI, purpose: Review and sign-off}

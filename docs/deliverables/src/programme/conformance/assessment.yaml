@@ -1,8 +1,8 @@
 # Review of the end-to-end conformance run (read by build_conformance.py): the decisions on requirements that the
 # evidence alone cannot give, notes on walkthrough steps checked by hand, the cycle steps of each requirement, the
 # fixes made during the run, the open gaps with their proposals and the corrections of the FRS texts.
-version: "1.3"
-date: 16 October 2026
+version: "1.4"
+date: 17 October 2026
 scope: >-
   Run on a fresh SIT/UAT environment (seed data of the release) on 09-Oct-2026: the 367 steps of the UAT walkthrough
   script, the walkthroughs of the sign-off packs performed live by their personas, one client taken through the whole
@@ -17,19 +17,24 @@ scope: >-
   of FRS v1.6); gaps G14, G15 and G16 closed; the other results are carried over from version 1.1. Version 1.3
   (16-Oct-2026): gaps G04 (report scheduling and subscriptions), G05 (master data change log), G08 (full
   insurer page) and G09 (daily service-invoice batch per insurer) closed on the automated checks of the release; the
-  walkthrough and persona results are carried over from version 1.2.
+  walkthrough and persona results are carried over from version 1.2. Version 1.4 (17-Oct-2026): case management of
+  the Customer Service Facility delivered (gap G01 closed); the 23 BRD-9 steps of the walkthrough script run again on
+  a fresh SIT/UAT environment (P2.1 to P2.12 now pass); the remaining parts of G04, G05, G08 and G09 delivered (run
+  time of day, last working day and relative periods of the report subscriptions; programme-wide Master Data Change
+  Log with export and the data scope of the change history; the insurer's ledger accounts; supplementary batches,
+  merged PDF and manifest of the service invoices); the other results are carried over from version 1.3.
 
 # The FRS whose requirements are counted, per BRD (Summary); BIBS FRS when not listed.
 baselines:
   BRD-02: BDOI FRS v3.4
-  BRD-03: BDOI FRS v1.4
+  BRD-03: BDOI FRS v1.6
   BRD-06: BDOI FRS v1.3
   BRD-11: BDOI FRS v1.6
 
 # Results of the previous version (Summary, Change since v<previous_version>).
-previous_version: "1.2"
+previous_version: "1.3"
 previous:
-  BRD-00: {frs: 25, ok: 15, partly: 2, nok: 5, nt: 3}
+  BRD-00: {frs: 25, ok: 19, partly: 1, nok: 2, nt: 3}
   BRD-01: {frs: 95, ok: 69, partly: 24, nok: 0, nt: 2}
   BRD-02: {frs: 28, ok: 16, partly: 12, nok: 0, nt: 0}
   BRD-03: {frs: 30, ok: 19, partly: 10, nok: 0, nt: 1}
@@ -43,13 +48,18 @@ previous:
   BRD-11: {frs: 12, ok: 4, partly: 8, nok: 0, nt: 0}
   BRD-12: {frs: 35, ok: 13, partly: 20, nok: 0, nt: 2}
   BRD-13: {frs: 48, ok: 18, partly: 19, nok: 0, nt: 11}
-  Total: {frs: 644, ok: 364, partly: 221, nok: 17, nt: 42}
+  Total: {frs: 644, ok: 368, partly: 220, nok: 14, nt: 42}
 
 # What changed since the previous version, per BRD (Summary).
 changes:
-  BRD-00: Gaps closed on the automated checks of the release - report subscriptions (G04), master data
-    change log (G05), full insurer page (G08) and the daily service-invoice batch per insurer (G09).
-  BRD-03: Insurer page and field-level change history (FRS BRD-03 v1.5, FRPM.023.02 and FRPM.021.03).
+  BRD-00: Remaining parts of the gaps of version 1.3 delivered - report subscriptions at a time of day, on the last
+    working day and with relative periods (G04), the Master Data Change Log screen with export and the data scope of
+    the change history (G05), the insurer's ledger accounts (G08), supplementary service-invoice batches with the
+    merged PDF and manifest (G09).
+  BRD-03: Ledger Accounts tab of the insurer page and the Master Data Change Log (FRS BRD-03 v1.6, FRPM.023.02 and
+    FRPM.021.03).
+  BRD-09: Case management delivered (gap G01, FR-CSF-050 to FR-CSF-061); walkthrough steps P2.1 to P2.12 run again
+    and pass (FRS BRD-9 v1.2).
 
 # Decisions on requirement items of the BDOI-template FRS (by item or group id): result, reason, evidence.
 bdoi_decisions:
@@ -199,7 +209,6 @@ requirements:
 
 # What the platform lacks for the steps of an open gap (step_checks.yaml, gap).
 step_gaps:
-  CSF-CASES: Case management of the Customer Service Facility is not on the platform yet (open gap G01)
   SBM-MANUAL: A policy cannot yet be created or edited by hand on the screens (open gap G11)
 
 # Walkthrough steps checked by hand after the run: "BRD step" -> result, observed, evidence.
@@ -283,6 +292,21 @@ gaps:
       team and fulfilment unit queues with reassign, escalate, resolve and return, SLA ageing with reminders, linked
       follow-up cases, the case dashboard and the case reports; log a case from the Servicing View.
     size: Large
+    status: Closed
+    closed: >-
+      Delivered in the release of 17-Oct-2026: Log Case on the Servicing View and on the Cases list (caller who is not a
+      client), with the Case ID, the due date from the turnaround time of the case type in working days and the
+      duplicate rule; routing to the fulfilment unit proposed by the routing table; the queues My Cases, Returned to
+      Me, CSR Action Required, Team Queue, Fulfilment Unit Queue, All Open and Closed; Resolve and Close, Return to
+      Agent, Request CSR Action, Re-endorse and Close by the agent; Reassign, Escalate and Change Category by the
+      supervisor; append-only notes, documents linked to the case and the client, linked follow-up cases and the case
+      history on the audit trail; the CSF_CASE_SLA check every 15 minutes with the approaching-breach and breach
+      notices and automatic escalation; the Case Dashboard and the reports Case Register, Case Ageing and SLA and Case
+      Summary; Case Routing (turnaround times, routing table, fulfilment unit members) on Broking Setup. The automated
+      checks of case management pass and steps P2.1 to P2.12 of the walkthrough script pass on a fresh SIT/UAT
+      environment. Open: the complete lists of values of the addendum (natures of transaction, product types, market
+      segments, fulfilment units) to be loaded from the list of Contact Center Management (CSQ19); the copy of the
+      routing notice to the account officer of the account.
   - id: G02
     brd: BRD-08
     frs: [FR-EB-010, FR-EB-011, FR-EB-012, FR-EB-013, FR-EB-014, FR-EB-015, FR-EB-045, FR-EB-056]
@@ -338,8 +362,10 @@ gaps:
       subscriptions due on the business date as their subscriber, checks the export permission and the data scope of
       the parameters at run time (a refused run is recorded as denied), archives the file in the report archive and
       e-mails it; one run per subscription and date. The automated checks of the
-      subscriptions pass. Not in this release: the run time of day (the job runs once a day), the last working day option and
-      the password protection of confidential reports.
+      subscriptions pass. Delivered in the release of 17-Oct-2026: the time of day of a run (the job checks every hour),
+      the last working day of the month on the holiday calendar of the company of the report, and relative periods of
+      the date parameters (previous day, month to date, previous month, quarter to date, previous quarter, year to
+      date, previous year). Open: the password protection of confidential reports.
   - id: G05
     brd: BRD-00
     frs: [FR-CR-031]
@@ -360,8 +386,10 @@ gaps:
       values, parties and the other authorizable masters) and of a client writes one row per changed field (field,
       old value, new value, maker, time) in the same transaction; the authorization adds the checker and its time.
       The history is shown in a Change History tab on the insurer, product and client records and read by the
-      Auditor (AUDIT_VIEW, MASTER_VIEW). The automated checks of the change log pass. Not in this release:
-      the programme-wide Master Data Change Log screen with filters and export (the history is read per record).
+      Auditor (AUDIT_VIEW, MASTER_VIEW). The automated checks of the change log pass. Delivered in the release of
+      17-Oct-2026: the programme-wide Master Data Change Log screen under Administration with filters by record type,
+      date range, maker and checker and the export to Excel, both limited to the records of the reader's data scope;
+      the history of a record owned by a company outside the reader's data scope answers as not found.
   - id: G06
     brd: BRD-00
     frs: [FR-CR-042, FR-CR-062]
@@ -406,9 +434,9 @@ gaps:
       terms, remittance cycle, mode, advice e-mail and currency), Bank Accounts, Products (package versions and
       commission rates naming the insurer), Branches & Commissions and Change History; contacts and bank accounts are
       maker-checker masters authorized from the approval inbox, and a change of the remittance details sends the
-      insurer back for authorization. The automated checks of the insurer page pass. Not in this release: Risk
-      Participation (waits for CRQ08) and the read-only view of the insurer's GL and sub-ledger accounts (kept on the
-      accounting screens).
+      insurer back for authorization. The automated checks of the insurer page pass. Delivered in the release of
+      17-Oct-2026: the read-only Ledger Accounts tab with the general ledger accounts posted for the insurer and its
+      sub-ledger open items. Open: Risk Participation (waits for CRQ08).
   - id: G09
     brd: BRD-00
     frs: [FR-CR-081]
@@ -426,8 +454,10 @@ gaps:
       company, insurer and date of the service invoices issued that day, unique so that a rerun leaves the existing
       batches unchanged, and e-mails it to the insurer's billing address with each service invoice attached and the
       list in the body. Service Invoice Batches under Booking lists the batches with totals and delivery status
-      (generated, sent, failed with the reason, retried) and sends a failed batch again. The automated checks of the batches pass. Not
-      in this release: the merged PDF or ZIP with a manifest and the file-transfer channel (CRQ18).
+      (generated, sent, failed with the reason, retried) and sends a failed batch again. The automated checks of the batches pass.
+      Delivered in the release of 17-Oct-2026: a service invoice issued after the day's batch goes into the next run or
+      into a supplementary batch run from the batch screen; each batch is e-mailed as one PDF with a manifest, both
+      downloadable. Open: the file-transfer channel (CRQ18).
   - id: G10
     brd: BRD-00
     frs: [FR-CR-090]

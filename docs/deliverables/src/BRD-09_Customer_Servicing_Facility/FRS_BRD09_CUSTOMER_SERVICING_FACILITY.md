@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-09
 name: Customer Servicing Facility
 doc_id: BIBS-FRS-BRD-09
-version: "1.1"
-date: 08 October 2026
+version: "1.2"
+date: 17 October 2026
 status: Issued for BDOI review
 header_title: FRS BRD-9 Customer Servicing Facility
-output: FRS/BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.1.docx
+output: FRS/BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.2.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -32,6 +32,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: "Re-based on Customer Servicing Facility_Case Management (CSF BRD v1.0 with the CSF Addendum - Case Management, signed 31-Mar to 22-Apr-2026); Case Management requirements FR-CSF-050 to FR-CSF-061 added; user-story view and storyboard index added."
+  - version: "1.2"
+    date: 17 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI Product Owner (pending)
+    change: "Case management delivered (Conformance Register gap G01): the texts follow the release - the turnaround times of the case types and the members of the fulfilment units are kept on Broking Setup > Case Routing with the routing table; the ageing counts working days and does not pause (CSQ18); the case lists are loaded with the values named in this FRS and completed by Contact Center Management on Lists of Values (CSQ19)."
 distribution:
   - {name: "Product Owner, Customer Servicing Facility", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Alternative Distribution Head", role: Approver, organisation: BDOI, purpose: Review and sign-off}
@@ -846,6 +852,7 @@ The case screens are reached from the menu section Customer Service Facility:
 - **Log Case** dialog: opened from the Servicing View of a client (button **Log Case** and the Cases tab) or from the Cases list for a caller who is not a client.
 - **Case record**: a header with the Case ID, the status, the case type with its turnaround time, the due date and the SLA indicator, the client and account, the fulfilment unit and the owner; tabs Details, Notes, Documents, Linked Cases and History.
 - **Case Dashboard**: the supervisor and management views of BRCSFCM.008 and BRCSFCM.011.
+- **Case Routing** (Broking Setup, System Administrator): the turnaround time of each case type, the routing table and the members of the fulfilment units.
 
 ```fr
 id: FR-CSF-050
@@ -932,8 +939,8 @@ main_flow:
 alternate_flows:
   - Closed case. Change Category is not offered.
 rules:
-  - [R1, "Case types and their turnaround times are maintained by Contact Center Management.", Configurable, LOV CSF_CASE_TYPE (turnaround time per value)]
-  - [R2, "Turnaround time in working days from the creation of the case, on the BIBS holiday calendar (CLR-CSF-09).", Configurable, Parameter CSF_CASE_TAT_UNIT]
+  - [R1, "Case types and their turnaround times are maintained by Contact Center Management.", Configurable, LOV CSF_CASE_TYPE; turnaround time and automatic escalation on Case Routing]
+  - [R2, "Turnaround time in working days from the creation of the case, on the BIBS holiday calendar of the head office (CLR-CSF-09).", Fixed, "-"]
   - [R3, "Only CSF_CASE_SUPERVISE changes the category of a submitted case; a reason is mandatory.", Fixed, "-"]
   - [R4, "A new case type recomputes the due date from the creation time, not from the change.", Fixed, "-"]
 validations:
@@ -1154,9 +1161,9 @@ main_flow:
   - BIBS updates the SLA status of each case and sends the near-breach and breach notifications once per case and threshold.
   - BIBS sets the Escalated indicator on breached cases of the case types set for automatic escalation.
 rules:
-  - [R1, "Ageing runs from the creation time; the clock does not stop while the case waits for the client (CLR-CSF-09).", Configurable, Parameter CSF_CASE_SLA_PAUSE]
+  - [R1, "Ageing runs from the creation time; the clock does not stop while the case waits for the client (CLR-CSF-09; a pause waits for CSQ18).", Fixed, "-"]
   - [R2, "Near-breach threshold - 1 working day before the due date (default).", Configurable, Parameter CSF_CASE_NEAR_BREACH_DAYS]
-  - [R3, "Automatic escalation on breach per case type (default on).", Configurable, LOV CSF_CASE_TYPE (auto-escalate flag)]
+  - [R3, "Automatic escalation on breach per case type (default on; off for Commendation).", Configurable, Case Routing (escalated on breach)]
   - [R4, "Check interval 15 minutes (default).", Configurable, Job CSF_CASE_SLA]
 validations: []
 notifications:
@@ -1267,7 +1274,7 @@ alternate_flows:
   - Wrong unit. The member returns the case with the reason Wrong fulfilment unit; the supervisor or the agent re-routes it.
 rules:
   - [R1, "Routing table - case type, market segment and nature of transaction to fulfilment unit and escalation group.", Configurable, Case routing table (Contact Center Management)]
-  - [R2, "Each fulfilment unit lists its member users; a user may belong to several units.", Configurable, Fulfilment unit membership (User Access request)]
+  - [R2, "Each fulfilment unit lists its member users; a user may belong to several units.", Configurable, Case Routing (fulfilment unit members)]
   - [R3, "Return reasons are maintained.", Configurable, LOV CSF_RETURN_REASON]
   - [R4, "A member sees only the cases of his fulfilment units.", Fixed, "-"]
 validations:
@@ -1296,7 +1303,7 @@ title: Maintain the case lists of values and the routing table
 brd: ["Lists of values I-VI (p.11-17)", "Envisioned process IV.2, IV.5 (p.4)", BRCSFCM.002 (p.5)]
 actor: System Administrator, at the request of Contact Center Management
 priority: Must have
-screens: Broking Setup > Lists of Values; Customer Service Facility > Case Routing
+screens: Broking Setup > Lists of Values; Broking Setup > Case Routing
 description:
   - The case lists of values of the addendum are loaded at go-live and maintained without a release - Channel (3 values), Case Type with its turnaround time (7), Nature of Transaction (125), Product Type (51), Market Segment (33) and Fulfillment Unit (53) - together with the lists that the FRs add - case priority, escalation reason, return reason, closure reason and case status labels. A value is deactivated, not deleted, so that existing cases keep it.
   - The routing table links the case type, market segment and nature of transaction to the fulfilment unit and its escalation group (FR-CSF-060). The market segments and product types of the case lists are the contact centre's own lists; each may carry the BIBS market segment or product line it corresponds to, for reporting across modules (CLR-CSF-10).
@@ -1513,8 +1520,6 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | LOGIN_MAX_FAILED_ATTEMPTS | 3 | Failed log-ins before lockout (platform, decision D5) |
 | CSF_CASE_PREFIX | CASE | Prefix of the Case ID CASE-yyyy-nnnnnn |
 | CSF_CASE_DUPLICATE_CHECK | true | Refuse a second open case for the same client, account and nature of transaction |
-| CSF_CASE_TAT_UNIT | Working days | Unit of the turnaround times of the case types (CSQ18) |
-| CSF_CASE_SLA_PAUSE | false | Stop the ageing while a case waits for the client (CSQ18) |
 | CSF_CASE_NEAR_BREACH_DAYS | 1 | Working days before the due date when a case is Approaching breach |
 | Job CSF_CASE_SLA | every 15 minutes | Updates the SLA status, sends the near-breach and breach notifications, escalates breached cases |
 | Job CSF_LEGACY_SYNC | every 15 minutes | Sends queued contact changes (manual only until sync is enabled) |
@@ -1540,7 +1545,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | CSF_RETURN_REASON | Incomplete case details; Wrong fulfilment unit; Needs contact centre handling (proposed) |
 | CSF_CLOSURE_REASON | Resolved; Information provided; Request completed; Client did not respond; Duplicate (proposed) |
 
-The case routing table (FR-CSF-060, FR-CSF-061) is maintained on Customer Service Facility > Case Routing: one row per case type, market segment and nature of transaction (a blank matches any value) with the fulfilment unit and its escalation group. Contact Center Management provides the first table (CSQ19).
+The case routing table (FR-CSF-060, FR-CSF-061) is maintained on Broking Setup > Case Routing, with the turnaround times of the case types and the members of the fulfilment units: one row per case type, market segment and nature of transaction (a blank matches any value) with the fulfilment unit and its escalation group. Contact Center Management provides the first table (CSQ19).
 
 ## Platform settings
 

@@ -281,6 +281,19 @@ LOG = [
      "Register v1.3 issued; v1.2 superseded. Product Maintenance FRS, UX Design, Process and Storyboards and Reports "
      "v1.5, Developer Specification v1.2, Data Dictionary v1.1, User Stories v1.1 and review workbooks v1.2 issued.",
      "Closed", "Conformance Register v1.3"),
+    ("O-015", "17 Oct 2026", "Decision", "BRD-00", "End-to-End Conformance Register v1.4: case management (G01) and "
+     "the remaining parts of G04, G05, G08 and G09", "Case management of the Customer Service Facility is delivered "
+     "and closed (G01): logging, routing to the fulfilment units, resolution, return and CSR action, supervision, "
+     "notes, documents, follow-up cases, SLA check with breach notices, Case Dashboard, case reports and Case "
+     "Routing; the BRD-9 walkthrough steps P2.1 to P2.12 pass on a fresh SIT/UAT environment. Also delivered: "
+     "report subscriptions at a time of day, on the last working day and with relative periods (G04); the Master "
+     "Data Change Log screen with export, and the change history limited to the reader's data scope (G05); the "
+     "insurer's ledger accounts on the insurer page (G08); supplementary service-invoice batches with one merged PDF "
+     "and a manifest (G09). Open: password protection of confidential reports, Risk Participation (CRQ08), the "
+     "file-transfer channel (CRQ18), the full case lists of the addendum (CSQ19).", "iorta TechNXT",
+     "Register v1.4 issued; v1.3 superseded. Product Maintenance FRS, UX Design, Process and Storyboards and Reports "
+     "v1.6, Developer Specification v1.3, User Stories v1.2 and review workbooks v1.3 issued; Customer Servicing "
+     "Facility FRS and test plan v1.2 issued.", "Closed", "Conformance Register v1.4"),
 ]
 
 # Document register: BRD folders, the owner on the BDOI side, and the standard documents expected in each pack.

@@ -9,8 +9,8 @@ meta:
   code: CSF
   frs: FRS_BRD09_CUSTOMER_SERVICING_FACILITY.md
   summary: TP_BRD09_CUSTOMER_SERVICING_FACILITY.md
-  version: "1.1"
-  date: 08 October 2026
+  version: "1.2"
+  date: 17 October 2026
   verify_messages: false
 
 personas:
@@ -51,7 +51,7 @@ screens:
   TEAMQ: Customer Service Facility > Cases > Team Queue
   FUQ: Customer Service Facility > Cases > Fulfilment Unit Queue
   DASH: Customer Service Facility > Case Dashboard
-  ROUTING: Customer Service Facility > Case Routing
+  ROUTING: Broking Setup > Case Routing
 
 data:
   - id: TD-CSF-01
@@ -1811,7 +1811,7 @@ frs:
         screen: ROUTING
         title: New routing row proposes its fulfilment unit
         steps:
-          - Open Customer Service Facility > Case Routing; add case type Complaint, market segment Leasing, any nature of transaction, fulfilment unit IDG/Leasing; save.
+          - Open Broking Setup > Case Routing; add case type Complaint, market segment Leasing, any nature of transaction, fulfilment unit IDG/Leasing; save.
           - As agent1 log a Complaint case for a client of the Leasing market segment.
         expected: IDG/Leasing is proposed as the fulfilment unit.
       - c: 3

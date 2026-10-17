@@ -228,7 +228,12 @@
     "BR-171"
    ],
    "direct": [],
-   "via": []
+   "via": [
+    "CatalogAccountApiIT",
+    "RemittanceApiIT",
+    "InsurerPageIT",
+    "MigrationReferenceChecksApiIT"
+   ]
   },
   {
    "brd": "BRD-00",
@@ -1278,6 +1283,7 @@
     "ClientRulesTest",
     "ClientServiceIT",
     "KycReviewIT",
+    "CsfCaseIT",
     "CsfContactChangeIT",
     "CsfReportsApiIT",
     "CsfServicingIT",
@@ -1404,6 +1410,7 @@
     "ClientRiskServiceIT",
     "ClientServiceIT",
     "KycReviewIT",
+    "CsfCaseIT",
     "CsfContactChangeIT",
     "CsfReportsApiIT",
     "CsfServicingIT",
@@ -18113,6 +18120,7 @@
     "CsfServicingIT"
    ],
    "via": [
+    "CsfCaseIT",
     "CsfReportsApiIT",
     "PersonaMenusIT",
     "features/csf/pages.test.tsx"
@@ -18132,6 +18140,7 @@
    "brd_ids": [],
    "direct": [],
    "via": [
+    "CsfCaseIT",
     "CsfContactChangeIT",
     "CsfReportsApiIT",
     "CsfServicingIT",
@@ -18167,6 +18176,7 @@
    "brd_ids": [],
    "direct": [],
    "via": [
+    "CsfCaseIT",
     "CsfContactChangeIT",
     "CsfReportsApiIT",
     "CsfServicingIT",
@@ -18188,6 +18198,7 @@
     "CsfContactChangeIT"
    ],
    "via": [
+    "CsfCaseIT",
     "CsfReportsApiIT",
     "PersonaMenusIT"
    ]
@@ -18208,6 +18219,7 @@
    "direct": [],
    "via": [
     "ScreeningSetupApiIT",
+    "CsfCaseIT",
     "CsfContactChangeIT",
     "CsfReportsApiIT",
     "ScreeningWatchlistIT",
@@ -18246,6 +18258,7 @@
    "brd_ids": [],
    "direct": [],
    "via": [
+    "CsfCaseIT",
     "CsfReportsApiIT",
     "CsfServicingIT",
     "PersonaMenusIT"
@@ -18264,6 +18277,7 @@
    "brd_ids": [],
    "direct": [],
    "via": [
+    "CsfCaseIT",
     "CsfReportsApiIT",
     "PersonaMenusIT"
    ]
@@ -18378,8 +18392,53 @@
    "brd_ids": [
     "BRCSFCM.001"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "ApiSmokeIT",
+    "ScreeningCasesApiIT",
+    "ScreeningEndToEndApiIT",
+    "ScreeningMatchingApiIT",
+    "ScreeningSetupApiIT",
+    "UserAccessEndToEndApiIT",
+    "ClaimsFoundationIT",
+    "ReferenceDataCacheIT",
+    "PageSizeLimitFilterTest",
+    "SecurityHeadersIT",
+    "ConfigUploadIT",
+    "EbFoundationIT",
+    "KafkaEventsIT",
+    "IdentityProvisioningIT",
+    "ScimGroupMembershipIT",
+    "IntegrationEventsLocalIT",
+    "AccessRequestIT",
+    "GroupProfileRequestIT",
+    "PermissionCombinationIT",
+    "RolePermissionRequestIT",
+    "UamOversightIT",
+    "UamSignoffControlsIT",
+    "InsurerSuiteRemovedIT",
+    "ReportParametersTest",
+    "TabularReportBuilderTest",
+    "ReportSubscriptionScheduleTest",
+    "CollectionsAccountingFoundationIT",
+    "DataScopeIT",
+    "ObjectAccessIT",
+    "PermissionConsistencyTest",
+    "PersonaMenusIT",
+    "ProductMaintenanceFoundationIT",
+    "ScreeningUserAccessFoundationIT",
+    "SessionLogIT",
+    "SignInPasswordIT",
+    "UserAccessExtensionsIT",
+    "UserAdminApiIT",
+    "BdoiSeedAccessIT",
+    "RedisEnabledPlatformIT",
+    "ProductModuleSwitchesIT",
+    "features/csf/cases/cases.test.tsx",
+    "features/csf/pages.test.tsx"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18396,8 +18455,13 @@
    "brd_ids": [
     "BRCSFCM.002"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "PersonaMenusIT",
+    "features/csf/cases/cases.test.tsx"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18414,8 +18478,15 @@
    "brd_ids": [
     "BRCSFCM.003"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "ScreeningCaseRulesIT",
+    "ScreeningCasesIT",
+    "PersonaMenusIT",
+    "features/csf/cases/cases.test.tsx"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18431,8 +18502,12 @@
    "brd_ids": [
     "BRCSFCM.004"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "PersonaMenusIT"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18448,8 +18523,12 @@
    "brd_ids": [
     "BRCSFCM.005"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "PersonaMenusIT"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18466,7 +18545,9 @@
    "brd_ids": [
     "BRCSFCM.006"
    ],
-   "direct": [],
+   "direct": [
+    "CsfCaseIT"
+   ],
    "via": []
   },
   {
@@ -18484,8 +18565,12 @@
    "brd_ids": [
     "BRCSFCM.007"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "PersonaMenusIT"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18502,8 +18587,13 @@
    "brd_ids": [
     "BRCSFCM.008"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "PersonaMenusIT",
+    "features/csf/cases/cases.test.tsx"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18519,8 +18609,12 @@
    "brd_ids": [
     "BRCSFCM.010"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "PersonaMenusIT"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18538,8 +18632,12 @@
     "BRCSFCM.008",
     "BRCSFCM.011"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "PersonaMenusIT"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18556,8 +18654,12 @@
    "brd_ids": [
     "BRCSFCM.012"
    ],
-   "direct": [],
-   "via": []
+   "direct": [
+    "CsfCaseIT"
+   ],
+   "via": [
+    "PersonaMenusIT"
+   ]
   },
   {
    "brd": "BRD-09",
@@ -18573,7 +18675,9 @@
    "brd_ids": [
     "BRCSFCM.002"
    ],
-   "direct": [],
+   "direct": [
+    "CsfCaseIT"
+   ],
    "via": []
   },
   {
@@ -19040,6 +19144,7 @@
     "ScreeningMatchingApiIT",
     "ScreeningSetupApiIT",
     "UserAccessEndToEndApiIT",
+    "CsfCaseIT",
     "ScreeningCaseRulesIT",
     "ScreeningCasesIT",
     "PersonaMenusIT",
@@ -22988,6 +23093,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.026",
     "BRNB.036",
     "BRNB.037",
@@ -23021,6 +23127,7 @@
     "DIS 3.25.0",
     "DIS 3.27.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-003",
@@ -23196,6 +23303,7 @@
     "BRRN.033",
     "BRRN.040",
     "CSHID.020",
+    "FR-CR-061",
     "PRCID.023"
    ],
    "result": "passed"
@@ -24176,6 +24284,7 @@
     "BRPM.024",
     "BRRN.030",
     "DIS 3.27.2",
+    "FR-CR-061",
     "MKTID.001",
     "MKTID.002",
     "MKTID.009",
@@ -24206,6 +24315,7 @@
    "name": "HTTP contract of screening cases, STRs and compliance reports (wave S1-C)",
    "direct": [],
    "via": [
+    "FR-CSF-050",
     "FR-SS-001",
     "FR-SS-030",
     "FR-SS-031",
@@ -24255,6 +24365,7 @@
     "BRNB.110",
     "CSHID.017",
     "CSHID.018",
+    "FR-CSF-050",
     "FR-SS-001",
     "FR-SS-030",
     "FR-SS-031",
@@ -24296,6 +24407,7 @@
     "BRNB.090",
     "BRNB.101",
     "BRNB.110",
+    "FR-CSF-050",
     "FR-SS-001",
     "FR-SS-030",
     "FR-SS-031",
@@ -24331,6 +24443,7 @@
    "direct": [],
    "via": [
     "FR-CSF-021",
+    "FR-CSF-050",
     "FR-SS-001",
     "FR-SS-010",
     "FR-SS-011",
@@ -24392,6 +24505,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.037",
     "BRNB.040",
     "BRNB.085",
@@ -24410,6 +24524,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-SS-001",
     "FR-SS-030",
     "FR-SS-031",
@@ -24615,6 +24730,16 @@
    "module": "audit",
    "named": true,
    "name": "The audit trail is insert-only in the database itself (V26 triggers), not only in the code.",
+   "direct": [],
+   "via": [],
+   "result": "passed"
+  },
+  "ChangeHistoryDataScopeIT": {
+   "id": "ChangeHistoryDataScopeIT",
+   "kind": "backend",
+   "module": "audit",
+   "named": true,
+   "name": "The change history of a record follows the data scope of the reader (G05)",
    "direct": [],
    "via": [],
    "result": "passed"
@@ -25070,6 +25195,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRNB.083",
     "BRPM.002",
@@ -25088,6 +25214,7 @@
     "DIS 2.2",
     "DIS 3.30.1",
     "FR-CM-002",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -25394,6 +25521,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRNB.083",
     "BRPM.002",
@@ -25413,6 +25541,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-005",
     "FRBS 2.10",
     "FRBS 2.2",
@@ -26142,7 +26271,8 @@
     "BRPM.011",
     "BRPM.015",
     "BRPM.017",
-    "BRPM.024"
+    "BRPM.024",
+    "FR-CR-061"
    ],
    "result": "passed"
   },
@@ -27192,6 +27322,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -27206,6 +27337,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-004",
     "FR-UA-005",
     "FRBS 2.10",
@@ -27271,6 +27403,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -27285,6 +27418,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-003",
@@ -27453,6 +27587,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -27469,6 +27604,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -27622,6 +27758,42 @@
    "direct": [],
    "via": [
     "BRRN.021"
+   ],
+   "result": "passed"
+  },
+  "CsfCaseIT": {
+   "id": "CsfCaseIT",
+   "kind": "backend",
+   "module": "csf",
+   "named": true,
+   "name": "Case management of the Customer Servicing Facility (FR-CSF-050, FR-CSF-051, FR-CSF-052, FR-CSF-053, FR-CSF-054, FR-CSF-055, FR-CSF-056, FR-CSF-057, FR-CSF-058, FR-CSF-059, FR-CSF-060, FR-CSF-061)",
+   "direct": [
+    "FR-CSF-050",
+    "FR-CSF-051",
+    "FR-CSF-052",
+    "FR-CSF-053",
+    "FR-CSF-054",
+    "FR-CSF-055",
+    "FR-CSF-056",
+    "FR-CSF-057",
+    "FR-CSF-058",
+    "FR-CSF-059",
+    "FR-CSF-060",
+    "FR-CSF-061"
+   ],
+   "via": [
+    "BRCSFCM.003",
+    "BRNB.090",
+    "BRNB.101",
+    "BRNB.110",
+    "FR-CSF-010",
+    "FR-CSF-011",
+    "FR-CSF-013",
+    "FR-CSF-020",
+    "FR-CSF-021",
+    "FR-CSF-030",
+    "FR-CSF-031",
+    "FR-SS-041"
    ],
    "result": "passed"
   },
@@ -28072,6 +28244,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.015",
     "BRNB.022",
     "BRNB.026",
@@ -28101,6 +28274,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-EB-021",
     "FRBS 2.10",
     "FRBS 2.2",
@@ -28419,6 +28593,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.008",
     "BRNB.013",
     "BRNB.035",
@@ -28437,6 +28612,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-005",
     "FRBS 2.10",
     "FRBS 2.2",
@@ -28716,6 +28892,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRPM.002",
     "BRPM.008",
@@ -28731,6 +28908,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-003",
@@ -28779,6 +28957,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -28793,6 +28972,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-005",
     "FRBS 2.10",
     "FRBS 2.2",
@@ -28842,6 +29022,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.008",
     "BRNB.013",
     "BRNB.027",
@@ -28890,6 +29071,7 @@
     "DIS 3.27.2",
     "DIS 3.30.1",
     "FR-CSF-022",
+    "FR-CSF-050",
     "FR-UA-005",
     "FRBS 2.10",
     "FRBS 2.2",
@@ -29904,7 +30086,8 @@
     "BRPM.011",
     "BRPM.015",
     "BRPM.017",
-    "BRPM.024"
+    "BRPM.024",
+    "FR-CR-061"
    ],
    "result": "passed"
   },
@@ -30058,6 +30241,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.085",
     "BRPM.002",
     "BRPM.008",
@@ -30073,6 +30257,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-010",
     "FR-UA-016",
     "FR-UA-017",
@@ -30158,6 +30343,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRNB.085",
     "BRPM.002",
@@ -30174,6 +30360,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-010",
     "FR-UA-016",
     "FR-UA-017",
@@ -30222,6 +30409,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.085",
     "BRPM.002",
     "BRPM.008",
@@ -30237,6 +30425,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-010",
     "FR-UA-016",
     "FR-UA-017",
@@ -30288,6 +30477,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.085",
     "BRPM.002",
     "BRPM.008",
@@ -30303,6 +30493,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-010",
     "FR-UA-012",
     "FR-UA-016",
@@ -30350,6 +30541,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.085",
     "BRPM.002",
     "BRPM.008",
@@ -30365,6 +30557,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-004",
     "FR-UA-005",
     "FR-UA-010",
@@ -30412,6 +30605,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRNB.085",
     "BRPM.002",
@@ -30428,6 +30622,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-002",
     "FR-UA-003",
     "FR-UA-010",
@@ -30598,6 +30793,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.037",
     "BRPM.002",
     "BRPM.008",
@@ -30614,6 +30810,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "FRBS 2.4.4",
@@ -33471,6 +33668,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -33486,6 +33684,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -33600,6 +33799,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -33615,6 +33815,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -33668,6 +33869,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -33682,6 +33884,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -33740,6 +33943,7 @@
    "via": [
     "ACSL 2.5.4",
     "ACSL 2.9.0",
+    "BRCSFCM.003",
     "BRNB.090",
     "BRNB.101",
     "BRNB.110",
@@ -33773,6 +33977,7 @@
    "via": [
     "ACSL 2.5.4",
     "ACSL 2.9.0",
+    "BRCSFCM.003",
     "BRNB.003",
     "BRNB.090",
     "BRNB.101",
@@ -33943,6 +34148,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRNB.083",
     "BRPM.002",
@@ -33959,6 +34165,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -34002,6 +34209,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.085",
     "BRPM.002",
     "BRPM.008",
@@ -34017,6 +34225,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-005",
     "FR-UA-010",
     "FR-UA-016",
@@ -34151,6 +34360,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -34165,6 +34375,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-003",
@@ -34203,6 +34414,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -34217,6 +34429,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -34270,6 +34483,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.009",
     "BRNB.010",
     "BRNB.037",
@@ -34329,6 +34543,16 @@
     "FR-CSF-021",
     "FR-CSF-030",
     "FR-CSF-031",
+    "FR-CSF-050",
+    "FR-CSF-051",
+    "FR-CSF-052",
+    "FR-CSF-053",
+    "FR-CSF-054",
+    "FR-CSF-056",
+    "FR-CSF-057",
+    "FR-CSF-058",
+    "FR-CSF-059",
+    "FR-CSF-060",
     "FR-DM-001",
     "FR-DM-002",
     "FR-DM-003",
@@ -34507,6 +34731,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.015",
     "BRNB.022",
     "BRNB.040",
@@ -34526,6 +34751,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -34559,6 +34785,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRNB.083",
     "BRPM.002",
@@ -34576,6 +34803,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FRBS 2.10",
     "FRBS 2.2",
     "MKTID.001",
@@ -34646,6 +34874,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -34660,6 +34889,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-003",
     "FR-UA-005",
@@ -34699,6 +34929,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRPM.002",
     "BRPM.008",
@@ -34714,6 +34945,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-004",
@@ -34781,6 +35013,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRPM.002",
     "BRPM.008",
@@ -34796,6 +35029,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-003",
@@ -34836,6 +35070,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.085",
     "BRPM.002",
     "BRPM.008",
@@ -34851,6 +35086,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-003",
@@ -34911,6 +35147,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRPM.002",
     "BRPM.008",
     "BRPM.018",
@@ -34925,6 +35162,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-003",
@@ -35114,6 +35352,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.040",
     "BRPM.002",
     "BRPM.008",
@@ -35129,6 +35368,7 @@
     "DBMID.001",
     "DIS 2.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-001",
     "FR-UA-002",
     "FR-UA-003",
@@ -35448,6 +35688,7 @@
     "BRCLXN.052",
     "BRCLXN.053",
     "BRCLXN.058",
+    "BRCSFCM.001",
     "BRNB.037",
     "BRNB.040",
     "BRNB.085",
@@ -35468,6 +35709,7 @@
     "DIS 2.2",
     "DIS 3.27.2",
     "DIS 3.30.1",
+    "FR-CSF-050",
     "FR-UA-005",
     "FR-UA-010",
     "FR-UA-012",
@@ -36338,6 +36580,16 @@
    "via": [],
    "result": "passed"
   },
+  "features/admin/MasterChangeLogPage.test.tsx": {
+   "id": "features/admin/MasterChangeLogPage.test.tsx",
+   "kind": "frontend",
+   "named": true,
+   "module": "admin",
+   "name": "Master Data Change Log",
+   "direct": [],
+   "via": [],
+   "result": "not run"
+  },
   "features/admin/RoleHomeSetupPage.test.tsx": {
    "id": "features/admin/RoleHomeSetupPage.test.tsx",
    "kind": "frontend",
@@ -37185,6 +37437,21 @@
    "via": [],
    "result": "passed"
   },
+  "features/csf/cases/cases.test.tsx": {
+   "id": "features/csf/cases/cases.test.tsx",
+   "kind": "frontend",
+   "named": true,
+   "module": "csf",
+   "name": "Case management",
+   "direct": [],
+   "via": [
+    "FR-CSF-050",
+    "FR-CSF-051",
+    "FR-CSF-052",
+    "FR-CSF-057"
+   ],
+   "result": "not run"
+  },
   "features/csf/csfCodes.test.ts": {
    "id": "features/csf/csfCodes.test.ts",
    "kind": "frontend",
@@ -37206,7 +37473,8 @@
     "FR-CSF-010",
     "FR-CSF-011",
     "FR-CSF-021",
-    "FR-CSF-041"
+    "FR-CSF-041",
+    "FR-CSF-050"
    ],
    "result": "passed"
   },

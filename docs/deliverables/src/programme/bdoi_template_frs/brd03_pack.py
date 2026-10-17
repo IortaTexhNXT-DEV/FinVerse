@@ -1,6 +1,6 @@
-"""BRD-03 Product Maintenance: content of the standard document set that is not already in brd03_v15_content.py,
-brd03_v15_pages.py and brd03_v15_screens.py. Read by build_pack.py (developer specification DSP, data dictionary DDI,
-user stories USR, the "How to read this pack" note) and by build_brd03_v15_workbooks.py (traceability).
+"""BRD-03 Product Maintenance: content of the standard document set that is not already in brd03_v16_content.py,
+brd03_v16_pages.py and brd03_v16_screens.py. Read by build_pack.py (developer specification DSP, data dictionary DDI,
+user stories USR, the "How to read this pack" note) and by build_brd03_v16_workbooks.py (traceability).
 
 The facts of the services, screens and tables are read from the sources by tools/deliverables/api_facts.py and
 schema_facts.py; this module says which of them belong to Product Maintenance and gives them their business wording.
@@ -9,8 +9,8 @@ schema_facts.py; this module says which of them belong to Product Maintenance an
 from __future__ import annotations
 
 import api_facts as af
-import brd03_v15_content as C
-import brd03_v15_screens as UX
+import brd03_v16_content as C
+import brd03_v16_screens as UX
 
 BRD = "BRD-03"
 NAME = "Product Maintenance"
@@ -36,12 +36,12 @@ SET = [
      "notices, e-mails and jobs.", "BDOI Business Unit owners; Internal Audit"),
     ("ICD", "ICD-BDOI", "Product_Maintenance_Interface_Specification", C.ICD_VERSION, "Product master transfer file "
      "and e-mail channel.", "BDOI IT (integration, mail)"),
-    ("DSP", "DSP-BDOI", "Product_Maintenance_Developer_Specification", "1.2", "Screens, service operations, field "
+    ("DSP", "DSP-BDOI", "Product_Maintenance_Developer_Specification", "1.3", "Screens, service operations, field "
      "validations, rules, states, jobs, audit events and permissions, as the system works.", "BDOI IT; iorta "
      "TechNXT developers and testers"),
     ("DDI", "DDI-BDOI", "Product_Maintenance_Data_Dictionary", "1.1", "Tables, columns, lists of values, parameters, "
      "status models and indexes.", "BDOI IT (database administration); Data Migration"),
-    ("USR", "USR-BDOI", "Product_Maintenance_User_Stories", "1.1", "User stories with acceptance criteria, ready to "
+    ("USR", "USR-BDOI", "Product_Maintenance_User_Stories", "1.2", "User stories with acceptance criteria, ready to "
      "import into the backlog tool.", "BDOI Product Owner; UAT lead"),
     ("RTM", "RTM", "Test_Cases_and_Traceability", C.WB_VERSION, "Test cases and the trace BRD, FRPM, user story, "
      "screen, test case.", "UAT lead; Internal Audit"),
@@ -79,6 +79,9 @@ DSP_REVISIONS = [
      "terms and remittance details, bank accounts and the products linked, each change maker-checker. Field-level "
      "change history of the master records (gap G05): old and new value, maker, checker and their times, shown on "
      "the insurer and product pages and readable by the Auditor.", PREPARED),
+    ("17 October 2026", "1.3", "Ledger Accounts tab of the insurer page (gap G08): the general ledger accounts "
+     "posted for the insurer and its sub-ledger open items, read-only. Master Data Change Log screen (gap G05) with "
+     "filters and Excel export; the change history follows the reader's data access.", PREPARED),
 ]
 
 DOCS = {
@@ -371,7 +374,7 @@ AUDIT_OMIT: set[str] = set()
 ACTION_WORDS = {"CREATE": "Created", "UPDATE": "Changed", "DEACTIVATE": "Deactivated", "SUBMIT": "Submitted",
                 "AUTHORIZE": "Authorised", "REJECT": "Rejected", "EXPORT": "Exported", "RUN": "Run",
                 "APPROVE": "Approved", "DELETE": "Removed", "SEND": "Sent"}
-JOBS = {j[0]: j[2] for j in __import__("brd03_v15_pages").JOBS}
+JOBS = {j[0]: j[2] for j in __import__("brd03_v16_pages").JOBS}
 JOB_OMIT: set[str] = set()
 
 # ================================================================================================ data dictionary
@@ -627,6 +630,17 @@ STORIES = [
      [("I add a bank account", "I save it", "it is pending until another user authorizes it"),
       ("the account number is already recorded for the insurer", "I save", "it is refused")],
      "FRPM.023.02", "BR-PM-01", "SCR-PM-18", "Medium", 5),
+    ("US-PM-036", "EP-PM-01", "MBS", "the ledger accounts of an insurer on its page",
+     "I see what is posted and outstanding with the insurer without leaving the insurer record",
+     [("premiums payable to the insurer are posted and partly remitted", "I open its Ledger Accounts tab",
+       "I see the accounts with debit, credit and balance and the open items with the outstanding amount")],
+     "FRPM.023.02", "BR-PM-01", "SCR-PM-18", "Medium", 3),
+    ("US-PM-037", "EP-PM-07", "Auditor", "one log of the changes of every master record",
+     "I can review the master data changes of a period without opening each record",
+     [("insurers and products were changed in October", "I filter the Master Data Change Log on October and a "
+       "maker", "I see each field change with its maker and checker and export the rows to Excel"),
+      ("a record belongs to a company outside my data access", "I filter the log", "its changes are not listed")],
+     "FRPM.021.03", "BR-PM-05", "SCR-PM-27", "Medium", 3),
     ("US-PM-031", "EP-PM-07", "MBS", "product master changes sent to the other BDOI systems",
      "other systems know which packages are on sale",
      [("a version is released", "the transfer runs", "the change is in the file and marked sent"),

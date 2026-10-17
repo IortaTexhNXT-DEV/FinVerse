@@ -1,12 +1,12 @@
-"""The review workbooks v1.2 of BRD-03 Product Maintenance, aligned with the document set v1.5.
+"""The review workbooks v1.3 of BRD-03 Product Maintenance, aligned with the document set v1.6.
 
-    python docs/deliverables/src/programme/bdoi_template_frs/build_brd03_v15_workbooks.py
+    python docs/deliverables/src/programme/bdoi_template_frs/build_brd03_v16_workbooks.py
 
 Writes in docs/deliverables/out/Programme/BDOI_Template_FRS/BRD-03_Product_Maintenance/: the Test Cases and
 Traceability (with the Trace sheet BRD, FRPM, user story, screen, test case), the Fit-Gap, the Change Request Register
 and Effort Estimate, the Business Unit Requirements Collection and the Walkthrough Users, all v1.2.
 
-Content from brd03_v15_content.py, brd03_v15_pages.py and brd03_pack.py, so that every number agrees with the FRS v1.5.
+Content from brd03_v16_content.py, brd03_v16_pages.py and brd03_pack.py, so that every number agrees with the FRS v1.6.
 No password is written. Self-checks: every FRPM requirement has a user story and a test case; every BRD row of the
 mapping has test cases; every open change request has an effort.
 """
@@ -20,8 +20,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parents[4] / "tools" / "deliverables"))
 import brd03_pack as K  # noqa: E402
-import brd03_v15_content as C  # noqa: E402
-import brd03_v15_pages as P  # noqa: E402
+import brd03_v16_content as C  # noqa: E402
+import brd03_v16_pages as P  # noqa: E402
 import pack_common as pc  # noqa: E402
 import pack_usr  # noqa: E402
 from brd11_xlsx import Column, ReviewWorkbook  # noqa: E402
@@ -155,7 +155,10 @@ def build_cr():
                "owner review."},
               {"d": "16 Oct 2026", "id": "Register v1.1", "e": "No change; aligned with the FRS v1.4."},
               {"d": "16 Oct 2026", "id": "Register v1.2", "e": "No change request: the insurer page (FRPM.023.02) "
-               "and the change history (FRPM.021.03) are delivered as best practice; aligned with the FRS v1.5."}])
+               "and the change history (FRPM.021.03) are delivered as best practice; aligned with the FRS v1.5."},
+              {"d": "17 Oct 2026", "id": "Register v1.3", "e": "No change request: the Ledger Accounts tab of the "
+               "insurer page and the Master Data Change Log screen are delivered as best practice; aligned with the "
+               "FRS v1.6."}])
     return _save(wb, "CRR"), len(rows)
 
 
